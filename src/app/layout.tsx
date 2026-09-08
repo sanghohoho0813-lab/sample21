@@ -15,6 +15,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko" data-theme="deep-navy" data-font="default" data-motion="normal" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+        {/* Device Preview Safety: inside the preview iframe, hide preview triggers before hydration (no recursion). */}
+        <script dangerouslySetInnerHTML={{ __html: "try{if(window.self!==window.top){document.documentElement.setAttribute('data-preview','1')}}catch(e){document.documentElement.setAttribute('data-preview','1')}" }} />
       </head>
       <body>
         <AppProviders>{children}</AppProviders>

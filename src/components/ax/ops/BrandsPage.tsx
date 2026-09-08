@@ -20,7 +20,7 @@ import { Term } from "@/components/ui/Misc";
 import { GradientImage } from "@/components/ui/ProductImage";
 import { Drawer } from "@/components/ui/Overlay";
 import { InventoryStatusBadge } from "@/components/ax/StatusBadges";
-import { KV, LiveFreshness, NoteCard, PageSkeleton, SectionBlock } from "./shared";
+import { KpiMoney, KV, LiveFreshness, NoteCard, PageSkeleton, SectionBlock } from "./shared";
 import { cn } from "@/lib/cn";
 
 const CONTRACT_LABEL: Record<Brand["contractStatus"], string> = { active: "계약중", renewal: "갱신 예정", new: "신규 입점" };
@@ -74,7 +74,7 @@ function BrandsBody() {
     <div className="animate-fadeIn">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard label="브랜드" value={num(BRANDS.length)} icon={<Store size={18} />} accent="#148C8C" sub={`사입 ${totals.purchase} · 입점·위탁 ${totals.consignment}`} />
-        <KpiCard label="브랜드 매출 합계 (30일)" value={krwShort(totals.revenue)} icon={<Building2 size={18} />} accent="#D79A43" sub="판매수량 × 판매가 (DEMO)" />
+        <KpiCard label="브랜드 매출 합계 (30일)" value={<KpiMoney>{krwShort(totals.revenue)}</KpiMoney>} icon={<Building2 size={18} />} accent="#D79A43" sub="판매수량 × 판매가 (DEMO)" />
         <KpiCard label="계약 갱신·신규" value={`${totals.renewal} · ${totals.newB}`} icon={<Handshake size={18} />} accent="#5B8DEF" sub="갱신 예정 · 신규 입점" />
         <KpiCard label="품절위험 옵션" value={num(totals.risk)} icon={<Boxes size={18} />} accent="#D66A5E" sub={<span><Term term="옵션">옵션</Term> 기준 품절 임박+품절</span>} />
       </div>

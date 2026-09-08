@@ -30,7 +30,7 @@ const PACK_PHASES: { weeks: string; title: string; items: string[] }[] = [
   { weeks: "1~2주", title: "Baseline 측정", items: ["구매전환율·찜→구매·재입고알림→구매 측정 지점 고정", "반품률·사이즈 반품률·재고일수 현재값 기록", "MD 주간 분석시간·수기 보고서 수 측정"] },
   { weeks: "3~6주", title: "Action 운영·채택률", items: ["Demand·Fit·Markdown·Repeat Engine 추천 실제 승인 비율", "Action 발견→확인 시간 기록", "예외·보류 사유 구조화 (EXCEPTION)"] },
   { weeks: "7~10주", title: "결과 비교", items: ["재입고 Action 전후 품절 손실·알림→구매 비교", "핏 안내 변경 상품의 사이즈 반품률 전후 비교", "세그먼트 캠페인 재구매율 vs Baseline"] },
-  { weeks: "11~12주", title: "리포트·확장 판단", items: ["Money KPI(Cost·Revenue·Scale) 정리", "Evidence Pack 생성 · 대표 보고", "브랜드·SKU 확장 여부와 AI API 연결 순서 결정"] },
+  { weeks: "11~12주", title: "리포트·확장 판단", items: ["Money KPI (Cost · Revenue · Scale) 정리", "Evidence Pack 생성 · 대표 보고", "브랜드·SKU 확장 여부와 AI API 연결 순서 결정"] },
 ];
 
 export function EvidencePage() {
@@ -145,7 +145,7 @@ function EvidenceBody() {
             <Card key={p.weeks} pad="md" className="flex flex-col gap-3">
               <div className="flex items-center justify-between gap-2"><span className="text-[0.78rem] font-bold tracking-wide text-theme-primary">{p.weeks}</span><Badge tone="ready" size="sm">실증 준비</Badge></div>
               <p className="font-bold text-[1.02rem]">{i + 1}. {p.title}</p>
-              <ul className="space-y-1.5 text-[0.88rem] text-neutral-text2">{p.items.map((it) => <li key={it} className="flex gap-2"><Circle size={14} className="mt-1 shrink-0" />{it}</li>)}</ul>
+              <ul className="space-y-1.5 text-[0.88rem] text-neutral-text2 break-words">{p.items.map((it) => <li key={it} className="flex gap-2"><Circle size={14} className="mt-1 shrink-0" />{it}</li>)}</ul>
             </Card>
           ))}
         </div>

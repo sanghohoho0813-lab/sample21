@@ -199,7 +199,7 @@ function CustomersBody() {
 
       {/* Segments */}
       <SectionBlock title="세그먼트 7" desc="규칙으로 나눈 고객 그룹입니다. 각 그룹마다 지금 할 수 있는 행동이 다릅니다 (Engine 4 · Repeat · RULE+STAT).">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {SEGMENTS.map((s) => {
             const meta = SEGMENT_META[s];
             const cta = segmentCta(s, role);
@@ -215,9 +215,9 @@ function CustomersBody() {
                 <p className="text-[0.88rem] text-neutral-text2 leading-relaxed flex-1">{meta.meaning}</p>
                 <div className="flex flex-wrap gap-2">
                   {cta && (cta.next ? (
-                    <Button size="sm" variant="secondary" onClick={() => setNextOpen(true)}>{cta.label}<Badge tone="next" size="sm">NEXT</Badge></Button>
+                    <Button size="sm" variant="secondary" onClick={() => setNextOpen(true)} className="!whitespace-normal !h-auto min-h-[36px] py-1.5 max-w-full">{cta.label}<Badge tone="next" size="sm">NEXT</Badge></Button>
                   ) : (
-                    <Button size="sm" variant="primary" href={cta.href}>{cta.label}</Button>
+                    <Button size="sm" variant="primary" href={cta.href} className="!whitespace-normal !h-auto min-h-[36px] py-1.5 max-w-full text-center">{cta.label}</Button>
                   ))}
                   <Button size="sm" variant="outline" onClick={() => { setSegment(s); document.getElementById("customer-list")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>목록 보기</Button>
                 </div>

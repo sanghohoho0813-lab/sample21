@@ -47,6 +47,11 @@ export function LiveFreshness({ source = "DEMO" }: { source?: "DEMO" | "LIVE" | 
   return <Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" aria-hidden />}><Freshness source={source} /></Hydrated>;
 }
 
+/** Money values inside KpiCard: smaller on narrow 2-col grids so "8,986만원" never spills past the card. */
+export function KpiMoney({ children }: { children: ReactNode }) {
+  return <span className="text-[1.3rem] sm:text-[1.6rem] lg:text-[length:inherit] tabular">{children}</span>;
+}
+
 /** 가상 고객 이름 마스킹 — 대표(full 권한) 외에는 가운데 글자를 가립니다. */
 export function maskName(name: string) {
   if (!name) return "";
@@ -98,7 +103,7 @@ export function NoteCard({ children, tone = "neutral", icon, className }: { chil
   return (
     <div className={cn("rounded-xl px-4 py-3 text-[0.88rem] leading-relaxed flex gap-2.5 items-start", tones[tone], className)}>
       <span className="mt-0.5 shrink-0">{icon ?? <Info size={16} />}</span>
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="min-w-0 flex-1 break-words">{children}</div>
     </div>
   );
 }

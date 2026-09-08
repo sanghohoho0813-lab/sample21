@@ -128,6 +128,9 @@ button, [role="button"] { cursor: pointer; }
 .hover-row { transition: background-color 140ms ease-out; }
 .hover-row:hover { background-color: #f6f8fb; }
 
+/* Device preview frame: never show a preview trigger inside a preview (P0 recursion guard) */
+html[data-preview="1"] [data-tour="device-preview"] { display: none !important; }
+
 /* Tour spotlight */
 .tour-target { position: relative; z-index: 80 !important; box-shadow: 0 0 0 4px var(--theme-highlight), 0 0 0 9999px rgba(11,24,48,0.62); border-radius: 12px; }
 

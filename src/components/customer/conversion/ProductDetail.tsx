@@ -189,6 +189,7 @@ export function ProductDetail({ product }: { product: Product }) {
   };
 
   const soldoutSelected = !!st && !st.purchasable;
+  const lowSelected = !!st && st.purchasable && st.key === "low";
   const related = PRODUCTS.filter((p) => p.brandId === product.brandId && p.id !== product.id).slice(0, 4);
   const alsoViewed = PRODUCTS.filter((p) => p.categoryId === product.categoryId && p.id !== product.id && p.brandId !== product.brandId).map((p) => ({ p, s: productAgg(p, store).rankScore })).sort((a, b) => b.s - a.s).slice(0, 4).map((x) => x.p);
   const badge = agg.worst === "rising" || product.tags.includes("급상승") ? { t: "급상승", tone: "accent" as const } : product.tags.includes("베스트") ? { t: "BEST", tone: "dark" as const } : Date.now() - new Date(product.createdAt).getTime() < 30 * 86400000 ? { t: "NEW", tone: "dark" as const } : null;
@@ -235,6 +236,14 @@ export function ProductDetail({ product }: { product: Product }) {
                 )}
               </div>
               {added && <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-brand-accent/40 bg-brand-accent/5 px-4 py-2.5 text-[0.88rem] animate-fadeIn"><span className="font-semibold">장바구니에 담았습니다</span><Link href="/cart" className="inline-flex items-center gap-1 font-bold text-brand-accent hover:underline underline-offset-2">장바구니 보기<ArrowRight size={14} /></Link></div>}
+              {lowSelected && (
+                <div className="mt-3 rounded-xl border border-semantic-warning/30 bg-[#fff8f1] px-4 py-3 animate-fadeIn">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                    <p className="text-[0.85rem] leading-snug flex-1"><span className="font-bold text-semantic-warning">품절 임박 · 재고 {st?.stock}개.</span> <span className="text-neutral-text2">놓칠까 걱정되면 재입고 알림을 함께 신청해 두세요. 신청은 MD의 재입고 판단 신호가 됩니다.</span></p>
+                    {subscribed ? <Button variant="secondary" size="sm" onClick={() => router.push("/my/restock")} icon={<Bell size={14} />} data-tour="c-restock" aria-label="재입고 알림 신청 완료 · 목록 보기">신청 완료 · 목록</Button> : <Button variant="outline" size="sm" onClick={restock} icon={<Bell size={14} />} data-tour="c-restock">재입고 알림 신청</Button>}
+                  </div>
+                </div>
+              )}
               {soldoutSelected && <p className="mt-3 text-[0.82rem] text-neutral-text2 leading-relaxed">품절 옵션의 재입고 알림 신청은 Business AX의 <span className="font-semibold text-neutral-text">Demand Radar</span> 수요신호가 되어 MD의 재입고 판단에 바로 반영됩니다. 입고되면 알림으로 알려드립니다.</p>}
             </div>
 
