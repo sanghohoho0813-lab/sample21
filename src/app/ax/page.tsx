@@ -17,7 +17,7 @@ import { PageHeader } from "@/components/ax/AxShell";
 import { AIReadyBadge } from "@/components/ax/AIReady";
 import { InventoryStatusBadge, OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { ActionCard } from "@/components/ax/core/ActionCard";
-import { AxLink, Big, CHART, ChartTip, InfoNote, MiniBar, OPEN_STATUSES, PageSkeleton, RoleNote, SectionCard, axisKrw, dayLabel, demandTone, sortByUrgency, visibleActions } from "@/components/ax/core/shared";
+import { AxLink, Big, BigLg, CHART, ChartTip, InfoNote, MiniBar, OPEN_STATUSES, PageSkeleton, RoleNote, SectionCard, axisKrw, dayLabel, demandTone, sortByUrgency, visibleActions } from "@/components/ax/core/shared";
 import { KpiCard } from "@/components/ui/Kpi";
 import { Segmented } from "@/components/ui/Form";
 import { Freshness, Term } from "@/components/ui/Misc";
@@ -134,12 +134,12 @@ function Dashboard() {
           {role === "md" && <RoleNote>MD 화면 — 전체 손익 대신 담당 브랜드({derived.mdBrandNames.join(" · ")}) 마진을 보여줍니다.</RoleNote>}
           {/* Row 1 — large */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" data-tour="kpi-row">
-            <KpiCard size="lg" label={`총 주문액 (${periodLabel})`} value={krwShort(k.cur.revenue)} delta={revDelta} href="/ax/sales" icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} />
-            <KpiCard size="lg" label="순매출 (반품 추정 차감)" value={krwShort(derived.net)} delta={pctDelta(derived.net, derived.netPrev)} href="/ax/sales" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.overview} />
+            <KpiCard size="lg" label={`총 주문액 (${periodLabel})`} value={<BigLg>{krwShort(k.cur.revenue)}</BigLg>} delta={revDelta} href="/ax/sales" icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} />
+            <KpiCard size="lg" label="순매출 (반품 추정 차감)" value={<BigLg>{krwShort(derived.net)}</BigLg>} delta={pctDelta(derived.net, derived.netPrev)} href="/ax/sales" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.overview} />
             {role === "owner"
-              ? <KpiCard size="lg" label="추정 매출총이익" value={krwShort(k.cur.grossMargin)} delta={pctDelta(k.cur.grossMargin, k.prev.grossMargin)} href="/ax/sales" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.evidence} />
-              : <KpiCard size="lg" label="담당 브랜드 마진" value={krwShort(derived.mdMargin)} delta={pctDelta(derived.mdMargin, derived.mdMarginPrev)} href="/ax/sales" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.evidence} />}
-            <KpiCard size="lg" label="구매 전환율" value={pct(k.conversion, 2)} delta={pctDelta(k.conversion, derived.convPrev)} href="/ax/customers" icon={<Zap size={18} />} accent={ICON_ACCENTS.customer} />
+              ? <KpiCard size="lg" label="추정 매출총이익" value={<BigLg>{krwShort(k.cur.grossMargin)}</BigLg>} delta={pctDelta(k.cur.grossMargin, k.prev.grossMargin)} href="/ax/sales" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.evidence} />
+              : <KpiCard size="lg" label="담당 브랜드 마진" value={<BigLg>{krwShort(derived.mdMargin)}</BigLg>} delta={pctDelta(derived.mdMargin, derived.mdMarginPrev)} href="/ax/sales" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.evidence} />}
+            <KpiCard size="lg" label="구매 전환율" value={<BigLg>{pct(k.conversion, 2)}</BigLg>} delta={pctDelta(k.conversion, derived.convPrev)} href="/ax/customers" icon={<Zap size={18} />} accent={ICON_ACCENTS.customer} />
           </div>
           {/* Row 2 */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

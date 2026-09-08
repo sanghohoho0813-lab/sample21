@@ -16,7 +16,8 @@ import { Hydrated } from "@/components/system/Hydrated";
 import { PageHeader } from "@/components/ax/AxShell";
 import { AIReadyBadge } from "@/components/ax/AIReady";
 import { ActionStatusBadge, InventoryStatusBadge } from "@/components/ax/StatusBadges";
-import { AxLink, InfoNote, MiniBar, PageSkeleton, SectionCard, UnitDelta, demandTone } from "@/components/ax/core/shared";
+import { AxLink, BigLg, InfoNote, MiniBar, PageSkeleton, SectionCard, UnitDelta, demandTone } from "@/components/ax/core/shared";
+import { useIsMobile } from "@/components/system/hooks";
 import { KpiCard } from "@/components/ui/Kpi";
 import { Freshness, Term } from "@/components/ui/Misc";
 import { Badge } from "@/components/ui/Badge";
@@ -43,6 +44,7 @@ function InventoryInner() {
   const showCost = can(role, "brand-margin");
   const [filter, setFilter] = useState<Filter>(PARAM_FILTER[sp.get("filter") ?? ""] ?? "all");
   const [limit, setLimit] = useState(PAGE);
+  const mobile = useIsMobile(); // data-tour goes only on the visible (table vs card) Scenario A element
   useEffect(() => { const f = PARAM_FILTER[sp.get("filter") ?? ""]; if (f) setFilter(f); }, [sp]);
 
   const inv = useMemo(() => inventoryKpi(app), [app]);
@@ -65,10 +67,10 @@ function InventoryInner() {
       <PageHeader title="재고·재입고" desc="옵션(색상×사이즈) 단위 수요신호로 어떤 옵션을 언제 확보할지, 무엇을 할인할지 먼저 봅니다." badge={<Badge tone="demo" size="sm">DEMO</Badge>} right={<Freshness source="DEMO" />} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard size="lg" label="품절위험 옵션" value={num(inv.lowRisk)} sub={`품절 임박 ${counts.low} · 품절 ${counts.soldout} · 7일 추정손실 ${krwShort(inv.lostSales7d)}`} icon={<AlertTriangle size={18} />} accent={ICON_ACCENTS.risk} />
-        <KpiCard size="lg" label="관심 상승 옵션" value={num(inv.rising)} sub="판매속도 +30% & 찜·재입고 신청 증가" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.customer} />
-        <KpiCard size="lg" label="판매소진율 (30일)" value={pct(inv.sellThrough, 1)} sub={<><Term term="판매소진율">판매 ÷ (판매 + 현재고)</Term></>} icon={<Boxes size={18} />} accent={ICON_ACCENTS.overview} />
-        <KpiCard size="lg" label="저회전·과잉 재고원가" value={showCost ? krwShort(inv.slowValue) : "권한 없음"} sub={showCost ? `총 재고원가 ${krwShort(inv.totalStockValue)} · 재입고 신청 ${num(inv.restockRequests)}건` : "원가는 대표·MD 권한"} icon={<TrendingDown size={18} />} accent={ICON_ACCENTS.settings} />
+        <KpiCard size="lg" label="품절위험 옵션" value={<BigLg>{num(inv.lowRisk)}</BigLg>} sub={`품절 임박 ${counts.low} · 품절 ${counts.soldout} · 7일 추정손실 ${krwShort(inv.lostSales7d)}`} icon={<AlertTriangle size={18} />} accent={ICON_ACCENTS.risk} />
+        <KpiCard size="lg" label="관심 상승 옵션" value={<BigLg>{num(inv.rising)}</BigLg>} sub="판매속도 +30% & 찜·재입고 신청 증가" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.customer} />
+        <KpiCard size="lg" label="판매소진율 (30일)" value={<BigLg>{pct(inv.sellThrough, 1)}</BigLg>} sub={<><Term term="판매소진율">판매 ÷ (판매 + 현재고)</Term></>} icon={<Boxes size={18} />} accent={ICON_ACCENTS.overview} />
+        <KpiCard size="lg" label="저회전·과잉 재고원가" value={<BigLg>{showCost ? krwShort(inv.slowValue) : "권한 없음"}</BigLg>} sub={showCost ? `총 재고원가 ${krwShort(inv.totalStockValue)} · 재입고 신청 ${num(inv.restockRequests)}건` : "원가는 대표·MD 권한"} icon={<TrendingDown size={18} />} accent={ICON_ACCENTS.settings} />
       </div>
 
       {/* Demand Radar */}
@@ -101,12 +103,12 @@ function InventoryInner() {
                   {["상품 · 옵션", "Demand Score", "7일 판매", "찜 7일", "장바구니", "재입고 신청", "현재고", "예상 소진", "리드타임", "상태", "추천", "Action"].map((h, i) => <th key={h} className={cn("px-3 py-2.5 font-semibold whitespace-nowrap", i >= 2 && i <= 8 && "text-right")}>{h}</th>)}
                 </tr></thead>
                 <tbody>
-                  {shown.map((r) => <RadarTr key={r.v.id} r={r} onRequest={requestReview} />)}
+                  {shown.map((r) => <RadarTr key={r.v.id} r={r} onRequest={requestReview} tourable={!mobile} />)}
                 </tbody>
               </table>
             </div>
             {/* Mobile cards */}
-            <div className="md:hidden space-y-3">{shown.map((r) => <RadarCard key={r.v.id} r={r} onRequest={requestReview} />)}</div>
+            <div className="md:hidden space-y-3">{shown.map((r) => <RadarCard key={r.v.id} r={r} onRequest={requestReview} tourable={mobile} />)}</div>
             {filtered.length > limit && <div className="flex justify-center"><Button variant="outline" onClick={() => setLimit((l) => l + PAGE)}>더 보기 ({num(filtered.length - limit)}개 남음)</Button></div>}
           </>
         )}
@@ -156,11 +158,11 @@ function ActionCell({ r, onRequest }: { r: RadarRow; onRequest: (label: string) 
   return <button onClick={() => onRequest(`${p.name} ${r.v.color} ${r.v.size}`)} className="h-8 px-2.5 rounded-lg border border-neutral-border bg-white text-[0.8rem] font-semibold hover:bg-neutral-canvas whitespace-nowrap">검토 요청</button>;
 }
 
-function RadarTr({ r, onRequest }: { r: RadarRow; onRequest: (label: string) => void }) {
+function RadarTr({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label: string) => void; tourable: boolean }) {
   const p = PRODUCT_BY_ID[r.v.productId];
   const isA = r.v.id === SCENARIO.A_VARIANT;
   return (
-    <tr className={cn("border-t border-neutral-border hover-row align-middle", isA && "bg-theme-soft/60 ring-inset ring-1 ring-theme-primary/40")} data-tour={isA ? "radar-scenario-a" : undefined} data-variant-id={r.v.id}>
+    <tr className={cn("border-t border-neutral-border hover-row align-middle", isA && "bg-theme-soft/60 ring-inset ring-1 ring-theme-primary/40")} data-tour={isA && tourable ? "radar-scenario-a" : undefined} data-variant-id={r.v.id}>
       <td className="px-3 py-2.5"><Link href={`/ax/products/${p.id}?tab=options`} className="font-semibold hover:text-theme-primary leading-snug">{p.name}<span className="block text-[0.78rem] text-neutral-text2 font-normal">{r.v.color} · {r.v.size} · {BRAND_BY_ID[p.brandId].name}{isA && <Badge tone="accent" size="sm" className="ml-1.5">시나리오 A</Badge>}</span></Link></td>
       <td className="px-3 py-2.5"><MiniBar value={r.score} tone={demandTone(r.score)} /></td>
       <td className="px-3 py-2.5 text-right tabular">{r.v.sales7d} <UnitDelta cur={r.v.sales7d} prev={r.v.salesPrev7d} /></td>
@@ -177,11 +179,11 @@ function RadarTr({ r, onRequest }: { r: RadarRow; onRequest: (label: string) => 
   );
 }
 
-function RadarCard({ r, onRequest }: { r: RadarRow; onRequest: (label: string) => void }) {
+function RadarCard({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label: string) => void; tourable: boolean }) {
   const p = PRODUCT_BY_ID[r.v.productId];
   const isA = r.v.id === SCENARIO.A_VARIANT;
   return (
-    <div className={cn("rounded-2xl border bg-white p-4", isA ? "border-theme-primary ring-2 ring-theme-primary/20" : "border-neutral-border")} data-tour={isA ? "radar-scenario-a" : undefined} data-variant-id={r.v.id}>
+    <div className={cn("rounded-2xl border bg-white p-4", isA ? "border-theme-primary ring-2 ring-theme-primary/20" : "border-neutral-border")} data-tour={isA && tourable ? "radar-scenario-a" : undefined} data-variant-id={r.v.id}>
       <div className="flex items-start justify-between gap-2">
         <Link href={`/ax/products/${p.id}?tab=options`} className="min-w-0"><p className="font-semibold leading-snug">{p.name}</p><p className="text-[0.8rem] text-neutral-text2">{r.v.color} · {r.v.size} · {BRAND_BY_ID[p.brandId].name}</p></Link>
         <InventoryStatusBadge status={r.status} />

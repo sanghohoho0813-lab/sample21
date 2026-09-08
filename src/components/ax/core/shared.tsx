@@ -95,9 +95,14 @@ export function SectionCard({ title, desc, right, children, tour, className, pad
   );
 }
 
-/** KPI value wrapper: shrinks big numbers only below `sm` so 2-column KPI grids never overflow at 360px. */
+/** KPI value wrapper for md KpiCards in `grid-cols-2 lg:grid-cols-4` rows: scales the number to the column width
+ *  (360px 2-col → 1.25rem · 1024px 4-col with 280px sidebar → 1.35rem · 1280px → 1.7rem · ≥1536px → full size). */
 export function Big({ children }: { children: ReactNode }) {
-  return <span className="text-[1.25rem] sm:text-[length:inherit] break-keep">{children}</span>;
+  return <span className="text-[1.25rem] sm:text-[length:inherit] lg:text-[1.35rem] xl:text-[1.7rem] 2xl:text-[length:inherit] break-keep">{children}</span>;
+}
+/** Same for size="lg" KpiCards in `grid-cols-1 sm:grid-cols-2 xl:grid-cols-4` rows (only the 1280px 4-col band is tight). */
+export function BigLg({ children }: { children: ReactNode }) {
+  return <span className="xl:text-[2rem] 2xl:text-[length:inherit] break-keep">{children}</span>;
 }
 
 export function DeltaText({ value, invert, label = "직전 대비", className, digits = 1 }: { value: number; invert?: boolean; label?: string; className?: string; digits?: number }) {
