@@ -109,7 +109,7 @@ function SalesInner() {
     { key: "discount", header: "할인", align: "right", cell: (r) => krwShort(r.discount) },
     { key: "returns", header: "반품", align: "right", cell: (r) => <span className={r.returns / Math.max(1, r.units) > 0.15 ? "text-semantic-error font-semibold" : ""}>{num(r.returns)}건</span> },
     ...(showMargin ? [{ key: "margin", header: "추정 마진", align: "right", cell: (r: Row) => <span className="tabular">{krwShort(r.margin)}<span className="block text-[0.75rem] text-neutral-text2">{pct(r.marginRate, 0)}</span></span> } as Column<Row>] : []),
-    { key: "flag", header: "위험/기회", cell: (r) => r.flag === "risk" ? <Badge tone="error" size="sm">위험 · 매출 높고 마진 낮음</Badge> : r.flag === "opp" ? <Badge tone="success" size="sm">기회 · 마진 높고 판매 ↑ {signed(r.velocity, 0)}</Badge> : <span className="text-neutral-text2 text-[0.82rem]">-</span> },
+    { key: "flag", header: "위험/기회", cell: (r) => r.flag === "risk" ? <span className="inline-flex items-center gap-1.5"><Badge tone="error" size="sm">위험</Badge><span className="hidden lg:inline text-[0.8rem] text-neutral-text2">매출 높고 마진 낮음</span></span> : r.flag === "opp" ? <span className="inline-flex items-center gap-1.5"><Badge tone="success" size="sm">기회</Badge><span className="hidden lg:inline text-[0.8rem] text-neutral-text2">마진 높고 판매 {signed(r.velocity, 0)}</span></span> : <span className="text-neutral-text2 text-[0.82rem]">-</span> },
     { key: "act", header: "", align: "right", cell: (r) => <Button size="sm" variant="outline" href={`/ax/actions?product=${r.id}`} onClick={(e) => e.stopPropagation()}>Action 보기</Button> },
   ];
 

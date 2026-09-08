@@ -19,7 +19,7 @@ import { ActionStatusBadge, InventoryStatusBadge, UrgencyBadge } from "@/compone
 import { ActionCard } from "@/components/ax/core/ActionCard";
 import { AxLink, CHART, ChartTip, InfoNote, MiniBar, PageSkeleton, SectionCard, StatPill, UnitDelta, dayLabel, demandTone } from "@/components/ax/core/shared";
 import { Segmented } from "@/components/ui/Form";
-import { Freshness, Term, Price, Progress } from "@/components/ui/Misc";
+import { Freshness, Term, Price } from "@/components/ui/Misc";
 import { Badge } from "@/components/ui/Badge";
 import { DataTable } from "@/components/ui/DataTable";
 import { EmptyState } from "@/components/ui/States";
@@ -297,7 +297,6 @@ function DetailInner() {
           <button onClick={() => setTab("insight")} className="text-[0.9rem] font-semibold text-theme-primary hover:underline underline-offset-4 text-left">AI·Logic Insight 보기 →</button>
         </InfoNote>
       )}
-      <div className="hidden"><Progress value={0} /></div>
     </div>
   );
 }

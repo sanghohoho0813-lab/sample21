@@ -194,9 +194,9 @@ export function ProductDetail({ product }: { product: Product }) {
   const badge = agg.worst === "rising" || product.tags.includes("급상승") ? { t: "급상승", tone: "accent" as const } : product.tags.includes("베스트") ? { t: "BEST", tone: "dark" as const } : Date.now() - new Date(product.createdAt).getTime() < 30 * 86400000 ? { t: "NEW", tone: "dark" as const } : null;
 
   const RestockCta = ({ full, tour }: { full?: boolean; tour?: string }) => subscribed ? (
-    <Button variant="secondary" size="lg" full={full} className={cn(!full && "flex-[2]")} onClick={() => router.push("/my/restock")} icon={<Bell size={18} />} data-tour={tour} aria-label="재입고 알림 신청 완료 · 내 재입고 알림 목록 보기">신청 완료 · 알림 목록 보기</Button>
+    <Button variant="secondary" size="lg" full={full} className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")} onClick={() => router.push("/my/restock")} icon={<Bell size={18} className="hidden sm:block" />} data-tour={tour} aria-label="재입고 알림 신청 완료 · 내 재입고 알림 목록 보기">신청 완료 · 목록 보기</Button>
   ) : (
-    <Button variant="brand" size="lg" full={full} className={cn(!full && "flex-[2]")} onClick={restock} icon={<Bell size={18} />} data-tour={tour}>재입고 알림 신청</Button>
+    <Button variant="brand" size="lg" full={full} className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")} onClick={restock} icon={<Bell size={18} className="hidden sm:block" />} data-tour={tour}>재입고 알림 신청</Button>
   );
 
   return (
@@ -226,11 +226,11 @@ export function ProductDetail({ product }: { product: Product }) {
                 </div>
               )}
               <div className="mt-4 flex gap-2">
-                <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[56px] px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
+                <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
                 {soldoutSelected ? <RestockCta tour="c-restock" /> : (
                   <>
-                    <Button variant="outline" size="lg" className="flex-1" onClick={addCart} icon={<ShoppingBag size={18} />}>장바구니</Button>
-                    <Button variant="brand" size="lg" className="flex-1" onClick={buyNow} icon={<Zap size={18} />}>바로 주문</Button>
+                    <Button variant="outline" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={addCart} icon={<ShoppingBag size={18} className="hidden sm:block" />}>장바구니</Button>
+                    <Button variant="brand" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={buyNow} icon={<Zap size={18} className="hidden sm:block" />}>바로 주문</Button>
                   </>
                 )}
               </div>
@@ -280,8 +280,8 @@ export function ProductDetail({ product }: { product: Product }) {
           <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
           {soldoutSelected ? <RestockCta /> : (
             <>
-              <Button variant="outline" size="lg" className="flex-1" onClick={addCart} icon={<ShoppingBag size={18} />}>장바구니</Button>
-              <Button variant="brand" size="lg" className="flex-1" onClick={buyNow}>바로 주문</Button>
+              <Button variant="outline" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={addCart} icon={<ShoppingBag size={18} className="hidden sm:block" />}>장바구니</Button>
+              <Button variant="brand" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={buyNow}>바로 주문</Button>
             </>
           )}
         </div>

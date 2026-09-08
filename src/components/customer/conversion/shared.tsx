@@ -146,5 +146,14 @@ export const DEFAULT_NOTIFY: NotifyPrefs = { restock: true, order: true, recomme
 export const INTERESTS_KEY = "morfit-interests";
 
 export function useDocumentTitle(title: string) {
-  useEffect(() => { document.title = `${title} | MORFIT`; }, [title]);
+  useEffect(() => {
+    const full = `${title} | MORFIT`;
+    const apply = () => { if (document.title !== full) document.title = full; };
+    apply();
+    // Next 15 streams route metadata after mount and may overwrite <title>; keep ours while this page is mounted.
+    const mo = new MutationObserver(apply);
+    mo.observe(document.head, { childList: true, subtree: true, characterData: true });
+    const t = window.setTimeout(apply, 800);
+    return () => { mo.disconnect(); window.clearTimeout(t); };
+  }, [title]);
 }
