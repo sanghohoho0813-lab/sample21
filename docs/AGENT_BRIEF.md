@@ -1,0 +1,33 @@
+# MORFIT — Page Builder Brief (shared context for parallel implementers)
+
+You are implementing pages of **MORFIT**, a fictional Korean multi-brand fashion **Customer Platform + Business AX** hybrid demo (Next.js 15 App Router, TypeScript, Tailwind 3.4, zustand, recharts, lucide-react). All copy is **Korean**. Everything is DEMO data — never present it as real results.
+
+Read first (do not modify these foundation files; if you truly need a new shared helper, create it inside your own page folder):
+- `PROJECT_SPEC.md` — the locked design (IA, loops, roles, visual direction)
+- `src/lib/types.ts` — data model
+- `src/lib/demo/seed.ts` — static Demo Repository: `BRANDS, CATEGORIES, CATEGORY_NAME, PRODUCTS, PRODUCT_BY_ID, BRAND_BY_ID, VARIANTS, VARIANT_BY_ID, variantsOf, variantId, CUSTOMERS, CUSTOMER_BY_ID, SEED_ORDERS, RETURNS, RETURN_REASON_LABEL, CAMPAIGNS, SEED_ACTIONS, SEED_EVIDENCE, DAILY(90d), PRODUCT_DAILY_BY_ID(30d), SCENARIO, SEGMENT_LABEL, DEMO_CUSTOMER_ID, DEMO_CUSTOMER_NAME, colorHex, productSalesStats`
+- `src/lib/store.ts` — `useApp()` zustand store (persisted). State + actions: theme/fontScale/reducedMotion/role, fitProfile/updateFitProfile, wishlist/toggleWishlist/removeWishlist, restockSubs/subscribeRestock/cancelRestock, cart/addToCart/updateCartQty/removeFromCart/clearCart, recentlyViewed/pushRecentlyViewed, orders/placeOrder, returns/requestReturn, events/track, notifications/pushNotification/markRead, deltas (viewDelta, wishlistDelta, cartDelta, restockDelta, inventoryDelta, returnDelta, salePriceOverride, fitNoteOverride, variantRestockState, orderStatusOverride, campaignStatusOverride), actions/updateActionStatus, evidence/addEvidence, updateOrderStatus, resetDemo. Also `ROLE_LABEL, ROLE_NAME, campaignStatus()`.
+- `src/lib/kpi.ts` — computed selectors: `effVariant, effVariants, effPrice, effFitNote, discountRate, allOrders, allReturns, dailySales, daysOfStock, velocityDelta, inventoryStatus, INVENTORY_STATUS_LABEL, INVENTORY_STATUS_TONE, demandScore, restockPriority, markdownReview, productAgg, allProductAgg, salesKpi(period), inventoryKpi, customerKpi, actionKpi, ORDER_STATUS_LABEL, ORDER_STATUS_FLOW, productSeries, PERIOD_LABEL`
+- `src/lib/engine.ts` — `recommendFit(product, fitProfile, fitNoteOverride?)`, `recommendForCustomer({...})`, `ruleBriefing(input)`
+- `src/lib/ai.ts` — `AI_STATUS`, `AI_READY_COPY` (for AI Ready modals)
+- `src/lib/roles.ts` — `AX_NAV, navFor(role), can(role, permission), canFull, PERMISSIONS`
+- `src/lib/format.ts` (`krw, krwShort, num, pct, signed, pctDelta, safeDiv`), `src/lib/dates.ts` (`fmtDate, relTime, daysBetween, daysAgoKey, todayKey`), `src/lib/cn.ts`, `src/lib/theme.ts` (`THEMES, ICON_ACCENTS`), `src/lib/assets.ts`
+- UI kit (`src/components/ui/*`): `Button` (variants primary|brand|accent|secondary|outline|ghost|danger; `href` renders Link), `Badge` (tones neutral|info|warning|error|success|accent|primary|dark|demo|next|ready|live) + `DemoBadge`, `Card`, `SectionTitle`, `Modal/Drawer/BottomSheet/Responsive` (Overlay.tsx), `toast()` + `useToast`, `Skeleton/SkeletonCard/SkeletonGrid/EmptyState/ErrorState` (States.tsx), `Input/Textarea/Select/Toggle/Segmented/Chip` (Form.tsx), `KpiCard/Stat` (Kpi.tsx), `ProductImage/GradientImage` (placeholder images — photos come later), `Term` (glossary tooltip), `Price`, `Progress`, `Freshness`, `Divider` (Misc.tsx), `DataTable` (responsive table→cards).
+- System: `Hydrated` (wrap all data-dependent content: `<Hydrated>…</Hydrated>`; store reads inside may otherwise mismatch SSR), hooks `useHydrated, useIsMobile, useIsPreviewFrame, useNow`, `LiveClock`, `DevicePreviewButton`, `usePresentation()` (Presentation.tsx — `start()`), `Tutorial`.
+- Shells already exist: `src/app/(customer)/layout.tsx` → `CustomerShell` (header, footer, bottom nav, demo bar, notifications, `NEXT_MENUS` export); `src/app/ax/layout.tsx` → `AxShell` (sidebar, topbar, role switcher). AX pages should start with `PageHeader` from `src/components/ax/AxShell.tsx`. Customer pages use `Container, SectionHead, PageTitle` from `src/components/customer/Section.tsx` and `ProductCard, ProductGrid, HScroll` from `src/components/customer/ProductCard.tsx`.
+
+## Hard rules (Unified v3.0 + MORFIT prompt)
+1. Pages are `"use client"` and wrap store-driven content in `<Hydrated>`; show skeleton until then. Every list needs Empty / Loading(skeleton) / Error-safe states.
+2. **No hard-coded decorative colors.** Use tokens: `bg-theme-primary text-theme-primary bg-theme-soft text-theme-highlight bg-neutral-canvas bg-white border-neutral-border text-neutral-text text-neutral-text2 text-semantic-success/warning/error bg-brand-black bg-brand-ivory bg-brand-accent`. Red only for real error/risk. Icon accents may use `ICON_ACCENTS` via inline style.
+3. Big readable type (Tailwind rem classes scale with root 18/19px). Buttons ≥44px tall on mobile. No `truncate` on critical info; `word-break` is global.
+4. **Mobile = same purpose, re-arranged**: verify layout works at 360px (2-col product grid, tables become cards via `DataTable`, filters in `BottomSheet`, sticky CTAs must not overlap the 64px bottom nav → use `bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0` for mobile sticky bars). Zero horizontal overflow.
+5. Every visible button/tab/filter/modal works. No TODO text, no placeholder-only sections, no dead links. NEXT/READY features are explicitly labeled (`<Badge tone="next">NEXT</Badge>`, `<Badge tone="ready">AI Ready</Badge>`).
+6. Demo honesty: KPI areas show `<Freshness source="DEMO" />`; simulation deltas labeled `DEMO`/`SIMULATION`; never claim real improvement.
+7. Explainability: any recommendation shows 무엇/왜(근거 2~4)/데이터/주의/누가 승인/다음 행동.
+8. Motion: hover on clickable elements (`hover-lift` class or `hover:` tints, 140–180ms), pressed states on mobile (`active:`), no bounce/neon.
+9. Add `data-tour="..."` attributes exactly where the brief asks (tutorial/presentation targets).
+10. Charts: recharts from real seed data, with axis labels/tooltips; use `var(--theme-primary)` etc. for colors via `stroke="var(--theme-primary)"`.
+11. Glossary: first mention of SKU/재고일수/판매소진율/Demand Signal/Fit Risk etc. use `<Term term="SKU">SKU</Term>`.
+12. Do NOT edit files outside your assigned folders except creating new components under `src/components/<your-area>/`. Do not touch `src/lib/*`, shells, or `globals.css`. If a selector you need is missing, compute it locally in your page.
+13. Run `npx tsc --noEmit` before finishing and fix your errors. Do not run `next build` (other agents are working concurrently). Dev server is running at http://localhost:3000 — you may `curl` your routes to verify 200.
+14. Korean copy must be natural, concise, "중학생도 이해". Use 대표님/MD/운영팀 language appropriately.
