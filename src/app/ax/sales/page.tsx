@@ -192,7 +192,7 @@ function SalesInner() {
                 </ResponsiveContainer>
               </div>
               <ul className="w-full sm:w-1/2 space-y-1.5 text-[0.88rem]">
-                {byCategory.map((c, i) => <li key={c.name} className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: CHART_SERIES[i % CHART_SERIES.length] }} /><span className="flex-1">{c.name}</span><span className="tabular font-semibold">{pct(safeDiv(c.value, catTotal), 0)}</span><span className="tabular text-neutral-text2 w-20 text-right">{krwShort(c.value)}</span></li>)}
+                {byCategory.map((c, i) => <li key={c.name} className="flex flex-wrap items-center gap-x-2 min-w-0"><span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: CHART_SERIES[i % CHART_SERIES.length] }} /><span className="flex-1 min-w-0">{c.name}</span><span className="tabular font-semibold shrink-0">{pct(safeDiv(c.value, catTotal), 0)}</span><span className="tabular text-neutral-text2 min-w-[4.5rem] text-right shrink-0">{krwShort(c.value)}</span></li>)}
               </ul>
             </div>
           )}

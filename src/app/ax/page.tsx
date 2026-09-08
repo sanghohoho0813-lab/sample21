@@ -221,7 +221,7 @@ function Dashboard() {
               {evidence.map((e) => (
                 <li key={e.id}>
                   <Link href={`/ax/evidence?id=${e.id}`} className="block rounded-xl border border-neutral-border p-3.5 hover:border-neutral-text2 transition-colors">
-                    <div className="flex items-center gap-2 mb-1"><Badge tone={e.type === "RESULT" || e.type === "REVENUE" ? "success" : e.type === "RISK" || e.type === "EXCEPTION" ? "warning" : "info"} size="sm">{e.type}</Badge><Badge tone={e.source === "SIMULATION" ? "demo" : "neutral"} size="sm">{e.source}</Badge><span className="ml-auto text-[0.75rem] text-neutral-text2 tabular">{relTime(e.at)}</span></div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1"><Badge tone={e.type === "RESULT" || e.type === "REVENUE" ? "success" : e.type === "RISK" || e.type === "EXCEPTION" ? "warning" : "info"} size="sm">{e.type}</Badge><Badge tone={e.source === "SIMULATION" ? "demo" : "neutral"} size="sm">{e.source}</Badge><span className="ml-auto text-[0.75rem] text-neutral-text2 tabular">{relTime(e.at)}</span></div>
                     <p className="font-semibold text-[0.92rem] leading-snug">{e.title}</p>
                     <p className="text-[0.8rem] text-neutral-text2 mt-0.5 leading-snug">{e.detail}</p>
                   </Link>
