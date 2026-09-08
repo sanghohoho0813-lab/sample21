@@ -6,23 +6,30 @@ import { usePresentation } from "@/components/system/Presentation";
 import { cn } from "@/lib/cn";
 import type { WhyIndexItem } from "./WhyParts";
 
-export function useScrollSpy(ids: string[]) {
+export function useScrollSpy(ids: string[], ready = true) {
   const [active, setActive] = useState(ids[0] ?? "");
   useEffect(() => {
-    if (typeof window === "undefined" || !("IntersectionObserver" in window)) return;
-    const els = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
-    if (!els.length) return;
+    if (!ready || typeof window === "undefined" || !("IntersectionObserver" in window)) return;
+    let io: IntersectionObserver | null = null;
+    let tries = 0;
+    let timer = 0;
     const visible = new Map<string, number>();
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) { if (e.isIntersecting) visible.set(e.target.id, e.boundingClientRect.top); else visible.delete(e.target.id); }
-      if (visible.size) {
-        const top = [...visible.entries()].sort((a, b) => a[1] - b[1])[0][0];
-        setActive(top);
-      }
-    }, { rootMargin: "-25% 0px -55% 0px", threshold: [0, 0.2, 0.5] });
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [ids]);
+    const arm = () => {
+      const els = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+      if (els.length < ids.length && tries++ < 40) { timer = window.setTimeout(arm, 150); return; }
+      if (!els.length) return;
+      io = new IntersectionObserver((entries) => {
+        for (const e of entries) { if (e.isIntersecting) visible.set(e.target.id, e.boundingClientRect.top); else visible.delete(e.target.id); }
+        if (visible.size) setActive([...visible.entries()].sort((a, b) => a[1] - b[1])[0][0]);
+      }, { rootMargin: "-25% 0px -55% 0px", threshold: [0, 0.2, 0.5] });
+      els.forEach((el) => io!.observe(el));
+      // honor #hash deep link once sections exist
+      const hash = window.location.hash.slice(1);
+      if (hash && ids.includes(hash)) document.getElementById(hash)?.scrollIntoView({ block: "start" });
+    };
+    arm();
+    return () => { clearTimeout(timer); io?.disconnect(); };
+  }, [ids, ready]);
   return active;
 }
 

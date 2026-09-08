@@ -65,7 +65,7 @@ function FitBody() {
   const orders = useMemo(() => allOrders(store), [store]);
   const kpi = useMemo(() => salesKpi(store, "30d"), [store]);
   const aggs = useMemo(() => allProductAgg(store), [store]);
-  const effStatus = (r: ReturnRequest) => processed[r.id] ?? r.status;
+  const effStatus = (r: ReturnRequest): ReturnRequest["status"] => processed[r.id] ?? r.status;
   const pendingCount = returns.filter((r) => effStatus(r) === "requested").length;
 
   const reasonDist = useMemo(() => REASONS.map((r) => ({ reason: r, name: RETURN_REASON_LABEL[r], value: returns.filter((x) => x.reason === r).length })), [returns]);

@@ -137,7 +137,8 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
   return (
     <article className={cn("rounded-cardlg bg-white border shadow-card transition-all duration-fast", highlight ? "border-theme-primary ring-2 ring-theme-primary/20" : "border-neutral-border", className)} data-tour={tour} data-action-id={action.id} id={`action-${action.id}`}>
       {/* Header */}
-      <button type="button" onClick={onToggle} className={cn("w-full text-left px-5 pt-5 pb-4 flex items-start gap-3", onToggle && "hover:bg-neutral-canvas/60 rounded-t-cardlg")} aria-expanded={expanded}>
+      <div role={onToggle ? "button" : undefined} tabIndex={onToggle ? 0 : undefined} onClick={onToggle} onKeyDown={onToggle ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(); } } : undefined}
+        className={cn("w-full text-left px-5 pt-5 pb-4 flex items-start gap-3 min-w-0", onToggle && "cursor-pointer hover:bg-neutral-canvas/60 rounded-t-cardlg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary/30")} aria-expanded={onToggle ? expanded : undefined} data-card-header>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 flex-wrap mb-2">
             <UrgencyBadge urgency={action.urgency} />
@@ -155,7 +156,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
           <span className="tabular whitespace-nowrap inline-flex items-center gap-1"><Clock size={12} />{relTime(action.recommendedAt)}</span>
           <span className="whitespace-nowrap">{action.ownerName}</span>
         </div>
-      </button>
+      </div>
 
       {expanded && (
         <div className="px-5 pb-5 space-y-4 animate-fadeIn">

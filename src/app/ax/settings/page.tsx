@@ -68,7 +68,7 @@ export default function SettingsPage() {
         title="설정"
         badge={<Badge tone="demo" size="sm">DEMO</Badge>}
         desc="테마·글자 크기·역할·데모 초기화가 실제로 동작합니다. 실제 연결이 필요한 항목은 READY로 표시했습니다."
-        right={<Freshness source="DEMO" />}
+        right={<Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" />}><Freshness source="DEMO" /></Hydrated>}
       />
       <nav aria-label="설정 섹션" className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap">
         {SECTIONS.map((s) => (
