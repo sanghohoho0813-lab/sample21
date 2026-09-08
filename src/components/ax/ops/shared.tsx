@@ -7,6 +7,8 @@ import { Badge, type Tone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { BottomSheet } from "@/components/ui/Overlay";
 import { Skeleton, SkeletonCard } from "@/components/ui/States";
+import { Freshness } from "@/components/ui/Misc";
+import { Hydrated } from "@/components/system/Hydrated";
 import { useIsMobile } from "@/components/system/hooks";
 import { useApp } from "@/lib/store";
 import { canFull } from "@/lib/roles";
@@ -38,6 +40,11 @@ export function useLocalJson<T>(key: string, initial: T) {
     });
   }, [key]);
   return [val, set] as const;
+}
+
+/** Freshness renders the current time → client-only to avoid SSR text mismatch. */
+export function LiveFreshness({ source = "DEMO" }: { source?: "DEMO" | "LIVE" | "SIMULATION" }) {
+  return <Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" aria-hidden />}><Freshness source={source} /></Hydrated>;
 }
 
 /** 가상 고객 이름 마스킹 — 대표(full 권한) 외에는 가운데 글자를 가립니다. */
@@ -127,12 +134,12 @@ export function KV({ label, children, className }: { label: ReactNode; children:
 export function SectionBlock({ title, desc, right, children, className, tour, id }: { title: ReactNode; desc?: ReactNode; right?: ReactNode; children: ReactNode; className?: string; tour?: string; id?: string }) {
   return (
     <section className={cn("mt-8", className)} data-tour={tour} id={id}>
-      <div className="flex items-end justify-between gap-3 mb-4 flex-wrap">
-        <div className="min-w-0">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-4 md:flex-wrap">
+        <div className="min-w-0 flex-1">
           <h2 className="text-[1.2rem] md:text-[1.35rem] font-bold tracking-tight">{title}</h2>
           {desc && <p className="mt-1 text-neutral-text2 text-[0.9rem] leading-relaxed">{desc}</p>}
         </div>
-        {right && <div className="shrink-0 flex items-center gap-2 flex-wrap">{right}</div>}
+        {right && <div className="flex items-center gap-2 flex-wrap min-w-0 max-w-full md:shrink-0 md:justify-end">{right}</div>}
       </div>
       {children}
     </section>

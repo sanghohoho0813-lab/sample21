@@ -120,14 +120,14 @@ export function AxShell({ children }: { children: ReactNode }) {
           <div className="h-[64px] px-4 md:px-6 flex items-center gap-3">
             <button onClick={() => setDrawer(true)} className="lg:hidden h-10 w-10 -ml-2 inline-flex items-center justify-center rounded-xl hover:bg-neutral-canvas" aria-label="메뉴 열기"><Menu size={22} /></button>
             <Link href="/ax" className="lg:hidden font-black tracking-tight text-[1.1rem]">MORFIT <span className="text-theme-primary">AX</span></Link>
-            <div className="hidden md:block"><LiveClock /></div>
-            <div className="md:hidden ml-auto"><LiveClock compact /></div>
+            <div className="hidden lg:block"><LiveClock /></div>
+            <div className="lg:hidden ml-auto md:ml-2"><LiveClock compact /></div>
             <div className="ml-auto hidden md:flex items-center gap-2">
               <RoleSwitcher compact />
               <button onClick={() => setTour(true)} className="h-10 px-3 rounded-xl border border-neutral-border bg-white text-[0.85rem] font-semibold hover:bg-neutral-canvas inline-flex items-center gap-1.5 whitespace-nowrap" data-tour="tutorial-btn" title="튜토리얼" aria-label="튜토리얼"><GraduationCap size={18} /><span className="hidden 2xl:inline">튜토리얼</span></button>
               <button onClick={start} className="h-10 px-3 rounded-xl border border-neutral-border bg-white text-[0.85rem] font-semibold hover:bg-neutral-canvas inline-flex items-center gap-1.5 whitespace-nowrap" data-tour="present-btn" title="시연 모드" aria-label="시연 모드"><Play size={16} /><span className="hidden 2xl:inline">시연</span></button>
               <DevicePreviewButton />
-              <Link href="/" className="h-10 px-3 rounded-xl bg-brand-black text-white text-[0.85rem] font-semibold inline-flex items-center gap-1.5 hover:bg-[#2a2a2a] whitespace-nowrap" data-tour="surface-switch"><ExternalLink size={16} />고객 화면 보기</Link>
+              <Link href="/" className="h-10 px-3 rounded-xl bg-brand-black text-white text-[0.85rem] font-semibold inline-flex items-center gap-1.5 hover:bg-[#2a2a2a] whitespace-nowrap" data-tour="surface-switch" aria-label="고객 화면 보기" title="고객 화면 보기"><ExternalLink size={16} /><span className="hidden lg:inline">고객 화면 보기</span></Link>
             </div>
           </div>
         </header>

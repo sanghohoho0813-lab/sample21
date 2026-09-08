@@ -64,7 +64,7 @@ function InventoryInner() {
     <div className="space-y-6">
       <PageHeader title="재고·재입고" desc="옵션(색상×사이즈) 단위 수요신호로 어떤 옵션을 언제 확보할지, 무엇을 할인할지 먼저 봅니다." badge={<Badge tone="demo" size="sm">DEMO</Badge>} right={<Freshness source="DEMO" />} />
 
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <KpiCard size="lg" label="품절위험 옵션" value={num(inv.lowRisk)} sub={`품절 임박 ${counts.low} · 품절 ${counts.soldout} · 7일 추정손실 ${krwShort(inv.lostSales7d)}`} icon={<AlertTriangle size={18} />} accent={ICON_ACCENTS.risk} />
         <KpiCard size="lg" label="관심 상승 옵션" value={num(inv.rising)} sub="판매속도 +30% & 찜·재입고 신청 증가" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.customer} />
         <KpiCard size="lg" label="판매소진율 (30일)" value={pct(inv.sellThrough, 1)} sub={<><Term term="판매소진율">판매 ÷ (판매 + 현재고)</Term></>} icon={<Boxes size={18} />} accent={ICON_ACCENTS.overview} />

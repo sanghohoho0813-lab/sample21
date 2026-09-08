@@ -95,6 +95,11 @@ export function SectionCard({ title, desc, right, children, tour, className, pad
   );
 }
 
+/** KPI value wrapper: shrinks big numbers only below `sm` so 2-column KPI grids never overflow at 360px. */
+export function Big({ children }: { children: ReactNode }) {
+  return <span className="text-[1.25rem] sm:text-[length:inherit] break-keep">{children}</span>;
+}
+
 export function DeltaText({ value, invert, label = "직전 대비", className, digits = 1 }: { value: number; invert?: boolean; label?: string; className?: string; digits?: number }) {
   const good = invert ? value <= 0 : value >= 0;
   return (

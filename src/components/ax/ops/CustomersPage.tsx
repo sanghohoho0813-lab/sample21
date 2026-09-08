@@ -20,12 +20,11 @@ import { Card } from "@/components/ui/Card";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Input, Select } from "@/components/ui/Form";
 import { KpiCard, Stat } from "@/components/ui/Kpi";
-import { Freshness, Term } from "@/components/ui/Misc";
+import { Term } from "@/components/ui/Misc";
 import { Drawer, Modal } from "@/components/ui/Overlay";
 import { EmptyState } from "@/components/ui/States";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
-import { displayName, FilterBar, KV, MoreButton, NoteCard, PageSkeleton, SectionBlock, useMore } from "./shared";
-import { cn } from "@/lib/cn";
+import { displayName, FilterBar, KV, LiveFreshness, MoreButton, NoteCard, PageSkeleton, SectionBlock, useMore } from "./shared";
 
 type Row = Customer & { daysSince: number | null; live: boolean };
 const SEGMENTS: SegmentId[] = ["first-purchase", "wish-no-buy", "restock-waiting", "cycle-due", "brand-loyal", "post-return-drop", "vip"];
@@ -91,7 +90,7 @@ export function CustomersPage() {
   return (
     <>
       <PageHeader title="고객·재구매" desc="구매이력·관심·구매주기 데이터를 세그먼트로 나누고, 지금 할 수 있는 행동을 제안합니다. 모든 고객은 가상 데이터이며 전화번호·이메일 같은 개인정보는 존재하지 않습니다."
-        badge={<Badge tone="demo">개인정보 없음 · 가상 고객</Badge>} right={<Freshness source="DEMO" />} />
+        badge={<Badge tone="demo">개인정보 없음 · 가상 고객</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={5} />}><CustomersBody /></Hydrated>
     </>
   );
@@ -169,7 +168,7 @@ function CustomersBody() {
   return (
     <div className="animate-fadeIn">
       {/* KPI */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-4">
         <KpiCard label="전체 고객" value={num(kpi.total)} icon={<Users size={18} />} accent={ICON_ACCENTS.customer} sub="가상 고객 (DEMO)" />
         <KpiCard label="구매 고객" value={num(kpi.buyers)} icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} sub="90일 내 1회 이상 주문" />
         <KpiCard label="신규 30일" value={num(kpi.newCust30)} icon={<UserPlus size={18} />} accent={ICON_ACCENTS.overview} sub="최근 30일 가입" />
@@ -179,22 +178,22 @@ function CustomersBody() {
 
       {/* 현재 시연 고객 */}
       <Card className="mt-6 border-theme-primary/30" pad="md">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="h-12 w-12 rounded-2xl bg-theme-soft text-theme-primary flex items-center justify-center font-black text-[1.1rem]">{DEMO_CUSTOMER_NAME[0]}</span>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap"><p className="font-bold text-[1.05rem]">현재 시연 고객 · {DEMO_CUSTOMER_NAME}</p><Badge tone="primary" size="sm">LIVE 상태</Badge><Badge tone="accent" size="sm">{SEGMENT_LABEL[me.segment]}</Badge></div>
-              <p className="text-[0.85rem] text-neutral-text2 mt-0.5">고객 화면에서 찜·장바구니·재입고 신청·주문을 하면 아래 숫자가 바로 바뀝니다 (Closed Loop). 개인정보 없음 · 가상 고객.</p>
-            </div>
+        <div className="flex items-start gap-3 min-w-0">
+          <span className="h-12 w-12 shrink-0 rounded-2xl bg-theme-soft text-theme-primary flex items-center justify-center font-black text-[1.1rem]">{DEMO_CUSTOMER_NAME[0]}</span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap"><p className="font-bold text-[1.05rem]">현재 시연 고객 · {DEMO_CUSTOMER_NAME}</p><Badge tone="primary" size="sm">LIVE 상태</Badge><Badge tone="accent" size="sm">{SEGMENT_LABEL[me.segment]}</Badge></div>
+            <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">고객 화면에서 찜·장바구니·재입고 신청·주문을 하면 아래 숫자가 바로 바뀝니다 (Closed Loop). 개인정보 없음 · 가상 고객.</p>
           </div>
-          <div className="md:ml-auto grid grid-cols-2 sm:grid-cols-5 gap-2 shrink-0">
+        </div>
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 flex-1 min-w-0">
             <Stat label="찜" value={<span className="inline-flex items-center gap-1"><Heart size={16} className="text-neutral-text2" />{me.wishlistCount}</span>} />
             <Stat label="장바구니" value={<span className="inline-flex items-center gap-1"><ShoppingCart size={16} className="text-neutral-text2" />{me.cartCount}</span>} />
             <Stat label="재입고 대기" value={<span className="inline-flex items-center gap-1"><BellRing size={16} className="text-neutral-text2" />{me.restockWaiting}</span>} />
             <Stat label="주문" value={<span className="inline-flex items-center gap-1"><PackageCheck size={16} className="text-neutral-text2" />{me.orderCount}</span>} sub={`DEMO 주문 ${store.orders.length}건`} />
             <Stat label="반품" value={<span className="inline-flex items-center gap-1"><Undo2 size={16} className="text-neutral-text2" />{me.returnCount}</span>} />
           </div>
-          <Button variant="outline" onClick={() => setOpenId(DEMO_CUSTOMER_ID)} icon={<ChevronRight size={16} />}>상세 보기</Button>
+          <Button variant="outline" onClick={() => setOpenId(DEMO_CUSTOMER_ID)} icon={<ChevronRight size={16} />} className="sm:shrink-0">상세 보기</Button>
         </div>
       </Card>
 
@@ -359,7 +358,7 @@ function CustomerDetail({ c, role, orders, onNext }: { c: Row; role: Role; order
         </ul>
         <p className="mt-2 text-[0.8rem] text-neutral-text2 inline-flex items-center gap-1"><Clock size={12} />규칙 기반 제안 · 실행은 담당자가 결정합니다 (L2).</p>
       </div>
-      <div className={cn("text-[0.78rem] text-neutral-text2")}>{relTime(c.joinedAt)} 가입 · DEMO</div>
+      <p className="text-[0.78rem] text-neutral-text2">{relTime(c.joinedAt)} 가입 · 가상 고객 · DEMO</p>
     </div>
   );
 }

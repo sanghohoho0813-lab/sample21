@@ -18,12 +18,12 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { KpiCard, Stat } from "@/components/ui/Kpi";
-import { Freshness, Progress, Term } from "@/components/ui/Misc";
+import { Progress, Term } from "@/components/ui/Misc";
 import { Drawer } from "@/components/ui/Overlay";
 import { EmptyState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { ActionStatusBadge } from "@/components/ax/StatusBadges";
-import { displayName, KV, MoreButton, NoteCard, PageSkeleton, SectionBlock, useLocalJson, useMore } from "./shared";
+import { displayName, KV, LiveFreshness, MoreButton, NoteCard, PageSkeleton, SectionBlock, useLocalJson, useMore } from "./shared";
 import { cn } from "@/lib/cn";
 
 const SIZING_LABEL: Record<SizingTendency, string> = { small: "작게 나옴", true: "정사이즈", large: "크게 나옴" };
@@ -47,7 +47,7 @@ export function FitReturnsPage() {
   return (
     <>
       <PageHeader title="핏·반품" desc="반품 사유를 구조화해 어떤 상품이 사이즈·핏 때문에 돌아오는지 찾고, 핏 안내와 추천 규칙을 고칩니다 (Engine 2 · Fit · RULE). 반품률이 높다고 자동으로 불이익을 주지 않습니다 — 판단은 사람이 합니다."
-        badge={<Badge tone="demo">DEMO</Badge>} right={<Freshness source="DEMO" />} />
+        badge={<Badge tone="demo">DEMO</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><FitBody /></Hydrated>
     </>
   );

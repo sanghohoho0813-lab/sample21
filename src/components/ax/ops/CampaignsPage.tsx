@@ -17,12 +17,11 @@ import { Card } from "@/components/ui/Card";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Input, Segmented, Select } from "@/components/ui/Form";
 import { KpiCard, Stat } from "@/components/ui/Kpi";
-import { Freshness } from "@/components/ui/Misc";
 import { Drawer, Modal } from "@/components/ui/Overlay";
 import { EmptyState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { ActionStatusBadge } from "@/components/ax/StatusBadges";
-import { NoteCard, PageSkeleton, SectionBlock, useLocalJson } from "./shared";
+import { LiveFreshness, NoteCard, PageSkeleton, SectionBlock, useLocalJson } from "./shared";
 import { cn } from "@/lib/cn";
 
 interface CampaignDraft { id: string; name: string; segment: SegmentId | "all"; productIds: string[]; discountRate: number; startAt: string; endAt: string; createdAt: string; createdBy: string }
@@ -53,7 +52,7 @@ export function CampaignsPage() {
   return (
     <>
       <PageHeader title="캠페인·기획전" desc="세그먼트·상품·할인율을 조합한 캠페인의 노출→클릭→장바구니→주문 흐름과 마진·반품을 함께 봅니다. 매출만 보고 판단하지 않습니다."
-        badge={<Badge tone="demo">DEMO</Badge>} right={<Freshness source="DEMO" />} />
+        badge={<Badge tone="demo">DEMO</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><CampaignsBody /></Hydrated>
     </>
   );

@@ -16,11 +16,11 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Chip, Segmented, Select } from "@/components/ui/Form";
 import { KpiCard } from "@/components/ui/Kpi";
-import { Freshness, Term } from "@/components/ui/Misc";
+import { Term } from "@/components/ui/Misc";
 import { Modal } from "@/components/ui/Overlay";
 import { EmptyState } from "@/components/ui/States";
 import { ActionStatusBadge } from "@/components/ax/StatusBadges";
-import { EVIDENCE_TYPES, EVIDENCE_TYPE_LABEL, EvidenceTypeBadge, FilterBar, MoreButton, NoteCard, PageSkeleton, SectionBlock, SourceBadge, useMore } from "./shared";
+import { EVIDENCE_TYPE_LABEL, EVIDENCE_TYPES, EvidenceTypeBadge, FilterBar, LiveFreshness, MoreButton, NoteCard, PageSkeleton, SectionBlock, SourceBadge, useMore } from "./shared";
 import { cn } from "@/lib/cn";
 
 const STATUS_LABEL: Record<EvidenceLog["status"], string> = { demo: "Demo", "pilot-ready": "Pilot 준비", live: "Live" };
@@ -37,7 +37,7 @@ export function EvidencePage() {
   return (
     <>
       <PageHeader title="AX Evidence" desc={<span><Term term="Evidence">Evidence</Term>는 추천 → 승인 → 실행 → 결과 → 고객 반영을 시간 순서로 남긴 기록입니다. 나중에 "정말 효과가 있었나"를 증명하는 재료가 됩니다 (Loop 5 · 실증).</span>}
-        badge={<Badge tone="demo">DEMO</Badge>} right={<Freshness source="DEMO" />} />
+        badge={<Badge tone="demo">DEMO</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><EvidenceBody /></Hydrated>
     </>
   );
@@ -139,7 +139,7 @@ function EvidenceBody() {
 
       {/* Evidence Pack */}
       <SectionBlock title="Evidence Pack · 12주 실증 준비" desc="MORFIT §33 실증 계획을 4단계 체크리스트로 정리했습니다. Demo에서는 준비 상태만 표시합니다."
-        right={<Button variant="outline" onClick={() => setPackOpen(true)} icon={<Download size={16} />} className="border-dashed text-neutral-text2">Evidence Pack 내보내기<Badge tone="ready" size="sm">READY · Pilot 전환 후</Badge></Button>}>
+        right={<><Badge tone="ready">READY · Pilot 전환 후</Badge><Button variant="outline" onClick={() => setPackOpen(true)} icon={<Download size={16} />} className="border-dashed text-neutral-text2" aria-describedby="pack-note">Evidence Pack 내보내기</Button></>}>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {PACK_PHASES.map((p, i) => (
             <Card key={p.weeks} pad="md" className="flex flex-col gap-3">
@@ -149,7 +149,7 @@ function EvidenceBody() {
             </Card>
           ))}
         </div>
-        <NoteCard className="mt-4" icon={<Lock size={16} />}>실제 Pilot 전환 전에는 Evidence Pack을 내보낼 수 없습니다 — Baseline 없이 나가는 리포트는 개선율을 지어내게 되기 때문입니다. 버튼을 누르면 Pack에 무엇이 들어가는지 볼 수 있습니다.</NoteCard>
+        <NoteCard className="mt-4" icon={<Lock size={16} />}><span id="pack-note">실제 Pilot 전환 전에는 Evidence Pack을 내보낼 수 없습니다 — Baseline 없이 나가는 리포트는 개선율을 지어내게 되기 때문입니다. 버튼을 누르면 Pack에 무엇이 들어가는지 볼 수 있습니다.</span></NoteCard>
       </SectionBlock>
 
       <Modal open={packOpen} onClose={() => setPackOpen(false)} title="Evidence Pack에 들어갈 내용" size="md" footer={<div className="flex justify-end gap-2"><Button variant="outline" href="/ax/why" size="sm">Why AX 보기</Button><Button size="sm" onClick={() => setPackOpen(false)}>확인</Button></div>}>

@@ -16,11 +16,11 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Segmented } from "@/components/ui/Form";
 import { KpiCard, Stat } from "@/components/ui/Kpi";
-import { Freshness, Term } from "@/components/ui/Misc";
+import { Term } from "@/components/ui/Misc";
 import { GradientImage } from "@/components/ui/ProductImage";
 import { Drawer } from "@/components/ui/Overlay";
 import { InventoryStatusBadge } from "@/components/ax/StatusBadges";
-import { KV, NoteCard, PageSkeleton, SectionBlock } from "./shared";
+import { KV, LiveFreshness, NoteCard, PageSkeleton, SectionBlock } from "./shared";
 import { cn } from "@/lib/cn";
 
 const CONTRACT_LABEL: Record<Brand["contractStatus"], string> = { active: "계약중", renewal: "갱신 예정", new: "신규 입점" };
@@ -34,7 +34,7 @@ export function BrandsPage() {
   return (
     <>
       <PageHeader title="브랜드·파트너" desc="브랜드별 매출·마진(또는 수수료)·반품·품절위험을 한 화면에서 비교합니다. 파트너가 직접 로그인하는 파트너센터는 NEXT 단계입니다."
-        badge={<Badge tone="demo">DEMO</Badge>} right={<Freshness source="DEMO" />} />
+        badge={<Badge tone="demo">DEMO</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><BrandsBody /></Hydrated>
     </>
   );

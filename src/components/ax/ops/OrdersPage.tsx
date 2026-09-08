@@ -18,13 +18,12 @@ import { Card } from "@/components/ui/Card";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Input, Segmented } from "@/components/ui/Form";
 import { KpiCard, Stat } from "@/components/ui/Kpi";
-import { Freshness } from "@/components/ui/Misc";
 import { Drawer } from "@/components/ui/Overlay";
 import { ProductImage } from "@/components/ui/ProductImage";
 import { EmptyState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
-import { displayName, MoreButton, NoteCard, PageSkeleton, useMore } from "./shared";
+import { displayName, LiveFreshness, MoreButton, NoteCard, PageSkeleton, useMore } from "./shared";
 import { cn } from "@/lib/cn";
 
 type Tab = "all" | OrderStatus;
@@ -44,7 +43,7 @@ export function OrdersPage() {
   return (
     <>
       <PageHeader title="주문·배송" desc="고객 화면에서 접수된 DEMO 주문이 이 목록에 바로 나타나고, 여기서 바꾼 배송 상태는 고객 My Page에 그대로 반영됩니다 (Loop 2)."
-        badge={<Badge tone="demo">DEMO</Badge>} right={<Freshness source="DEMO" />} />
+        badge={<Badge tone="demo">DEMO</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><OrdersBody /></Hydrated>
     </>
   );

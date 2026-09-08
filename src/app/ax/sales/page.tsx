@@ -131,7 +131,7 @@ function SalesInner() {
 
       {role === "md" && <RoleNote>MD 화면 — 회사 전체 손익(추정 마진 합계)은 대표 권한이라 숨겼습니다. 상품·브랜드 마진은 표시됩니다.</RoleNote>}
 
-      <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         <KpiCard size="lg" label="매출" value={krwShort(a.revenue)} delta={pctDelta(a.revenue, p.revenue)} icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.sales} />
         <KpiCard label="주문 수" value={`${num(a.orders)}건`} delta={pctDelta(a.orders, p.orders)} icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.overview} />
         <KpiCard label="객단가" value={krw(a.aov)} delta={pctDelta(a.aov, p.aov)} icon={<Receipt size={18} />} accent={ICON_ACCENTS.operations} />
