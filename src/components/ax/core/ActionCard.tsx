@@ -128,7 +128,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
           </div>
           <ChevronDown size={18} className="-rotate-90 text-neutral-text2 shrink-0 mt-1" />
         </div>
-        <div className="mt-2 flex items-center justify-between text-[0.78rem] text-neutral-text2"><span>{action.ownerName}</span><span className="tabular">{relTime(action.recommendedAt)}</span></div>
+        <div className="mt-2 flex items-center justify-between gap-2 min-w-0 text-[0.78rem] text-neutral-text2"><span className="min-w-0">{action.ownerName}</span><span className="tabular shrink-0">{relTime(action.recommendedAt)}</span></div>
       </Link>
     );
   }

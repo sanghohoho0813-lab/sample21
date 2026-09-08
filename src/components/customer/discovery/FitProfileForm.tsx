@@ -58,7 +58,7 @@ function PreviewCard({ product, profile }: { product: Product; profile: FitProfi
                 </ul>
               </>
             ) : (
-              <p className="rounded-xl bg-neutral-canvas md:bg-brand-ivory px-3 py-2.5 text-[0.88rem] text-neutral-text2">키·몸무게 또는 평소 사이즈를 입력하면 이 자리에 추천 사이즈와 이유가 나타납니다.</p>
+              <p className="min-w-0 rounded-xl bg-neutral-canvas md:bg-brand-ivory px-3 py-2.5 text-[0.88rem] text-neutral-text2">키·몸무게 또는 평소 사이즈를 입력하면 이 자리에 추천 사이즈와 이유가 나타납니다.</p>
             )}
           </div>
         </div>

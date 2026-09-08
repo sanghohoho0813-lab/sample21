@@ -10,7 +10,7 @@ export function DataTable<T>({ rows, columns, rowKey, onRowClick, empty, classNa
 }) {
   if (!rows.length) return <div className={className}>{empty ?? <p className="text-center text-neutral-text2 py-10">데이터가 없습니다.</p>}</div>;
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn("w-full min-w-0 max-w-full", className)}>
       <div className="hidden md:block overflow-x-auto rounded-cardlg border border-neutral-border bg-white">
         <table className="w-full text-[0.92rem]">
           <thead>

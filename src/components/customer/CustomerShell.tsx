@@ -122,16 +122,16 @@ export function CustomerShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-neutral-border">
         <div className="mx-auto max-w-[1280px] px-4">
           <div className="h-[64px] md:h-[72px] flex items-center gap-3 md:gap-6">
-            <button onClick={() => setMenu(true)} className="md:hidden h-11 w-11 -ml-2 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="전체 메뉴"><Menu size={24} /></button>
+            <button onClick={() => setMenu(true)} className="lg:hidden h-11 w-11 -ml-2 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="전체 메뉴"><Menu size={24} /></button>
             <Link href="/" className="font-black tracking-tight text-[1.45rem] md:text-[1.6rem] leading-none" aria-label="MORFIT 홈">MORFIT<span className="text-brand-accent">.</span></Link>
-            <nav className="hidden md:flex items-center gap-1 ml-2" aria-label="주요 메뉴">
+            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 ml-1 xl:ml-2" aria-label="주요 메뉴">
               {NAV.map((n) => (
-                <Link key={n.href} href={n.href} className={cn("h-10 px-3 rounded-lg text-[0.95rem] font-semibold whitespace-nowrap hover:bg-neutral-canvas transition-colors", isActive(n.href) && "bg-neutral-canvas")}>{n.label}</Link>
+                <Link key={n.href} href={n.href} className={cn("h-10 px-2 xl:px-3 rounded-lg text-[0.9rem] xl:text-[0.95rem] font-semibold whitespace-nowrap hover:bg-neutral-canvas transition-colors", isActive(n.href) && "bg-neutral-canvas")}>{n.label}</Link>
               ))}
             </nav>
-            <div className="hidden lg:block flex-1 max-w-sm ml-auto"><SearchBox /></div>
-            <div className="ml-auto lg:ml-0 flex items-center gap-0.5">
-              <button onClick={() => setSearch(true)} className="lg:hidden h-11 w-11 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="검색"><Search size={22} /></button>
+            <div className="hidden xl:block flex-1 max-w-sm ml-auto"><SearchBox /></div>
+            <div className="ml-auto xl:ml-0 flex items-center gap-0.5 shrink-0">
+              <button onClick={() => setSearch(true)} className="xl:hidden h-11 w-11 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="검색"><Search size={22} /></button>
               <NotificationsButton />
               <Link href="/wishlist" className="hidden md:inline-flex relative h-11 w-11 items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label={`찜 ${wishCount}개`}><Heart size={22} />{wishCount > 0 && <span className="absolute top-1.5 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-black text-white text-[0.68rem] font-bold flex items-center justify-center">{wishCount}</span>}</Link>
               <Link href="/cart" className="relative h-11 w-11 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label={`장바구니 ${cartCount}개`} data-tour="c-cart"><ShoppingBag size={22} />{cartCount > 0 && <span className="absolute top-1.5 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-accent text-white text-[0.68rem] font-bold flex items-center justify-center">{cartCount}</span>}</Link>
