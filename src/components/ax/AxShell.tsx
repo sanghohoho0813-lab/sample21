@@ -39,7 +39,7 @@ function NavList({ role, onNavigate }: { role: Role; onNavigate?: () => void }) 
                   <Link href={i.href} onClick={onNavigate} data-tour={i.tour} aria-current={active ? "page" : undefined}
                     className={cn("group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-fast", active ? "bg-white/12" : "hover:bg-white/8")}>
                     <span className="h-8 w-8 shrink-0 rounded-lg flex items-center justify-center" style={{ background: `${i.accent}${active ? "44" : "26"}`, color: i.accent }}><NavIcon name={i.icon} /></span>
-                    <span className={cn("text-[0.95rem] font-semibold truncate", active ? "text-white" : "text-[color:var(--sidebar-muted)] group-hover:text-white")}>{i.label}</span>
+                    <span className={cn("text-[0.95rem] font-semibold leading-snug", active ? "text-white" : "text-[color:var(--sidebar-muted)] group-hover:text-white")}>{i.label}</span>
                     {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-theme-highlight" />}
                   </Link>
                 </li>
@@ -124,10 +124,10 @@ export function AxShell({ children }: { children: ReactNode }) {
             <div className="md:hidden ml-auto"><LiveClock compact /></div>
             <div className="ml-auto hidden md:flex items-center gap-2">
               <RoleSwitcher compact />
-              <button onClick={() => setTour(true)} className="h-10 px-3 rounded-xl border border-neutral-border bg-white text-[0.85rem] font-semibold hover:bg-neutral-canvas inline-flex items-center gap-1.5" data-tour="tutorial-btn"><GraduationCap size={18} /><span className="hidden xl:inline">튜토리얼</span></button>
-              <button onClick={start} className="h-10 px-3 rounded-xl border border-neutral-border bg-white text-[0.85rem] font-semibold hover:bg-neutral-canvas inline-flex items-center gap-1.5" data-tour="present-btn"><Play size={16} /><span className="hidden xl:inline">시연</span></button>
+              <button onClick={() => setTour(true)} className="h-10 px-3 rounded-xl border border-neutral-border bg-white text-[0.85rem] font-semibold hover:bg-neutral-canvas inline-flex items-center gap-1.5 whitespace-nowrap" data-tour="tutorial-btn" title="튜토리얼" aria-label="튜토리얼"><GraduationCap size={18} /><span className="hidden 2xl:inline">튜토리얼</span></button>
+              <button onClick={start} className="h-10 px-3 rounded-xl border border-neutral-border bg-white text-[0.85rem] font-semibold hover:bg-neutral-canvas inline-flex items-center gap-1.5 whitespace-nowrap" data-tour="present-btn" title="시연 모드" aria-label="시연 모드"><Play size={16} /><span className="hidden 2xl:inline">시연</span></button>
               <DevicePreviewButton />
-              <Link href="/" className="h-10 px-3 rounded-xl bg-brand-black text-white text-[0.85rem] font-semibold inline-flex items-center gap-1.5 hover:bg-[#2a2a2a]" data-tour="surface-switch"><ExternalLink size={16} />고객 화면 보기</Link>
+              <Link href="/" className="h-10 px-3 rounded-xl bg-brand-black text-white text-[0.85rem] font-semibold inline-flex items-center gap-1.5 hover:bg-[#2a2a2a] whitespace-nowrap" data-tour="surface-switch"><ExternalLink size={16} />고객 화면 보기</Link>
             </div>
           </div>
         </header>
@@ -138,10 +138,10 @@ export function AxShell({ children }: { children: ReactNode }) {
       {/* Mobile bottom nav (AX) */}
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border safe-bottom" aria-label="AX 하단 메뉴">
         <ul className="grid grid-cols-5 h-[64px]">
-          {[AX_NAV[0], AX_NAV[1], AX_NAV[4], AX_NAV[9]].map((i) => {
+          {([[AX_NAV[0], "대시보드"], [AX_NAV[1], "Action"], [AX_NAV[4], "재고"], [AX_NAV[9], "주문"]] as const).map(([i, label]) => {
             const active = i.href === "/ax" ? pathname === "/ax" : pathname.startsWith(i.href);
             return (
-              <li key={i.key}><Link href={i.href} className={cn("h-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold active:bg-neutral-canvas", active ? "text-theme-primary" : "text-neutral-text2")}><NavIcon name={i.icon} size={22} />{i.label.split(" ")[0].replace("·", "·")}</Link></li>
+              <li key={i.key}><Link href={i.href} className={cn("h-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold active:bg-neutral-canvas", active ? "text-theme-primary" : "text-neutral-text2")}><NavIcon name={i.icon} size={22} />{label}</Link></li>
             );
           })}
           <li><button onClick={() => setDrawer(true)} className="h-full w-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold text-neutral-text2 active:bg-neutral-canvas"><MoreHorizontal size={22} />더보기</button></li>

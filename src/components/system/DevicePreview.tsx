@@ -21,8 +21,8 @@ export function DevicePreviewButton({ className, light, label }: { className?: s
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} data-tour="device-preview" aria-label={text} title={text}
-        className={cn("inline-flex items-center gap-1.5 h-10 px-3 rounded-xl text-[0.85rem] font-semibold transition-colors duration-fast", light ? "text-white/90 hover:bg-white/10" : "text-neutral-text hover:bg-neutral-canvas border border-neutral-border bg-white", className)}>
-        <Icon size={18} />{label !== false && <span className="hidden sm:inline">{text}</span>}
+        className={cn("inline-flex items-center gap-1.5 h-10 px-3 rounded-xl text-[0.85rem] font-semibold transition-colors duration-fast whitespace-nowrap", light ? "text-white/90 hover:bg-white/10" : "text-neutral-text hover:bg-neutral-canvas border border-neutral-border bg-white", className)}>
+        <Icon size={18} />{label !== false && <span className="hidden 2xl:inline">{text}</span>}
       </button>
       {open && <PreviewFrame mode={isMobile ? "desktop" : "mobile"} onClose={() => setOpen(false)} />}
     </>
