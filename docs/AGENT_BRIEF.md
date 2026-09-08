@@ -31,3 +31,7 @@ Read first (do not modify these foundation files; if you truly need a new shared
 12. Do NOT edit files outside your assigned folders except creating new components under `src/components/<your-area>/`. Do not touch `src/lib/*`, shells, or `globals.css`. If a selector you need is missing, compute it locally in your page.
 13. Run `npx tsc --noEmit` before finishing and fix your errors. Do not run `next build` (other agents are working concurrently). Dev server is running at http://localhost:3000 — you may `curl` your routes to verify 200.
 14. Korean copy must be natural, concise, "중학생도 이해". Use 대표님/MD/운영팀 language appropriately.
+
+## Shared AX components (already exist — use them)
+- `src/components/ax/AIReady.tsx` → `<AIReadyBadge kind="briefing|demand|fit" />` (opens the explanation modal)
+- `src/components/ax/StatusBadges.tsx` → `ActionStatusBadge, UrgencyBadge, InventoryStatusBadge, OrderStatusBadge, ACTION_STATUS_LABEL, URGENCY_LABEL`
