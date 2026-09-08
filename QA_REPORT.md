@@ -59,7 +59,7 @@ Fresh Load·Demo Reset → Home 5초 → Tutorial 종료(Overlay 0) → 랭킹 �
 |---|---|
 | 404 / notFound | 0 |
 | 런타임·콘솔 오류 | 0 (CDN 폰트 차단 노이즈 제외) |
-| Horizontal overflow | 1차 74건 → 헤더 폭·그리드 min-width·표 컨테이너 수정 후 재측정 (아래 §7 최종값) |
+| Horizontal overflow | 1차 74건(헤더 폭·그리드 min-width·표·썸네일 폭) → 수정 후 **0건 / 256 조합** |
 | Mobile 360 | 2열 상품 그리드 · 표→카드 · 필터 Sheet · Sticky CTA와 Bottom Nav 비중첩 |
 
 ## 5. Theme / Visual
@@ -84,9 +84,10 @@ Fresh Load·Demo Reset → Home 5초 → Tutorial 종료(Overlay 0) → 랭킹 �
 | 11 | Data Devil | 개인정보(전화·이메일) 없음, 이름은 역할별 마스킹 | — | 유지 |
 | P2 | — | Evidence Pack Export, 재입고→구매 추적, 캠페인 초안 store 승격 등 | P2 | docs/RECOMMENDATIONS.md |
 
-## 7. 최종 재측정 (수정 후 프로덕션 빌드)
-- Acceptance Journey: 21/21 PASS
-- Overflow: 아래 "최종 오버플로 측정" 참조 (자동 갱신)
+## 7. 최종 재측정 (수정 후 프로덕션 빌드, 3회차)
+- Acceptance Journey: **21/21 PASS** · pageerror 0
+- Responsive: 256 조합 중 **404 0 · 오류 0 · overflow 0**
+- 재현: `npm run build && npm start` 후 `node scripts/qa-journey.mjs`, `QA_SHOTS=0 npm run qa:shots`
 
 ## 8. Known Issues / 남은 것
 - 사진 자산 미적용(의도) — placeholder. 적용 후 Image Sharpness Gate 재검증 필요
