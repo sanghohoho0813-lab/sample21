@@ -201,7 +201,7 @@ function CampaignDetail({ c, showMargin, loop4Changed, onDelete }: { c: Row; sho
                 <XAxis dataKey="name" tick={{ fontSize: 12, fill: "var(--neutral-text)" }} />
                 <YAxis tickFormatter={(x: number) => krwShort(x)} tick={{ fontSize: 11, fill: "var(--neutral-text-secondary)" }} width={64} />
                 <Tooltip cursor={{ fill: "var(--neutral-canvas)" }} formatter={(x: number) => [krwShort(x), "매출"]} contentStyle={{ borderRadius: 12, borderColor: "var(--neutral-border)", fontSize: 13 }} />
-                <Bar dataKey="value" fill="var(--theme-primary)" radius={[6, 6, 0, 0]} maxBarSize={64} />
+                <Bar isAnimationActive={false} dataKey="value" fill="var(--theme-primary)" radius={[6, 6, 0, 0]} maxBarSize={64} />
               </BarChart>
             </ResponsiveContainer>
           </div>

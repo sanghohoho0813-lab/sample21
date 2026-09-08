@@ -181,7 +181,7 @@ for (const p of PRODUCTS) {
 /* Day-dependent weight to shape Scenario A (급상승) and C (저회전). dayOffset = days ago (0 = today). */
 function dayWeight(vb: VariantBase, dayOffset: number) {
   let w = vb.weight;
-  if (vb.id === SCENARIO.A_VARIANT) w *= dayOffset <= 7 ? 2.2 : dayOffset <= 14 ? 1.6 : 1.1;
+  if (vb.id === SCENARIO.A_VARIANT) w *= dayOffset <= 7 ? 1.9 : dayOffset <= 14 ? 1.7 : 1.1;
   else if (vb.productId === SCENARIO.A_PRODUCT) w *= dayOffset <= 7 ? 1.7 : 1.0;
   if (vb.productId === SCENARIO.C_PRODUCT) w *= dayOffset <= 21 ? 0.12 : dayOffset <= 45 ? 0.9 : 1.5;
   if (vb.productId === SCENARIO.B_PRODUCT) w *= 1.4;
@@ -261,8 +261,8 @@ export const SEED_ORDERS: Order[] = [];
     const nOrders = base + randInt(orderRand, -2, 4);
     // Scenario injections (deterministic): A = 급상승 최근 7일, C = 과거에는 팔리다 최근 멈춤
     const forced: VariantBase[] = [];
-    if (d < 7) forced.push(A_BASE, A_BASE);
-    else if (d < 14) forced.push(A_BASE);
+    if (d < 7) { forced.push(A_BASE); if (d % 2 === 0) forced.push(A_BASE); }
+    else if (d < 14) { forced.push(A_BASE); if (d % 2 === 1) forced.push(A_BASE); }
     if (d >= 22 && d % 2 === 0) forced.push(C_BASES[d % C_BASES.length]);
     for (let k = 0; k < nOrders; k++) {
       const nItems = orderRand() < 0.55 ? 1 : orderRand() < 0.8 ? 2 : 3;
@@ -280,7 +280,9 @@ export const SEED_ORDERS: Order[] = [];
       const couponDiscount = orderRand() < 0.22 ? Math.round(subtotal * 0.05 / 1000) * 1000 : 0;
       const shippingFee = subtotal >= 50000 ? 0 : 3000;
       const total = subtotal - couponDiscount + shippingFee;
-      const cust = pick(orderRand, nonDemoCustomers);
+      // 42% 비회원(1회) 주문 → 재구매율이 현실적인 수준(약 30%)이 되도록 한다
+      const isGuest = orderRand() < 0.42;
+      const cust = isGuest ? { id: `g-${String(seq).padStart(4, "0")}`, name: `${pick(orderRand, FAMILY)}${pick(orderRand, GIVEN)}` } : pick(orderRand, nonDemoCustomers);
       const hour = randInt(orderRand, 8, 23);
       const createdAt = isoDaysAgo(d, hour, randInt(orderRand, 0, 59));
       let status: OrderStatus = "delivered";
@@ -398,7 +400,7 @@ export const RETURNS: ReturnRequest[] = [];
       else if (p.sizing === "large") reason = r() < 0.45 ? "size-large" : pick(r, REASONS);
       else reason = pick(r, REASONS);
       const age = Math.floor((Date.now() - new Date(o.createdAt).getTime()) / 86400000);
-      RETURNS.push({ id: `RT-${String(n++).padStart(4, "0")}`, orderId: o.id, customerId: o.customerId, productId: it.productId, variantId: it.variantId, reason, createdAt: isoDaysAgo(Math.max(0, age - randInt(r, 2, 6)), 11), status: age < 5 ? "requested" : r() < 0.85 ? "completed" : "approved" });
+      RETURNS.push({ id: `RT-${String(n++).padStart(4, "0")}`, orderId: o.id, customerId: o.customerId, customerName: o.customerName, productId: it.productId, variantId: it.variantId, reason, createdAt: isoDaysAgo(Math.max(0, age - randInt(r, 2, 6)), 11), status: age < 5 ? "requested" : r() < 0.85 ? "completed" : "approved" });
     }
   }
 }

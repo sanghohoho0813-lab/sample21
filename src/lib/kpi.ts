@@ -4,7 +4,7 @@
 ------------------------------------------------------------------- */
 import type { AppState } from "./store";
 import type { InventoryStatus, Order, OrderStatus, Product, ReturnRequest, Variant, SegmentId } from "./types";
-import { BRAND_BY_ID, CUSTOMERS, DAILY, PRODUCTS, PRODUCT_BY_ID, RETURNS, SEED_ORDERS, VARIANTS, variantsOf, PRODUCT_DAILY_BY_ID } from "./demo/seed";
+import { BRAND_BY_ID, CUSTOMERS, CUSTOMER_BY_ID, DAILY, PRODUCTS, PRODUCT_BY_ID, RETURNS, SEED_ORDERS, VARIANTS, variantsOf, PRODUCT_DAILY_BY_ID } from "./demo/seed";
 import { safeDiv } from "./format";
 
 type Delta = Pick<AppState, "viewDelta" | "wishlistDelta" | "cartDelta" | "restockDelta" | "inventoryDelta" | "returnDelta" | "salePriceOverride" | "fitNoteOverride" | "variantRestockState" | "orderStatusOverride" | "orders" | "returns">;
@@ -120,9 +120,11 @@ export type Period = "today" | "7d" | "30d" | "90d";
 export const PERIOD_LABEL: Record<Period, string> = { today: "오늘", "7d": "최근 7일", "30d": "최근 30일", "90d": "최근 90일" };
 const periodDays: Record<Period, number> = { today: 1, "7d": 7, "30d": 30, "90d": 90 };
 
+/** Whole-day windows (00:00 boundaries) so "오늘"과 "직전 기간" 비교가 공정하다. offset=1 → 직전 기간 */
 export function periodOrders(orders: Order[], period: Period, offset = 0) {
   const days = periodDays[period];
-  const end = Date.now() - offset * days * 86400000;
+  const endOfToday = new Date(); endOfToday.setHours(23, 59, 59, 999);
+  const end = endOfToday.getTime() - offset * days * 86400000;
   const start = end - days * 86400000;
   return orders.filter((o) => { const t = new Date(o.createdAt).getTime(); return t > start && t <= end && o.status !== "cancelled"; });
 }
@@ -167,11 +169,13 @@ export function inventoryKpi(d: Delta) {
 
 export function customerKpi(d: Delta) {
   const orders = allOrders(d);
-  const buyers = new Set(orders.filter((o) => o.status !== "cancelled").map((o) => o.customerId));
+  const allBuyers = new Set(orders.filter((o) => o.status !== "cancelled").map((o) => o.customerId));
+  const buyers = new Set([...allBuyers].filter((id) => !!CUSTOMER_BY_ID[id]));
+  const guestBuyers = allBuyers.size - buyers.size;
   const newCust30 = CUSTOMERS.filter((c) => Date.now() - new Date(c.joinedAt).getTime() <= 30 * 86400000).length;
   const withProfile = CUSTOMERS.filter((c) => c.hasFitProfile).length;
   const segments = Object.fromEntries((["first-purchase", "wish-no-buy", "restock-waiting", "cycle-due", "brand-loyal", "post-return-drop", "vip"] as SegmentId[]).map((s) => [s, CUSTOMERS.filter((c) => c.segment === s).length])) as Record<SegmentId, number>;
-  return { total: CUSTOMERS.length, buyers: buyers.size, newCust30, profileRate: safeDiv(withProfile, CUSTOMERS.length), segments };
+  return { total: CUSTOMERS.length, buyers: buyers.size, guestBuyers, newCust30, profileRate: safeDiv(withProfile, CUSTOMERS.length), segments };
 }
 
 export function actionKpi(actions: AppState["actions"]) {

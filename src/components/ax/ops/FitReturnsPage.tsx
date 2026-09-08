@@ -139,7 +139,7 @@ function FitBody() {
     ) },
     { key: "at", header: "접수 시각", cell: (r) => <span title={fmtDate(r.createdAt, "datetime")}>{relTime(r.createdAt)}</span> },
     { key: "order", header: "주문번호", cell: (r) => <Link href={`/ax/orders?q=${r.orderId}`} onClick={(e) => e.stopPropagation()} className="hover:text-theme-primary underline-offset-2 hover:underline">{r.orderId}</Link> },
-    { key: "customer", header: "고객", cell: (r) => displayName(CUSTOMER_BY_ID[r.customerId]?.name ?? r.customerId, store.role) },
+    { key: "customer", header: "고객", cell: (r) => <span>{displayName(r.customerName ?? CUSTOMER_BY_ID[r.customerId]?.name ?? "비회원", store.role)}{!CUSTOMER_BY_ID[r.customerId] && <span className="ml-1 text-[0.72rem] text-neutral-text2">비회원</span>}</span> },
     { key: "product", header: "상품·옵션", cell: (r) => { const p = PRODUCT_BY_ID[r.productId]; const v = VARIANT_BY_ID[r.variantId]; return <span>{p?.name ?? r.productId}{v && <span className="text-neutral-text2"> · {v.color} / {v.size}</span>}</span>; } },
     { key: "reason", header: "사유", cell: (r) => <Badge tone={isSizeReason(r.reason) ? "warning" : "neutral"} size="sm">{RETURN_REASON_LABEL[r.reason]}</Badge> },
     { key: "status", header: "상태", hideOnMobile: true, cell: (r) => <Badge tone={RETURN_STATUS_TONE[effStatus(r)]} size="sm">{RETURN_STATUS_LABEL[effStatus(r)]}</Badge> },
@@ -194,7 +194,7 @@ function FitBody() {
                 <XAxis type="number" tick={{ fontSize: 12, fill: "var(--neutral-text-secondary)" }} allowDecimals={false} label={{ value: "건수", position: "insideBottomRight", offset: -2, fontSize: 11, fill: "var(--neutral-text-secondary)" }} />
                 <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12, fill: "var(--neutral-text)" }} />
                 <Tooltip cursor={{ fill: "var(--neutral-canvas)" }} formatter={(v: number) => [`${v}건`, "반품"]} contentStyle={{ borderRadius: 12, borderColor: "var(--neutral-border)", fontSize: 13 }} />
-                <Bar dataKey="value" fill="var(--theme-primary)" radius={[0, 6, 6, 0]} />
+                <Bar isAnimationActive={false} dataKey="value" fill="var(--theme-primary)" radius={[0, 6, 6, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -208,7 +208,7 @@ function FitBody() {
                 <XAxis type="number" unit="%" tick={{ fontSize: 12, fill: "var(--neutral-text-secondary)" }} />
                 <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12, fill: "var(--neutral-text)" }} />
                 <Tooltip cursor={{ fill: "var(--neutral-canvas)" }} formatter={(v: number, _n, item) => [`${v}% (반품 ${item.payload.returns} / 판매 ${item.payload.sales})`, "반품률"]} contentStyle={{ borderRadius: 12, borderColor: "var(--neutral-border)", fontSize: 13 }} />
-                <Bar dataKey="rate" fill="var(--theme-secondary)" radius={[0, 6, 6, 0]} />
+                <Bar isAnimationActive={false} dataKey="rate" fill="var(--theme-secondary)" radius={[0, 6, 6, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

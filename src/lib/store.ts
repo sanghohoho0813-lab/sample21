@@ -170,7 +170,7 @@ export const useApp = create<AppState>()(
 
       requestReturn: (orderId, variantId, reason, note) => {
         const v = VARIANT_BY_ID[variantId];
-        const rr: ReturnRequest = { id: uid("RT"), orderId, customerId: DEMO_CUSTOMER_ID, productId: v.productId, variantId, reason, createdAt: nowIso(), status: "requested", note };
+        const rr: ReturnRequest = { id: uid("RT"), orderId, customerId: DEMO_CUSTOMER_ID, customerName: DEMO_CUSTOMER_NAME, productId: v.productId, variantId, reason, createdAt: nowIso(), status: "requested", note };
         set((s) => ({ returns: [rr, ...s.returns], returnDelta: { ...s.returnDelta, [variantId]: (s.returnDelta[variantId] ?? 0) + 1 } }));
         get().updateOrderStatus(orderId, "return-requested", DEMO_CUSTOMER_NAME);
         get().track("request_return", { productId: v.productId, variantId, reason });

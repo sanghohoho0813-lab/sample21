@@ -189,6 +189,7 @@ export interface ReturnRequest {
   id: string;
   orderId: string;
   customerId: string;
+  customerName?: string;
   productId: string;
   variantId: string;
   reason: ReturnReason;

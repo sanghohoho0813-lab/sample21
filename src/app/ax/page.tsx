@@ -150,7 +150,7 @@ function Dashboard() {
           </div>
           {/* Row 3 */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <KpiCard label="반품률" value={<Big>{pct(k.returnRate, 1)}</Big>} delta={pctDelta(k.returnRate, derived.returnRatePrev)} invert href="/ax/fit-returns" />
+            <KpiCard label="반품률" value={<Big>{pct(k.returnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 ÷ 판매 ${num(k.cur.units)}개`} href="/ax/fit-returns" />
             <KpiCard label="사이즈 관련 반품률" value={<Big>{pct(k.fitReturnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 중 사이즈·핏 사유`} href="/ax/fit-returns" icon={<Ruler size={18} />} accent="#C76C86" />
             <KpiCard label="재입고 신청" value={<Big>{num(inv.restockRequests)}</Big>} sub="옵션별 재입고 알림 신청 누적" href="/ax/inventory" />
             <KpiCard label="미처리 Action" value={<Big>{num(ak.open)}</Big>} sub={`긴급 ${num(ak.high)}건 · 완료율 ${pct(ak.executionRate, 0)}`} href="/ax/actions" icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} />
@@ -187,8 +187,8 @@ function Dashboard() {
               <YAxis yAxisId="rev" tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} tickFormatter={axisKrw} width={54} />
               <YAxis yAxisId="ord" orientation="right" tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} width={32} />
               <Tooltip content={<ChartTip formatter={(k2, v) => (k2 === "매출" ? krwShort(v) : `${num(v)}건`)} />} cursor={{ fill: "var(--theme-soft)", opacity: 0.5 }} />
-              <Bar yAxisId="ord" dataKey="주문" fill={CHART.secondary} opacity={0.55} radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Area yAxisId="rev" type="monotone" dataKey="매출" stroke={CHART.primary} strokeWidth={2.5} fill="url(#dashRev)" />
+              <Bar isAnimationActive={false} yAxisId="ord" dataKey="주문" fill={CHART.secondary} opacity={0.55} radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Area isAnimationActive={false} yAxisId="rev" type="monotone" dataKey="매출" stroke={CHART.primary} strokeWidth={2.5} fill="url(#dashRev)" />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

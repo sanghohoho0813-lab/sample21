@@ -147,9 +147,9 @@ function DetailInner() {
                 <YAxis yAxisId="u" orientation="right" tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip content={<ChartTip />} />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-                <Line yAxisId="v" type="monotone" dataKey="조회" stroke={CHART.secondary} strokeWidth={2} dot={false} />
-                <Line yAxisId="v" type="monotone" dataKey="찜" stroke={CHART.accent} strokeWidth={2} dot={false} />
-                <Line yAxisId="u" type="monotone" dataKey="판매" stroke={CHART.primary} strokeWidth={2.5} dot={false} />
+                <Line isAnimationActive={false} yAxisId="v" type="monotone" dataKey="조회" stroke={CHART.secondary} strokeWidth={2} dot={false} />
+                <Line isAnimationActive={false} yAxisId="v" type="monotone" dataKey="찜" stroke={CHART.accent} strokeWidth={2} dot={false} />
+                <Line isAnimationActive={false} yAxisId="u" type="monotone" dataKey="판매" stroke={CHART.primary} strokeWidth={2.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -173,7 +173,7 @@ function DetailInner() {
                   <XAxis dataKey="date" tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={{ stroke: CHART.border }} interval={4} />
                   <YAxis tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} width={32} allowDecimals={false} />
                   <Tooltip content={<ChartTip formatter={(_, v) => `${num(v)}개`} />} />
-                  <Area type="monotone" dataKey="판매" stroke={CHART.primary} strokeWidth={2.5} fill="url(#pdUnits)" />
+                  <Area isAnimationActive={false} type="monotone" dataKey="판매" stroke={CHART.primary} strokeWidth={2.5} fill="url(#pdUnits)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -204,7 +204,7 @@ function DetailInner() {
                     <XAxis type="number" hide allowDecimals={false} />
                     <YAxis type="category" dataKey="label" width={110} tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} />
                     <Tooltip content={<ChartTip formatter={(_, v) => `${num(v)}건`} />} cursor={{ fill: "var(--theme-soft)", opacity: 0.5 }} />
-                    <Bar dataKey="count" name="반품" fill={CHART.error} radius={[0, 6, 6, 0]} maxBarSize={18} />
+                    <Bar isAnimationActive={false} dataKey="count" name="반품" fill={CHART.error} radius={[0, 6, 6, 0]} maxBarSize={18} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

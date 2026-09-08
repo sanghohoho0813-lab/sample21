@@ -73,8 +73,8 @@ Mobile  : Bottom Nav = 대시보드 / Action / 재고 / 주문 / 더보기(Drawe
 
 ## 5. Data Model (src/lib/types.ts)
 Brand · Category · Product · Variant(옵션) · Customer · Order/OrderItem · ReturnRequest · Campaign · AXAction · EvidenceLog · RestockSubscription · CartItem · FitProfile · TrackedEvent · Notification · DailyPoint · ProductDaily.
-Demo 규모: 브랜드 10 · 상품 48 · 옵션 365 · 고객 361 · 주문 1,27x(90일) · 반품 9x · 캠페인 8 · Action 12 · Evidence 8.
-Scenario A: `p-nove-oxford` 블랙 M (재고 4, 7일 판매 21 vs 13, 찜 41, 알림 18) · B: `p-plane-wide` 사이즈 작음 반품 · C: `p-still-balmacaan` 저회전 · D: AERNO 구매주기 도래 42명.
+Demo 규모: 브랜드 10 · 상품 48 · 옵션 365 · 회원 361(+비회원 주문 42%) · 주문 약 1,240(90일) · 반품 약 90 · 캠페인 8 · Action 12 · Evidence 8.
+Scenario A: `p-nove-oxford` 블랙 M (재고 4, 7일 판매 급상승, 찜 41, 알림 18) · B: `p-plane-wide` 사이즈 작음 반품 · C: `p-still-balmacaan` 저회전 · D: AERNO 구매주기 도래 42명.
 
 ## 6. Event Tracking (Adapter: store.track)
 view_home · search_product · select_category · view_product · select_color · select_size · complete_fit_profile · view_fit_recommendation · add_wishlist · remove_wishlist · subscribe_restock · add_to_cart · begin_checkout · complete_demo_order · view_order · request_return · view_recommendation · click_recommendation · return_visit

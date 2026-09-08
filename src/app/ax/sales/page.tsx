@@ -154,8 +154,8 @@ function SalesInner() {
                 <YAxis yAxisId="rev" tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} tickFormatter={axisKrw} width={54} />
                 <YAxis yAxisId="ord" orientation="right" tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip content={<ChartTip formatter={(k, v) => (k === "매출" ? krwShort(v) : `${num(v)}건`)} />} cursor={{ fill: "var(--theme-soft)", opacity: 0.5 }} />
-                <Bar yAxisId="ord" dataKey="주문" fill={CHART.secondary} opacity={0.55} radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Area yAxisId="rev" type="monotone" dataKey="매출" stroke={CHART.primary} strokeWidth={2.5} fill="url(#salesRev)" />
+                <Bar isAnimationActive={false} yAxisId="ord" dataKey="주문" fill={CHART.secondary} opacity={0.55} radius={[4, 4, 0, 0]} maxBarSize={28} />
+                <Area isAnimationActive={false} yAxisId="rev" type="monotone" dataKey="매출" stroke={CHART.primary} strokeWidth={2.5} fill="url(#salesRev)" />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -172,7 +172,7 @@ function SalesInner() {
                   <XAxis type="number" tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} tickFormatter={axisKrw} />
                   <YAxis type="category" dataKey="name" width={96} tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} />
                   <Tooltip content={<ChartTip formatter={(_, v) => krwShort(v)} />} cursor={{ fill: "var(--theme-soft)", opacity: 0.5 }} />
-                  <Bar dataKey="매출" fill={CHART.primary} radius={[0, 6, 6, 0]} maxBarSize={20} />
+                  <Bar isAnimationActive={false} dataKey="매출" fill={CHART.primary} radius={[0, 6, 6, 0]} maxBarSize={20} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -184,7 +184,7 @@ function SalesInner() {
               <div className="h-[220px] w-full sm:w-1/2">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={byCategory} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={2} stroke="none">
+                    <Pie isAnimationActive={false} data={byCategory} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="88%" paddingAngle={2} stroke="none">
                       {byCategory.map((_, i) => <Cell key={i} fill={CHART_SERIES[i % CHART_SERIES.length]} />)}
                     </Pie>
                     <Tooltip content={<ChartTip formatter={(_, v) => `${krwShort(v)} (${pct(safeDiv(v, catTotal), 0)})`} />} />
@@ -209,8 +209,8 @@ function SalesInner() {
                 <YAxis tick={{ fontSize: 12, fill: CHART.text2 }} tickLine={false} axisLine={false} tickFormatter={axisKrw} width={54} />
                 <Tooltip content={<ChartTip formatter={(_, v) => krwShort(v)} />} cursor={{ fill: "var(--theme-soft)", opacity: 0.5 }} />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-                <Bar dataKey="mobile" name="모바일" stackId="c" fill={CHART.primary} maxBarSize={28} />
-                <Bar dataKey="web" name="PC 웹" stackId="c" fill={CHART.accent} radius={[4, 4, 0, 0]} maxBarSize={28} />
+                <Bar isAnimationActive={false} dataKey="mobile" name="모바일" stackId="c" fill={CHART.primary} maxBarSize={28} />
+                <Bar isAnimationActive={false} dataKey="web" name="PC 웹" stackId="c" fill={CHART.accent} radius={[4, 4, 0, 0]} maxBarSize={28} />
               </BarChart>
             </ResponsiveContainer>
           </div>
