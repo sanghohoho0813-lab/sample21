@@ -27,7 +27,7 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
   const [slot, setSlot] = useState(0);
   const cur = SLOTS[slot];
   return (
-    <div className="md:sticky md:top-[88px] space-y-3">
+    <div className="md:sticky md:top-[88px] space-y-3 min-w-0">
       <ProductImage colors={product.colors} variant={colorIdx} label={`${product.name} · ${product.colors[colorIdx]} · ${cur.label}`} ratio="aspect-[3/4]" className="rounded-2xl md:rounded-cardlg">
         {slot === 1 && <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }} />}
         {slot === 2 && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }} />}
@@ -206,7 +206,7 @@ export function ProductDetail({ product }: { product: Product }) {
         <div className="grid md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-6 md:gap-10 items-start">
           <Gallery product={product} colorIdx={colorIdx} onColor={pickColor} />
 
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             <div>
               <div className="flex items-center gap-2 mb-2"><Link href={`/brands/${brand.slug}`} className="text-[0.85rem] font-bold tracking-wide text-neutral-text2 hover:text-neutral-text inline-flex items-center gap-0.5">{brand.name}<ChevronRight size={14} /></Link>{badge && <Badge tone={badge.tone} size="sm">{badge.t}</Badge>}</div>
               <h1 className="text-[1.5rem] md:text-[1.8rem] font-bold tracking-tight leading-tight">{product.name}</h1>

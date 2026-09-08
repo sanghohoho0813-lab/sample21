@@ -70,7 +70,7 @@ function CheckoutForm() {
 
   return (
     <form onSubmit={submit} noValidate className="grid lg:grid-cols-[minmax(0,1fr)_380px] gap-6 lg:gap-8 items-start">
-      <div className="space-y-5">
+      <div className="space-y-5 min-w-0">
         <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
           <h2 className="font-bold text-[1.05rem] flex items-center gap-2 mb-4"><User size={18} />주문자 정보</h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -110,7 +110,7 @@ function CheckoutForm() {
         </section>
       </div>
 
-      <aside className="lg:sticky lg:top-[96px] rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 shadow-card space-y-4">
+      <aside className="lg:sticky lg:top-[96px] rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 shadow-card space-y-4 min-w-0">
         <p className="font-bold text-[1.05rem]">결제 예정 금액</p>
         <PriceSummary subtotal={subtotal} itemDiscount={itemDiscount} coupon={cDisc} shipping={ship} total={total} couponLabel={cp.code || undefined} />
         {cp.code && <p className="text-[0.82rem] text-brand-accent font-semibold">{cp.code} 쿠폰 적용 · {cp.rate}% 할인 ({krw(cDisc)})</p>}

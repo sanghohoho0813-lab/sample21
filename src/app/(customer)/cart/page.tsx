@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ShoppingBag, Minus, Plus, Trash2, Truck, Ticket, Heart, ArrowRight } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { BRAND_BY_ID, PRODUCT_BY_ID, VARIANT_BY_ID } from "@/lib/demo/seed";
-import { useApp } from "@/lib/store";
+import { useApp, campaignStatus } from "@/lib/store";
 import { effPrice } from "@/lib/kpi";
 import { krw } from "@/lib/format";
 import { Hydrated } from "@/components/system/Hydrated";
@@ -18,7 +18,7 @@ import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { OptionSheet } from "@/components/customer/conversion/OptionSheet";
 import { PriceSummary } from "@/components/customer/conversion/OrderBits";
-import { COUPONS, FREE_SHIP_MIN, couponByCode, couponDiscount, etaLabel, parseVariant, shippingFeeFor, stockState, useDocumentTitle } from "@/components/customer/conversion/shared";
+import { AERNO_COUPON, COUPONS, FREE_SHIP_MIN, couponByCode, couponDiscount, etaLabel, parseVariant, shippingFeeFor, stockState, useDocumentTitle } from "@/components/customer/conversion/shared";
 
 function CartContent() {
   const store = useApp();
@@ -27,6 +27,8 @@ function CartContent() {
   const rows = store.cart.map((c) => { const parsed = parseVariant(c.variantId); if (!parsed) return null; const price = effPrice(parsed.product, store); const st = stockState(parsed.variant, store); return { c, ...parsed, price, st }; }).filter((r): r is NonNullable<typeof r> => !!r);
   const subtotal = rows.reduce((s, r) => s + r.price * r.c.qty, 0);
   const itemDiscount = rows.reduce((s, r) => s + (r.product.price - r.price) * r.c.qty, 0);
+  const aernoRunning = campaignStatus("cp-06", store.campaignStatusOverride) === "running";
+  const coupons = aernoRunning ? [...COUPONS, AERNO_COUPON] : COUPONS;
   const cp = couponByCode(coupon);
   const cDisc = couponDiscount(subtotal, cp.rate);
   const ship = shippingFeeFor(subtotal);
@@ -49,7 +51,7 @@ function CartContent() {
 
   return (
     <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-6 lg:gap-8 items-start">
-      <div className="space-y-4">
+      <div className="space-y-4 min-w-0">
         <ul className="rounded-cardlg border border-neutral-border bg-white divide-y divide-neutral-border">
           {rows.map(({ c, product, variant, colorIdx, price, st }) => (
             <li key={c.variantId} className="p-4 md:p-5">
@@ -84,15 +86,15 @@ function CartContent() {
         <div className="rounded-cardlg border border-neutral-border bg-white p-4 md:p-5">
           <div className="flex items-center gap-2 mb-3"><Ticket size={18} /><p className="font-bold">쿠폰</p><DemoBadge /></div>
           <Select name="coupon" aria-label="쿠폰 선택" value={coupon} onChange={(e) => { setCoupon(e.target.value); const sel = couponByCode(e.target.value); if (sel.code) toast(`${sel.code} 쿠폰을 적용했습니다`, `${sel.rate}% 할인 · ${sel.desc}`); }}>
-            {COUPONS.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
+            {coupons.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
           </Select>
-          <p className="text-[0.8rem] text-neutral-text2 mt-2">시연용 쿠폰입니다. 선택한 쿠폰은 주문서로 그대로 전달됩니다.</p>
+          <p className="text-[0.8rem] text-neutral-text2 mt-2">시연용 쿠폰입니다. 선택한 쿠폰은 주문서로 그대로 전달됩니다.{aernoRunning && <span className="ml-1 font-semibold text-brand-accent">AERNO 재구매 캠페인 진행중 · AERNO7 사용 가능</span>}</p>
         </div>
 
         {wishCandidates.length > 0 && <WishQuick products={wishCandidates} onPick={(p) => setSheet({ product: p, colorIdx: 0 })} />}
       </div>
 
-      <aside className="lg:sticky lg:top-[96px] rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 shadow-card">
+      <aside className="lg:sticky lg:top-[96px] rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 shadow-card min-w-0">
         <p className="font-bold text-[1.05rem] mb-4">결제 예정 금액</p>
         <PriceSummary subtotal={subtotal} itemDiscount={itemDiscount} coupon={cDisc} shipping={ship} total={total} couponLabel={cp.code || undefined} />
         <p className="mt-3 text-[0.8rem] text-neutral-text2">{ship > 0 ? `${krw(FREE_SHIP_MIN - subtotal)} 더 담으면 무료배송` : "무료배송 적용"} · {etaLabel(ship === 0)}</p>

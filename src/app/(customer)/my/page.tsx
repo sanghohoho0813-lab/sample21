@@ -49,11 +49,11 @@ function MyContent() {
           <ProfileCard />
           <QuickStats orders={orders} />
           <div className="grid lg:grid-cols-2 gap-6">
-            <section>
+            <section className="min-w-0">
               <SectionHead title="최근 주문" desc="운영팀의 상태 변경이 즉시 반영됩니다." more="/my/orders" moreLabel="전체 주문" />
               {orders.length === 0 ? <div className="rounded-cardlg border border-dashed border-neutral-border bg-white p-6 text-center text-[0.9rem] text-neutral-text2">아직 주문이 없습니다. <Link href="/ranking" className="font-semibold text-neutral-text underline underline-offset-2">상품 둘러보기</Link></div> : <ul className="space-y-3">{orders.slice(0, 3).map((o) => <li key={o.id}><OrderCard order={o} /></li>)}</ul>}
             </section>
-            <section>
+            <section className="min-w-0">
               <SectionHead title="재입고 알림" desc="신청 즉시 Business AX Demand Radar에 반영됩니다." more="/my/restock" moreLabel="전체 보기" />
               <RestockList limit={2} compact />
               {store.restockSubs.length > 2 && <Link href="/my/restock" className="mt-3 inline-flex items-center gap-0.5 text-[0.88rem] font-semibold hover:underline underline-offset-2">재입고 알림 {store.restockSubs.length}건 모두 보기<ChevronRight size={14} /></Link>}

@@ -75,14 +75,14 @@ function OrderDetail({ id }: { id: string }) {
       <div className="flex items-center gap-2"><Link href="/my/orders" className="h-10 w-10 -ml-2 inline-flex items-center justify-center rounded-full hover:bg-brand-ivory" aria-label="주문내역으로"><ChevronLeft size={22} /></Link><div className="min-w-0 flex-1"><p className="text-[0.82rem] text-neutral-text2 tabular">{fmtDate(order.createdAt, "datetime")} 주문</p><h1 className="text-[1.3rem] md:text-[1.6rem] font-bold tracking-tight leading-tight tabular">주문번호 {order.id}</h1></div><OrderStatusBadge status={order.status} size="md" /></div>
 
       <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-5 items-start">
-        <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
+        <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 min-w-0">
           <p className="font-bold mb-4 flex items-center gap-2">배송 진행 상태 <DemoBadge /></p>
           <OrderTimeline order={order} tour="c-order-status" />
           <p className="mt-4 text-[0.8rem] text-neutral-text2 leading-relaxed">상태는 Business AX 주문·배송 화면에서 운영직원이 변경하며, 이 화면과 알림에 동시에 반영됩니다.</p>
           {store.role !== "customer" && <Link href="/ax/orders" className="mt-2 inline-flex items-center gap-1 text-[0.82rem] font-bold text-brand-accent hover:underline underline-offset-2"><ExternalLink size={13} />(대표·관리자) Business AX에서 상태 변경</Link>}
         </section>
 
-        <div className="space-y-5">
+        <div className="space-y-5 min-w-0">
           <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
             <p className="font-bold mb-3">주문 상품 {order.items.length}종</p>
             <ul className="divide-y divide-neutral-border">{order.items.map((it) => <li key={it.variantId} className="py-3 first:pt-0 last:pb-0"><OrderItemRow item={it} /></li>)}</ul>

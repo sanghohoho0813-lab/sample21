@@ -32,7 +32,9 @@ export const COUPONS: Coupon[] = [
   { code: "WELCOME5", label: "WELCOME5 · 5% 할인", rate: 5, desc: "첫 구매 감사 쿠폰 (DEMO)" },
   { code: "FIT10", label: "FIT10 · 10% 할인", rate: 10, desc: "핏 프로필 완성 쿠폰 (DEMO)" },
 ];
-export const couponByCode = (code: string | null | undefined): Coupon => COUPONS.find((c) => c.code === (code ?? "")) ?? COUPONS[0];
+/** Loop 4: cp-06 캠페인이 running일 때만 장바구니 목록에 노출되는 재구매 쿠폰 */
+export const AERNO_COUPON: Coupon = { code: "AERNO7", label: "AERNO7 · 7% 할인", rate: 7, desc: "AERNO 재구매 감사 쿠폰 · 캠페인 기간 한정 (DEMO)" };
+export const couponByCode = (code: string | null | undefined): Coupon => [...COUPONS, AERNO_COUPON].find((c) => c.code === (code ?? "")) ?? COUPONS[0];
 /** 스토어 placeOrder와 동일한 계산: 100원 단위 절사 */
 export const couponDiscount = (subtotal: number, rate: number) => Math.round((subtotal * rate) / 100 / 100) * 100;
 

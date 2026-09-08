@@ -17,7 +17,7 @@ export default function MyOrdersPage() {
   useDocumentTitle("주문내역");
   return (
     <Container className="py-6 md:py-10 max-w-[960px]">
-      <PageTitle title="주문내역" desc="운영팀이 상태를 바꾸면 이곳과 알림에 즉시 반영됩니다." right={<Freshness source="DEMO" />} />
+      <PageTitle title="주문내역" desc="운영팀이 상태를 바꾸면 이곳과 알림에 즉시 반영됩니다." right={<Hydrated fallback={null}><Freshness source="DEMO" /></Hydrated>} />
       <Hydrated fallback={<div className="space-y-3"><SkeletonCard lines={3} /><SkeletonCard lines={3} /><SkeletonCard lines={3} /></div>}><OrdersContent /></Hydrated>
     </Container>
   );

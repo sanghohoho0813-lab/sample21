@@ -21,7 +21,7 @@ function RestockContent() {
         {store.role !== "customer" && <Link href="/ax/inventory" className="text-[0.82rem] font-bold text-brand-accent hover:underline underline-offset-2 inline-flex items-center gap-0.5 whitespace-nowrap">Demand Radar 보기<ChevronRight size={14} /></Link>}
       </div>
       <div className="flex flex-wrap gap-2 text-[0.88rem]"><Badge tone="warning">대기중 {waiting}</Badge><Badge tone="success">재입고 알림 도착 {notified}</Badge><Badge tone="neutral">전체 {store.restockSubs.length}</Badge></div>
-      <RestockList tour="c-restock-list" />
+      <div data-tour="c-restock-list"><RestockList /></div>
     </div>
   );
 }

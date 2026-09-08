@@ -7,7 +7,7 @@ import { effFitNote } from "@/lib/kpi";
 import { recommendFit } from "@/lib/engine";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { Input, Select, Segmented } from "@/components/ui/Form";
+import { Input, Select, Chip } from "@/components/ui/Form";
 import { Progress } from "@/components/ui/Misc";
 import { toast } from "@/components/ui/Toast";
 import { AIReadyBadge } from "@/components/ax/AIReady";
@@ -54,7 +54,7 @@ export function FitProfileForm({ compact, onSaved, submitLabel = "저장하고 �
       </div>
       <div>
         <p className="mb-1.5 text-[0.9rem] font-semibold">선호 핏</p>
-        <Segmented<Fit | ""> value={preferredFit} onChange={setPreferredFit} options={[{ value: "", label: "상관없음" }, ...PREFERRED_FIT_OPTIONS]} size={compact ? "sm" : "md"} className="w-full" />
+        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="선호 핏">{[{ value: "" as Fit | "", label: "상관없음" }, ...PREFERRED_FIT_OPTIONS].map((o) => <Chip key={o.value || "any"} active={preferredFit === o.value} onClick={() => setPreferredFit(o.value)} className={compact ? "h-10" : "h-11"}>{o.label}</Chip>)}</div>
       </div>
       {!compact && (
         <Select label="체형 (선택)" name="bodyType" value={bodyType} onChange={(e) => setBodyType(e.target.value as typeof bodyType)}>

@@ -34,7 +34,7 @@ function ProfileContent() {
   const reset = () => { store.updateFitProfile({ height: null, weight: null, topSize: null, bottomSize: null, preferredFit: null, bodyType: null }); toast("핏 프로필을 초기화했습니다", undefined, "info"); };
   return (
     <div className="grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-6 items-start">
-      <div className="space-y-6">
+      <div className="space-y-6 min-w-0">
         <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4"><p className="font-bold text-[1.05rem] flex items-center gap-2"><Ruler size={18} />핏 프로필 {complete ? <Badge tone="success" size="sm">완성</Badge> : <Badge tone="warning" size="sm">미완성</Badge>}</p>{fp.updatedAt && <span className="text-[0.8rem] text-neutral-text2 tabular">마지막 수정 {fmtDate(fp.updatedAt, "datetime")}</span>}</div>
           <FitProfileForm key={fp.updatedAt ?? "init"} submitLabel="프로필 저장" />
@@ -42,7 +42,7 @@ function ProfileContent() {
         </section>
         <InterestsCard />
       </div>
-      <div className="space-y-6">
+      <div className="space-y-6 min-w-0">
         <NotifyPrefsCard />
         <div className="rounded-cardlg bg-brand-ivory p-5 md:p-6 text-[0.9rem] space-y-2">
           <p className="font-bold flex items-center gap-2"><ShieldCheck size={16} />데이터 사용 안내</p>
