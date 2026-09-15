@@ -1,6 +1,7 @@
 /* Whole-Hybrid Acceptance Journey (Unified U-7 / MORFIT §51) — drives the real app end to end.
    Fails loudly on: dead route, missing element, overlay stuck, state not propagating between surfaces. */
 import { chromium } from "playwright";
+import fs from "node:fs";
 
 const BASE = process.env.QA_BASE ?? "http://localhost:3000";
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH ?? "/opt/pw-browsers/chromium-1194/chrome-linux/chrome" });
@@ -38,11 +39,25 @@ await step("Action approve → execute → done (Loop 1 close)", async () => {
 });
 await step("Customer sees restock notification / status", async () => { await go("/my/restock"); const t = await text(); if (!/재입고/.test(t)) throw new Error("no restock text"); });
 await step("Cart → Checkout → DEMO order (Loop 2 start)", async () => {
+  // 재입고 알림을 받은 옵션(Scenario A)을 먼저 담는다 → 주문 시 Loop 1이 '구매 전환'으로 닫힌다
+  await go("/products/p-nove-oxford?color=블랙&size=M"); const addA = page.getByRole("button", { name: /장바구니/ }).first(); await addA.waitFor({ timeout: 10000 }); await addA.click(); await page.waitForTimeout(300);
   await go("/products/p-aerno-sweat"); const size = page.getByRole("button", { name: /^사이즈 (S|M)\b/ }).first(); await size.waitFor({ timeout: 10000 }); await size.click(); await page.getByRole("button", { name: /장바구니/ }).first().click(); await page.waitForTimeout(300);
   await go("/cart"); await page.getByRole("link", { name: /주문하기/ }).first().click(); await page.waitForLoadState("networkidle");
-  const agree = page.locator('input[type="checkbox"]'); if (await agree.count()) await agree.first().check();
-  await page.getByRole("button", { name: /DEMO 주문 완료|주문 완료/ }).first().click(); await page.waitForLoadState("networkidle"); await page.waitForTimeout(500);
+  const agree = page.locator('input[name="agree"]'); await agree.waitFor({ timeout: 8000 });
+  for (let attempt = 0; attempt < 3 && !/checkout\/complete/.test(page.url()); attempt++) {
+    if (!(await agree.isChecked())) { await agree.check(); await page.waitForTimeout(150); }
+    if (!(await agree.isChecked())) throw new Error("agree checkbox did not stay checked (controlled input reset?)");
+    await page.getByRole("button", { name: /DEMO 주문 완료|주문 완료/ }).first().click();
+    await page.waitForURL(/checkout\/complete/, { timeout: 6000 }).catch(() => {});
+  }
   if (!/checkout\/complete/.test(page.url())) throw new Error("not on completion page: " + page.url());
+});
+await step("Restock notified → purchased (Loop 1 complete)", async () => {
+  const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state);
+  const sub = (st.restockSubs || []).find((r) => r.variantId === "p-nove-oxford-c0-M");
+  if (!sub || sub.status !== "purchased" || !sub.notifiedAt || !sub.purchaseOrderId) throw new Error("restock sub not closed: " + JSON.stringify(sub));
+  if (!st.evidence.some((e) => e.type === "RESULT" && /구매 전환/.test(e.title))) throw new Error("no purchase-conversion evidence");
+  await go("/my/restock"); const t = await text(); if (!/구매 완료 1/.test(t)) throw new Error("restock page does not show purchased count");
 });
 await step("AX orders shows customer order → status change (Loop 2 close)", async () => {
   await go("/ax/orders"); const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state); const oid = st.orders[0].id; const t = await text(); if (!t.includes(oid)) throw new Error("order not listed");
@@ -51,6 +66,15 @@ await step("AX orders shows customer order → status change (Loop 2 close)", as
 });
 await step("Customer My Page reflects order status", async () => { const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state); await go(`/my/orders/${st.orders[0].id}`); const t = await text(); if (!/상품준비/.test(t)) throw new Error("status not reflected"); });
 await step("Evidence lists loop", async () => { await go("/ax/evidence"); await page.locator('[data-tour="evidence-list"]').waitFor({ timeout: 8000 }); const t = await text(); if (!/재고 \+/.test(t)) throw new Error("restock result evidence missing"); });
+await step("Evidence Pack preview + JSON export", async () => {
+  await go("/ax/evidence/pack"); await page.locator("#pack-log").waitFor({ timeout: 10000 }); const t = await text();
+  if (!/UNKNOWN \/ REQUIRED/.test(t) || !/VALIDATE LATER/.test(t)) throw new Error("pack lacks baseline honesty markers");
+  if (!/구매 전환/.test(t)) throw new Error("pack does not include Loop 1 purchase conversion");
+  const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 8000 }), page.getByRole("button", { name: /JSON 내보내기/ }).first().click()]);
+  const file = await dl.path(); const json = JSON.parse(fs.readFileSync(file, "utf8"));
+  if (json.meta?.stage !== "DEMO" || json.meta?.baseline !== "UNKNOWN / REQUIRED" || !Array.isArray(json.baseline) || json.baseline.length < 8 || !Array.isArray(json.actions) || !Array.isArray(json.evidence)) throw new Error("pack json shape invalid");
+  if (json.kpiDelta.some((r) => r.delta !== "VALIDATE LATER")) throw new Error("pack json claims a delta");
+});
 await step("Why AX discoverable", async () => { await go("/ax"); await page.locator('[data-tour="nav-why"]').first().click(); await page.waitForLoadState("networkidle"); await page.locator('[data-tour="why-top"]').waitFor({ timeout: 20000 }); });
 await step("Presentation mode starts", async () => { await go("/ax/present"); await page.getByRole("button", { name: /시연 시작/ }).first().click(); await page.waitForTimeout(600); const t = await text(); if (!/시연 모드 · 1/.test(t)) throw new Error("controller missing"); await page.keyboard.press("Escape"); });
 await step("Theme 9 switch + no residual", async () => {

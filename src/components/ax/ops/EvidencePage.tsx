@@ -139,7 +139,7 @@ function EvidenceBody() {
 
       {/* Evidence Pack */}
       <SectionBlock title="Evidence Pack · 12주 실증 준비" desc="MORFIT §33 실증 계획을 4단계 체크리스트로 정리했습니다. Demo에서는 준비 상태만 표시합니다."
-        right={<><Badge tone="ready">READY · Pilot 전환 후</Badge><Button variant="outline" onClick={() => setPackOpen(true)} icon={<Download size={16} />} className="border-dashed text-neutral-text2" aria-describedby="pack-note">Evidence Pack 내보내기</Button></>}>
+        right={<><Badge tone="ready">READY · Pilot 전환 후 실측</Badge><Button variant="ghost" size="sm" onClick={() => setPackOpen(true)} aria-describedby="pack-note">구성 보기</Button><Button variant="outline" href="/ax/evidence/pack" icon={<Download size={16} />} data-tour="evidence-pack">Evidence Pack 미리보기</Button></>}>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {PACK_PHASES.map((p, i) => (
             <Card key={p.weeks} pad="md" className="flex flex-col gap-3">
@@ -149,13 +149,13 @@ function EvidenceBody() {
             </Card>
           ))}
         </div>
-        <NoteCard className="mt-4" icon={<Lock size={16} />}><span id="pack-note">실제 Pilot 전환 전에는 Evidence Pack을 내보낼 수 없습니다 — Baseline 없이 나가는 리포트는 개선율을 지어내게 되기 때문입니다. 버튼을 누르면 Pack에 무엇이 들어가는지 볼 수 있습니다.</span></NoteCard>
+        <NoteCard className="mt-4" icon={<Lock size={16} />}><span id="pack-note">Pilot 전환 전에는 <b>DEMO 미리보기</b>만 열립니다 — Baseline 없이 나가는 리포트는 개선율을 지어내게 되기 때문에, 미리보기의 모든 변화 칸은 VALIDATE LATER로 고정됩니다. 미리보기는 인쇄(PDF)와 JSON 내보내기를 지원합니다.</span></NoteCard>
       </SectionBlock>
 
-      <Modal open={packOpen} onClose={() => setPackOpen(false)} title="Evidence Pack에 들어갈 내용" size="md" footer={<div className="flex justify-end gap-2"><Button variant="outline" href="/ax/why" size="sm">Why AX 보기</Button><Button size="sm" onClick={() => setPackOpen(false)}>확인</Button></div>}>
+      <Modal open={packOpen} onClose={() => setPackOpen(false)} title="Evidence Pack에 들어갈 내용" size="md" footer={<div className="flex justify-end gap-2 flex-wrap"><Button variant="outline" href="/ax/why" size="sm">Why AX 보기</Button><Button variant="outline" href="/ax/evidence/pack" size="sm">미리보기 열기</Button><Button size="sm" onClick={() => setPackOpen(false)}>확인</Button></div>}>
         <div className="space-y-4 text-[0.92rem] leading-relaxed">
-          <div className="flex items-center gap-2 flex-wrap"><Badge tone="ready">READY</Badge><span className="font-bold">Pilot 전환 후 CSV·PDF로 내보내기</span></div>
-          <p className="text-neutral-text2">지금은 DEMO 데이터라 내보내기가 잠겨 있습니다. Baseline이 측정된 뒤 아래 항목이 한 묶음으로 생성됩니다.</p>
+          <div className="flex items-center gap-2 flex-wrap"><Badge tone="ready">READY</Badge><span className="font-bold">Pilot 전환 후 실측 Baseline으로 채워지는 항목</span></div>
+          <p className="text-neutral-text2">지금은 DEMO 미리보기(구조·현재값·VALIDATE LATER)만 열립니다. Baseline이 측정된 뒤 아래 항목이 실제 값으로 한 묶음이 됩니다.</p>
           <ol className="space-y-2">
             {[["Baseline 표", "구매전환율·찜→구매·재입고알림→구매·반품률·재고일수·MD 분석시간의 측정 시점과 값"], ["Action 로그", "추천 → 확인 → 실행 → 완료/보류/무시 이력과 담당자·사유 (ACTION·EXCEPTION)"], ["결과 비교", "Action 전후 KPI 변화 (RESULT·REVENUE·EFFICIENCY) — Baseline 대비로만 표기"], ["고객 반영", "알림·추천·상태 변경이 고객 화면에 도달한 기록과 반응 (CUSTOMER)"], ["채택·확장 지표", "Action 채택률, MD 1인당 활성 SKU, 관리 브랜드 수 (ADOPTION·SCALE)"], ["위험·예외", "Fit Risk 상승, 추천 오류, 보류 사유 (RISK·EXCEPTION)"]].map(([t, d], i) => (
               <li key={t} className="flex gap-3 rounded-xl bg-neutral-canvas px-4 py-3"><span className="h-6 w-6 shrink-0 rounded-full bg-white border border-neutral-border text-[0.78rem] font-bold inline-flex items-center justify-center">{i + 1}</span><span><span className="font-semibold">{t}</span><span className="block text-[0.85rem] text-neutral-text2">{d}</span></span></li>
@@ -197,14 +197,17 @@ function LoopTimeline({ action, evidence, store }: { action: AXAction; evidence:
   const resultEv = sorted.find((e) => e.type === "RESULT" && e.actionId === action.id);
   const feedbackEv = sorted.filter((e) => e.type === "CUSTOMER" && e.actionId === action.id && (!resultEv || e.at >= resultEv.at))[0];
   const done = hist("done"); const inProg = hist("in-progress"); const conf = hist("confirmed");
-  const notified = action.variantId ? store.restockSubs.filter((r) => r.variantId === action.variantId && r.status === "notified").length : 0;
+  const subs = action.variantId ? store.restockSubs.filter((r) => r.variantId === action.variantId) : [];
+  const purchased = subs.filter((r) => r.status === "purchased" && !!r.notifiedAt).length;
+  const notified = subs.filter((r) => r.status === "notified").length + purchased;
+  const purchaseEv = sorted.find((e) => e.actionId === action.id && e.title.startsWith("재입고 알림 → 구매 전환"));
   const stages: Stage[] = [
     { key: "customer", label: "Customer Event", icon: <UserRound size={16} />, done: !!customerEvent, at: customerEvent?.at, title: customerEvent?.title ?? "고객 조회·찜·재입고 신청·반품 등", detail: customerEvent?.detail ?? (action.productId ? `고객 화면에서 '${PRODUCT_BY_ID[action.productId]?.name}'을 찜하거나 재입고 알림을 신청하면 여기에 기록됩니다.` : "고객 Event 대기"), actor: customerEvent?.actor, href: action.productId ? `/products/${action.productId}` : undefined },
     { key: "insight", label: "Insight · 추천", icon: <Lightbulb size={16} />, done: true, at: action.recommendedAt, title: action.title, detail: `트리거: ${action.trigger} · 근거 ${action.reasons.length}개 · ${action.engine} engine (${action.automation})`, actor: action.statusHistory[0]?.actor, href: `/ax/actions?open=${action.id}` },
     { key: "approval", label: "Approval · 승인", icon: <ThumbsUp size={16} />, done: !!(conf || inProg || done), at: (conf ?? inProg ?? done)?.at, title: conf ? "담당자 확인" : inProg || done ? "확인 단계 생략 후 실행" : "승인 대기", detail: conf?.note ?? (conf ? `${conf.actor}이(가) 근거를 확인했습니다.` : "Action Center에서 '확인'을 누르면 기록됩니다."), actor: conf?.actor },
     { key: "action", label: "Action · 실행", icon: <Play size={16} />, done: !!(inProg || done), at: (inProg ?? done)?.at, title: inProg ? "실행중" : done ? "실행 완료" : "실행 대기", detail: inProg?.note ?? (inProg ? `${inProg.actor}이(가) 실행을 시작했습니다.` : done ? "실행 후 바로 완료 처리되었습니다." : "'실행중'으로 바꾸면 기록됩니다."), actor: inProg?.actor ?? done?.actor },
     { key: "result", label: "Result · 결과", icon: <Flag size={16} />, done: !!(done || resultEv), at: resultEv?.at ?? done?.at, title: resultEv?.title ?? (done ? action.resultNote ?? "완료" : "결과 대기"), detail: resultEv?.detail ?? (done ? "완료 기록" : "완료되면 재고·가격·핏 안내 등 실제 변화가 기록됩니다."), actor: resultEv?.actor ?? done?.actor },
-    { key: "feedback", label: "Customer Feedback · 고객 반영", icon: <MessageSquare size={16} />, done: !!feedbackEv || notified > 0 || (!!done && (action.type === "segment-campaign" || action.type === "cart-reminder")), at: feedbackEv?.at ?? (notified > 0 ? done?.at : undefined), title: feedbackEv?.title ?? (notified > 0 ? `재입고 알림 ${notified}명 발송 · 옵션 상태 '입고 완료'` : done && (action.type === "segment-campaign" || action.type === "cart-reminder") ? "고객 알림·추천 발송" : "고객 반응 대기"), detail: feedbackEv?.detail ?? (notified > 0 ? "고객 화면 알림과 My Page 재입고 알림 상태가 바뀌었습니다. 이후 구매 여부는 실증에서 측정합니다." : "결과가 고객 화면(알림·상태·가격·핏 안내)에 도달하면 기록됩니다. 구매 반응은 Baseline과 비교합니다."), actor: feedbackEv?.actor },
+    { key: "feedback", label: "Customer Feedback · 고객 반영", icon: <MessageSquare size={16} />, done: !!purchaseEv || !!feedbackEv || notified > 0 || (!!done && (action.type === "segment-campaign" || action.type === "cart-reminder")), at: purchaseEv?.at ?? feedbackEv?.at ?? (notified > 0 ? done?.at : undefined), title: purchaseEv ? `재입고 알림 ${notified}명 발송 → 구매 전환 ${purchased}명 (Loop 1 완결)` : feedbackEv?.title ?? (notified > 0 ? `재입고 알림 ${notified}명 발송 · 옵션 상태 '입고 완료'` : done && (action.type === "segment-campaign" || action.type === "cart-reminder") ? "고객 알림·추천 발송" : "고객 반응 대기"), detail: purchaseEv ? purchaseEv.detail : feedbackEv?.detail ?? (notified > 0 ? "고객 화면 알림과 My Page 재입고 알림 상태가 바뀌었습니다. 고객이 이 옵션을 주문하면 '구매 전환'으로 닫힙니다 (Baseline 대비 비교는 실증에서)." : "결과가 고객 화면(알림·상태·가격·핏 안내)에 도달하면 기록됩니다. 구매 반응은 Baseline과 비교합니다."), actor: purchaseEv?.actor ?? feedbackEv?.actor },
   ];
   const doneCount = stages.filter((s) => s.done).length;
   return (

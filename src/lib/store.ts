@@ -157,14 +157,24 @@ export const useApp = create<AppState>()(
         const d = new Date();
         const id = `MF${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}-${String(get().orders.length + 1).padStart(2, "0")}${Math.floor(Math.random() * 90 + 10)}`;
         const order: Order = { id, customerId: DEMO_CUSTOMER_ID, customerName: DEMO_CUSTOMER_NAME, createdAt: at, status: "pending", items, subtotal, discount: coupon + items.reduce((s, i) => s + i.discount * i.qty, 0), shippingFee, total, channel: typeof window !== "undefined" && window.innerWidth < 768 ? "mobile" : "web", address, memo: memo ? `${memo} · 결제수단(DEMO): ${payment}` : `결제수단(DEMO): ${payment}`, source: "DEMO", statusHistory: [{ status: "pending", at, actor: DEMO_CUSTOMER_NAME }] };
+        // Loop 1 완결: 재입고 알림을 받았던(또는 기다리던) 옵션을 이 주문에서 구매하면 '구매 완료'로 닫는다 (D-17)
+        const bought = new Set(items.map((i) => i.variantId));
+        const closing = get().restockSubs.filter((r) => bought.has(r.variantId) && r.status !== "purchased");
         set((s) => {
           const inv = { ...s.inventoryDelta };
           for (const it of items) inv[it.variantId] = (inv[it.variantId] ?? 0) - it.qty;
-          return { orders: [order, ...s.orders], cart: [], inventoryDelta: inv };
+          const restockSubs = closing.length ? s.restockSubs.map((r) => (bought.has(r.variantId) && r.status !== "purchased" ? { ...r, status: "purchased" as const, purchasedAt: at, purchaseOrderId: id } : r)) : s.restockSubs;
+          return { orders: [order, ...s.orders], cart: [], inventoryDelta: inv, restockSubs };
         });
         get().track("complete_demo_order", { orderId: id, total });
         get().pushNotification({ title: "DEMO 주문이 접수되었습니다", body: `주문번호 ${id} · ${items.length}개 상품 · 운영팀 확인 후 상품준비로 전환됩니다.`, kind: "order", href: `/my/orders/${id}` });
         get().addEvidence({ type: "CUSTOMER", title: `DEMO 주문 접수 ${id}`, detail: `${DEMO_CUSTOMER_NAME} 고객 주문 ${items.length}건 · 합계 ${total.toLocaleString("ko-KR")}원. 주문·매출·재고에 즉시 반영되었습니다.`, actor: DEMO_CUSTOMER_NAME, orderId: id, customerId: DEMO_CUSTOMER_ID, source: "DEMO", status: "demo" });
+        for (const r of closing) {
+          const v = VARIANT_BY_ID[r.variantId]; const p = PRODUCT_BY_ID[v.productId];
+          const restockAction = get().actions.find((a) => a.variantId === r.variantId && (a.type === "restock" || a.type === "rebalance"));
+          const viaNotice = r.status === "notified";
+          get().addEvidence({ type: "RESULT", title: `재입고 알림 → 구매 전환 · ${p.name} ${v.color} ${v.size}`, detail: viaNotice ? `재입고 알림을 받은 고객이 해당 옵션을 구매했습니다 (알림 ${r.notifiedAt ? new Date(r.notifiedAt).toLocaleString("ko-KR") : "-"} → 주문 ${id}). 재입고 Action이 매출로 이어진 첫 기록입니다.` : `재입고 알림 대기 중이던 고객이 해당 옵션을 구매했습니다 (주문 ${id}).`, actor: DEMO_CUSTOMER_NAME, actionId: restockAction?.id, productId: p.id, orderId: id, customerId: DEMO_CUSTOMER_ID, kpiDelta: viaNotice ? "알림→구매 전환 1건 (Baseline 대비: VALIDATE LATER)" : "대기→구매 1건", source: "DEMO", status: "demo" });
+        }
         return order;
       },
 

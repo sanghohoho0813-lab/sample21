@@ -109,14 +109,14 @@ export function AxShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex bg-neutral-canvas">
       <SurfaceMarker surface="ax" />
-      <aside className="ax-sidebar hidden lg:flex w-[280px] shrink-0 flex-col fixed inset-y-0 left-0 z-30 overflow-y-auto px-3 py-5">
+      <aside className="ax-sidebar hidden lg:flex print:hidden w-[280px] shrink-0 flex-col fixed inset-y-0 left-0 z-30 overflow-y-auto px-3 py-5">
         <Wordmark />
         <div className="mt-6 flex-1"><NavList role={effectiveRole} /></div>
         <SidebarFooter />
       </aside>
 
-      <div className="flex-1 min-w-0 lg:pl-[280px] flex flex-col">
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-neutral-border">
+      <div className="flex-1 min-w-0 lg:pl-[280px] print:pl-0 flex flex-col">
+        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-neutral-border print:hidden">
           <div className="h-[64px] px-4 md:px-6 flex items-center gap-3">
             <button onClick={() => setDrawer(true)} className="lg:hidden h-10 w-10 -ml-2 inline-flex items-center justify-center rounded-xl hover:bg-neutral-canvas" aria-label="메뉴 열기"><Menu size={22} /></button>
             <Link href="/ax" className="lg:hidden font-black tracking-tight text-[1.1rem]">MORFIT <span className="text-theme-primary">AX</span></Link>
@@ -136,7 +136,7 @@ export function AxShell({ children }: { children: ReactNode }) {
       </div>
 
       {/* Mobile bottom nav (AX) */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border safe-bottom" aria-label="AX 하단 메뉴">
+      <nav className="lg:hidden print:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border safe-bottom" aria-label="AX 하단 메뉴">
         <ul className="grid grid-cols-5 h-[64px]">
           {([[AX_NAV[0], "대시보드"], [AX_NAV[1], "Action"], [AX_NAV[4], "재고"], [AX_NAV[9], "주문"]] as const).map(([i, label]) => {
             const active = i.href === "/ax" ? pathname === "/ax" : pathname.startsWith(i.href);
@@ -144,7 +144,7 @@ export function AxShell({ children }: { children: ReactNode }) {
               <li key={i.key}><Link href={i.href} className={cn("h-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold active:bg-neutral-canvas", active ? "text-theme-primary" : "text-neutral-text2")}><NavIcon name={i.icon} size={22} />{label}</Link></li>
             );
           })}
-          <li><button onClick={() => setDrawer(true)} className="h-full w-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold text-neutral-text2 active:bg-neutral-canvas"><MoreHorizontal size={22} />더보기</button></li>
+          <li><button onClick={() => setDrawer(true)} className="h-full w-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold text-neutral-text2 active:bg-neutral-canvas" aria-label="더보기 메뉴 열기"><MoreHorizontal size={22} />더보기</button></li>
         </ul>
       </nav>
 

@@ -108,12 +108,13 @@ export function RestockList({ limit, tour, compact }: { limit?: number; tour?: s
                   <div className="min-w-0"><Link href={href} className="font-semibold leading-snug hover:underline underline-offset-2">{p.name}</Link><p className="text-[0.85rem] text-neutral-text2">{v.color} · {v.size}</p></div>
                   <Badge tone={RS_TONE[s.status]} size="sm">{RS_LABEL[s.status]}</Badge>
                 </div>
-                <p className="text-[0.8rem] text-neutral-text2 mt-1 tabular">신청일 {fmtDate(s.createdAt, "datetime")} ({relTime(s.createdAt)}){s.notifiedAt && ` · 입고 알림 ${relTime(s.notifiedAt)}`}</p>
+                <p className="text-[0.8rem] text-neutral-text2 mt-1 tabular">신청일 {fmtDate(s.createdAt, "datetime")} ({relTime(s.createdAt)}){s.notifiedAt && ` · 입고 알림 ${relTime(s.notifiedAt)}`}{s.purchasedAt && ` · 구매 ${relTime(s.purchasedAt)}`}</p>
                 <div className="mt-1.5"><Badge tone={st.tone} size="sm">현재 {st.label}</Badge></div>
                 {!compact && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {s.status === "notified" && <Button size="sm" variant="brand" href={href} icon={<Sparkles size={14} />}>지금 구매</Button>}
                     {s.status === "waiting" && <Button size="sm" variant="outline" href={href}>상품 보기</Button>}
+                    {s.status === "purchased" && s.purchaseOrderId && <Button size="sm" variant="outline" href={`/my/orders/${s.purchaseOrderId}`}>주문 보기</Button>}
                     {s.status !== "purchased" && <Button size="sm" variant="ghost" onClick={() => { store.cancelRestock(s.id); toast("재입고 알림을 취소했습니다", "Demand Radar 수요신호에서 제외됩니다", "info"); }} icon={<X size={14} />}>취소</Button>}
                   </div>
                 )}

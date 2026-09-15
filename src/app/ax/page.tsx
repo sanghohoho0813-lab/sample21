@@ -1,13 +1,15 @@
 "use client";
 /* 01 경영 대시보드 — 10초 안에: 무엇이 잘되고 / 어디서 돈이 새고 / 무엇을 먼저 봐야 하고 / 오늘 무엇을 결정해야 하는가 */
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { BookOpen, Boxes, FileCheck2, PackageCheck, RotateCcw, Ruler, ShoppingBag, Sparkles, TrendingUp, Zap } from "lucide-react";
+import { BookOpen, Boxes, FileCheck2, PackageCheck, RotateCcw, Ruler, ShoppingBag, Sparkles, TrendingUp, Zap, Wand2 } from "lucide-react";
 import { useApp, ROLE_NAME } from "@/lib/store";
 import { BRANDS, DAILY, PRODUCT_BY_ID, VARIANTS } from "@/lib/demo/seed";
 import { actionKpi, allOrders, allReturns, daysOfStock, demandScore, effVariant, inventoryStatus, inventoryKpi, periodOrders, salesKpi, PERIOD_LABEL, type Period } from "@/lib/kpi";
 import { ruleBriefing } from "@/lib/engine";
+import { aiStatus, explain, type AIExplainResponse } from "@/lib/ai";
+import { toast } from "@/components/ui/Toast";
 import { krwShort, num, pct, pctDelta, safeDiv } from "@/lib/format";
 import { relTime } from "@/lib/dates";
 import { ICON_ACCENTS } from "@/lib/theme";
@@ -70,6 +72,24 @@ function Dashboard() {
     openActions: ak.open, highActions: ak.high, restockRequests: inv.restockRequests, fitReturnRate: k.fitReturnRate,
     topProductName: radar[0] ? PRODUCT_BY_ID[radar[0].v.productId].name : "-",
   }), [k, inv, ak, radar]);
+
+  /* ------------------------------ LLM 설명 (AI READY → LIVE 는 서버 키 유무로 결정) ------------------------------ */
+  const [llm, setLlm] = useState<{ configured: boolean; model: string } | null>(null);
+  const [aiText, setAiText] = useState<AIExplainResponse | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  useEffect(() => { let on = true; aiStatus().then((s) => { if (on) setLlm({ configured: s.configured, model: s.model }); }); return () => { on = false; }; }, []);
+  const runAi = async () => {
+    setAiLoading(true);
+    const fallback = [briefing.headline, ...briefing.points.map((p) => `- ${p}`), `다음 행동 · ${briefing.next}`].join("\n");
+    const res = await explain({ kind: "briefing", structured: {
+      period, revenue: k.cur.revenue, revenuePrev: k.prev.revenue, revenueDelta: Number(revDelta.toFixed(4)), grossMargin: k.cur.grossMargin, orders: k.cur.orders, units: k.cur.units,
+      conversion: Number(k.conversion.toFixed(4)), repeat: Number(k.repeat.toFixed(4)), returnRate: Number(k.returnRate.toFixed(4)), fitReturnRate: Number(k.fitReturnRate.toFixed(4)),
+      lowRiskOptions: inv.lowRisk, risingOptions: inv.rising, slowStockValue: inv.slowValue, lostSales7d: Math.round(inv.lostSales7d), restockRequests: inv.restockRequests,
+      openActions: ak.open, highActions: ak.high, topDemandOption: radar[0] ? `${PRODUCT_BY_ID[radar[0].v.productId].name} ${radar[0].v.color} ${radar[0].v.size}` : null, dataSource: "DEMO",
+    } }, fallback);
+    setAiText(res); setAiLoading(false);
+    if (res.status !== "LIVE") toast("AI READY — LLM 미연결", res.note ?? "규칙 기반 요약을 그대로 표시합니다. 서버에 ANTHROPIC_API_KEY를 설정하면 LIVE로 바뀝니다.", "info");
+  };
 
   /* ------------------------------ Actions / evidence ------------------------------ */
   const todayActions = useMemo(() => sortByUrgency(visibleActions(role, app.actions).filter((a) => OPEN_STATUSES.has(a.status))).slice(0, 4), [app.actions, role]);
@@ -160,7 +180,7 @@ function Dashboard() {
 
       {/* AI 브리핑 + 오늘의 Action */}
       <div className="grid lg:grid-cols-5 gap-5">
-        <SectionCard tour="ai-briefing" className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">AI 브리핑 <AIReadyBadge kind="briefing" /></span>} desc="규칙 기반 요약 · LLM 연결 시 자연어 설명 추가">
+        <SectionCard tour="ai-briefing" className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">AI 브리핑 <AIReadyBadge kind="briefing" label={llm?.configured ? "AI LIVE" : undefined} /></span>} desc={llm?.configured ? `규칙 기반 요약 + LLM 설명 (${llm.model}) · 숫자는 코드가 계산` : "규칙 기반 요약 · LLM 연결 시 자연어 설명 추가"}>
           <p className="text-[1.15rem] md:text-[1.3rem] font-bold leading-snug tracking-tight">{briefing.headline}</p>
           <ul className="mt-4 space-y-2">
             {briefing.points.map((p) => <li key={p} className="flex gap-2.5 text-[0.95rem] leading-relaxed"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-theme-primary shrink-0" />{p}</li>)}
@@ -169,7 +189,17 @@ function Dashboard() {
             <p className="text-[0.95rem] font-semibold">다음 행동 · {briefing.next}</p>
             <Button size="sm" href="/ax/actions" icon={<Zap size={16} />}>Action Center 열기</Button>
           </div>
-          <p className="mt-3 text-[0.78rem] text-neutral-text2">규칙 기반 요약 · LLM 연결 시 자연어 설명 추가 · 숫자는 코드로 계산됨 (AI 아님)</p>
+          <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
+            <p className="text-[0.78rem] text-neutral-text2 inline-flex items-center gap-1.5 flex-wrap"><Badge tone={llm?.configured ? "live" : "ready"} size="sm">{llm === null ? "LLM 확인 중" : llm.configured ? "LLM 연결됨" : "LLM 미연결 · AI READY"}</Badge>숫자는 코드로 계산됨 (AI 아님){llm?.configured ? ` · 설명만 ${llm.model}` : " · 서버 ANTHROPIC_API_KEY 설정 시 자연어 설명 활성"}</p>
+            <Button size="sm" variant="outline" onClick={runAi} loading={aiLoading} icon={<Wand2 size={15} />} data-tour="ai-explain" aria-label="AI 설명 생성">{llm?.configured ? "AI 설명 생성" : "AI 설명 생성 (READY 확인)"}</Button>
+          </div>
+          {aiText && (
+            <div className={`mt-3 rounded-xl border p-4 ${aiText.status === "LIVE" ? "border-theme-primary/40 bg-theme-soft/60" : "border-dashed border-neutral-border bg-neutral-canvas"}`} aria-live="polite">
+              <div className="flex items-center gap-2 flex-wrap mb-2"><Badge tone={aiText.status === "LIVE" ? "live" : "ready"} size="sm">{aiText.status === "LIVE" ? "AI LIVE" : "AI READY"}</Badge><span className="text-[0.8rem] text-neutral-text2">{aiText.model}{aiText.usage ? ` · 토큰 in ${aiText.usage.input} / out ${aiText.usage.output}` : ""}</span></div>
+              <pre className="whitespace-pre-wrap font-sans text-[0.92rem] leading-relaxed">{aiText.text}</pre>
+              {aiText.note && <p className="mt-2 text-[0.8rem] text-neutral-text2">{aiText.note}</p>}
+            </div>
+          )}
         </SectionCard>
         <SectionCard className="lg:col-span-2" title="오늘의 Action" desc="긴급도 순 · 미처리 4건" right={<AxLink href="/ax/actions">전체</AxLink>}>
           {todayActions.length === 0 ? <EmptyState title="처리할 Action이 없습니다" desc="새 추천이 생기면 여기에 표시됩니다." /> : <div className="space-y-3">{todayActions.map((a, i) => <ActionCard key={a.id} action={a} compact tour={i === 0 ? "dash-action-first" : undefined} />)}</div>}

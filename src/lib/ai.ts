@@ -1,8 +1,9 @@
 /* ------------------------------------------------------------------
    AI READY — LLM service interface (연결 지점).
-   현재: 규칙 기반 텍스트(engine.ts)를 반환한다. 실제 API 키가 주어지면
-   서버 Route(/api/ai/briefing)에서 Claude 등 LLM을 호출하도록 교체한다.
-   외부 LLM API를 임의로 호출하지 않는다 (Unified §42).
+   - 계산·추천·우선순위는 전부 코드(engine.ts / kpi.ts)가 담당한다.
+   - LLM은 '설명'만 맡는다. 서버 Route /api/ai/explain 이 ANTHROPIC_API_KEY 가
+     있을 때만 Claude를 호출하고, 없으면 규칙 기반 텍스트를 그대로 돌려준다.
+   - 브라우저는 절대 LLM API를 직접 호출하지 않는다 (키 노출 금지 · Unified §42).
 ------------------------------------------------------------------- */
 export type AIStatus = "AI_READY" | "LIVE";
 
@@ -14,14 +15,37 @@ export interface AIExplainResponse {
   status: AIStatus;
   text: string;
   model: string;
+  note?: string;
+  usage?: { input: number; output: number };
 }
 
+/** 빌드 시점 기본값. 실제 연결 여부는 aiStatus()(서버 Route GET)로 확인한다. */
 export const AI_STATUS: AIStatus = "AI_READY";
 
+const RULE_RESPONSE = (fallback: string, note?: string): AIExplainResponse => ({ status: "AI_READY", text: fallback, model: "rule-based (LLM 연결 예정)", note });
+
+/** 서버 Route에 연결 상태를 묻는다. 실패하면 AI_READY. */
+export async function aiStatus(): Promise<{ status: AIStatus; model: string; configured: boolean }> {
+  try {
+    const r = await fetch("/api/ai/explain", { method: "GET", cache: "no-store" });
+    if (!r.ok) throw new Error(String(r.status));
+    return (await r.json()) as { status: AIStatus; model: string; configured: boolean };
+  } catch {
+    return { status: "AI_READY", model: "rule-based", configured: false };
+  }
+}
+
+/** 구조화된 숫자 + 규칙 텍스트를 보내고 설명을 받는다. 키가 없거나 실패하면 규칙 텍스트가 그대로 돌아온다. */
 export async function explain(req: AIExplainRequest, fallback: string): Promise<AIExplainResponse> {
-  // Future: fetch("/api/ai/explain", { method: "POST", body: JSON.stringify(req) })
-  void req;
-  return { status: AI_STATUS, text: fallback, model: "rule-based (LLM 연결 예정)" };
+  if (typeof window === "undefined") return RULE_RESPONSE(fallback);
+  try {
+    const r = await fetch("/api/ai/explain", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...req, fallback }) });
+    if (!r.ok) return RULE_RESPONSE(fallback, `서버 응답 ${r.status} — 규칙 기반 텍스트를 표시합니다.`);
+    const data = (await r.json()) as Partial<AIExplainResponse>;
+    return { status: data.status === "LIVE" ? "LIVE" : "AI_READY", text: data.text || fallback, model: data.model ?? "rule-based", note: data.note, usage: data.usage };
+  } catch {
+    return RULE_RESPONSE(fallback, "네트워크 오류 — 규칙 기반 텍스트를 표시합니다.");
+  }
 }
 
 export const AI_READY_COPY = {

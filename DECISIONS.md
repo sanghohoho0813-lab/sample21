@@ -59,3 +59,19 @@
 
 ## D-16 KPI 기간 비교는 일 단위 경계(00:00)로 계산
 - WHY: "지금 시각" 기준 창은 오늘의 남은 시간만큼 현재 기간이 짧아져 매출이 항상 하락처럼 보였다. 직전 기간과 같은 길이의 온전한 일 단위 창으로 비교한다.
+
+## D-17 재입고 알림 → 구매 전환은 주문 시점에 자동으로 닫는다 (RestockSubscription.status = purchased)
+- WHY: Loop 1이 "알림 발송"에서 끝나면 재입고 Action이 매출로 이어졌는지 증명할 수 없다. 고객이 해당 옵션을 주문하는 순간 purchased(+purchasedAt, purchaseOrderId)로 바꾸고 RESULT Evidence를 남겨 알림→구매 퍼널을 코드로 계산한다.
+- WHY NOT: 알림 후 N일 내 구매만 인정 — Demo에서는 시간 창을 두면 시연이 끊긴다. 실증에서 창(예: 7일)을 붙인다 (Baseline 측정 항목).
+
+## D-18 Evidence Pack은 Pilot 전에도 "DEMO 미리보기"로 연다 (인쇄·JSON)
+- WHY: 대표·심사자는 "어떤 형식으로 증명할 것인가"를 미리 봐야 한다. 대신 모든 변화 칸을 VALIDATE LATER, Baseline을 UNKNOWN / REQUIRED로 고정해 개선율을 지어낼 수 없게 했다.
+- WHY NOT: CSV/PDF 생성 라이브러리 추가 — 브라우저 인쇄(PDF)와 JSON이면 심사 재사용에 충분하고 의존성이 없다.
+
+## D-19 LLM은 서버 Route(/api/ai/explain)에서만, 키가 있을 때만 호출한다
+- WHY: 브라우저 키 노출 금지·외부 API 임의 호출 금지(Unified §42). 키가 없으면 규칙 텍스트를 그대로 돌려주어 화면이 절대 비지 않는다. 구조화된 KPI 숫자만 전달하며 개인정보는 보내지 않는다. 연결 범위는 경영 브리핑 1곳.
+- WHY NOT: 4개 엔진에 LLM 근거 생성 — 규칙 기반 근거가 먼저 실증되어야 LLM 문장의 가치를 비교할 수 있다.
+
+## D-20 Unit Economics는 "계산 가능한 항목"과 "측정 설계"를 분리해 표시한다
+- WHY: 객단가·주문당 매출총이익·배송비 비중·사입/위탁 구성은 지금 데이터로 계산되지만 CAC·LTV·Payback은 마케팅비·코호트가 없으면 추정값이 된다. Demo에서 추정값을 넣는 순간 Fake KPI가 된다.
+

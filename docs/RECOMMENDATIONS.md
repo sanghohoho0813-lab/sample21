@@ -8,7 +8,7 @@
 |---|---|---|---|
 | R-01 | 실제 사진 자산 적용 (Hero / Why AX / 카테고리 / 브랜드) | 사용자 지시: 사진은 추후. 등록 경로(`src/lib/assets.ts`)는 준비됨 | Drive 「샘플 21. 의류」 업로드 시 |
 | R-02 | Supabase Auth/RLS + 실데이터 Import | API 키·비용·설정은 Hard Blocker. Adapter 구조 준비됨 | Pilot 계약 시 |
-| R-03 | AI Briefing LLM 연결 (1개만) | 키 없음. 규칙 기반이 먼저 실증되어야 LLM 가치가 검증됨 | `ANTHROPIC_API_KEY` 제공 시 |
+| R-03 | AI Briefing LLM 연결 (1개만) — **Route·클라이언트 연결 완료(2차)**, 키만 없음 | 키 없음. 규칙 기반이 먼저 실증되어야 LLM 가치가 검증됨 | `ANTHROPIC_API_KEY` 를 서버 환경변수로 제공 시 즉시 LIVE |
 | R-04 | 브랜드 파트너센터 (로그인·상품등록·재고연동·정산) | Platform Readiness MID. 현재는 내부 운영 우선 | 입점 브랜드 20개 이상 |
 | R-05 | 멤버십 / B2B 단체구매 / 광고·기획전 상품 / 스타일 콘텐츠 | 반복매출·B2B 수요 검증 전. Preview 페이지로 방향만 노출 | 재구매율·B2B 문의 데이터 확보 후 |
 | R-06 | 자동발주 L4 | Error Cost MID. 12주 실증 없이 자동실행 금지 | 실증 후 저위험 베이식 한정 |
@@ -16,14 +16,16 @@
 ## 제품 폴리시 후보 (P2)
 | # | 항목 | 기대 효과 | 비용 |
 |---|---|---|---|
-| P-01 | 재입고 알림 → 구매 전환 추적을 RestockSubscription.status=purchased로 자동 연결 (현재 notified까지) | Loop 1 Evidence 완결성 | 소 |
+| ~~P-01~~ | 재입고 알림 → 구매 전환 자동 연결 — **2차 고도화에서 구현 (D-17)** | Loop 1 Evidence 완결성 | 완료 |
 | P-02 | 캠페인 생성 Draft를 store로 승격해 Action·Evidence와 연결 | Loop 4 Evidence 강화 | 소 |
 | P-03 | Demand Radar에 30일 스파크라인 추가 | 판단 속도 | 소 |
 | P-04 | 주문 상태 일괄 처리(체크박스) | 운영직원 반복 클릭 감소 | 소 |
-| P-05 | Evidence Pack PDF/CSV Export (READY → 실제) | 심사·보고서 재사용 | 중 |
+| ~~P-05~~ | Evidence Pack 미리보기 · 인쇄(PDF) · JSON — **2차 고도화에서 구현 (D-18)**. CSV는 JSON→변환으로 대체 | 심사·보고서 재사용 | 완료 |
 | P-06 | 고객 화면 검색 자동완성·오타 보정 | 탐색 전환 | 중 |
-| P-07 | 접근성 정밀 점검 (스크린리더 순서, 색 대비 자동 검사) | Public Web Quality | 중 |
-| P-08 | Playwright 여정 테스트를 CI(GitHub Actions)에 연결 | 회귀 방지 | 소 |
+| P-07 | 접근성 정밀 점검 — **이름·터치타겟·Hover 자동 점검(`scripts/qa-a11y.mjs`) 2차 구현**. 남은 것: 스크린리더 순서·색 대비 | Public Web Quality | 중 |
+| P-08 | Playwright 여정·반응형·접근성 테스트를 CI(GitHub Actions)에 연결 | 회귀 방지 | 소 |
+| P-09 | 재입고 알림→구매 인정 시간창(예: 7일)과 Baseline 비교 — Pilot에서 | Loop 1 KPI 정밀화 | 소 |
+| P-10 | LLM 설명을 Action 근거(Demand)·핏 설명으로 확장 — 브리핑 실증 후 | 승인 속도 | 중 |
 
 ## 시드 데이터 후보
 - 리뷰를 seed 레이어로 이동해 Fit Engine 입력(반품 피드백)과 연결

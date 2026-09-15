@@ -1,7 +1,8 @@
 "use client";
 /* [AI] AI Ready 상태 — 4개 규칙 기반 엔진 + LLM 연결 가이드. 계산은 코드가 하고, LLM은 설명만 맡는다 (DECISIONS D-04). */
+import { useEffect, useState } from "react";
 import { Cpu, KeyRound, Sparkles } from "lucide-react";
-import { AI_STATUS } from "@/lib/ai";
+import { aiStatus } from "@/lib/ai";
 import { AIReadyBadge } from "@/components/ax/AIReady";
 import { Badge, type Tone } from "@/components/ui/Badge";
 import { Term } from "@/components/ui/Misc";
@@ -15,14 +16,16 @@ export const ENGINES: { no: string; name: string; method: string; automation: "L
 const COST_TONE: Record<"LOW" | "MID" | "HIGH", Tone> = { LOW: "success", MID: "warning", HIGH: "error" };
 
 export function AIEngines() {
+  const [llm, setLlm] = useState<{ configured: boolean; model: string } | null>(null);
+  useEffect(() => { let on = true; aiStatus().then((s) => { if (on) setLlm({ configured: s.configured, model: s.model }); }); return () => { on = false; }; }, []);
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-neutral-canvas px-4 py-3">
         <Cpu size={18} className="text-theme-primary" />
         <span className="font-bold">현재: 규칙 기반 동작</span>
         <span className="text-neutral-text2">·</span>
-        <span className="font-bold">LLM: 미연결</span>
-        <Badge tone="ready" className="ml-auto">{AI_STATUS === "LIVE" ? "AI LIVE" : "AI READY"}</Badge>
+        <span className="font-bold">LLM: {llm === null ? "확인 중…" : llm.configured ? `연결됨 (${llm.model} · 설명만)` : "미연결"}</span>
+        <Badge tone={llm?.configured ? "live" : "ready"} className="ml-auto">{llm?.configured ? "AI LIVE" : "AI READY"}</Badge>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {ENGINES.map((e) => (
@@ -62,10 +65,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ANTHROPIC_API_KEY=`}</code></pre>
           </div>
           <ol className="space-y-1.5 text-[0.9rem] list-decimal pl-5">
-            <li><code className="rounded bg-neutral-canvas px-1.5 py-0.5 text-[0.82rem]">ANTHROPIC_API_KEY</code>를 서버 환경변수로 설정 (브라우저 노출 금지)</li>
-            <li>서버 Route <code className="rounded bg-neutral-canvas px-1.5 py-0.5 text-[0.82rem]">/api/ai/explain</code> 추가 — 구조화된 KPI만 전달</li>
-            <li><code className="rounded bg-neutral-canvas px-1.5 py-0.5 text-[0.82rem]">src/lib/ai.ts</code>의 <code className="rounded bg-neutral-canvas px-1.5 py-0.5 text-[0.82rem]">explain()</code> fallback을 fetch로 교체</li>
-            <li>경영 대시보드 AI Briefing <span className="font-semibold">1곳만</span> 먼저 연결 → 계산은 그대로 코드가 담당</li>
+            <li><code className="rounded bg-neutral-canvas px-1.5 py-0.5 text-[0.82rem]">ANTHROPIC_API_KEY</code>를 서버 환경변수(.env.local / Vercel)에 설정 — 브라우저에는 노출되지 않습니다</li>
+            <li>서버 Route <code className="rounded bg-neutral-canvas px-1.5 py-0.5 text-[0.82rem]">/api/ai/explain</code> <Badge tone="success" size="sm">준비됨</Badge> — 키가 있을 때만 Claude 호출, 없으면 규칙 텍스트 반환</li>
+            <li>서버 재시작 후 경영 대시보드 AI 브리핑의 <span className="font-semibold">"AI 설명 생성"</span> 버튼이 LIVE로 바뀝니다 (구조화된 KPI 숫자만 전달 · 개인정보 없음)</li>
+            <li>검증: 생성된 문장의 숫자가 화면 KPI와 일치하는지 확인 → 불일치 시 프롬프트 규칙을 조정 (계산은 계속 코드가 담당)</li>
           </ol>
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-3">

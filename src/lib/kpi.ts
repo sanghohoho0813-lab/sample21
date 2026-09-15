@@ -9,6 +9,16 @@ import { safeDiv } from "./format";
 
 type Delta = Pick<AppState, "viewDelta" | "wishlistDelta" | "cartDelta" | "restockDelta" | "inventoryDelta" | "returnDelta" | "salePriceOverride" | "fitNoteOverride" | "variantRestockState" | "orderStatusOverride" | "orders" | "returns">;
 
+/** Loop 1 퍼널: 재입고 알림 신청 → 알림 발송 → 구매 (Demo 세션 기준 · Baseline은 실증에서) */
+export function restockFunnel(subs: AppState["restockSubs"]) {
+  const waiting = subs.filter((s) => s.status === "waiting").length;
+  const notified = subs.filter((s) => s.status === "notified").length;
+  const purchased = subs.filter((s) => s.status === "purchased").length;
+  const purchasedAfterNotice = subs.filter((s) => s.status === "purchased" && !!s.notifiedAt).length;
+  const sent = notified + purchasedAfterNotice;
+  return { total: subs.length, waiting, notified, purchased, purchasedAfterNotice, sent, noticeToPurchase: safeDiv(purchasedAfterNotice, sent) };
+}
+
 export function effVariant(v: Variant, d: Delta): Variant {
   const p = PRODUCT_BY_ID[v.productId];
   const wishAdd = d.wishlistDelta[v.productId] ?? 0;

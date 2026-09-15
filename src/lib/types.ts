@@ -276,6 +276,8 @@ export interface RestockSubscription {
   createdAt: string;
   status: "waiting" | "notified" | "purchased";
   notifiedAt?: string;
+  purchasedAt?: string;
+  purchaseOrderId?: string;
 }
 
 export interface CartItem {

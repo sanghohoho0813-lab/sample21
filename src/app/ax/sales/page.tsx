@@ -15,6 +15,7 @@ import type { CategoryId, Order, Role } from "@/lib/types";
 import { Hydrated } from "@/components/system/Hydrated";
 import { PageHeader } from "@/components/ax/AxShell";
 import { AxLink, CHART, CHART_SERIES, ChartTip, InfoNote, PageSkeleton, RoleNote, SectionCard, axisKrw, dayLabel } from "@/components/ax/core/shared";
+import { UnitEconomicsPanel } from "@/components/ax/ops/UnitEconomics";
 import { KpiCard } from "@/components/ui/Kpi";
 import { Segmented } from "@/components/ui/Form";
 import { Freshness, Term } from "@/components/ui/Misc";
@@ -233,6 +234,11 @@ function SalesInner() {
           { key: "returns", header: "반품", align: "right", cell: (c) => `${num(c.returns)}건` },
         ]} />
         <InfoNote className="mt-3">전후 비교는 시뮬레이션 값이며 실제 개선율이 아닙니다. Baseline 측정 후 실증(12주)에서 검증합니다.</InfoNote>
+      </SectionCard>
+
+      {/* Unit Economics 측정 설계 (Scale) */}
+      <SectionCard title="Unit Economics 측정 설계" desc="지금 계산 가능한 단위경제 항목과, 실증에서 측정할 CAC · LTV · Payback 의 정의·측정 지점" right={<AxLink href="/ax/evidence/pack">Evidence Pack</AxLink>}>
+        <UnitEconomicsPanel showMargin={showCompanyMargin} />
       </SectionCard>
     </div>
   );

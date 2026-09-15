@@ -15,9 +15,11 @@
 5. `src/lib/store.ts`의 action(placeOrder, updateActionStatus, updateOrderStatus, subscribeRestock …)을 Supabase 호출로 교체 — UI는 변경 불필요
 
 ## 3. AI API (LLM) — 선택, 1개만 먼저
-1. `.env.local`에 `ANTHROPIC_API_KEY` 추가
-2. `src/app/api/ai/explain/route.ts` 서버 Route 생성 → `src/lib/ai.ts`의 `explain()`을 fetch로 교체
-3. 1순위 연결: **경영 대시보드 AI 브리핑** (구조화된 KPI → 자연어 요약). 계산은 계속 코드가 담당합니다.
+1. `.env.local`에 `ANTHROPIC_API_KEY` 추가 (서버 전용 · 브라우저 노출 없음)
+2. 서버 Route `src/app/api/ai/explain/route.ts` 는 이미 준비되어 있습니다 — 키가 있으면 `claude-opus-5` 를 호출하고, 없으면 규칙 기반 텍스트를 그대로 돌려줍니다 (`@anthropic-ai/sdk`).
+3. 서버 재시작 → 경영 대시보드 AI 브리핑의 **"AI 설명 생성"** 버튼이 AI READY → AI LIVE 로 바뀝니다. 설정 > AI 섹션에서도 연결 상태를 확인할 수 있습니다.
+4. 연결 범위는 **경영 브리핑 1곳**입니다. 계산·추천·우선순위는 계속 코드가 담당하고, LLM은 설명 문장만 만듭니다. 구조화된 KPI 숫자만 전달하며 개인정보는 보내지 않습니다.
+5. 검증: 생성 문장의 숫자가 화면 KPI와 일치하는지 확인합니다 (불일치 시 `route.ts` SYSTEM 프롬프트 규칙 조정).
 
 ## 4. 실제 데이터 일부 반영 (CSV)
 - 설정 > 데이터 > CSV 가져오기에서 필드 구조 확인 (products / variants / orders)

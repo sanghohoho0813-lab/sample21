@@ -8,9 +8,12 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "qa:shots": "node scripts/qa-screens.mjs"
+    "qa:shots": "node scripts/qa-screens.mjs",
+    "qa:journey": "node scripts/qa-journey.mjs",
+    "qa:a11y": "node scripts/qa-a11y.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.125.0",
     "lucide-react": "^0.460.0",
     "next": "15.5.25",
     "react": "^19.0.0",

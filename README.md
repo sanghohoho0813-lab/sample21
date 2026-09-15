@@ -11,8 +11,9 @@ npm install
 npm run dev        # http://localhost:3000
 npm run build && npm start
 npm run typecheck
-npm run qa:shots   # 8개 폭 × 전 Route 스크린샷 + overflow/404 리포트 (dev 서버 필요)
-node scripts/qa-journey.mjs   # Whole-Hybrid Acceptance Journey 자동 검증
+npm run qa:shots     # 8개 폭 × 전 Route 스크린샷 + overflow/404 리포트 (프로덕션 서버 권장 · QA_SHOTS=0 이면 overflow만)
+npm run qa:journey   # Whole-Hybrid Acceptance Journey 23 Step 자동 검증 (4 Loop + Evidence Pack)
+npm run qa:a11y      # 접근 가능한 이름 · 모바일 터치 타겟 · Hover 커버리지 자동 점검 → qa-output/qa-a11y.json
 ```
 
 ## 구조
@@ -21,7 +22,8 @@ node scripts/qa-journey.mjs   # Whole-Hybrid Acceptance Journey 자동 검증
 /                     Customer Front (MORFIT)           /ax                Business AX
 /ranking /new /brands /shop /search /style              /ax/actions        Growth & Action Center
 /products/[id]  (Fit Signal · 재입고 알림)              /ax/inventory      Demand Radar
-/wishlist /cart /checkout (DEMO) /my …                  /ax/orders /ax/evidence /ax/why /ax/present /ax/settings
+/wishlist /cart /checkout (DEMO) /my …                  /ax/orders /ax/evidence (+/pack) /ax/why /ax/present /ax/settings
+                                                        /api/ai/explain (LLM Route · ANTHROPIC_API_KEY 있을 때만 호출)
 /next/[slug]    향후 확장 Preview (404 없음)
 
 src/lib/types.ts        데이터 모델 (SSOT)

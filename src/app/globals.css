@@ -136,4 +136,10 @@ html[data-preview="1"] [data-tour="device-preview"] { display: none !important; 
 /* Tour spotlight */
 .tour-target { position: relative; z-index: 80 !important; box-shadow: 0 0 0 4px var(--theme-highlight), 0 0 0 9999px rgba(11,24,48,0.62); border-radius: 12px; }
 
-@media print { .no-print { display: none !important; } }
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; }
+  .print-avoid { break-inside: avoid; }
+  .print-break { break-before: page; }
+  a { text-decoration: none; }
+}
