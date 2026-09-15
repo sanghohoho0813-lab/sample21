@@ -8,7 +8,9 @@ export function ActionStatusBadge({ status, size }: { status: ActionStatus; size
 
 export const URGENCY_LABEL: Record<Urgency, string> = { high: "긴급", mid: "보통", low: "낮음" };
 const urgencyTone: Record<Urgency, Tone> = { high: "error", mid: "warning", low: "neutral" };
-export function UrgencyBadge({ urgency, size = "sm" }: { urgency: Urgency; size?: "sm" | "md" }) { return <Badge tone={urgencyTone[urgency]} size={size}>{URGENCY_LABEL[urgency]}</Badge>; }
+export function UrgencyBadge({ urgency, size = "sm" }: { urgency: Urgency; size?: "sm" | "md" }) {
+  return <Badge tone={urgencyTone[urgency]} size={size}>{urgency === "high" && <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current animate-breathe" />}{URGENCY_LABEL[urgency]}</Badge>;
+}
 
 export function InventoryStatusBadge({ status, size = "sm" }: { status: InventoryStatus; size?: "sm" | "md" }) { return <Badge tone={INVENTORY_STATUS_TONE[status]} size={size}>{INVENTORY_STATUS_LABEL[status]}</Badge>; }
 

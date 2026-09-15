@@ -20,19 +20,19 @@ export function DataTable<T>({ rows, columns, rowKey, onRowClick, empty, classNa
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={rowKey(r)} onClick={onRowClick ? () => onRowClick(r) : undefined} className={cn("border-t border-neutral-border hover-row", onRowClick && "cursor-pointer")}>
+              <tr key={rowKey(r)} onClick={onRowClick ? () => onRowClick(r) : undefined} className={cn("group border-t border-neutral-border hover-row", onRowClick && "cursor-pointer")}>
                 {columns.map((c) => <td key={c.key} className={cn("px-4 align-middle", dense ? "py-2.5" : "py-3.5", c.align === "right" && "text-right tabular", c.align === "center" && "text-center")}>{c.cell(r)}</td>)}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden space-y-3 stagger stagger-sm">
         {rows.map((r) => {
           const primary = columns.find((c) => c.primary) ?? columns[0];
           const rest = columns.filter((c) => c !== primary && !c.hideOnMobile);
           return (
-            <div key={rowKey(r)} onClick={onRowClick ? () => onRowClick(r) : undefined} className={cn("rounded-2xl border border-neutral-border bg-white p-4 active:bg-neutral-canvas transition-colors", onRowClick && "cursor-pointer")}>
+            <div key={rowKey(r)} onClick={onRowClick ? () => onRowClick(r) : undefined} className={cn("rounded-2xl border border-neutral-border bg-white p-4 active:bg-neutral-canvas transition-all duration-200 hover:border-neutral-text2/40 hover:shadow-card active:scale-[0.99]", onRowClick && "cursor-pointer")}>
               <div className="font-semibold text-[1rem] mb-2">{primary.cell(r)}</div>
               <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[0.85rem]">
                 {rest.map((c) => (

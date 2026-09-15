@@ -35,7 +35,7 @@ export function ProductCard({ product, rank, reason, className, compact }: { pro
         </div>
       </Link>
       <button type="button" aria-label={wished ? "찜 해제" : "찜하기"} aria-pressed={wished} onClick={(e) => { e.preventDefault(); const on = store.toggleWishlist(product.id); toast(on ? "찜 목록에 저장했습니다" : "찜을 해제했습니다", on ? "재고와 가격 변화를 알려드릴게요" : undefined, on ? "success" : "info"); }}
-        className={cn("absolute right-2 top-2 h-10 w-10 rounded-full flex items-center justify-center transition-all duration-fast shadow-card", wished ? "bg-brand-black text-white" : "bg-white/90 text-neutral-text hover:bg-white active:scale-95")}>
+        className={cn("absolute right-2 top-2 h-10 w-10 rounded-full flex items-center justify-center transition-all duration-fast shadow-card hover:scale-110 hover:shadow-raised active:scale-95", wished ? "bg-brand-black text-white hover:bg-[#2a2a2a]" : "bg-white/90 text-neutral-text hover:bg-white")}>
         <Heart size={18} fill={wished ? "currentColor" : "none"} />
       </button>
     </div>
@@ -44,7 +44,7 @@ export function ProductCard({ product, rank, reason, className, compact }: { pro
 
 export function ProductGrid({ products, ranked, reasons, cols = "grid-cols-2 md:grid-cols-4", className }: { products: Product[]; ranked?: boolean; reasons?: Record<string, string>; cols?: string; className?: string }) {
   return (
-    <div className={cn("grid gap-x-4 gap-y-7", cols, className)}>
+    <div className={cn("grid gap-x-4 gap-y-7 stagger stagger-sm", cols, className)}>
       {products.map((p, i) => <ProductCard key={p.id} product={p} rank={ranked ? i + 1 : undefined} reason={reasons?.[p.id]} />)}
     </div>
   );

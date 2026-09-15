@@ -12,7 +12,7 @@ import { aiStatus, explain, type AIExplainResponse } from "@/lib/ai";
 import { toast } from "@/components/ui/Toast";
 import { krwShort, num, pct, pctDelta, safeDiv } from "@/lib/format";
 import { relTime } from "@/lib/dates";
-import { ICON_ACCENTS } from "@/lib/theme";
+import { ICON_ACCENTS, ICON_TONE } from "@/lib/theme";
 import type { Role } from "@/lib/types";
 import { Hydrated } from "@/components/system/Hydrated";
 import { PageHeader } from "@/components/ax/AxShell";
@@ -125,7 +125,7 @@ function Dashboard() {
       {role === "ops" ? (
         <>
           <RoleNote>운영직원 화면 — 매출·마진 대신 오늘 처리할 업무를 우선 보여줍니다.</RoleNote>
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4" data-tour="kpi-row">
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 stagger" data-tour="kpi-row">
             <KpiCard size="lg" label="오늘 처리할 주문" value={num(ops.todo.length)} sub={`결제대기·상품준비 · 배송 중 ${num(ops.shipping)}건`} href="/ax/orders" icon={<PackageCheck size={18} />} accent={ICON_ACCENTS.operations} />
             <KpiCard size="lg" label="반품 요청" value={num(ops.returnReq)} sub="처리 대기 반품·교환" href="/ax/fit-returns" icon={<RotateCcw size={18} />} accent={ICON_ACCENTS.risk} />
             <KpiCard size="lg" label="재입고 문의" value={num(inv.restockRequests)} sub={`고객 알림 대기 ${num(ops.waitingSubs)}건 포함`} href="/ax/inventory" icon={<Boxes size={18} />} accent={ICON_ACCENTS.sales} />
@@ -153,7 +153,7 @@ function Dashboard() {
         <>
           {role === "md" && <RoleNote>MD 화면 — 전체 손익 대신 담당 브랜드({derived.mdBrandNames.join(" · ")}) 마진을 보여줍니다.</RoleNote>}
           {/* Row 1 — large */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" data-tour="kpi-row">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 stagger" data-tour="kpi-row">
             <KpiCard size="lg" label={`총 주문액 (${periodLabel})`} value={<BigLg>{krwShort(k.cur.revenue)}</BigLg>} delta={revDelta} href="/ax/sales" icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} />
             <KpiCard size="lg" label="순매출 (반품 추정 차감)" value={<BigLg>{krwShort(derived.net)}</BigLg>} delta={pctDelta(derived.net, derived.netPrev)} href="/ax/sales" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.overview} />
             {role === "owner"
@@ -162,16 +162,16 @@ function Dashboard() {
             <KpiCard size="lg" label="구매 전환율" value={<BigLg>{pct(k.conversion, 2)}</BigLg>} delta={pctDelta(k.conversion, derived.convPrev)} href="/ax/customers" icon={<Zap size={18} />} accent={ICON_ACCENTS.customer} />
           </div>
           {/* Row 2 */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
             <KpiCard label="재구매율" value={<Big>{pct(k.repeat, 1)}</Big>} sub="2회 이상 구매 고객 비율 (90일)" href="/ax/customers" />
             <KpiCard label="판매소진율 (30일)" value={<Big>{pct(inv.sellThrough, 1)}</Big>} sub="판매 ÷ (판매 + 현재고)" href="/ax/inventory" />
             <KpiCard label="품절위험 옵션 수" value={<Big>{num(inv.lowRisk)}</Big>} sub={`관심 상승 ${num(inv.rising)}개 · 7일 품절 추정손실 ${krwShort(inv.lostSales7d)}`} href="/ax/inventory?filter=low" accent={ICON_ACCENTS.risk} />
             <KpiCard label="저회전 재고금액" value={<Big>{krwShort(inv.slowValue)}</Big>} sub={`총 재고원가 ${krwShort(inv.totalStockValue)} 중`} href="/ax/inventory?filter=slow" accent={ICON_ACCENTS.settings} />
           </div>
           {/* Row 3 */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
             <KpiCard label="반품률" value={<Big>{pct(k.returnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 ÷ 판매 ${num(k.cur.units)}개`} href="/ax/fit-returns" />
-            <KpiCard label="사이즈 관련 반품률" value={<Big>{pct(k.fitReturnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 중 사이즈·핏 사유`} href="/ax/fit-returns" icon={<Ruler size={18} />} accent="#C76C86" />
+            <KpiCard label="사이즈 관련 반품률" value={<Big>{pct(k.fitReturnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 중 사이즈·핏 사유`} href="/ax/fit-returns" icon={<Ruler size={18} />} accent={ICON_TONE.t7} />
             <KpiCard label="재입고 신청" value={<Big>{num(inv.restockRequests)}</Big>} sub="옵션별 재입고 알림 신청 누적" href="/ax/inventory" />
             <KpiCard label="미처리 Action" value={<Big>{num(ak.open)}</Big>} sub={`긴급 ${num(ak.high)}건 · 완료율 ${pct(ak.executionRate, 0)}`} href="/ax/actions" icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} />
           </div>

@@ -86,7 +86,7 @@ function ProductsInner() {
     <div className="space-y-6">
       <PageHeader title={<>상품 · <Term term="SKU">SKU</Term></>} desc="상품 단위로 판매속도·재고·찜·재입고 신청·반품률을 비교합니다. 행을 누르면 옵션(색상×사이즈) 단위 상세로 이동합니다." badge={<Badge tone="demo" size="sm">DEMO</Badge>} right={<Freshness source="DEMO" />} />
 
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 stagger">
         <KpiCard label="전체 상품" value={num(summary.total)} sub={`브랜드 ${BRANDS.length}개`} icon={<Shirt size={18} />} accent={ICON_ACCENTS.operations} />
         <KpiCard label="판매 중 옵션" value={num(summary.liveOptions)} sub="재고 1개 이상 색상×사이즈" icon={<Layers size={18} />} accent={ICON_ACCENTS.overview} />
         <KpiCard label="품절 옵션" value={num(summary.soldout)} sub="재입고 검토 대상" href="/ax/inventory?filter=low" icon={<PackageX size={18} />} accent={ICON_ACCENTS.risk} />

@@ -53,6 +53,37 @@
 [data-theme="plum-indigo"]    { --theme-shell:#291A3D; --theme-primary:#573F91; --theme-secondary:#4E63A8; --theme-accent:#8B5AA6; --theme-highlight:#C4B0E6; --theme-soft:#E9E5F3; --brand-accent:#573F91; }
 [data-theme="steel-platinum"] { --theme-shell:#24303B; --theme-primary:#44647A; --theme-secondary:#6D8899; --theme-accent:#4C9AAA; --theme-highlight:#C9D6DE; --theme-soft:#E7EDF1; --brand-accent:#44647A; }
 
+/* ------------------------------------------------------------------
+   ICON TONE LADDER — 아이콘은 '다른 색'이 아니라 '같은 색의 다른 톤'.
+   테마 Primary 하나에서 10단계를 파생해 모듈을 구분한다. 테마를 바꾸면
+   10단계가 통째로 따라 움직인다 (장식색 0).
+   t1(가장 진함) → t9(가장 옅음) → t10(무채 계열 · 중요도 최하)
+------------------------------------------------------------------- */
+:root {
+  --icon-t1: #1b429f; --icon-t2: #1f4cb8; --icon-t3: #2252cb; --icon-t4: #2457d6; --icon-t5: #3766db;
+  --icon-t6: #4d79e0; --icon-t7: #648be5; --icon-t8: #7b9dea; --icon-t9: #92afef; --icon-t10: #5f6b82;
+  /* 차트 계열색은 '구분'이 목적이라 톤 사다리와 분리한다 (테마 4색 + 각 색의 밝은/어두운 변형) */
+  --chart-5: #7d9ce8; --chart-6: #6fb9cc; --chart-7: #6cc9b4; --chart-8: #b99331;
+}
+@supports (color: color-mix(in oklab, red, blue)) {
+  :root {
+    --icon-t1:  color-mix(in oklab, var(--theme-primary) 82%, #000);
+    --icon-t2:  color-mix(in oklab, var(--theme-primary) 88%, #000);
+    --icon-t3:  color-mix(in oklab, var(--theme-primary) 94%, #000);
+    --icon-t4:  var(--theme-primary);
+    --icon-t5:  color-mix(in oklab, var(--theme-primary) 95%, #fff);
+    --icon-t6:  color-mix(in oklab, var(--theme-primary) 90%, #fff);
+    --icon-t7:  color-mix(in oklab, var(--theme-primary) 85%, #fff);
+    --icon-t8:  color-mix(in oklab, var(--theme-primary) 80%, #fff);
+    --icon-t9:  color-mix(in oklab, var(--theme-primary) 75%, #fff);
+    --icon-t10: color-mix(in oklab, var(--theme-primary) 58%, var(--neutral-text-secondary));
+    --chart-5: color-mix(in oklab, var(--theme-primary) 70%, #fff);
+    --chart-6: color-mix(in oklab, var(--theme-secondary) 70%, #fff);
+    --chart-7: color-mix(in oklab, var(--theme-accent) 70%, #fff);
+    --chart-8: color-mix(in oklab, var(--theme-highlight) 76%, #000);
+  }
+}
+
 html[data-font="small"]   { --font-scale: 0.9; }
 html[data-font="default"] { --font-scale: 1; }
 html[data-font="large"]   { --font-scale: 1.12; }
@@ -69,7 +100,17 @@ html[data-surface="ax"] { font-size: calc(19px * var(--font-scale)); }
 
 html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after {
   animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
   transition-duration: 60ms !important;
+}
+/* OS 설정도 존중한다 (설정 토글과 별개) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 60ms !important;
+  }
 }
 
 body {
@@ -124,11 +165,66 @@ button, [role="button"] { cursor: pointer; }
 /* AX sidebar */
 .ax-sidebar { background: var(--theme-shell); color: var(--sidebar-text); }
 
-/* Hover tint helper */
-.hover-lift { transition: transform 160ms ease-out, box-shadow 160ms ease-out, background-color 160ms ease-out; }
-.hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(17,24,39,0.12); }
-.hover-row { transition: background-color 140ms ease-out; }
-.hover-row:hover { background-color: #f6f8fb; }
+/* ------------------------------------------------------------------
+   MOTION PRIMITIVES — 정보 전달을 돕는 모션만. 전부 data-motion="reduced",
+   OS의 prefers-reduced-motion, 인쇄에서 자동으로 꺼진다.
+   (차트 애니메이션은 D-14대로 계속 비활성: 시연·스크린샷·인쇄 안정성 우선)
+------------------------------------------------------------------- */
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes riseSm { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes popIn { 0% { opacity: 0; transform: scale(0.94); } 60% { transform: scale(1.02); } 100% { opacity: 1; transform: none; } }
+@keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+.animate-rise { animation: rise 300ms cubic-bezier(0.22, 0.72, 0.28, 1) both; }
+.animate-pop { animation: popIn 260ms cubic-bezier(0.22, 0.72, 0.28, 1) both; }
+.animate-breathe { animation: breathe 2.2s ease-in-out infinite; }
+
+/* 순차 진입 — 목록·KPI 행이 한 번에 튀어나오지 않고 읽는 순서대로 들어온다 */
+.stagger > * { animation: rise 320ms cubic-bezier(0.22, 0.72, 0.28, 1) both; }
+.stagger.stagger-sm > * { animation-name: riseSm; animation-duration: 260ms; }
+.stagger > *:nth-child(1)  { animation-delay: 0ms; }
+.stagger > *:nth-child(2)  { animation-delay: 45ms; }
+.stagger > *:nth-child(3)  { animation-delay: 90ms; }
+.stagger > *:nth-child(4)  { animation-delay: 135ms; }
+.stagger > *:nth-child(5)  { animation-delay: 175ms; }
+.stagger > *:nth-child(6)  { animation-delay: 210ms; }
+.stagger > *:nth-child(7)  { animation-delay: 240ms; }
+.stagger > *:nth-child(8)  { animation-delay: 265ms; }
+.stagger > *:nth-child(9)  { animation-delay: 285ms; }
+.stagger > *:nth-child(n+10) { animation-delay: 300ms; }
+
+/* ------------------------------------------------------------------
+   HOVER PRIMITIVES — "지금 이걸 누르면 무엇이 열리는가"를 미리 보여준다.
+------------------------------------------------------------------- */
+.hover-lift { transition: transform 200ms cubic-bezier(0.22,0.72,0.28,1), box-shadow 200ms ease-out, border-color 200ms ease-out, background-color 200ms ease-out; }
+.hover-lift:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(17,24,39,0.13); }
+.hover-lift:active { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(17,24,39,0.10); }
+
+/* 표 행: 배경 + 왼쪽 강조바 */
+.hover-row { transition: background-color 150ms ease-out, box-shadow 150ms ease-out; }
+.hover-row:hover { background-color: #f6f8fb; box-shadow: inset 3px 0 0 var(--theme-primary); }
+
+/* 아이콘 타일: 부모(.group) hover에 반응 */
+.tile { transition: transform 220ms cubic-bezier(0.22,0.72,0.28,1), background-color 220ms ease-out, color 220ms ease-out, box-shadow 220ms ease-out; }
+.group:hover .tile { transform: translateY(-1px) scale(1.08); }
+.group:active .tile { transform: translateY(0) scale(1.02); }
+
+/* 누름 반응 */
+.press { transition: transform 130ms ease-out, background-color 160ms ease-out, color 160ms ease-out; }
+.press:active { transform: scale(0.97); }
+
+/* 텍스트 링크: 밑줄이 좌→우로 그려진다 */
+.link-line { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1.5px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size 240ms cubic-bezier(0.22,0.72,0.28,1); }
+.link-line:hover, .link-line:focus-visible { background-size: 100% 1.5px; }
+
+/* 광택 스윕 — 주요 CTA에만 (한 화면에 2~3개 이하) */
+.sheen { position: relative; overflow: hidden; }
+.sheen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,0.26) 47%, transparent 62%); transform: translateX(-130%); transition: transform 680ms cubic-bezier(0.22,0.72,0.28,1); }
+.sheen:hover::after { transform: translateX(130%); }
+
+/* 화살표가 hover에서 가리키는 방향으로 밀린다 */
+.group:hover .nudge-x { transform: translateX(3px); }
+.nudge-x { transition: transform 200ms cubic-bezier(0.22,0.72,0.28,1), color 200ms ease-out; }
 
 /* Touch-target expander for inline text links on touch widths — bigger hit area, no layout shift */
 @media (max-width: 767px) { .tap { padding-top: 0.6rem; padding-bottom: 0.6rem; margin-top: -0.6rem; margin-bottom: -0.6rem; } }
@@ -140,6 +236,7 @@ html[data-preview="1"] [data-tour="device-preview"] { display: none !important; 
 .tour-target { position: relative; z-index: 80 !important; box-shadow: 0 0 0 4px var(--theme-highlight), 0 0 0 9999px rgba(11,24,48,0.62); border-radius: 12px; }
 
 @media print {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
   .no-print { display: none !important; }
   body { background: #fff !important; }
   .print-avoid { break-inside: avoid; }

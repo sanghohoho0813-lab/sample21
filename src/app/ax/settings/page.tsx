@@ -7,7 +7,7 @@ import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Database, FileSpreadsheet, GraduationCap, Image as ImageIcon, LayoutDashboard, Palette, Play, ShieldCheck, Sparkles, Award, Users } from "lucide-react";
 import { useApp, ROLE_LABEL, ROLE_NAME } from "@/lib/store";
 import { BRANDS, PRODUCTS, VARIANTS, CUSTOMERS, SEED_ORDERS, RETURNS, CAMPAIGNS, SEED_ACTIONS } from "@/lib/demo/seed";
-import { THEMES } from "@/lib/theme";
+import { THEMES, tint } from "@/lib/theme";
 import { ICON_ACCENTS } from "@/lib/theme";
 import { num } from "@/lib/format";
 import { relTime } from "@/lib/dates";
@@ -46,7 +46,7 @@ function SettingsCard({ id, no, title, desc, badge, children, tour }: { id: stri
   return (
     <Card id={id} data-tour={tour} className="scroll-mt-24" pad="lg">
       <div className="mb-5 flex items-start gap-3">
-        <span className="h-10 w-10 shrink-0 rounded-xl inline-flex items-center justify-center" style={{ background: `${s?.accent ?? ICON_ACCENTS.settings}1f`, color: s?.accent ?? ICON_ACCENTS.settings }}>{s?.icon}</span>
+        <span className="h-10 w-10 shrink-0 rounded-xl inline-flex items-center justify-center" style={{ background: tint(s?.accent ?? ICON_ACCENTS.settings, 14), color: s?.accent ?? ICON_ACCENTS.settings }}>{s?.icon}</span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[0.78rem] font-bold text-neutral-text2 tabular">{no}</span>

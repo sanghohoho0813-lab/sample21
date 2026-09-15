@@ -13,7 +13,7 @@ import { can } from "@/lib/roles";
 import type { Customer, Role, SegmentId } from "@/lib/types";
 import { krw, krwShort, num, pct } from "@/lib/format";
 import { daysBetween, fmtDate, relTime } from "@/lib/dates";
-import { ICON_ACCENTS } from "@/lib/theme";
+import { ICON_ACCENTS, ICON_TONE, tint } from "@/lib/theme";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -31,11 +31,11 @@ const SEGMENTS: SegmentId[] = ["first-purchase", "wish-no-buy", "restock-waiting
 
 const SEGMENT_META: Record<SegmentId, { meaning: string; icon: ReactNode; accent: string }> = {
   "first-purchase": { meaning: "가입은 했지만 아직 첫 구매가 없는 고객. 첫 구매 혜택이 가장 잘 통합니다.", icon: <UserPlus size={18} />, accent: ICON_ACCENTS.customer },
-  "wish-no-buy": { meaning: "찜은 많은데 구매가 없는 고객. 찜·장바구니 리마인드 대상입니다.", icon: <Heart size={18} />, accent: "#C76C86" },
+  "wish-no-buy": { meaning: "찜은 많은데 구매가 없는 고객. 찜·장바구니 리마인드 대상입니다.", icon: <Heart size={18} />, accent: ICON_TONE.t7 },
   "restock-waiting": { meaning: "품절 옵션의 재입고 알림을 기다리는 고객. 입고가 곧 매출입니다.", icon: <BellRing size={18} />, accent: ICON_ACCENTS.risk },
   "cycle-due": { meaning: "평균 구매주기가 돌아온 고객. 지금 추천하면 재구매 확률이 높습니다.", icon: <Repeat size={18} />, accent: ICON_ACCENTS.overview },
-  "brand-loyal": { meaning: "한 브랜드를 반복 구매하는 고객. 브랜드 신상품 소식이 효과적입니다.", icon: <Store size={18} />, accent: "#148C8C" },
-  "post-return-drop": { meaning: "반품을 겪은 뒤 구매가 줄어든 고객. 이탈 위험이 있어 케어가 필요합니다.", icon: <Undo2 size={18} />, accent: "#D96D32" },
+  "brand-loyal": { meaning: "한 브랜드를 반복 구매하는 고객. 브랜드 신상품 소식이 효과적입니다.", icon: <Store size={18} />, accent: ICON_TONE.t5 },
+  "post-return-drop": { meaning: "반품을 겪은 뒤 구매가 줄어든 고객. 이탈 위험이 있어 케어가 필요합니다.", icon: <Undo2 size={18} />, accent: ICON_TONE.t8 },
   vip: { meaning: "고가치 반복구매 고객. 감사 메시지·선공개 혜택으로 관계를 지킵니다.", icon: <Sparkles size={18} />, accent: ICON_ACCENTS.sales },
 };
 
@@ -168,11 +168,11 @@ function CustomersBody() {
   return (
     <div className="animate-fadeIn">
       {/* KPI */}
-      <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-4 stagger">
         <KpiCard label="전체 고객" value={num(kpi.total)} icon={<Users size={18} />} accent={ICON_ACCENTS.customer} sub="가상 고객 (DEMO)" />
         <KpiCard label="구매 고객" value={num(kpi.buyers)} icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} sub="90일 내 1회 이상 주문" />
         <KpiCard label="신규 30일" value={num(kpi.newCust30)} icon={<UserPlus size={18} />} accent={ICON_ACCENTS.overview} sub="최근 30일 가입" />
-        <KpiCard label="사이즈 프로필 완성률" value={pct(kpi.profileRate, 0)} icon={<Ruler size={18} />} accent="#C76C86" sub="핏 프로필 입력 고객 비율" />
+        <KpiCard label="사이즈 프로필 완성률" value={pct(kpi.profileRate, 0)} icon={<Ruler size={18} />} accent={ICON_TONE.t7} sub="핏 프로필 입력 고객 비율" />
         <KpiCard label="재구매율 (90일)" value={pct(repeat, 1)} icon={<Repeat size={18} />} accent={ICON_ACCENTS.evidence} sub={<span><Term term="재구매율">2회 이상 구매</Term> 고객 비율</span>} />
       </div>
 
@@ -207,7 +207,7 @@ function CustomersBody() {
               <Card key={s} className="flex flex-col gap-3" pad="md">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${meta.accent}1f`, color: meta.accent }}>{meta.icon}</span>
+                    <span className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: tint(meta.accent, 14), color: meta.accent }}>{meta.icon}</span>
                     <p className="font-bold leading-tight">{SEGMENT_LABEL[s]}</p>
                   </div>
                   <span className="text-[1.6rem] font-bold tabular leading-none">{num(kpi.segments[s])}<span className="text-[0.85rem] text-neutral-text2 font-semibold ml-0.5">명</span></span>

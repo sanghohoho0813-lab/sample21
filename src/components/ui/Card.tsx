@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 export function Card({ className, children, hover, pad = "md", ...rest }: HTMLAttributes<HTMLDivElement> & { hover?: boolean; pad?: "none" | "sm" | "md" | "lg" }) {
   const pads = { none: "", sm: "p-4", md: "p-5 md:p-6", lg: "p-6 md:p-8" };
   return (
-    <div className={cn("rounded-cardlg bg-neutral-raised border border-neutral-border shadow-card", pads[pad], hover && "hover-lift cursor-pointer", className)} {...rest}>
+    <div className={cn("rounded-cardlg bg-neutral-raised border border-neutral-border shadow-card", pads[pad], hover && "group hover-lift cursor-pointer", className)} {...rest}>
       {children}
     </div>
   );

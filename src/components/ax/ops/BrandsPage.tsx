@@ -22,6 +22,7 @@ import { Drawer } from "@/components/ui/Overlay";
 import { InventoryStatusBadge } from "@/components/ax/StatusBadges";
 import { KpiMoney, KV, LiveFreshness, NoteCard, PageSkeleton, SectionBlock } from "./shared";
 import { cn } from "@/lib/cn";
+import { ICON_TONE } from "@/lib/theme";
 
 const CONTRACT_LABEL: Record<Brand["contractStatus"], string> = { active: "계약중", renewal: "갱신 예정", new: "신규 입점" };
 const CONTRACT_TONE: Record<Brand["contractStatus"], Tone> = { active: "success", renewal: "warning", new: "info" };
@@ -72,11 +73,11 @@ function BrandsBody() {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard label="브랜드" value={num(BRANDS.length)} icon={<Store size={18} />} accent="#148C8C" sub={`사입 ${totals.purchase} · 입점·위탁 ${totals.consignment}`} />
-        <KpiCard label="브랜드 매출 합계 (30일)" value={<KpiMoney>{krwShort(totals.revenue)}</KpiMoney>} icon={<Building2 size={18} />} accent="#D79A43" sub="판매수량 × 판매가 (DEMO)" />
-        <KpiCard label="계약 갱신·신규" value={`${totals.renewal} · ${totals.newB}`} icon={<Handshake size={18} />} accent="#5B8DEF" sub="갱신 예정 · 신규 입점" />
-        <KpiCard label="품절위험 옵션" value={num(totals.risk)} icon={<Boxes size={18} />} accent="#D66A5E" sub={<span><Term term="옵션">옵션</Term> 기준 품절 임박+품절</span>} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+        <KpiCard label="브랜드" value={num(BRANDS.length)} icon={<Store size={18} />} accent={ICON_TONE.t5} sub={`사입 ${totals.purchase} · 입점·위탁 ${totals.consignment}`} />
+        <KpiCard label="브랜드 매출 합계 (30일)" value={<KpiMoney>{krwShort(totals.revenue)}</KpiMoney>} icon={<Building2 size={18} />} accent={ICON_TONE.t6} sub="판매수량 × 판매가 (DEMO)" />
+        <KpiCard label="계약 갱신·신규" value={`${totals.renewal} · ${totals.newB}`} icon={<Handshake size={18} />} accent={ICON_TONE.t3} sub="갱신 예정 · 신규 입점" />
+        <KpiCard label="품절위험 옵션" value={num(totals.risk)} icon={<Boxes size={18} />} accent={ICON_TONE.t4} sub={<span><Term term="옵션">옵션</Term> 기준 품절 임박+품절</span>} />
       </div>
 
       <SectionBlock title="브랜드 현황" desc="카드를 누르면 상위 상품·옵션 상태·반품 사유·담당 MD를 볼 수 있습니다."

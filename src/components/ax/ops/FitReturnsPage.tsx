@@ -12,7 +12,7 @@ import { allOrders, allProductAgg, allReturns, effFitNote, salesKpi, type Produc
 import type { ReturnReason, ReturnRequest, SizingTendency } from "@/lib/types";
 import { num, pct, safeDiv } from "@/lib/format";
 import { fmtDate, relTime } from "@/lib/dates";
-import { ICON_ACCENTS } from "@/lib/theme";
+import { ICON_ACCENTS, ICON_TONE } from "@/lib/theme";
 import { Badge, type Tone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -150,9 +150,9 @@ function FitBody() {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
         <KpiCard label="반품률 (30일)" value={pct(kpi.returnRate, 1)} icon={<Undo2 size={18} />} accent={ICON_ACCENTS.risk} sub={`반품 ${num(kpi.returns)}건 ÷ 판매 ${num(kpi.cur.units)}개`} />
-        <KpiCard label="사이즈 관련 반품률" value={pct(kpi.fitReturnRate, 1)} icon={<Ruler size={18} />} accent="#C76C86" sub="사이즈 작음·큼·핏 불만족" />
+        <KpiCard label="사이즈 관련 반품률" value={pct(kpi.fitReturnRate, 1)} icon={<Ruler size={18} />} accent={ICON_TONE.t7} sub="사이즈 작음·큼·핏 불만족" />
         <KpiCard label="반품 요청 (30일)" value={num(kpi.returns)} icon={<Inbox size={18} />} accent={ICON_ACCENTS.operations} sub={`전체 기록 ${num(returns.length)}건 (90일)`} />
         <KpiCard label="처리 대기" value={num(pendingCount)} icon={<Clock size={18} />} accent={ICON_ACCENTS.sales} sub="접수됨 상태 · 승인 필요" />
       </div>

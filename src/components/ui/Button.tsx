@@ -17,11 +17,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const base = "inline-flex items-center justify-center gap-2 font-semibold rounded-xl whitespace-nowrap select-none transition-all duration-fast ease-out active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none focus-visible:ring-2 focus-visible:ring-offset-2";
 const variants: Record<Variant, string> = {
-  primary: "bg-theme-primary text-white hover:brightness-110 hover:shadow-raised",
-  brand: "bg-brand-black text-white hover:bg-[#2a2a2a] hover:shadow-raised",
-  accent: "bg-brand-accent text-white hover:brightness-110 hover:shadow-raised",
+  primary: "sheen bg-theme-primary text-white hover:brightness-110 hover:shadow-raised hover:-translate-y-[1px]",
+  brand: "sheen bg-brand-black text-white hover:bg-[#2a2a2a] hover:shadow-raised hover:-translate-y-[1px]",
+  accent: "sheen bg-brand-accent text-white hover:brightness-110 hover:shadow-raised hover:-translate-y-[1px]",
   secondary: "bg-theme-soft text-neutral-text hover:brightness-95",
-  outline: "border border-neutral-border bg-white text-neutral-text hover:bg-neutral-canvas hover:border-neutral-text2",
+  outline: "border border-neutral-border bg-white text-neutral-text hover:bg-neutral-canvas hover:border-neutral-text2 hover:-translate-y-[1px]",
   ghost: "text-neutral-text hover:bg-neutral-canvas",
   danger: "bg-semantic-error text-white hover:brightness-110",
 };

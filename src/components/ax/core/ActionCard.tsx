@@ -119,7 +119,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
   /* ---------- compact (dashboard) ---------- */
   if (compact) {
     return (
-      <Link href={`/ax/actions?open=${action.id}`} className={cn("block rounded-2xl border border-neutral-border bg-white p-4 hover-lift active:bg-neutral-canvas", className)} data-tour={tour}>
+      <Link href={`/ax/actions?open=${action.id}`} className={cn("group block rounded-2xl border border-neutral-border bg-white p-4 hover-lift hover:border-theme-primary/35 active:bg-neutral-canvas", className)} data-tour={tour}>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap mb-1"><UrgencyBadge urgency={action.urgency} /><Badge tone="neutral" size="sm">{ACTION_TYPE_LABEL[action.type]}</Badge><ActionStatusBadge status={action.status} size="sm" /></div>

@@ -28,7 +28,8 @@ DELIVERY STAGE       : DEMO
 
 ## SYSTEM CORE
 - [x] App Shell (Customer Header/Footer/Bottom Nav · AX Sidebar 280px/Topbar) · 실시간 날짜·시각(PC/Mobile)
-- [x] Settings: 9 Canonical Theme(전부 동작) · 글자크기 · 모션 · Role Preview · Permission Matrix · Demo/Ready/Next · 데모 초기화 · CSV Import(READY) · AI 상태 · 기술자산(해당없음) · 이미지 자산 등록표
+- [x] AX 사이드바 4그룹(오늘의 판단 · 상품·재고 · 고객·매출 · 근거·설정) · 그룹 구분선/개수/톤 점 · 활성 강조바
+- [x] Settings: 9 Canonical Theme(전부 동작 · 아이콘 10단계 톤이 테마를 따라 이동) · 글자크기 · 모션 · Role Preview · Permission Matrix · Demo/Ready/Next · 데모 초기화 · CSV Import(READY) · AI 상태 · 기술자산(해당없음) · 이미지 자산 등록표
 - [x] Tutorial (AX 5 Step · Customer 3 Step, 실제 Route 위 Spotlight, Overlay 완전 해제)
 - [x] Why AX 16 Section (회사 맞춤 · 목차 스크롤스파이 · 이미지 슬롯 3)
 - [x] Presentation Mode 16 Step (실제 Route 이동 Guided Journey, 키보드 ←/→/ESC)
@@ -59,7 +60,8 @@ DELIVERY STAGE       : DEMO
 Demand&Restock(RULE+STAT, L3) · Fit(RULE, L2) · Markdown(RULE+OPT, L3) · Repeat(RULE+STAT, L2) — 전부 코드 계산. LLM: 서버 Route `/api/ai/explain` 준비(@anthropic-ai/sdk · claude-opus-5 · 키 없으면 규칙 텍스트 반환). 현재 키 없음 → AI READY (마커 3곳: 경영 브리핑 / Demand 설명 / 핏 설명).
 
 ## RESPONSIVE / THEME
-검증 폭 360/390/430/768/1024/1280/1440/1920 · 9 Theme 전환 실측 · Font 3단계 · Motion 감소 · 인쇄 미디어(Evidence Pack) 실측 · 모바일 터치 타겟 40px+ (qa:a11y).
+검증 폭 360/390/430/768/1024/1280/1440/1920 · 9 Theme 전환 실측 · Font 3단계 · Motion 감소(설정 + OS prefers-reduced-motion) · 인쇄 미디어(Evidence Pack) 실측 · 모바일 터치 타겟 40px+ (qa:a11y).
+모션: 진입(stagger)·페이지 전환·호버 프리미티브(tile/press/sheen/link-line/nudge). 차트 애니메이션은 D-14대로 비활성.
 
 ## KNOWN ISSUES
 - 사진 자산 미적용(의도) — Hero/Why AX/브랜드/상품은 색상 기반 Gradient placeholder
@@ -82,6 +84,7 @@ Demand&Restock(RULE+STAT, L3) · Fit(RULE, L2) · Markdown(RULE+OPT, L3) · Repe
 4. Pilot 1~2주차 Baseline 측정 → Evidence Pack의 UNKNOWN/VALIDATE LATER 칸 채우기
 
 ## 최근 주요 변경
+- 3차: 사이드바 4그룹 재편(D-21) · 아이콘 '같은 색 10단계 톤'으로 통일하고 테마 연동(D-22) · 모션/호버 프리미티브 도입(D-23)
 - 2차 고도화: Loop 1 알림→구매 전환 자동 기록(D-17) · Evidence Pack 미리보기 인쇄·JSON(D-18) · LLM Route 서버 연결 지점(D-19) · Unit Economics 측정 설계(D-20) · 접근성/Hover 자동 점검 + 터치 타겟·사이드바 hover 버그 수정 · 여정 QA 23 Step
 - 첫 빌드 완료: 35 Route · 4 Closed Loop 실동작 · 수용 여정 21/21 · 반응형 8폭 검증
 - Red Team 수정: 재구매율 비현실(93%→25%, 비회원 주문 도입) · 기간 비교 창 일 단위화 · 차트 애니메이션 제거 · 품절 임박 재입고 CTA · Preview 재귀 가드 · 헤더 폭 정리

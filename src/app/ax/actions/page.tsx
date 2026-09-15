@@ -83,7 +83,7 @@ function ActionsInner() {
         badge={<Badge tone="demo" size="sm">DEMO</Badge>} right={<Freshness source="DEMO" />} />
 
       {/* Header stats */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 stagger">
         <KpiCard label="생성된 Action" value={num(kpi.created)} sub="엔진 4개가 규칙으로 생성" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.ai} />
         <KpiCard label="미처리" value={num(kpi.open)} sub="추천됨 · 확인 · 실행중" icon={<Zap size={18} />} accent={ICON_ACCENTS.sales} />
         <KpiCard label="긴급" value={num(kpi.high)} sub="완료·무시 제외 긴급도 높음" icon={<Play size={18} />} accent={ICON_ACCENTS.risk} />

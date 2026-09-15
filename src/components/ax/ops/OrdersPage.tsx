@@ -25,6 +25,7 @@ import { toast } from "@/components/ui/Toast";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { displayName, LiveFreshness, MoreButton, NoteCard, PageSkeleton, useMore } from "./shared";
 import { cn } from "@/lib/cn";
+import { ICON_TONE } from "@/lib/theme";
 
 type Tab = "all" | OrderStatus;
 const TABS: { key: Tab; label: string }[] = [
@@ -123,11 +124,11 @@ function OrdersBody() {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard label="오늘 주문" value={num(summary.today)} icon={<PackageCheck size={18} />} accent="#5B8DEF" sub={`고객 화면 DEMO 주문 ${newOrders.length}건 포함`} />
-        <KpiCard label="처리 대기" value={num(summary.waiting)} icon={<Clock size={18} />} accent="#D79A43" sub="신규주문 + 상품준비" />
-        <KpiCard label="배송중" value={num(summary.shipping)} icon={<Truck size={18} />} accent="#3AAFA9" sub="출고완료 + 배송중" />
-        <KpiCard label="반품·교환 요청" value={num(summary.returns)} icon={<Undo2 size={18} />} accent="#D66A5E" sub="핏·반품 화면에서 처리" href="/ax/fit-returns" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+        <KpiCard label="오늘 주문" value={num(summary.today)} icon={<PackageCheck size={18} />} accent={ICON_TONE.t3} sub={`고객 화면 DEMO 주문 ${newOrders.length}건 포함`} />
+        <KpiCard label="처리 대기" value={num(summary.waiting)} icon={<Clock size={18} />} accent={ICON_TONE.t6} sub="신규주문 + 상품준비" />
+        <KpiCard label="배송중" value={num(summary.shipping)} icon={<Truck size={18} />} accent={ICON_TONE.t6} sub="출고완료 + 배송중" />
+        <KpiCard label="반품·교환 요청" value={num(summary.returns)} icon={<Undo2 size={18} />} accent={ICON_TONE.t4} sub="핏·반품 화면에서 처리" href="/ax/fit-returns" />
       </div>
 
       {/* Customer-created orders (Loop 2) */}

@@ -41,14 +41,32 @@ export function themeById(id: string | undefined | null): ThemeDef {
   return THEMES.find((t) => t.id === id) ?? THEMES[0];
 }
 
-/** Sidebar / module icon accents (Unified §SIDEBAR ICON COLOR SYSTEM) */
-export const ICON_ACCENTS = {
-  overview: "#5B8DEF",
-  operations: "#3AAFA9",
-  sales: "#D79A43",
-  customer: "#A66BBE",
-  ai: "#7376D9",
-  evidence: "#3C9A75",
-  risk: "#D66A5E",
-  settings: "#718096",
+/* ------------------------------------------------------------------
+   ICON TONE SYSTEM (Unified §SIDEBAR ICON COLOR SYSTEM)
+   모듈 구분을 '다른 색'이 아니라 '같은 색의 다른 톤'으로 한다.
+   실제 값은 globals.css의 --icon-t1~t10 (테마 Primary에서 파생) —
+   테마를 바꾸면 10단계가 통째로 따라 움직이고, 장식색은 0이 된다.
+   t1 = 가장 진함(주목) → t9 = 가장 옅음 → t10 = 무채 계열(중요도 최하)
+------------------------------------------------------------------- */
+export const ICON_TONE = {
+  t1: "var(--icon-t1)", t2: "var(--icon-t2)", t3: "var(--icon-t3)", t4: "var(--icon-t4)", t5: "var(--icon-t5)",
+  t6: "var(--icon-t6)", t7: "var(--icon-t7)", t8: "var(--icon-t8)", t9: "var(--icon-t9)", t10: "var(--icon-t10)",
 } as const;
+export type IconTone = keyof typeof ICON_TONE;
+
+/** 의미 기반 별칭 — 화면 코드는 이 이름으로 톤을 고른다. */
+export const ICON_ACCENTS = {
+  overview: ICON_TONE.t1,
+  ai: ICON_TONE.t2,
+  operations: ICON_TONE.t3,
+  risk: ICON_TONE.t4,
+  sales: ICON_TONE.t5,
+  evidence: ICON_TONE.t6,
+  customer: ICON_TONE.t7,
+  settings: ICON_TONE.t10,
+} as const;
+
+/** 아이콘 타일 배경 — 같은 색을 옅게 깐다 (hex·var 모두 동작). */
+export const tint = (color: string, percent = 14) => `color-mix(in srgb, ${color} ${percent}%, transparent)`;
+/** 어두운 사이드바 위에서 같은 색의 밝은 톤으로 들어올린다. */
+export const onDark = (color: string, mix = 58) => `color-mix(in oklab, ${color} ${mix}%, #fff)`;

@@ -23,6 +23,7 @@ import { toast } from "@/components/ui/Toast";
 import { ActionStatusBadge } from "@/components/ax/StatusBadges";
 import { KpiMoney, LiveFreshness, NoteCard, PageSkeleton, SectionBlock, useLocalJson } from "./shared";
 import { cn } from "@/lib/cn";
+import { ICON_TONE } from "@/lib/theme";
 
 interface CampaignDraft { id: string; name: string; segment: SegmentId | "all"; productIds: string[]; discountRate: number; startAt: string; endAt: string; createdAt: string; createdBy: string }
 type Row = Campaign & { effStatus: Campaign["status"]; isDraft: boolean };
@@ -106,11 +107,11 @@ function CampaignsBody() {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard label="진행중" value={num(counts.running)} icon={<Megaphone size={18} />} accent="#D96D32" sub={`예정 ${counts.scheduled} · 종료 ${counts.ended}`} />
-        <KpiCard label="캠페인 매출 합계" value={<KpiMoney>{krwShort(totalRevenue)}</KpiMoney>} icon={<PackageCheck size={18} />} accent="#D79A43" sub="전체 캠페인 · SIMULATION" />
-        <KpiCard label="평균 클릭→주문" value={pct(safeDiv(rows.reduce((s, r) => s + r.orders, 0), Math.max(1, rows.reduce((s, r) => s + r.clicks, 0))), 1)} icon={<MousePointerClick size={18} />} accent="#5B8DEF" sub="주문 ÷ 클릭" />
-        <KpiCard label="내 초안" value={num(counts.draft)} icon={<CalendarDays size={18} />} accent="#A66BBE" sub="이 브라우저에 저장 · READY" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+        <KpiCard label="진행중" value={num(counts.running)} icon={<Megaphone size={18} />} accent={ICON_TONE.t8} sub={`예정 ${counts.scheduled} · 종료 ${counts.ended}`} />
+        <KpiCard label="캠페인 매출 합계" value={<KpiMoney>{krwShort(totalRevenue)}</KpiMoney>} icon={<PackageCheck size={18} />} accent={ICON_TONE.t6} sub="전체 캠페인 · SIMULATION" />
+        <KpiCard label="평균 클릭→주문" value={pct(safeDiv(rows.reduce((s, r) => s + r.orders, 0), Math.max(1, rows.reduce((s, r) => s + r.clicks, 0))), 1)} icon={<MousePointerClick size={18} />} accent={ICON_TONE.t3} sub="주문 ÷ 클릭" />
+        <KpiCard label="내 초안" value={num(counts.draft)} icon={<CalendarDays size={18} />} accent={ICON_TONE.t7} sub="이 브라우저에 저장 · READY" />
       </div>
 
       {/* Loop 4 banner */}

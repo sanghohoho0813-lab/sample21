@@ -28,8 +28,9 @@ export const CHART = {
   warning: "var(--semantic-warning)",
   error: "var(--semantic-error)",
 };
-/** Categorical palette: theme colors first, then icon accents (allowed inline accents). */
-export const CHART_SERIES = [CHART.primary, CHART.secondary, CHART.accent, CHART.highlight, ICON_ACCENTS.customer, ICON_ACCENTS.sales, ICON_ACCENTS.settings, ICON_ACCENTS.risk];
+/** Categorical palette — 아이콘 톤 사다리와 분리한다: 차트는 '구분'이 목적이라
+ *  같은 색의 톤 차이만으로는 계열을 읽을 수 없다. 테마 4색 + 각 색의 변형 4개. */
+export const CHART_SERIES = [CHART.primary, CHART.secondary, CHART.accent, CHART.highlight, "var(--chart-5)", "var(--chart-6)", "var(--chart-7)", "var(--chart-8)"];
 
 export const axisKrw = (n: number) => {
   const abs = Math.abs(n);
@@ -88,7 +89,7 @@ export const variantLabel = (variantId: string) => {
 /* ------------------------------ Small presentational parts ------------------------------ */
 export function SectionCard({ title, desc, right, children, tour, className, pad, as }: { title?: ReactNode; desc?: ReactNode; right?: ReactNode; children: ReactNode; tour?: string; className?: string; pad?: "none" | "sm" | "md" | "lg"; as?: "h2" | "h3" }) {
   return (
-    <Card className={cn("bg-white", className)} data-tour={tour} pad={pad}>
+    <Card className={cn("bg-white transition-colors duration-200 hover:border-neutral-text2/25", className)} data-tour={tour} pad={pad}>
       {title && <SectionTitle title={title} desc={desc} right={right} as={as ?? "h2"} className="mb-4" />}
       {children}
     </Card>
@@ -126,7 +127,7 @@ export function MiniBar({ value, tone = "primary", className, showValue = true }
   const v = Math.max(0, Math.min(100, value));
   return (
     <span className={cn("inline-flex items-center gap-2 min-w-[96px]", className)}>
-      <span className="h-2 flex-1 rounded-full bg-neutral-canvas overflow-hidden border border-neutral-border/60"><span className={cn("block h-full rounded-full", colors[tone])} style={{ width: `${Math.max(3, v)}%` }} /></span>
+      <span className="h-2 flex-1 rounded-full bg-neutral-canvas overflow-hidden border border-neutral-border/60"><span className={cn("block h-full rounded-full transition-[width] duration-500 ease-out", colors[tone])} style={{ width: `${Math.max(3, v)}%` }} /></span>
       {showValue && <span className="tabular font-bold text-[0.9rem] w-7 text-right">{Math.round(v)}</span>}
     </span>
   );
@@ -135,7 +136,7 @@ export const demandTone = (score: number): "error" | "warning" | "primary" | "su
 
 export function EntityChip({ href, children, tone = "neutral" }: { href?: string; children: ReactNode; tone?: "neutral" | "accent" | "info" }) {
   const cls = cn("inline-flex items-center gap-1 rounded-full px-2.5 h-10 md:h-7 text-[0.78rem] font-semibold border transition-colors duration-fast whitespace-nowrap max-w-full", tone === "accent" ? "bg-theme-soft border-transparent text-theme-primary hover:brightness-95" : tone === "info" ? "bg-[#e8f0fe] border-transparent text-[#1d4ed8]" : "bg-neutral-canvas border-neutral-border text-neutral-text hover:border-neutral-text2");
-  if (href) return <Link href={href} className={cls} onClick={(e) => e.stopPropagation()}>{children}<ChevronRight size={12} className="opacity-60" /></Link>;
+  if (href) return <Link href={href} className={cn(cls, "press group")} onClick={(e) => e.stopPropagation()}>{children}<ChevronRight size={12} className="opacity-60 nudge-x" /></Link>;
   return <span className={cls}>{children}</span>;
 }
 
@@ -155,7 +156,7 @@ export function ActionEntityChips({ action }: { action: AXAction }) {
 }
 
 export function AxLink({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
-  return <Link href={href} className={cn("tap inline-flex items-center gap-0.5 text-[0.9rem] font-semibold text-theme-primary hover:underline underline-offset-4", className)}>{children}<ChevronRight size={16} /></Link>;
+  return <Link href={href} className={cn("tap group inline-flex items-center gap-0.5 text-[0.9rem] font-semibold text-theme-primary", className)}><span className="link-line">{children}</span><ChevronRight size={16} className="nudge-x" /></Link>;
 }
 
 export function InfoNote({ children, tone = "neutral", className }: { children: ReactNode; tone?: "neutral" | "accent" | "warning"; className?: string }) {
