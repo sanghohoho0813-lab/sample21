@@ -185,7 +185,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.82rem] text-neutral-text2">
-            <span className="inline-flex items-center gap-1.5"><Cpu size={14} />{ENGINE_LABEL[action.engine]}{action.engine === "demand" && <AIReadyBadge kind="demand" className="h-7 px-2.5 text-[0.75rem]" />}</span>
+            <span className="inline-flex items-center gap-1.5"><Cpu size={14} />{ENGINE_LABEL[action.engine]}{action.engine === "demand" && <AIReadyBadge kind="demand" className="h-10 md:h-7 px-2.5 text-[0.75rem]" />}</span>
             <span>자동화 <Term term={action.automation}>{action.automation}</Term> · {action.automation === "L3" ? "시스템 준비 → 사람 승인" : "추천만 · 사람이 실행"}</span>
             <span>{ERROR_COST_LABEL[action.errorCost]}</span>
             <span>담당 <span className="font-semibold text-neutral-text">{action.ownerName}</span> · 추천일 {fmtDate(action.recommendedAt, "datetime")}</span>

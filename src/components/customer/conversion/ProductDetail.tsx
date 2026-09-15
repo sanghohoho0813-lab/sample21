@@ -219,7 +219,7 @@ export function ProductDetail({ product }: { product: Product }) {
 
             <div id="options" className="rounded-cardlg border border-neutral-border bg-white p-5 scroll-mt-24">
               <OptionPicker product={product} colorIdx={colorIdx} size={size} onColor={pickColor} onSize={pickSize}
-                sizeAction={<a href="#fit-signal" onClick={(e) => { e.preventDefault(); document.getElementById("fit-signal")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="inline-flex items-center gap-1 text-[0.85rem] font-bold text-brand-accent hover:underline underline-offset-2"><Ruler size={14} />핏 추천{fit.ready && fit.size ? ` ${fit.size}` : ""}</a>} />
+                sizeAction={<a href="#fit-signal" onClick={(e) => { e.preventDefault(); document.getElementById("fit-signal")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="tap inline-flex items-center gap-1 text-[0.85rem] font-bold text-brand-accent hover:underline underline-offset-2"><Ruler size={14} />핏 추천{fit.ready && fit.size ? ` ${fit.size}` : ""}</a>} />
               {variant && (
                 <div className="mt-4 rounded-xl bg-brand-ivory px-4 py-3 flex items-center justify-between gap-3 text-[0.9rem]">
                   <span className="min-w-0"><span className="font-semibold">{variant.color} · {variant.size}</span><span className="text-neutral-text2"> · 1개</span></span>

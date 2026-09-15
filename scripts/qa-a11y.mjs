@@ -19,7 +19,7 @@ const report = { base: BASE, at: new Date().toISOString(), unnamed: [], small: [
 
 const dismissTour = async (page) => { const skip = page.getByText("건너뛰기"); if (await skip.count()) { await skip.first().click({ timeout: 1500 }).catch(() => {}); await page.waitForTimeout(250); } };
 
-for (const width of [1280, 390]) {
+for (const width of (process.env.QA_WIDTHS ?? "1280,390").split(",").map(Number)) {
   const mobile = width < 768;
   const ctx = await browser.newContext({ viewport: { width, height: mobile ? 844 : 900 }, deviceScaleFactor: 1, locale: "ko-KR", hasTouch: mobile });
   const page = await ctx.newPage();

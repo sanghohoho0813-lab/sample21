@@ -44,7 +44,7 @@ function WishRow({ item, onPick }: { item: WishItem; onPick: (p: Product, colorI
   return (
     <li className="rounded-cardlg border border-neutral-border bg-white p-4 md:p-5 transition-shadow hover:shadow-raised">
       <div className="flex gap-4">
-        <Link href={`/products/${p.id}`} className="shrink-0 w-24 md:w-28"><ProductImage colors={p.colors} variant={parsed?.colorIdx ?? 0} label={p.name} ratio="aspect-[3/4]" /></Link>
+        <Link href={`/products/${p.id}`} className="shrink-0 w-24 md:w-28 hover:opacity-90 transition-opacity"><ProductImage colors={p.colors} variant={parsed?.colorIdx ?? 0} label={p.name} ratio="aspect-[3/4]" /></Link>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0"><p className="text-[0.78rem] font-bold text-neutral-text2">{BRAND_BY_ID[p.brandId].name}</p><Link href={`/products/${p.id}`} className="font-semibold leading-snug hover:underline underline-offset-2">{p.name}</Link></div>

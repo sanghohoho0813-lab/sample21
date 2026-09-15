@@ -85,9 +85,9 @@ function InventoryInner() {
 
         {/* Status chips */}
         <div className="flex flex-wrap gap-2">
-          <button onClick={() => { setFilter("all"); setLimit(PAGE); }} className={cn("h-9 px-3 rounded-full text-[0.85rem] font-semibold border transition-colors", filter === "all" ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2")}>전체 <span className="tabular opacity-70">{rows.length}</span></button>
+          <button onClick={() => { setFilter("all"); setLimit(PAGE); }} className={cn("h-10 md:h-9 px-3 rounded-full text-[0.85rem] font-semibold border transition-colors", filter === "all" ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2")}>전체 <span className="tabular opacity-70">{rows.length}</span></button>
           {STATUS_ORDER.map((s) => (
-            <button key={s} onClick={() => { setFilter(s); setLimit(PAGE); }} aria-pressed={filter === s} className={cn("h-9 px-3 rounded-full text-[0.85rem] font-semibold border transition-colors inline-flex items-center gap-1.5", filter === s ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2")}>
+            <button key={s} onClick={() => { setFilter(s); setLimit(PAGE); }} aria-pressed={filter === s} className={cn("h-10 md:h-9 px-3 rounded-full text-[0.85rem] font-semibold border transition-colors inline-flex items-center gap-1.5", filter === s ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2")}>
               <span className={cn("h-2 w-2 rounded-full", filter === s ? "bg-white" : INVENTORY_STATUS_TONE[s] === "error" ? "bg-semantic-error" : INVENTORY_STATUS_TONE[s] === "warning" ? "bg-semantic-warning" : INVENTORY_STATUS_TONE[s] === "success" ? "bg-semantic-success" : INVENTORY_STATUS_TONE[s] === "accent" ? "bg-theme-accent" : INVENTORY_STATUS_TONE[s] === "info" ? "bg-theme-secondary" : "bg-neutral-border")} />
               {INVENTORY_STATUS_LABEL[s]} <span className="tabular opacity-70">{counts[s]}</span>
             </button>

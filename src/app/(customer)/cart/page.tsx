@@ -117,7 +117,7 @@ function WishQuick({ products, onPick }: { products: Product[]; onPick: (p: Prod
       <ul className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {products.map((p) => (
           <li key={p.id} className="min-w-0">
-            <Link href={`/products/${p.id}`} className="block"><ProductImage colors={p.colors} label={p.name} ratio="aspect-[3/4]" className="rounded-xl" /></Link>
+            <Link href={`/products/${p.id}`} className="block hover:opacity-90 transition-opacity"><ProductImage colors={p.colors} label={p.name} ratio="aspect-[3/4]" className="rounded-xl" /></Link>
             <p className="mt-2 text-[0.85rem] font-semibold leading-snug line-clamp-2 min-h-[2.5em]">{p.name}</p>
             <p className="text-[0.85rem] font-bold tabular">{krw(effPrice(p, store))}</p>
             <Button size="sm" variant="outline" full className="mt-2" onClick={() => onPick(p)}>옵션 선택 후 담기</Button>

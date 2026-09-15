@@ -29,7 +29,7 @@ export function Term({ children, term }: { children?: ReactNode; term: string })
     <span className="relative inline-flex items-center gap-0.5">
       {children ?? term}
       {desc && (
-        <button type="button" aria-label={`${term} 설명`} onClick={() => setOpen((v) => !v)} onBlur={() => setOpen(false)} className="text-neutral-text2 hover:text-theme-primary inline-flex items-center justify-center h-10 w-10 -my-3 -mx-3 md:h-5 md:w-5 md:m-0"><HelpCircle size={14} /></button>
+        <button type="button" aria-label={`${term} 설명`} onClick={() => setOpen((v) => !v)} onBlur={() => setOpen(false)} className="text-neutral-text2 hover:text-theme-primary inline-flex shrink-0 items-center justify-center h-10 w-10 -my-3 -mx-3 md:h-5 md:w-5 md:m-0"><HelpCircle size={14} /></button>
       )}
       {open && desc && <span className="absolute left-0 top-full mt-1 z-40 w-64 rounded-xl bg-brand-black text-white text-[0.82rem] px-3 py-2 shadow-lift leading-snug animate-fadeIn">{desc}</span>}
     </span>

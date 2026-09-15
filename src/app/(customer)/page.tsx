@@ -82,11 +82,11 @@ function Hero() {
           <HScroll className="items-center gap-2">
             <span className="shrink-0 text-[0.72rem] font-bold tracking-widest text-neutral-text2 pr-1">BRANDS</span>
             {BRANDS.map((b) => (
-              <Link key={b.id} href={`/brands/${b.slug}`} className="shrink-0 snap-start h-9 px-3 rounded-full bg-white border border-neutral-border text-[0.82rem] font-bold hover:border-neutral-text2 hover:bg-neutral-canvas transition-colors inline-flex items-center gap-1.5">
+              <Link key={b.id} href={`/brands/${b.slug}`} className="shrink-0 snap-start h-10 md:h-9 px-3 rounded-full bg-white border border-neutral-border text-[0.82rem] font-bold hover:border-neutral-text2 hover:bg-neutral-canvas transition-colors inline-flex items-center gap-1.5">
                 <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: `linear-gradient(135deg, ${b.gradient[0]}, ${b.gradient[1]})` }} />{b.name}
               </Link>
             ))}
-            <Link href="/brands" className="shrink-0 h-9 px-3 rounded-full bg-brand-black text-white text-[0.82rem] font-bold inline-flex items-center gap-1">전체 브랜드<ChevronRight size={14} /></Link>
+            <Link href="/brands" className="shrink-0 h-10 md:h-9 px-3 rounded-full bg-brand-black text-white text-[0.82rem] font-bold inline-flex items-center gap-1 hover:bg-[#2a2a2a] transition-colors">전체 브랜드<ChevronRight size={14} /></Link>
           </HScroll>
         </Container>
       </div>

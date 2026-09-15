@@ -44,7 +44,7 @@ function DemoControlBar() {
         <div className="ml-auto flex items-center gap-1">
           <button onClick={start} className="h-10 md:h-7 px-2.5 rounded-lg hover:bg-white/10 inline-flex items-center gap-1 font-semibold"><Play size={12} />시연</button>
           <DevicePreviewButton light className="h-10 md:h-7 px-2.5 text-[0.8rem]" />
-          <Link href="/ax" className="h-10 md:h-7 px-2.5 rounded-lg bg-white text-brand-black inline-flex items-center gap-1 font-bold hover:bg-neutral-canvas" data-tour="c-surface-switch"><ExternalLink size={12} />Business AX 보기</Link>
+          <Link href="/ax" className="h-10 md:h-7 px-2.5 rounded-lg bg-white text-brand-black inline-flex items-center gap-1 font-bold hover:bg-neutral-canvas transition-colors" data-tour="c-surface-switch"><ExternalLink size={12} />Business AX 보기</Link>
         </div>
       </div>
     </div>
