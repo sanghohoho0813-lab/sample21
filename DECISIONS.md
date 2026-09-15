@@ -93,3 +93,8 @@
 - 넣지 않은 것: **숫자 카운트업**(읽는 순간 정확한 값이 더 중요하고, 시연·스크린샷 중 중간값이 찍힌다), **차트 애니메이션**(D-14 유지).
 - 모든 모션은 설정의 '모션 줄이기', OS의 `prefers-reduced-motion`, 인쇄(Evidence Pack)에서 자동으로 꺼진다. 진입 모션은 `transform: none`으로 끝나 stacking context를 남기지 않는다(튜토리얼 스포트라이트 보호).
 
+## D-24 토큰 색(CSS 변수)에 투명도 수식이 먹도록 Tailwind 색 정의를 함수형으로 바꿈
+- 증상: `border-neutral-text2/40`, `bg-brand-accent/5`, `ring-theme-primary/20` 처럼 **토큰 색 + 투명도** 조합 74곳이 CSS를 아예 생성하지 않아 호버·구분선·강조 배경이 조용히 죽어 있었다(에러도 경고도 없음). Tailwind v3는 `var(--x)` 색의 알파를 계산하지 못한다.
+- 조치: `tailwind.config.ts`에서 토큰 색을 함수로 정의해 투명도가 오면 `color-mix(in srgb, var(--x) N%, transparent)`로 직접 섞는다. 74곳이 한 번에 살아난다.
+- 주의: 이 규칙은 CSS 변수 색에만 적용된다. 리터럴 색(`bg-white/20`)은 원래대로 동작한다. 스케일 밖 숫자(`/8`, `/12`)는 여전히 생성되지 않으므로 `bg-white/[0.08]` 형태를 쓴다.
+
