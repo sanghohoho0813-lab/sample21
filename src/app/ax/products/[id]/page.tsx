@@ -78,7 +78,7 @@ function DetailInner() {
 
   return (
     <div className="space-y-6">
-      <Link href="/ax/products" className="inline-flex items-center gap-1 text-[0.88rem] font-semibold text-neutral-text2 hover:text-neutral-text"><ArrowLeft size={16} />상품·SKU 목록</Link>
+      <Link href="/ax/products" className="tap inline-flex items-center gap-1 text-[0.88rem] font-semibold text-neutral-text2 hover:text-neutral-text"><ArrowLeft size={16} />상품·SKU 목록</Link>
       <div className="rounded-cardlg bg-white border border-neutral-border shadow-card p-5 md:p-6 flex flex-col md:flex-row gap-5">
         <ProductImage colors={product.colors} label={product.name} className="w-full md:w-40 shrink-0" ratio="aspect-[4/5] md:aspect-[3/4]" />
         <div className="min-w-0 flex-1">
@@ -294,7 +294,7 @@ function DetailInner() {
       {agg.demand >= 60 && tab !== "insight" && (
         <InfoNote tone="accent" className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <span className="inline-flex items-center gap-2"><UrgencyBadge urgency="high" />수요 점수가 높은 옵션이 있습니다 ({num(agg.demand)}점). 재입고 우선순위를 확인하세요.</span>
-          <button onClick={() => setTab("insight")} className="text-[0.9rem] font-semibold text-theme-primary hover:underline underline-offset-4 text-left">AI·Logic Insight 보기 →</button>
+          <button onClick={() => setTab("insight")} className="tap text-[0.9rem] font-semibold text-theme-primary hover:underline underline-offset-4 text-left">AI·Logic Insight 보기 →</button>
         </InfoNote>
       )}
     </div>

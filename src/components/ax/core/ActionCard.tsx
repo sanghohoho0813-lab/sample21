@@ -221,7 +221,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
             {action.status === "dismissed" && <Button size="md" variant="ghost" onClick={() => change("recommended")} icon={<RotateCcw size={18} />}>다시 검토</Button>}
             {action.status === "done" && <span className="inline-flex items-center gap-1.5 text-[0.88rem] font-semibold text-semantic-success"><CheckCircle2 size={16} />완료됨 · 고객 화면 반영</span>}
             {isOpen && <span className="text-[0.78rem] text-neutral-text2 ml-auto">승인자: {actor} (현재 역할)</span>}
-            {product && <Link href={`/products/${product.id}`} className="text-[0.82rem] font-semibold text-neutral-text2 hover:text-theme-primary">고객 화면 보기</Link>}
+            {product && <Link href={`/products/${product.id}`} className="tap inline-flex items-center text-[0.82rem] font-semibold text-neutral-text2 hover:text-theme-primary">고객 화면 보기</Link>}
           </div>
         </div>
       )}

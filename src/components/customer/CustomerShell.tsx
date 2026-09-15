@@ -42,9 +42,9 @@ function DemoControlBar() {
         <span className="hidden sm:inline text-white/80">대표·관리자 시연 모드 · 일반 고객에게는 보이지 않습니다</span>
         <span className="hidden md:inline-flex text-white/70"><LiveClock compact light /></span>
         <div className="ml-auto flex items-center gap-1">
-          <button onClick={start} className="h-7 px-2.5 rounded-lg hover:bg-white/10 inline-flex items-center gap-1 font-semibold"><Play size={12} />시연</button>
-          <DevicePreviewButton light className="h-7 px-2.5 text-[0.8rem]" />
-          <Link href="/ax" className="h-7 px-2.5 rounded-lg bg-white text-brand-black inline-flex items-center gap-1 font-bold hover:bg-neutral-canvas" data-tour="c-surface-switch"><ExternalLink size={12} />Business AX 보기</Link>
+          <button onClick={start} className="h-10 md:h-7 px-2.5 rounded-lg hover:bg-white/10 inline-flex items-center gap-1 font-semibold"><Play size={12} />시연</button>
+          <DevicePreviewButton light className="h-10 md:h-7 px-2.5 text-[0.8rem]" />
+          <Link href="/ax" className="h-10 md:h-7 px-2.5 rounded-lg bg-white text-brand-black inline-flex items-center gap-1 font-bold hover:bg-neutral-canvas" data-tour="c-surface-switch"><ExternalLink size={12} />Business AX 보기</Link>
         </div>
       </div>
     </div>
@@ -64,7 +64,7 @@ function NotificationsButton() {
         <Bell size={22} />
         {unread > 0 && <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-accent text-white text-[0.68rem] font-bold flex items-center justify-center">{unread}</span>}
       </button>
-      <Drawer open={open} onClose={() => setOpen(false)} title="알림" footer={notifications.some((n) => !n.read) ? <button onClick={markAllRead} className="text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text">모두 읽음</button> : undefined}>
+      <Drawer open={open} onClose={() => setOpen(false)} title="알림" footer={notifications.some((n) => !n.read) ? <button onClick={markAllRead} className="tap text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text">모두 읽음</button> : undefined}>
         {notifications.length === 0 ? <p className="text-neutral-text2 py-10 text-center">아직 알림이 없습니다.</p> : (
           <ul className="space-y-2">
             {notifications.map((n) => (
@@ -123,7 +123,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
         <div className="mx-auto max-w-[1280px] px-4">
           <div className="h-[64px] md:h-[72px] flex items-center gap-3 md:gap-6">
             <button onClick={() => setMenu(true)} className="lg:hidden h-11 w-11 -ml-2 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="전체 메뉴"><Menu size={24} /></button>
-            <Link href="/" className="font-black tracking-tight text-[1.45rem] md:text-[1.6rem] leading-none" aria-label="MORFIT 홈">MORFIT<span className="text-brand-accent">.</span></Link>
+            <Link href="/" className="inline-flex items-center h-11 font-black tracking-tight text-[1.45rem] md:text-[1.6rem] leading-none hover:opacity-80 transition-opacity" aria-label="MORFIT 홈">MORFIT<span className="text-brand-accent">.</span></Link>
             <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 ml-1 xl:ml-2" aria-label="주요 메뉴">
               {NAV.map((n) => (
                 <Link key={n.href} href={n.href} className={cn("h-10 px-2 xl:px-3 rounded-lg text-[0.9rem] xl:text-[0.95rem] font-semibold whitespace-nowrap hover:bg-neutral-canvas transition-colors", isActive(n.href) && "bg-neutral-canvas")}>{n.label}</Link>
@@ -156,7 +156,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
           </div>
           <div>
             <p className="font-bold mb-3 flex items-center gap-2">향후 확장 <Badge tone="next" size="sm">NEXT</Badge></p>
-            <ul className="space-y-2 text-neutral-text2">{NEXT_MENUS.map((n) => <li key={n.slug}><Link href={`/next/${n.slug}`} className="hover:text-neutral-text inline-flex items-center gap-1">{n.label}<ChevronRight size={14} /></Link></li>)}</ul>
+            <ul className="space-y-2 text-neutral-text2">{NEXT_MENUS.map((n) => <li key={n.slug}><Link href={`/next/${n.slug}`} className="tap hover:text-neutral-text inline-flex items-center gap-1">{n.label}<ChevronRight size={14} /></Link></li>)}</ul>
           </div>
           <div>
             <p className="font-bold mb-3">고객 안내</p>

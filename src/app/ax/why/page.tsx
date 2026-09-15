@@ -372,7 +372,7 @@ function WhyBody() {
             <Button variant="outline" href="/" icon={<ExternalLink size={16} />} className="sm:flex-1 !bg-white !text-brand-black">고객 화면으로</Button>
             <Button variant="accent" onClick={() => { start(); toast("시연 모드 시작", "화면 하단 컨트롤러로 16단계를 이동합니다.", "info"); }} icon={<Play size={16} />} className="sm:flex-1 !bg-theme-highlight !text-brand-black">시연 시작</Button>
           </div>
-          <p className="mt-3 text-[0.78rem] text-white/60 flex items-center gap-1.5"><Sparkles size={12} /> 시연 모드 로비: <Link href="/ax/present" className="underline hover:text-white">/ax/present</Link> · 기획의도 원문 구조: MORFIT §42 <BookOpen size={12} /></p>
+          <p className="mt-3 text-[0.78rem] text-white/60 flex items-center gap-1.5"><Sparkles size={12} /> 시연 모드 로비: <Link href="/ax/present" className="tap underline hover:text-white">/ax/present</Link> · 기획의도 원문 구조: MORFIT §42 <BookOpen size={12} /></p>
                   </div>
       </WhySection>
     </div>

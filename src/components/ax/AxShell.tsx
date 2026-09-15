@@ -37,7 +37,7 @@ function NavList({ role, onNavigate }: { role: Role; onNavigate?: () => void }) 
               return (
                 <li key={i.key}>
                   <Link href={i.href} onClick={onNavigate} data-tour={i.tour} aria-current={active ? "page" : undefined}
-                    className={cn("group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-fast", active ? "bg-white/12" : "hover:bg-white/8")}>
+                    className={cn("group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-fast", active ? "bg-white/[0.12]" : "hover:bg-white/[0.08]")}>
                     <span className="h-8 w-8 shrink-0 rounded-lg flex items-center justify-center" style={{ background: `${i.accent}${active ? "44" : "26"}`, color: i.accent }}><NavIcon name={i.icon} /></span>
                     <span className={cn("text-[0.95rem] font-semibold leading-snug", active ? "text-white" : "text-[color:var(--sidebar-muted)] group-hover:text-white")}>{i.label}</span>
                     {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-theme-highlight" />}
@@ -54,7 +54,7 @@ function NavList({ role, onNavigate }: { role: Role; onNavigate?: () => void }) 
 
 function Wordmark() {
   return (
-    <Link href="/ax" className="block px-3 py-1">
+    <Link href="/ax" className="block px-3 py-1 rounded-xl hover:bg-white/[0.06] transition-colors" aria-label="Business AX 홈">
       <span className="block text-[1.35rem] font-black tracking-tight text-white leading-none">MORFIT</span>
       <span className="block mt-1 text-[0.85rem] font-bold tracking-wide" style={{ color: "var(--theme-highlight)" }}>Business AX</span>
     </Link>
@@ -80,7 +80,7 @@ export function RoleSwitcher({ compact }: { compact?: boolean }) {
   return (
     <div className="inline-flex rounded-xl bg-neutral-canvas border border-neutral-border p-1" role="radiogroup" aria-label="역할 전환" data-tour="role-switch">
       {roles.map((r) => (
-        <button key={r} role="radio" aria-checked={role === r} onClick={() => setRole(r)} className={cn("h-8 rounded-lg font-semibold whitespace-nowrap transition-all duration-fast", compact ? "px-2.5 text-[0.8rem]" : "px-3 text-[0.85rem]", role === r ? "bg-brand-black text-white shadow-card" : "text-neutral-text2 hover:text-neutral-text")}>{ROLE_LABEL[r]}</button>
+        <button key={r} role="radio" aria-checked={role === r} onClick={() => setRole(r)} className={cn("h-10 md:h-8 rounded-lg font-semibold whitespace-nowrap transition-all duration-fast", compact ? "px-2.5 text-[0.8rem]" : "px-3 text-[0.85rem]", role === r ? "bg-brand-black text-white shadow-card" : "text-neutral-text2 hover:text-neutral-text")}>{ROLE_LABEL[r]}</button>
       ))}
     </div>
   );
@@ -119,7 +119,7 @@ export function AxShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-neutral-border print:hidden">
           <div className="h-[64px] px-4 md:px-6 flex items-center gap-3">
             <button onClick={() => setDrawer(true)} className="lg:hidden h-10 w-10 -ml-2 inline-flex items-center justify-center rounded-xl hover:bg-neutral-canvas" aria-label="메뉴 열기"><Menu size={22} /></button>
-            <Link href="/ax" className="lg:hidden font-black tracking-tight text-[1.1rem]">MORFIT <span className="text-theme-primary">AX</span></Link>
+            <Link href="/ax" className="lg:hidden inline-flex items-center h-10 font-black tracking-tight text-[1.1rem]" aria-label="Business AX 홈">MORFIT <span className="text-theme-primary">AX</span></Link>
             <div className="hidden xl:block"><LiveClock /></div>
             <div className="xl:hidden ml-auto md:ml-2"><LiveClock compact /></div>
             <div className="ml-auto hidden md:flex items-center gap-2">
@@ -153,10 +153,10 @@ export function AxShell({ children }: { children: ReactNode }) {
           <div className="px-2 pb-4 space-y-3">
             <RoleSwitcher compact />
             <div className="flex flex-wrap gap-2">
-              <button onClick={() => { setDrawer(false); setTour(true); }} className="h-9 px-3 rounded-lg bg-white/10 text-white text-[0.82rem] font-semibold inline-flex items-center gap-1"><GraduationCap size={16} />튜토리얼</button>
-              <button onClick={() => { setDrawer(false); start(); }} className="h-9 px-3 rounded-lg bg-white/10 text-white text-[0.82rem] font-semibold inline-flex items-center gap-1"><Play size={14} />시연</button>
+              <button onClick={() => { setDrawer(false); setTour(true); }} className="h-10 px-3 rounded-lg bg-white/10 text-white text-[0.82rem] font-semibold inline-flex items-center gap-1 hover:bg-white/20"><GraduationCap size={16} />튜토리얼</button>
+              <button onClick={() => { setDrawer(false); start(); }} className="h-10 px-3 rounded-lg bg-white/10 text-white text-[0.82rem] font-semibold inline-flex items-center gap-1 hover:bg-white/20"><Play size={14} />시연</button>
               <DevicePreviewButton light />
-              <Link href="/" className="h-9 px-3 rounded-lg bg-white text-brand-black text-[0.82rem] font-semibold inline-flex items-center gap-1"><ExternalLink size={14} />고객 화면</Link>
+              <Link href="/" className="h-10 px-3 rounded-lg bg-white text-brand-black text-[0.82rem] font-semibold inline-flex items-center gap-1 hover:bg-neutral-canvas"><ExternalLink size={14} />고객 화면</Link>
             </div>
           </div>
           <NavList role={effectiveRole} onNavigate={() => setDrawer(false)} />

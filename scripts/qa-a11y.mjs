@@ -26,7 +26,7 @@ for (const width of [1280, 390]) {
   await page.route("**/*", (route) => (route.request().url().startsWith(BASE) ? route.continue() : route.abort()));
   for (const route of ROUTES) {
     await page.goto(BASE + route, { waitUntil: "networkidle", timeout: 60000 }).catch(() => {});
-    await page.waitForTimeout(600); await dismissTour(page);
+    await page.waitForTimeout(1200); await dismissTour(page); await page.waitForTimeout(200); await dismissTour(page);
     const items = await page.evaluate((mobile) => {
       const txt = (el) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
       const accName = (el) => {
@@ -73,10 +73,15 @@ for (const width of [1280, 390]) {
         const sel = `[data-qa-idx="${it.idx}"]`;
         const snap = (s) => s.evaluate((el, props) => { const pick = (e) => props.map((p) => getComputedStyle(e).getPropertyValue(p)); const nodes = [el, ...Array.from(el.querySelectorAll("*")).slice(0, 6)]; return nodes.map(pick); }, HOVER_PROPS);
         try {
-          await page.mouse.move(2, 2); await page.waitForTimeout(160);
+          await page.mouse.move(2, 2); await page.waitForTimeout(200);
           const loc = page.locator(sel).first(); const box = await loc.boundingBox(); if (!box) continue;
+          // pick a point that actually lands on the element (wrapped inline links can have empty box centers)
+          const candidates = [[box.x + box.width / 2, box.y + Math.min(box.height / 2, 20)], [box.x + 12, box.y + 12], [box.x + box.width - 12, box.y + box.height - 12]];
+          let point = null;
+          for (const [x, y] of candidates) { const ok = await page.evaluate(([x, y, s]) => { const el = document.querySelector(s); const t = document.elementFromPoint(x, y); return !!el && !!t && (t === el || el.contains(t)); }, [x, y, sel]); if (ok) { point = [x, y]; break; } }
+          if (!point) continue; // covered by another element (overlay / sticky) — not a hover problem
           const before = await snap(loc);
-          await page.mouse.move(box.x + box.width / 2, box.y + Math.min(box.height / 2, 20)); await page.waitForTimeout(200);
+          await page.mouse.move(point[0], point[1]); await page.waitForTimeout(350);
           const after = await snap(loc);
           report.scanned.hovered += 1;
           if (JSON.stringify(before) === JSON.stringify(after)) report.noHover.push({ route, desc: it.desc, name: it.name });

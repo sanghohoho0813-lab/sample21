@@ -29,7 +29,7 @@ function NotificationsCard() {
           <li key={n.id}><Link href={n.href ?? "/my"} onClick={() => store.markRead(n.id)} className={cn("block rounded-xl px-3 py-2.5 transition-colors hover:bg-brand-ivory", !n.read && "bg-brand-accent/5")}><p className="text-[0.9rem] font-semibold leading-snug flex items-start gap-2">{!n.read && <span className="mt-2 h-1.5 w-1.5 rounded-full bg-brand-accent shrink-0" />}<span>{n.title}</span></p><p className="text-[0.78rem] text-neutral-text2 mt-0.5">{relTime(n.at)} · {n.body}</p></Link></li>
         ))}</ul>
       )}
-      {store.notifications.some((n) => !n.read) && <button type="button" onClick={store.markAllRead} className="mt-3 text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text">모두 읽음 처리</button>}
+      {store.notifications.some((n) => !n.read) && <button type="button" onClick={store.markAllRead} className="tap mt-3 inline-flex items-center text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text">모두 읽음 처리</button>}
     </div>
   );
 }
@@ -56,7 +56,7 @@ function MyContent() {
             <section className="min-w-0">
               <SectionHead title="재입고 알림" desc="신청 즉시 Business AX Demand Radar에 반영됩니다." more="/my/restock" moreLabel="전체 보기" />
               <RestockList limit={2} compact />
-              {store.restockSubs.length > 2 && <Link href="/my/restock" className="mt-3 inline-flex items-center gap-0.5 text-[0.88rem] font-semibold hover:underline underline-offset-2">재입고 알림 {store.restockSubs.length}건 모두 보기<ChevronRight size={14} /></Link>}
+              {store.restockSubs.length > 2 && <Link href="/my/restock" className="tap mt-3 inline-flex items-center gap-0.5 text-[0.88rem] font-semibold hover:underline underline-offset-2">재입고 알림 {store.restockSubs.length}건 모두 보기<ChevronRight size={14} /></Link>}
               <div className="mt-6"><NotificationsCard /></div>
             </section>
           </div>
@@ -67,7 +67,7 @@ function MyContent() {
           <RecommendSection limit={4} tour="c-recommend" title="추천 상품" />
           <div className="grid lg:grid-cols-2 gap-6">
             <NotifyPrefsCard />
-            <div className="rounded-cardlg bg-brand-ivory p-5 flex flex-col justify-center gap-2 text-[0.9rem]"><p className="font-bold flex items-center gap-2"><Sparkles size={16} />내 데이터가 어떻게 쓰이나요?</p><p className="text-neutral-text2 leading-relaxed">조회·찜·재입고 신청·사이즈 선택은 Business AX의 Demand Radar와 핏 추천 규칙에 반영됩니다. 실제 개인정보는 저장하지 않으며, DEMO 데이터는 이 기기에만 남습니다.</p><Link href="/my/profile" className="inline-flex items-center gap-0.5 font-semibold hover:underline underline-offset-2">프로필·알림 설정<ChevronRight size={14} /></Link></div>
+            <div className="rounded-cardlg bg-brand-ivory p-5 flex flex-col justify-center gap-2 text-[0.9rem]"><p className="font-bold flex items-center gap-2"><Sparkles size={16} />내 데이터가 어떻게 쓰이나요?</p><p className="text-neutral-text2 leading-relaxed">조회·찜·재입고 신청·사이즈 선택은 Business AX의 Demand Radar와 핏 추천 규칙에 반영됩니다. 실제 개인정보는 저장하지 않으며, DEMO 데이터는 이 기기에만 남습니다.</p><Link href="/my/profile" className="tap inline-flex items-center gap-0.5 font-semibold hover:underline underline-offset-2">프로필·알림 설정<ChevronRight size={14} /></Link></div>
           </div>
         </div>
       )}

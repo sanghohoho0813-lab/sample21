@@ -79,7 +79,7 @@ export function PreviewStrip() {
           <div className="flex flex-wrap gap-2"><Badge tone="accent">관심 상승</Badge><Badge tone="primary">Primary</Badge></div>
         </div>
         <div className="rounded-cardlg bg-theme-shell p-4 flex flex-col justify-center gap-2">
-          <div className="rounded-xl bg-white/12 px-3 py-2.5 flex items-center gap-3">
+          <div className="rounded-xl bg-white/[0.12] px-3 py-2.5 flex items-center gap-3">
             <span className="h-8 w-8 rounded-lg bg-white/20 shrink-0" />
             <span className="text-white font-semibold text-[0.9rem]">경영 대시보드</span>
             <span className="ml-auto h-1.5 w-1.5 rounded-full bg-theme-highlight" />

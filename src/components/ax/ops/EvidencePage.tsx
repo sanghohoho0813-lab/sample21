@@ -179,9 +179,9 @@ function EvidenceItem({ e, action }: { e: EvidenceLog; action?: AXAction }) {
         {e.kpiDelta && <span className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-neutral-canvas px-2.5 py-1 text-[0.82rem] font-semibold tabular"><Flag size={12} />{e.kpiDelta}</span>}
         <div className="mt-2.5 flex items-center gap-x-3 gap-y-1.5 flex-wrap text-[0.82rem]">
           <span className="inline-flex items-center gap-1 text-neutral-text2"><UserRound size={13} />{e.actor}</span>
-          {e.actionId && <Link href={`/ax/actions?open=${e.actionId}`} className="inline-flex items-center gap-1 font-semibold text-theme-primary hover:underline"><Zap size={13} />{e.actionId}{action && <ActionStatusBadge status={action.status} />}</Link>}
-          {e.productId && PRODUCT_BY_ID[e.productId] && <Link href={`/ax/products/${e.productId}`} className="inline-flex items-center gap-1 font-semibold hover:text-theme-primary hover:underline"><Package size={13} />{PRODUCT_BY_ID[e.productId].name}</Link>}
-          {e.orderId && <Link href={`/ax/orders?q=${e.orderId}`} className="inline-flex items-center gap-1 font-semibold hover:text-theme-primary hover:underline"><ChevronRight size={13} />주문 {e.orderId}</Link>}
+          {e.actionId && <Link href={`/ax/actions?open=${e.actionId}`} className="tap inline-flex items-center gap-1 font-semibold text-theme-primary hover:underline"><Zap size={13} />{e.actionId}{action && <ActionStatusBadge status={action.status} />}</Link>}
+          {e.productId && PRODUCT_BY_ID[e.productId] && <Link href={`/ax/products/${e.productId}`} className="tap inline-flex items-center gap-1 font-semibold hover:text-theme-primary hover:underline"><Package size={13} />{PRODUCT_BY_ID[e.productId].name}</Link>}
+          {e.orderId && <Link href={`/ax/orders?q=${e.orderId}`} className="tap inline-flex items-center gap-1 font-semibold hover:text-theme-primary hover:underline"><ChevronRight size={13} />주문 {e.orderId}</Link>}
         </div>
       </div>
     </li>

@@ -79,7 +79,7 @@ function OrderDetail({ id }: { id: string }) {
           <p className="font-bold mb-4 flex items-center gap-2">배송 진행 상태 <DemoBadge /></p>
           <OrderTimeline order={order} tour="c-order-status" />
           <p className="mt-4 text-[0.8rem] text-neutral-text2 leading-relaxed">상태는 Business AX 주문·배송 화면에서 운영직원이 변경하며, 이 화면과 알림에 동시에 반영됩니다.</p>
-          {store.role !== "customer" && <Link href="/ax/orders" className="mt-2 inline-flex items-center gap-1 text-[0.82rem] font-bold text-brand-accent hover:underline underline-offset-2"><ExternalLink size={13} />(대표·관리자) Business AX에서 상태 변경</Link>}
+          {store.role !== "customer" && <Link href="/ax/orders" className="tap mt-2 inline-flex items-center gap-1 text-[0.82rem] font-bold text-brand-accent hover:underline underline-offset-2"><ExternalLink size={13} />(대표·관리자) Business AX에서 상태 변경</Link>}
         </section>
 
         <div className="space-y-5 min-w-0">

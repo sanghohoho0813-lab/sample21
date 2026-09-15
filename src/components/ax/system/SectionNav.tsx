@@ -50,7 +50,7 @@ export function DesktopSectionNav({ items, active }: { items: WhyIndexItem[]; ac
           return (
             <li key={it.id}>
               <button type="button" onClick={() => scrollToSection(it.id)} aria-current={on ? "location" : undefined}
-                className={cn("w-full text-left flex items-start gap-2 rounded-xl px-3 py-1.5 text-[0.82rem] transition-colors duration-fast", on ? "bg-theme-soft text-theme-primary font-bold" : "text-neutral-text2 hover:bg-neutral-canvas hover:text-neutral-text")}>
+                className={cn("w-full text-left flex items-start gap-2 rounded-xl px-3 py-2.5 md:py-1.5 text-[0.82rem] transition-colors duration-fast", on ? "bg-theme-soft text-theme-primary font-bold" : "text-neutral-text2 hover:bg-neutral-canvas hover:text-neutral-text")}>
                 <span className="tabular shrink-0 w-5 text-[0.75rem] font-bold">{it.no}</span>
                 <span className="leading-snug">{it.title}</span>
               </button>

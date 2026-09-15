@@ -93,7 +93,7 @@ function ActiveFilters({ value, onChange }: { value: ListingFilters; onChange: (
           {it.label}<X size={14} />
         </button>
       ))}
-      <button type="button" onClick={() => onChange(clearFilters(value))} className="inline-flex items-center gap-1 h-9 px-2 text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text"><RotateCcw size={14} />필터 초기화</button>
+      <button type="button" onClick={() => onChange(clearFilters(value))} className="inline-flex items-center gap-1 h-10 px-2 text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text"><RotateCcw size={14} />필터 초기화</button>
     </div>
   );
 }

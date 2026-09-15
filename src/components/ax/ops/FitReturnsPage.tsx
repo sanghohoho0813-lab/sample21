@@ -127,7 +127,7 @@ function FitBody() {
       <div className="max-w-[260px]"><p className="text-[0.82rem] text-neutral-text2 leading-snug line-clamp-2">{effFitNote(a.product, store)}</p>{store.fitNoteOverride[a.product.id] && <Badge tone="success" size="sm" className="mt-1">개선됨</Badge>}</div>
     ) },
     { key: "reco", header: "권장 조치", cell: (a) => { const r = recommendation(a, topReasonOf.get(a.product.id) ?? null); return <Badge tone={r.tone} size="sm">{r.label}</Badge>; } },
-    { key: "action", header: "Action", cell: (a) => { const act = fitActionOf(a.product.id); return act ? <Link href={`/ax/actions?open=${act.id}`} onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-1 text-[0.85rem] font-semibold text-theme-primary hover:underline">{act.id}<ChevronRight size={14} /></Link> : <Badge tone="neutral" size="sm">검토 필요</Badge>; } },
+    { key: "action", header: "Action", cell: (a) => { const act = fitActionOf(a.product.id); return act ? <Link href={`/ax/actions?open=${act.id}`} onClick={(e) => e.stopPropagation()} className="tap inline-flex items-center gap-1 text-[0.85rem] font-semibold text-theme-primary hover:underline">{act.id}<ChevronRight size={14} /></Link> : <Badge tone="neutral" size="sm">검토 필요</Badge>; } },
   ];
 
   const queueColumns: Column<ReturnRequest>[] = [
@@ -224,7 +224,7 @@ function FitBody() {
 
       {/* Return queue */}
       <SectionBlock title="반품·교환 요청 처리" desc="접수된 요청을 승인 → 완료 순서로 처리합니다. 고객 화면에서 접수된 요청은 표시가 붙습니다. 처리 상태는 이 브라우저(Demo)에만 저장됩니다."
-        right={<div className="inline-flex rounded-xl bg-neutral-canvas p-1 border border-neutral-border">{(["open", "all"] as const).map((k) => <button key={k} onClick={() => setQueueFilter(k)} className={cn("h-9 px-3 rounded-lg text-[0.85rem] font-semibold transition-all duration-fast", queueFilter === k ? "bg-white shadow-card" : "text-neutral-text2 hover:text-neutral-text")}>{k === "open" ? `미처리 (${returns.filter((r) => effStatus(r) === "requested" || effStatus(r) === "approved").length})` : `전체 (${returns.length})`}</button>)}</div>}>
+        right={<div className="inline-flex rounded-xl bg-neutral-canvas p-1 border border-neutral-border">{(["open", "all"] as const).map((k) => <button key={k} onClick={() => setQueueFilter(k)} className={cn("h-10 md:h-9 px-3 rounded-lg text-[0.85rem] font-semibold transition-all duration-fast", queueFilter === k ? "bg-white shadow-card" : "text-neutral-text2 hover:text-neutral-text")}>{k === "open" ? `미처리 (${returns.filter((r) => effStatus(r) === "requested" || effStatus(r) === "approved").length})` : `전체 (${returns.length})`}</button>)}</div>}>
         <DataTable rows={queue.slice(0, limit)} columns={queueColumns} rowKey={(r) => r.id} dense
           empty={<EmptyState title="처리할 요청이 없습니다" desc="모든 반품·교환 요청이 완료되었습니다. 고객 화면 My Page > 주문에서 반품을 요청하면 여기에 접수됩니다." icon={<CheckCircle2 size={22} />} action={<Button variant="outline" href="/my/orders">고객 화면에서 반품 요청해 보기</Button>} />} />
         <MoreButton hasMore={hasMore} onClick={more} remaining={queue.length - limit} />

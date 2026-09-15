@@ -14,7 +14,7 @@ export function SectionHead({ title, desc, more, moreLabel = "더보기", classN
         <h2 className="text-[1.3rem] md:text-[1.6rem] font-bold tracking-tight leading-tight">{title}</h2>
         {desc && <p className="mt-1 text-neutral-text2 text-[0.9rem] md:text-[0.95rem]">{desc}</p>}
       </div>
-      {more && <Link href={more} className="shrink-0 inline-flex items-center gap-0.5 text-[0.9rem] font-semibold text-neutral-text2 hover:text-neutral-text">{moreLabel}<ChevronRight size={16} /></Link>}
+      {more && <Link href={more} className="tap shrink-0 inline-flex items-center gap-0.5 text-[0.9rem] font-semibold text-neutral-text2 hover:text-neutral-text">{moreLabel}<ChevronRight size={16} /></Link>}
     </div>
   );
 }

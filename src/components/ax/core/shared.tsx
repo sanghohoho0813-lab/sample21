@@ -134,7 +134,7 @@ export function MiniBar({ value, tone = "primary", className, showValue = true }
 export const demandTone = (score: number): "error" | "warning" | "primary" | "success" => (score >= 70 ? "error" : score >= 45 ? "warning" : score >= 25 ? "primary" : "success");
 
 export function EntityChip({ href, children, tone = "neutral" }: { href?: string; children: ReactNode; tone?: "neutral" | "accent" | "info" }) {
-  const cls = cn("inline-flex items-center gap-1 rounded-full px-2.5 h-7 text-[0.78rem] font-semibold border transition-colors duration-fast whitespace-nowrap max-w-full", tone === "accent" ? "bg-theme-soft border-transparent text-theme-primary hover:brightness-95" : tone === "info" ? "bg-[#e8f0fe] border-transparent text-[#1d4ed8]" : "bg-neutral-canvas border-neutral-border text-neutral-text hover:border-neutral-text2");
+  const cls = cn("inline-flex items-center gap-1 rounded-full px-2.5 h-10 md:h-7 text-[0.78rem] font-semibold border transition-colors duration-fast whitespace-nowrap max-w-full", tone === "accent" ? "bg-theme-soft border-transparent text-theme-primary hover:brightness-95" : tone === "info" ? "bg-[#e8f0fe] border-transparent text-[#1d4ed8]" : "bg-neutral-canvas border-neutral-border text-neutral-text hover:border-neutral-text2");
   if (href) return <Link href={href} className={cls} onClick={(e) => e.stopPropagation()}>{children}<ChevronRight size={12} className="opacity-60" /></Link>;
   return <span className={cls}>{children}</span>;
 }
@@ -155,7 +155,7 @@ export function ActionEntityChips({ action }: { action: AXAction }) {
 }
 
 export function AxLink({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
-  return <Link href={href} className={cn("inline-flex items-center gap-0.5 text-[0.9rem] font-semibold text-theme-primary hover:underline underline-offset-4", className)}>{children}<ChevronRight size={16} /></Link>;
+  return <Link href={href} className={cn("tap inline-flex items-center gap-0.5 text-[0.9rem] font-semibold text-theme-primary hover:underline underline-offset-4", className)}>{children}<ChevronRight size={16} /></Link>;
 }
 
 export function InfoNote({ children, tone = "neutral", className }: { children: ReactNode; tone?: "neutral" | "accent" | "warning"; className?: string }) {

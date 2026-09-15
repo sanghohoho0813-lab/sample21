@@ -113,7 +113,7 @@ function WishQuick({ products, onPick }: { products: Product[]; onPick: (p: Prod
   const store = useApp();
   return (
     <div className="mt-6 rounded-cardlg border border-neutral-border bg-white p-4 md:p-5">
-      <div className="flex items-center justify-between gap-2 mb-3"><p className="font-bold flex items-center gap-2"><Heart size={16} />찜한 상품 담기</p><Link href="/wishlist" className="text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text">전체 보기</Link></div>
+      <div className="flex items-center justify-between gap-2 mb-3"><p className="font-bold flex items-center gap-2"><Heart size={16} />찜한 상품 담기</p><Link href="/wishlist" className="tap inline-flex items-center text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text">전체 보기</Link></div>
       <ul className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {products.map((p) => (
           <li key={p.id} className="min-w-0">

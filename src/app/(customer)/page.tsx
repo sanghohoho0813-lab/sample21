@@ -62,7 +62,7 @@ function Hero() {
             <div className="absolute bottom-4 left-4 right-4 text-white">
               <p className="text-[0.68rem] font-bold tracking-[0.18em] text-white/75">FW EDITORIAL</p>
               <p className="mt-1 font-bold text-[1.05rem] md:text-[1.25rem] leading-tight">구조적인 미니멀리즘,<br />오늘의 아우터</p>
-              <Link href="/shop?category=outer" className="mt-2 inline-flex items-center gap-1 text-[0.82rem] font-semibold underline-offset-4 hover:underline">아우터 보기<ArrowRight size={14} /></Link>
+              <Link href="/shop?category=outer" className="tap mt-2 inline-flex items-center gap-1 text-[0.82rem] font-semibold underline-offset-4 hover:underline">아우터 보기<ArrowRight size={14} /></Link>
             </div>
           </GradientImage>
           <Link href="/brands/mellow-code" className="block group">

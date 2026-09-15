@@ -28,7 +28,7 @@ function SearchForm({ initial, onSubmit }: { initial: string; onSubmit: (q: stri
     <form onSubmit={submit} role="search" className="relative">
       <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-text2" />
       <input value={v} onChange={(e) => setV(e.target.value)} placeholder="상품, 브랜드, 스타일을 검색해보세요" aria-label="검색어" autoComplete="off" className="h-[52px] w-full rounded-2xl bg-neutral-canvas md:bg-white border border-neutral-border pl-12 pr-24 text-[1rem] focus:outline-none focus:ring-2 focus:ring-brand-black/20 focus:border-neutral-text2" />
-      {v && <button type="button" onClick={() => setV("")} aria-label="입력 지우기" className="absolute right-[76px] top-1/2 -translate-y-1/2 h-9 w-9 rounded-full inline-flex items-center justify-center text-neutral-text2 hover:bg-neutral-canvas"><X size={16} /></button>}
+      {v && <button type="button" onClick={() => setV("")} aria-label="입력 지우기" className="absolute right-[76px] top-1/2 -translate-y-1/2 h-10 w-10 rounded-full inline-flex items-center justify-center text-neutral-text2 hover:bg-neutral-canvas"><X size={16} /></button>}
       <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-4 rounded-xl bg-brand-black text-white text-[0.9rem] font-semibold hover:bg-[#2a2a2a] active:scale-[0.98] transition-all">검색</button>
     </form>
   );

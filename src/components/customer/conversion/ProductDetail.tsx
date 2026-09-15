@@ -209,7 +209,7 @@ export function ProductDetail({ product }: { product: Product }) {
 
           <div className="space-y-6 min-w-0">
             <div>
-              <div className="flex items-center gap-2 mb-2"><Link href={`/brands/${brand.slug}`} className="text-[0.85rem] font-bold tracking-wide text-neutral-text2 hover:text-neutral-text inline-flex items-center gap-0.5">{brand.name}<ChevronRight size={14} /></Link>{badge && <Badge tone={badge.tone} size="sm">{badge.t}</Badge>}</div>
+              <div className="flex items-center gap-2 mb-2"><Link href={`/brands/${brand.slug}`} className="tap text-[0.85rem] font-bold tracking-wide text-neutral-text2 hover:text-neutral-text inline-flex items-center gap-0.5">{brand.name}<ChevronRight size={14} /></Link>{badge && <Badge tone={badge.tone} size="sm">{badge.t}</Badge>}</div>
               <h1 className="text-[1.5rem] md:text-[1.8rem] font-bold tracking-tight leading-tight">{product.name}</h1>
               <p className="text-neutral-text2 mt-1">{product.subtitle}</p>
               <div className="mt-3 flex items-center gap-3 text-[0.85rem] text-neutral-text2"><span className="inline-flex items-center gap-1"><Star size={14} className="text-brand-black" fill="currentColor" /><span className="font-semibold text-neutral-text tabular">{product.rating}</span> · 리뷰 {product.reviewCount}</span><span className="inline-flex items-center gap-1"><Heart size={14} /> 찜 {agg.wishlist7d} (7일)</span></div>

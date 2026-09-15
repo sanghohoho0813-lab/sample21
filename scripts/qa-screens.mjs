@@ -4,7 +4,7 @@ import fs from "node:fs";
 
 const BASE = process.env.QA_BASE ?? "http://localhost:3000";
 const OUT = process.env.QA_OUT ?? "qa/screens";
-const WIDTHS = [360, 390, 430, 768, 1024, 1280, 1440, 1920];
+const WIDTHS = (process.env.QA_WIDTHS ?? "360,390,430,768,1024,1280,1440,1920").split(",").map(Number);
 const ROUTES = (process.env.QA_ROUTES ?? "/,/ranking,/new,/brands,/brands/nove-studio,/shop,/search?q=셔츠,/style,/products/p-nove-oxford,/wishlist,/cart,/checkout,/my,/my/orders,/my/restock,/my/profile,/next/membership,/ax,/ax/actions,/ax/sales,/ax/products,/ax/products/p-nove-oxford,/ax/inventory,/ax/customers,/ax/fit-returns,/ax/campaigns,/ax/brands,/ax/orders,/ax/evidence,/ax/evidence/pack,/ax/why,/ax/present,/ax/settings").split(",");
 
 fs.mkdirSync(OUT, { recursive: true });

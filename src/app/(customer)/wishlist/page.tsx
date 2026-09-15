@@ -95,7 +95,7 @@ function WishlistContent() {
       ) : (
         <ul className="space-y-3">{items.map((w) => <WishRow key={w.productId} item={w} onPick={(product, colorIdx, size) => setSheet({ product, colorIdx, size })} />)}</ul>
       )}
-      <div className="mt-6 rounded-cardlg bg-brand-ivory px-5 py-4 text-[0.88rem] flex flex-wrap items-center justify-between gap-2"><span>찜 데이터는 Business AX의 <span className="font-semibold">Demand Radar</span> 관심 신호로 집계됩니다.</span><Link href="/my/restock" className="inline-flex items-center gap-0.5 font-semibold hover:underline underline-offset-2">내 재입고 알림<ChevronRight size={14} /></Link></div>
+      <div className="mt-6 rounded-cardlg bg-brand-ivory px-5 py-4 text-[0.88rem] flex flex-wrap items-center justify-between gap-2"><span>찜 데이터는 Business AX의 <span className="font-semibold">Demand Radar</span> 관심 신호로 집계됩니다.</span><Link href="/my/restock" className="tap inline-flex items-center gap-0.5 font-semibold hover:underline underline-offset-2">내 재입고 알림<ChevronRight size={14} /></Link></div>
       {similar.length > 0 && <section className="mt-12"><SectionHead title="비슷한 상품 추천" desc={items.length ? "찜한 상품의 카테고리·브랜드를 기준으로 골랐습니다." : "지금 반응이 좋은 상품"} more="/ranking" /><ProductGrid products={similar} /></section>}
       <OptionSheet product={sheet?.product ?? null} open={!!sheet} onClose={() => setSheet(null)} initialColorIdx={sheet?.colorIdx ?? 0} initialSize={sheet?.size ?? null} />
     </>

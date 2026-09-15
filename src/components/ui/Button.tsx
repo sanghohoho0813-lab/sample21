@@ -26,7 +26,7 @@ const variants: Record<Variant, string> = {
   danger: "bg-semantic-error text-white hover:brightness-110",
 };
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-3 text-[0.85rem]",
+  sm: "h-10 md:h-9 px-3 text-[0.85rem]",
   md: "h-11 px-4 text-[0.95rem]",
   lg: "h-[52px] px-6 text-[1rem]",
 };

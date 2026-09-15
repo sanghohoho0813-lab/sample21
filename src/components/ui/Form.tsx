@@ -51,7 +51,7 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
   return (
     <div className={cn("inline-flex rounded-xl bg-neutral-canvas p-1 border border-neutral-border max-w-full overflow-x-auto hide-scrollbar", className)} role="tablist">
       {options.map((o) => (
-        <button key={o.value} role="tab" aria-selected={value === o.value} onClick={() => onChange(o.value)} className={cn("rounded-lg font-semibold whitespace-nowrap transition-all duration-fast", size === "sm" ? "px-3 h-8 text-[0.82rem]" : "px-4 h-10 text-[0.9rem]", value === o.value ? "bg-white text-neutral-text shadow-card" : "text-neutral-text2 hover:text-neutral-text")}>{o.label}</button>
+        <button key={o.value} role="tab" aria-selected={value === o.value} onClick={() => onChange(o.value)} className={cn("rounded-lg font-semibold whitespace-nowrap transition-all duration-fast", size === "sm" ? "px-3 h-10 md:h-8 text-[0.82rem]" : "px-4 h-10 text-[0.9rem]", value === o.value ? "bg-white text-neutral-text shadow-card" : "text-neutral-text2 hover:text-neutral-text")}>{o.label}</button>
       ))}
     </div>
   );

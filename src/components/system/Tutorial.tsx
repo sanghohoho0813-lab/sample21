@@ -66,7 +66,7 @@ export function Tutorial({ steps, open, onClose, storageFlag }: { steps: TourSte
         <h4 className="mt-1 text-[1.1rem] font-bold">{step.title}</h4>
         <p className="mt-1.5 text-[0.9rem] text-neutral-text2 leading-relaxed">{step.body}</p>
         <div className="mt-4 flex items-center justify-between gap-2">
-          <button onClick={() => finish(false)} className="text-[0.85rem] text-neutral-text2 hover:text-neutral-text font-semibold">건너뛰기</button>
+          <button onClick={() => finish(false)} className="h-10 px-3 -mx-3 rounded-lg text-[0.85rem] text-neutral-text2 hover:text-neutral-text hover:bg-neutral-canvas font-semibold">건너뛰기</button>
           <div className="flex gap-2">
             {i > 0 && <Button size="sm" variant="outline" onClick={() => setI(i - 1)}>이전</Button>}
             {i < steps.length - 1 ? <Button size="sm" onClick={() => setI(i + 1)}>다음</Button> : <Button size="sm" onClick={() => finish(true)}>완료</Button>}

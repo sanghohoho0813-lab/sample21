@@ -129,7 +129,7 @@ function InventoryInner() {
             ...(showCost ? [{ key: "value", header: "재고원가", align: "right" as const, cell: (x: (typeof slow)[number]) => <span className="tabular font-semibold">{krwShort(x.m.stockValue)}</span> }] : []),
             { key: "cur", header: "현재 할인", align: "right", cell: (x) => pct(x.m.currentRate, 0) },
             { key: "sug", header: "제안 할인율", align: "right", cell: (x) => <span className="font-semibold text-theme-primary tabular">{pct(x.m.suggestedRate, 0)}</span> },
-            { key: "act", header: "Action", cell: (x) => x.action ? <Link href={`/ax/actions?open=${x.action.id}`} className="inline-flex items-center gap-1 font-semibold text-theme-primary hover:underline underline-offset-4 text-[0.85rem]"><ActionStatusBadge status={x.action.status} size="sm" />열기</Link> : <Button size="sm" variant="outline" onClick={() => requestReview(x.p.name)}>검토 요청</Button> },
+            { key: "act", header: "Action", cell: (x) => x.action ? <Link href={`/ax/actions?open=${x.action.id}`} className="tap inline-flex items-center gap-1 font-semibold text-theme-primary hover:underline underline-offset-4 text-[0.85rem]"><ActionStatusBadge status={x.action.status} size="sm" />열기</Link> : <Button size="sm" variant="outline" onClick={() => requestReview(x.p.name)}>검토 요청</Button> },
           ]} />
         )}
       </SectionCard>
@@ -154,8 +154,8 @@ function InventoryInner() {
 /* ------------------------------ Radar rows ------------------------------ */
 function ActionCell({ r, onRequest }: { r: RadarRow; onRequest: (label: string) => void }) {
   const p = PRODUCT_BY_ID[r.v.productId];
-  if (r.actionId) return <Link href={`/ax/actions?open=${r.actionId}`} className="inline-flex items-center gap-1 text-[0.82rem] font-semibold text-theme-primary hover:underline underline-offset-4 whitespace-nowrap"><Zap size={13} />Action 열기</Link>;
-  return <button onClick={() => onRequest(`${p.name} ${r.v.color} ${r.v.size}`)} className="h-8 px-2.5 rounded-lg border border-neutral-border bg-white text-[0.8rem] font-semibold hover:bg-neutral-canvas whitespace-nowrap">검토 요청</button>;
+  if (r.actionId) return <Link href={`/ax/actions?open=${r.actionId}`} className="tap inline-flex items-center gap-1 text-[0.82rem] font-semibold text-theme-primary hover:underline underline-offset-4 whitespace-nowrap"><Zap size={13} />Action 열기</Link>;
+  return <button onClick={() => onRequest(`${p.name} ${r.v.color} ${r.v.size}`)} className="h-10 md:h-8 px-2.5 rounded-lg border border-neutral-border bg-white text-[0.8rem] font-semibold hover:bg-neutral-canvas whitespace-nowrap">검토 요청</button>;
 }
 
 function RadarTr({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label: string) => void; tourable: boolean }) {

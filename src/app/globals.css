@@ -130,6 +130,9 @@ button, [role="button"] { cursor: pointer; }
 .hover-row { transition: background-color 140ms ease-out; }
 .hover-row:hover { background-color: #f6f8fb; }
 
+/* Touch-target expander for inline text links on touch widths — bigger hit area, no layout shift */
+@media (max-width: 767px) { .tap { padding-top: 0.6rem; padding-bottom: 0.6rem; margin-top: -0.6rem; margin-bottom: -0.6rem; } }
+
 /* Device preview frame: never show a preview trigger inside a preview (P0 recursion guard) */
 html[data-preview="1"] [data-tour="device-preview"] { display: none !important; }
 
