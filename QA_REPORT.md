@@ -104,7 +104,7 @@ Loop 1 완결(알림→구매 전환 자동 기록) · Evidence Pack DEMO 미리
 |---|---|
 | typecheck / build | 0 error · `next build` 성공 · 36 Route |
 | Whole-Hybrid Journey (`npm run qa:journey`) | **23/23 PASS** · pageerror 0 — 추가 Step: "Restock notified → purchased (Loop 1 complete)", "Evidence Pack preview + JSON export"(다운로드 JSON 구조·VALIDATE LATER 고정 검증) |
-| 반응형 (`QA_SHOTS=0 npm run qa:shots`) | 최종 재측정 진행 중 — 직전 측정: 8폭 × 33 Route = 264 조합 · 404 0 · 런타임 오류 0 · overflow 0 / 모바일 3폭 재검사에서 Why AX 360px 6px 넘침 1건 발견 → 수정 |
+| 반응형 (`QA_SHOTS=0 npm run qa:shots`) | 최종: 8폭 × 33 Route = **264 조합 · 404 0 · 상태코드 비정상 0 · 런타임 오류 0 · overflow 0** (중간 재검사에서 Why AX 360px 6px 넘침 1건 발견 → flex-wrap 수정 후 0) |
 | 접근성·Hover (`npm run qa:a11y`) | 최종: 66 route×폭(1280·390) · 4,987 인터랙티브 요소 — **접근 이름 누락 0 · 모바일 40px 미만 터치 타겟 0**(1차 35종 → 2차 7종 → 최종 0) · 40~43px 경고 778건(허용) · hover 무변화 16종 = 선택된 탭·칩·현재 메뉴 등 활성 상태 컨트롤과 hover-lift 카드 내부 링크(측정 한계) — 실제 hover 클래스 누락 없음 |
 | 인쇄 미디어 (Evidence Pack) | `emulateMedia(print)` 실측: AX 사이드바·상단바·하단 탭·목차 숨김, 좌측 여백 0, 흰 배경, 7 Section 출력 |
 | LLM Route 스모크 | `GET /api/ai/explain` → `{status:"AI_READY", configured:false}` · `POST`(키 없음) → 규칙 텍스트 그대로 + note. 외부 호출 0 |
