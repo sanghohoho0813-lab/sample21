@@ -320,7 +320,7 @@ function WhyBody() {
           </div>
         )}
         <div>
-          <p className="font-bold mb-2 flex items-center gap-2"><Term term="Evidence">Evidence</Term> 예시 <Badge tone="demo" size="sm">DEMO / SIMULATION</Badge></p>
+          <p className="font-bold mb-2 flex flex-wrap items-center gap-2"><Term term="Evidence">Evidence</Term> 예시 <Badge tone="demo" size="sm">DEMO / SIMULATION</Badge></p>
           <ul className="space-y-2">
             {evidenceExamples.map((e) => (
               <li key={e.id} className="rounded-2xl border border-neutral-border bg-white px-4 py-3">
