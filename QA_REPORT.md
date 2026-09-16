@@ -139,8 +139,8 @@ Loop 1 완결(알림→구매 전환 자동 기록) · Evidence Pack DEMO 미리
 |---|---|
 | typecheck / build | 0 error · `next build` 성공 |
 | Whole-Hybrid Journey | **23/23 PASS** · pageerror 0 (그룹 재편 후 튜토리얼·시연·Loop 전부 정상) |
-| 반응형 8폭 × 33 Route | __SCREENS5__ |
-| 접근성·Hover | __A11Y5__ |
+| 반응형 8폭 × 33 Route | **264 조합 · 404 0 · 상태코드 비정상 0 · overflow 0** (그룹 재편·모션 도입 후 재측정) |
+| 접근성·Hover | 66 route×폭 · 5,016 요소 — **접근 이름 누락 0 · 모바일 40px 미만 타겟 0** · hover 무변화 11종(선택된 탭·칩·현재 메뉴·현재 역할 등 활성 상태 컨트롤). 고객 데모바의 '호버해도 흰색→흰색'이던 링크 1건은 수정 |
 | 테마 연동 | 9테마 중 Deep Navy · Emerald Gold 실측 — 사이드바/KPI 아이콘 톤이 테마 Primary를 따라 이동, 차트 4계열은 색상 구분 유지 |
 | 모션 차단 | 설정 '모션 줄이기' → `animation-duration 0.001s · opacity 1`(내용 즉시 표시) 실측 · OS `prefers-reduced-motion` · 인쇄에서 전체 비활성 |
 
