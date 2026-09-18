@@ -152,3 +152,27 @@ Loop 1 완결(알림→구매 전환 자동 기록) · Evidence Pack DEMO 미리
 | 3 | 진입 모션의 `transform: translateY(0)` 잔류가 stacking context를 만들어 튜토리얼 스포트라이트를 가릴 수 있음 | P2 | 모든 진입 키프레임을 `transform: none`으로 종료 |
 | 4 | 숫자 카운트업은 시연·스크린샷 중 중간값이 찍힘 | — | 도입하지 않음 (D-23) |
 
+## 11. 4차 — 미래AI랩 브릿지 CTA (2026-09-18)
+### 11.1 구성
+| 위치 | 컴포넌트 | 내용 |
+|---|---|---|
+| 고객 화면 전 페이지 하단(푸터 위) | `SampleBridgeCTA surface="customer"` | 배지 → 제작 고지 → 헤드라인 → 소개 → **우리 회사도 만들어보기** → 다른 샘플 보기 / 미래AI랩 홈페이지 |
+| Business AX 전 페이지 하단(main 끝) | `SampleBridgeCTA surface="ax"` | 동일 구조 · 테마 컬러 팔레트 |
+| AX 사이드바 왼쪽 아래 | `SampleBridgeMini` | 같은 3개 링크 축소판 (상시 노출) |
+
+### 11.2 검증
+| 항목 | 결과 |
+|---|---|
+| 링크 | 3개 모두 정확 (`/business-diagnosis`, `/business-services`, `/`) · `target=_blank` + `rel=noopener noreferrer` · 새 창 aria-label · 한 페이지에 중복 0 |
+| 터치 타겟 | 메인 CTA 52px · 서브 50px · 사이드바 축소판 43~48px |
+| 모션 | 광택 `sweepIdle 6s infinite`(흰색 22% 띠, 마지막 1초) · hover 시 일시정지 + lift·glow · **모션 줄이기에서 `animation-name: none`** 실측 |
+| 인쇄 | Evidence Pack 인쇄 시 브릿지 `display: none` 실측 (보고서에 광고 미포함) |
+| 반응형 | 390px 가로 넘침 0 · 8폭 × 33 Route **264 조합 · 404 0 · overflow 0** |
+| 접근성 | 66 route×폭 · 5,340 요소 — 접근 이름 누락 0 · 40px 미만 타겟 0 · hover 무변화 10종(전부 선택된 탭·현재 메뉴 등 활성 상태) |
+| 여정 | **23/23 PASS** · pageerror 0 (CTA 추가 후에도 4 Loop·시연·튜토리얼 정상) |
+
+### 11.3 수정 위치
+- **링크 3개**: `src/lib/mirae.ts` → `MIRAE_LINKS.consult / samples / home`
+- **문구 전체**: 같은 파일 `MIRAE_COPY` (배지·제작 고지·헤드라인·설명·버튼 문구)
+- **개별 페이지만 다르게**: `<SampleBridgeCTA consultHref=... samplesHref=... homeHref=... />` props
+
