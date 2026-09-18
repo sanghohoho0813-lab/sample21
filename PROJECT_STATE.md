@@ -35,6 +35,7 @@ DELIVERY STAGE       : DEMO
 - [x] Presentation Mode 16 Step (실제 Route 이동 Guided Journey, 키보드 ←/→/ESC)
 - [x] Device Preview (같은 Route iframe · 재귀 금지 · ESC/배경/닫기)
 - [x] Surface Switch (AX→고객 / 고객 Demo Bar→AX, 고객 Role에서는 숨김)
+- [x] 미래AI랩 브릿지 CTA — 고객·AX 전 화면 하단 공통(`SampleBridgeCTA`) + AX 사이드바 축소판(`SampleBridgeMini`) · 링크/문구는 `src/lib/mirae.ts`
 - [x] Demo Reset (두 Surface 동시 초기화)
 - [x] 접근성·Hover 자동 점검 스크립트 (`npm run qa:a11y`) · 모바일 터치 타겟 40px+ · 인쇄 CSS(AX 셸 숨김)
 
@@ -84,6 +85,7 @@ Demand&Restock(RULE+STAT, L3) · Fit(RULE, L2) · Markdown(RULE+OPT, L3) · Repe
 4. Pilot 1~2주차 Baseline 측정 → Evidence Pack의 UNKNOWN/VALIDATE LATER 칸 채우기
 
 ## 최근 주요 변경
+- 4차: 미래AI랩 브릿지 CTA(상담·다른 샘플·홈페이지) 양쪽 셸에 공통 배치(D-25) · 장식 반복 모션의 reduced-motion 점멸 위험 제거(D-26)
 - 3차: 사이드바 4그룹 재편(D-21) · 아이콘 '같은 색 10단계 톤'으로 통일하고 테마 연동(D-22) · 모션/호버 프리미티브 도입(D-23)
 - 2차 고도화: Loop 1 알림→구매 전환 자동 기록(D-17) · Evidence Pack 미리보기 인쇄·JSON(D-18) · LLM Route 서버 연결 지점(D-19) · Unit Economics 측정 설계(D-20) · 접근성/Hover 자동 점검 + 터치 타겟·사이드바 hover 버그 수정 · 여정 QA 23 Step
 - 첫 빌드 완료: 35 Route · 4 Closed Loop 실동작 · 수용 여정 21/21 · 반응형 8폭 검증

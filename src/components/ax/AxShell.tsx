@@ -17,6 +17,7 @@ import { usePresentation } from "@/components/system/Presentation";
 import { Tutorial, AX_TOUR } from "@/components/system/Tutorial";
 import { useIsPreviewFrame } from "@/components/system/hooks";
 import { SurfaceMarker } from "@/components/system/AppProviders";
+import { SampleBridgeCTA, SampleBridgeMini } from "@/components/system/SampleBridgeCTA";
 
 function NavIcon({ name, size = 18 }: { name: string; size?: number }) {
   const I = (Icons as unknown as Record<string, Icons.LucideIcon>)[name] ?? Icons.Circle;
@@ -82,9 +83,9 @@ function SidebarFooter() {
   return (
     <div className="px-3 pt-4 mt-4 border-t border-white/10 space-y-2">
       <div className="flex items-center gap-2"><Badge tone="demo" size="sm">DEMO DATA</Badge><span className="text-[0.75rem]" style={{ color: "var(--sidebar-label)" }}>가상 데이터 · 실제 성과 아님</span></div>
-      <p className="text-[0.78rem]" style={{ color: "var(--sidebar-label)" }}>TECH ASSET · 해당없음 (Demo 프로젝트)</p>
       <p className="text-[0.78rem]" style={{ color: "var(--sidebar-muted)" }}>현재 역할: <span className="text-white font-semibold">{ROLE_NAME[role]}</span></p>
-      <p className="text-[0.72rem]" style={{ color: "var(--sidebar-label)" }}>제작 · 미래AI랩 AX Standard v3.0</p>
+      {/* 미래AI랩 브릿지 축소판 — 왼쪽 아래에 3개 링크만 작게 */}
+      <SampleBridgeMini className="pt-3 mt-3 border-t border-white/[0.09]" />
     </div>
   );
 }
@@ -150,6 +151,8 @@ export function AxShell({ children }: { children: ReactNode }) {
 
         <main className="flex-1 px-4 md:px-6 xl:px-8 py-5 md:py-7 pb-[calc(84px+env(safe-area-inset-bottom))] lg:pb-10 max-w-[1720px] w-full mx-auto">
           <div key={pathname} className="animate-rise">{children}</div>
+          {/* 미래AI랩 브릿지 — 모든 AX 화면 하단 공통 (인쇄 시 제외) */}
+          <SampleBridgeCTA surface="ax" className="mt-10 md:mt-12" />
         </main>
       </div>
 

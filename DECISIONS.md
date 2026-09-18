@@ -98,3 +98,15 @@
 - 조치: `tailwind.config.ts`에서 토큰 색을 함수로 정의해 투명도가 오면 `color-mix(in srgb, var(--x) N%, transparent)`로 직접 섞는다. 74곳이 한 번에 살아난다.
 - 주의: 이 규칙은 CSS 변수 색에만 적용된다. 리터럴 색(`bg-white/20`)은 원래대로 동작한다. 스케일 밖 숫자(`/8`, `/12`)는 여전히 생성되지 않으므로 `bg-white/[0.08]` 형태를 쓴다.
 
+## D-25 미래AI랩 브릿지 CTA는 '셸'에 한 번만 심는다 (페이지마다 붙이지 않음)
+- `SampleBridgeCTA`를 CustomerShell(푸터 위)과 AxShell(main 끝)에 각각 1회 배치해 **모든 화면 하단에 자동으로** 같은 구조가 나온다. 페이지 파일은 건드리지 않아 기존 샘플 디자인·흐름이 그대로 유지된다.
+- 링크·문구는 `src/lib/mirae.ts` 한 곳(MIRAE_LINKS / MIRAE_COPY)에서만 관리하고, 컴포넌트는 `consultHref` · `samplesHref` · `homeHref` props로 덮어쓸 수 있다.
+- 로고는 화면에 이미 있으므로 반복하지 않고 `MIRAE AI LAB` 배지 + 브랜드명만 쓴다. 메인 CTA 문구는 **"우리 회사도 만들어보기"** 로 통일.
+- 팔레트만 surface로 나눈다: 고객 화면은 아이보리·잉크(브랜드 톤), AX는 테마 컬러. 구조·문구·링크는 동일.
+- 외부 링크는 전부 `target="_blank" rel="noopener noreferrer"` + 새 창 안내. Evidence Pack 인쇄에서는 `no-print`로 빠진다(보고서에 광고가 찍히지 않게).
+- 모바일 sticky mini CTA는 넣지 않았다 — 두 화면 모두 이미 하단 고정 내비게이션이 있어 겹치고, 광고 배너 느낌이 난다. 대신 AX 사이드바 왼쪽 아래에 축소판(`SampleBridgeMini`)으로 3개 링크를 상시 노출한다.
+
+## D-26 장식용 반복 모션은 '모션 줄이기'에서 빠르게 돌리지 않고 끈다
+- 기존 규칙은 `animation-duration: 1ms`만 강제해서, 무한 반복 모션(호흡 점·스켈레톤·CTA 광택)이 **1ms 주기로 고속 점멸**할 수 있었다. `animation-iteration-count: 1`을 함께 강제하고, 순수 장식(`.animate-breathe`, `.sheen-idle::after`)은 `animation: none`으로 완전히 끈다.
+- 메인 CTA 광택은 6초 주기 중 마지막 1초에만 흰색 22% 띠가 지나간다(색 변화·깜빡임 없음). 마우스를 올리면 일시정지하고, 대신 살짝 떠오르며 색 그림자(glow)가 생긴다.
+

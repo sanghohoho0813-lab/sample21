@@ -26,6 +26,8 @@ npm run qa:a11y      # 접근 가능한 이름 · 모바일 터치 타겟 · Hov
                                                         /api/ai/explain (LLM Route · ANTHROPIC_API_KEY 있을 때만 호출)
 /next/[slug]    향후 확장 Preview (404 없음)
 
+미래AI랩 브릿지 CTA: 두 화면 하단 공통 · 링크/문구 수정은 src/lib/mirae.ts 한 곳
+
 src/lib/types.ts        데이터 모델 (SSOT)
 src/lib/demo/seed.ts    Demo Repository — 결정론적 시드, Scenario A~D 내장
 src/lib/store.ts        공유 Zustand 스토어 (Customer ↔ AX Closed Loop, localStorage 유지)

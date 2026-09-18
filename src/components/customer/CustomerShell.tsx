@@ -12,6 +12,7 @@ import { DevicePreviewButton } from "@/components/system/DevicePreview";
 import { useHydrated, useIsPreviewFrame } from "@/components/system/hooks";
 import { usePresentation } from "@/components/system/Presentation";
 import { SurfaceMarker } from "@/components/system/AppProviders";
+import { SampleBridgeCTA } from "@/components/system/SampleBridgeCTA";
 import { Tutorial, CUSTOMER_TOUR } from "@/components/system/Tutorial";
 import { LiveClock } from "@/components/system/LiveClock";
 import { relTime } from "@/lib/dates";
@@ -143,7 +144,12 @@ export function CustomerShell({ children }: { children: ReactNode }) {
 
       <main className="flex-1 pb-[calc(72px+env(safe-area-inset-bottom))] md:pb-0">{children}</main>
 
-      <footer className="bg-brand-ivory border-t border-neutral-border mt-16">
+      {/* 미래AI랩 브릿지 — 모든 고객 화면 하단 공통 */}
+      <div className="mx-auto w-full max-w-[1280px] px-4 mt-12 md:mt-16">
+        <SampleBridgeCTA surface="customer" />
+      </div>
+
+      <footer className="bg-brand-ivory border-t border-neutral-border mt-14 md:mt-16">
         <div className="mx-auto max-w-[1280px] px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-[0.9rem]">
           <div className="col-span-2 md:col-span-1">
             <p className="font-black text-[1.4rem] tracking-tight">MORFIT<span className="text-brand-accent">.</span></p>

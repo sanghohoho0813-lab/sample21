@@ -101,8 +101,12 @@ html[data-surface="ax"] { font-size: calc(19px * var(--font-scale)); }
 html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after {
   animation-duration: 1ms !important;
   animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important; /* 무한 반복을 1ms로 돌리면 고속 점멸이 된다 */
   transition-duration: 60ms !important;
 }
+/* 순수 장식용 반복 모션은 아예 끈다 */
+html[data-motion="reduced"] .animate-breathe,
+html[data-motion="reduced"] .sheen-idle::after { animation: none !important; }
 /* OS 설정도 존중한다 (설정 토글과 별개) */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -111,6 +115,7 @@ html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-
     animation-iteration-count: 1 !important;
     transition-duration: 60ms !important;
   }
+  .animate-breathe, .sheen-idle::after { animation: none !important; }
 }
 
 body {
@@ -216,6 +221,18 @@ button, [role="button"] { cursor: pointer; }
 /* 텍스트 링크: 밑줄이 좌→우로 그려진다 */
 .link-line { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1.5px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size 240ms cubic-bezier(0.22,0.72,0.28,1); }
 .link-line:hover, .link-line:focus-visible { background-size: 100% 1.5px; }
+
+/* 은은한 자동 광택 — 미래AI랩 메인 CTA 전용. 6초에 한 번, 1초 동안만 지나간다.
+   (깜빡임·네온 금지 원칙: 밝기 22%, 이동만, 색 변화 없음) */
+@keyframes sweepIdle { 0%, 84% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+.sheen-idle { position: relative; overflow: hidden; }
+.sheen-idle::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.22) 50%, transparent 62%);
+  transform: translateX(-130%);
+  animation: sweepIdle 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.sheen-idle:hover::after { animation-play-state: paused; }
 
 /* 광택 스윕 — 주요 CTA에만 (한 화면에 2~3개 이하) */
 .sheen { position: relative; overflow: hidden; }
