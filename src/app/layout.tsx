@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppProviders } from "@/components/system/AppProviders";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: { default: "MORFIT — 멀티브랜드 패션 플랫폼", template: "%s | MORFIT" },
@@ -19,6 +20,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: "try{if(window.self!==window.top){document.documentElement.setAttribute('data-preview','1')}}catch(e){document.documentElement.setAttribute('data-preview','1')}" }} />
       </head>
       <body>
+        {/* 미래AI랩 데모 공용 뒤로·앞으로 버튼 */}
+        <Script src="/mirae-history-nav.js" strategy="beforeInteractive" />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
