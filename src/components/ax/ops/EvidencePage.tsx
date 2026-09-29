@@ -36,7 +36,7 @@ const PACK_PHASES: { weeks: string; title: string; items: string[] }[] = [
 export function EvidencePage() {
   return (
     <>
-      <PageHeader title="AX 성과 증빙" desc={<span><Term term="증빙">증빙</Term>는 추천 → 승인 → 실행 → 결과 → 고객 반영을 시간 순서로 남긴 기록입니다. 나중에 “정말 효과가 있었나”를 증명하는 재료가 됩니다 (순환 5 · 실증).</span>}
+      <PageHeader title="성과 증빙" desc={<span><Term term="증빙">증빙</Term>는 추천 → 승인 → 실행 → 결과 → 고객 반영을 시간 순서로 남긴 기록입니다. 나중에 “정말 효과가 있었나”를 증명하는 재료가 됩니다 (순환 5 · 실증).</span>}
         badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><EvidenceBody /></Hydrated>
     </>
@@ -94,7 +94,7 @@ function EvidenceBody() {
         <KpiCard label="증빙 총 건수" value={num(evidence.length)} icon={<FileCheck2 size={18} />} accent={ICON_ACCENTS.evidence} sub="시드 8건 + 시연 중 생성" />
         <KpiCard label="최근 7일" value={num(week)} icon={<Clock size={18} />} accent={ICON_ACCENTS.overview} sub="고객 행동·과제 기록" />
         <KpiCard label="과제 연결 비율" value={pct(safeDiv(linked, Math.max(1, evidence.length)), 0)} icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} sub={`${linked}건이 과제와 연결`} />
-        <KpiCard label="RESULT 기록" value={num(results)} icon={<CheckCircle2 size={18} />} accent={ICON_ACCENTS.sales} sub="실행 결과가 남은 건수" />
+        <KpiCard label="결과 기록" value={num(results)} icon={<CheckCircle2 size={18} />} accent={ICON_ACCENTS.sales} sub="실행 결과가 남은 건수" />
       </div>
 
       <Card className="mt-6" pad="md">
@@ -104,7 +104,7 @@ function EvidenceBody() {
             <li key={`${t}-${i}`} className="inline-flex items-center gap-2"><span className="inline-flex items-center gap-1.5 rounded-full bg-neutral-canvas px-3 h-9 font-semibold"><span className="text-[0.78rem] text-neutral-text2">{i + 1}</span>{l}</span>{i < 4 && <ChevronRight size={14} className="text-neutral-text2" />}</li>
           ))}
         </ol>
-        <p className="mt-2 text-[0.85rem] text-neutral-text2">10가지 유형: {EVIDENCE_TYPES.map((t) => `${t}(${EVIDENCE_TYPE_LABEL[t]})`).join(" · ")}</p>
+        <p className="mt-2 text-[0.85rem] text-neutral-text2">10가지 유형: {EVIDENCE_TYPES.map((t) => EVIDENCE_TYPE_LABEL[t]).join(" · ")}</p>
       </Card>
 
       <SectionBlock title="기록" desc={`${num(filtered.length)}건 · 최신순`} right={<Segmented value={view} onChange={setView} options={[{ value: "list", label: <span className="inline-flex items-center gap-1.5"><ListTree size={15} />목록</span> }, { value: "loop", label: <span className="inline-flex items-center gap-1.5"><GitBranch size={15} />순환 보기</span> }]} />}>
@@ -115,7 +115,7 @@ function EvidenceBody() {
           <div className="w-full md:w-44"><Select label="관련 과제" name="ev-action" value={actionId} onChange={(e) => setActionId(e.target.value)}><option value="all">전체</option>{actionIds.map((a) => <option key={a} value={a}>{a}</option>)}{actionId !== "all" && !actionIds.includes(actionId) && <option value={actionId}>{actionId} (기록 없음)</option>}</Select></div>
           <div className="w-full md:w-36"><Select label="상태" name="ev-status" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}><option value="all">전체</option><option value="demo">데모</option><option value="pilot-ready">실증 준비</option><option value="live">연결됨</option></Select></div>
           <div className="w-full md:w-40"><Select label="데이터 출처" name="ev-source" value={source} onChange={(e) => setSource(e.target.value as typeof source)}><option value="all">전체</option><option value="DEMO">데모</option><option value="SIMULATION">시뮬레이션</option><option value="LIVE">연결됨</option></Select></div>
-          <div className="w-full"><p className="text-[0.9rem] font-semibold mb-1.5">유형</p><div className="flex flex-wrap gap-1.5">{EVIDENCE_TYPES.map((t) => <Chip key={t} active={types.includes(t)} onClick={() => setTypes((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]))} className="h-9 px-3 text-[0.82rem]">{t} · {EVIDENCE_TYPE_LABEL[t]}</Chip>)}</div></div>
+          <div className="w-full"><p className="text-[0.9rem] font-semibold mb-1.5">유형</p><div className="flex flex-wrap gap-1.5">{EVIDENCE_TYPES.map((t) => <Chip key={t} active={types.includes(t)} onClick={() => setTypes((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]))} className="h-9 px-3 text-[0.82rem]">{EVIDENCE_TYPE_LABEL[t]}</Chip>)}</div></div>
         </FilterBar>
 
         {view === "list" ? (

@@ -44,7 +44,7 @@ export default function NextPreviewPage() {
   const slug = typeof params?.slug === "string" ? params.slug : "";
   const menu = NEXT_MENUS.find((m) => m.slug === slug);
   const content = CONTENT[slug];
-  useEffect(() => { document.title = menu ? `${menu.label} (Coming Next) | MORFIT` : "향후 확장 | MORFIT"; }, [menu]);
+  useEffect(() => { document.title = menu ? `${menu.label} (예정) | MORFIT` : "향후 확장 | MORFIT"; }, [menu]);
 
   if (!menu || !content) {
     return (
@@ -58,7 +58,7 @@ export default function NextPreviewPage() {
   return (
     <Container className="py-6 md:py-10 animate-fadeIn">
       <div className="max-w-[56rem]">
-        <Badge tone="next">향후 확장 · Coming Next</Badge>
+        <Badge tone="next">향후 확장 · 예정</Badge>
         <h1 className="mt-3 text-[1.9rem] md:text-[2.4rem] font-black tracking-tight leading-tight inline-flex items-center gap-3"><span className="h-11 w-11 rounded-2xl bg-neutral-canvas md:bg-brand-ivory border border-neutral-border inline-flex items-center justify-center text-neutral-text">{content.icon}</span>{menu.label}</h1>
         <p className="mt-2 text-neutral-text2">{menu.desc} · 대상: {content.audience}</p>
 
@@ -95,7 +95,7 @@ export default function NextPreviewPage() {
           <div className="md:col-span-5">
             <GradientImage gradient={content.gradient} ratio="aspect-[4/3]" overlay label={`${menu.label} 미리보기 이미지`} className="rounded-cardlg">
               <div className="absolute inset-0 p-5 flex flex-col justify-end text-white">
-                <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/70">PREVIEW ONLY</p>
+                <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/70">미리보기 전용</p>
                 <p className="mt-1 font-black text-[1.3rem] leading-tight">{menu.label}</p>
                 <p className="mt-1 text-[0.82rem] text-white/80">화면·데이터 없음 · 설명용</p>
               </div>

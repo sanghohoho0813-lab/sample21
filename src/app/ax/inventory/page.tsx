@@ -100,7 +100,7 @@ function InventoryInner() {
             <div className="hidden md:block overflow-x-auto rounded-cardlg border border-neutral-border">
               <table className="w-full text-[0.88rem]">
                 <thead><tr className="bg-neutral-canvas text-neutral-text2 text-left">
-                  {["상품 · 옵션", "수요 점수", "7일 판매", "찜 7일", "장바구니", "재입고 신청", "현재고", "예상 소진", "리드타임", "상태", "추천", "Action"].map((h, i) => <th key={h} className={cn("px-3 py-2.5 font-semibold whitespace-nowrap", i >= 2 && i <= 8 && "text-right")}>{h}</th>)}
+                  {["상품 · 옵션", "수요 점수", "7일 판매", "찜 7일", "장바구니", "재입고 신청", "현재고", "예상 소진", "리드타임", "상태", "추천", "과제"].map((h, i) => <th key={h} className={cn("px-3 py-2.5 font-semibold whitespace-nowrap", i >= 2 && i <= 8 && "text-right")}>{h}</th>)}
                 </tr></thead>
                 <tbody>
                   {shown.map((r) => <RadarTr key={r.v.id} r={r} onRequest={requestReview} tourable={!mobile} />)}
@@ -163,7 +163,7 @@ function RadarTr({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label: s
   const isA = r.v.id === SCENARIO.A_VARIANT;
   return (
     <tr className={cn("border-t border-neutral-border hover-row align-middle", isA && "bg-theme-soft/60 ring-inset ring-1 ring-theme-primary/40")} data-tour={isA && tourable ? "radar-scenario-a" : undefined} data-variant-id={r.v.id}>
-      <td className="px-3 py-2.5"><Link href={`/ax/products/${p.id}?tab=options`} className="font-semibold hover:text-theme-primary leading-snug">{p.name}<span className="block text-[0.78rem] text-neutral-text2 font-normal">{r.v.color} · {r.v.size} · {BRAND_BY_ID[p.brandId].name}{isA && <Badge tone="accent" size="sm" className="ml-1.5">시나리오 A</Badge>}</span></Link></td>
+      <td className="px-3 py-2.5 break-keep"><Link href={`/ax/products/${p.id}?tab=options`} className="block min-w-[11rem] font-semibold hover:text-theme-primary leading-snug">{p.name}<span className="block text-[0.78rem] text-neutral-text2 font-normal">{r.v.color} · {r.v.size} · {BRAND_BY_ID[p.brandId].name}{isA && <Badge tone="accent" size="sm" className="ml-1.5">시나리오 A</Badge>}</span></Link></td>
       <td className="px-3 py-2.5"><MiniBar value={r.score} tone={demandTone(r.score)} /></td>
       <td className="px-3 py-2.5 text-right tabular">{r.v.sales7d} <UnitDelta cur={r.v.sales7d} prev={r.v.salesPrev7d} /></td>
       <td className="px-3 py-2.5 text-right tabular">{r.v.wishlist7d} <UnitDelta cur={r.v.wishlist7d} prev={r.v.wishlistPrev7d} /></td>

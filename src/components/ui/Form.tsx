@@ -1,6 +1,7 @@
 "use client";
 import { forwardRef, type InputHTMLAttributes, type SelectHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
+import { ChipLabel } from "@/components/ui/chipLabel";
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement> & { label?: string; hint?: string; suffix?: string }>(function Input({ label, hint, suffix, className, id, ...rest }, ref) {
   const inputId = id ?? rest.name;
@@ -59,6 +60,6 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
 
 export function Chip({ active, onClick, children, className }: { active?: boolean; onClick?: () => void; children: ReactNode; className?: string }) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={active} className={cn("inline-flex items-center gap-1 h-10 px-4 rounded-full border text-[0.9rem] font-semibold whitespace-nowrap transition-all duration-fast", active ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border text-neutral-text hover:border-neutral-text2", className)}>{children}</button>
+    <button type="button" onClick={onClick} aria-pressed={active} className={cn("inline-flex items-center gap-1 h-10 px-4 max-w-full rounded-full border text-[0.9rem] font-semibold whitespace-nowrap transition-all duration-fast", active ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border text-neutral-text hover:border-neutral-text2", className)}><ChipLabel gap="gap-1">{children}</ChipLabel></button>
   );
 }

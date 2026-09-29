@@ -114,7 +114,7 @@ export function ImageSlot({ asset, label, gradient, caption }: { asset: string; 
           </div>
         </div>
       </GradientImage>
-      <figcaption className="text-[0.8rem] text-neutral-text2">{caption} · 사진은 추후 적용 (placeholder)</figcaption>
+      <figcaption className="text-[0.8rem] text-neutral-text2">{caption} · 사진은 추후 적용 (임시 이미지)</figcaption>
     </figure>
   );
 }

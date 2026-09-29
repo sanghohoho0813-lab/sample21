@@ -55,7 +55,7 @@ function DemoControlBar() {
   if (!hydrated || role === "customer" || inFrame) return null;
   return (
     <div className="bg-brand-black text-white text-[0.8rem] no-print" data-tour="c-demo-bar">
-      <div className="mx-auto max-w-[1280px] px-4 h-9 flex items-center gap-3">
+      <div className="mx-auto max-w-[1280px] px-4 h-11 md:h-9 flex items-center gap-3">
         <Badge tone="demo" size="sm">데모</Badge>
         <span className="hidden sm:inline text-white/80">대표·관리자 시연용 · 일반 고객에게는 보이지 않습니다</span>
         <span className="hidden md:inline-flex text-white/70"><LiveClock compact light /></span>
@@ -161,7 +161,7 @@ function SearchBox({ className, autoFocus, onDone }: { className?: string; autoF
   return (
     <form onSubmit={submit} role="search" className={cn("relative", className)}>
       <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-text2" />
-      <input value={q} onChange={(e) => setQ(e.target.value)} autoFocus={autoFocus} placeholder="상품, 브랜드, 스타일을 검색해보세요" aria-label="검색" className="h-11 w-full rounded-full bg-neutral-canvas pl-11 pr-4 text-[0.95rem] focus:outline-none focus:ring-2 focus:ring-brand-black/20 focus:bg-white border border-transparent focus:border-neutral-border" />
+      <input value={q} onChange={(e) => setQ(e.target.value)} autoFocus={autoFocus} placeholder="상품 · 브랜드 · 스타일 검색" aria-label="검색" className="h-11 w-full rounded-full bg-neutral-canvas pl-11 pr-4 text-[0.95rem] focus:outline-none focus:ring-2 focus:ring-brand-black/20 focus:bg-white border border-transparent focus:border-neutral-border" />
     </form>
   );
 }
@@ -198,7 +198,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
             <Link href="/" className="inline-flex items-center h-11 font-black tracking-tight text-[1.45rem] md:text-[1.6rem] leading-none hover:opacity-80 transition-opacity" aria-label="MORFIT 홈">MORFIT<span className="text-brand-accent">.</span></Link>
             <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 ml-1 xl:ml-2" aria-label="주요 메뉴">
               {NAV.map((n) => (
-                <Link key={n.href} href={n.href} className={cn("h-10 px-2 xl:px-3 rounded-lg text-[0.9rem] xl:text-[0.95rem] font-semibold whitespace-nowrap hover:bg-neutral-canvas transition-colors", isActive(n.href) && "bg-neutral-canvas")}>{n.label}</Link>
+                <Link key={n.href} href={n.href} className={cn("inline-flex items-center h-10 px-2 xl:px-3 rounded-lg text-[0.9rem] xl:text-[0.95rem] font-semibold whitespace-nowrap hover:bg-neutral-canvas transition-colors", isActive(n.href) && "bg-neutral-canvas")}>{n.label}</Link>
               ))}
             </nav>
             <div className="hidden xl:block flex-1 max-w-sm ml-auto"><SearchBox /></div>

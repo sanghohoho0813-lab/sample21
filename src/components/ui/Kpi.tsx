@@ -14,7 +14,7 @@ export function KpiCard({ label, value, delta, deltaLabel = "직전 기간 대�
     <div className={cn("group h-full rounded-cardlg bg-white border border-neutral-border shadow-card p-5 flex flex-col gap-3", href ? "hover-lift hover:border-neutral-text2/40" : "transition-colors duration-200 hover:border-neutral-text2/25")} data-tour={tour}>
       <div className="flex items-center justify-between gap-2">
         <span className="min-w-0 text-[0.9rem] font-semibold text-neutral-text2 break-keep leading-snug">{label}</span>
-        {icon && <span className="tile h-9 w-9 shrink-0 rounded-xl flex items-center justify-center" style={{ background: tint(accent ?? ICON_TONE.t3, 14), color: accent ?? ICON_TONE.t3 }}>{icon}</span>}
+        {icon && <span className="tile hidden min-[440px]:flex h-9 w-9 shrink-0 rounded-xl items-center justify-center" style={{ background: tint(accent ?? ICON_TONE.t3, 14), color: accent ?? ICON_TONE.t3 }}>{icon}</span>}
       </div>
       <div className={cn("font-bold tracking-tight tabular leading-none transition-transform duration-200 group-hover:-translate-y-[1px]", size === "lg" ? "text-[2.3rem] md:text-[2.6rem]" : "text-[1.8rem] md:text-[2rem]")}><AutoFit>{value}</AutoFit></div>
       <div className="flex items-center justify-between gap-2 min-h-[22px]">

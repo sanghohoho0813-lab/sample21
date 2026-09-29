@@ -202,29 +202,29 @@ export function AxShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex bg-neutral-canvas">
       <SurfaceMarker surface="ax" />
-      <aside className="ax-sidebar hidden lg:flex print:hidden w-[280px] shrink-0 flex-col fixed inset-y-0 left-0 z-30 overflow-y-auto overscroll-contain px-3 py-5">
+      <aside className="ax-sidebar hidden xl:flex print:hidden w-[280px] shrink-0 flex-col fixed inset-y-0 left-0 z-30 overflow-y-auto overscroll-contain px-3 py-5">
         <Wordmark />
         <div className="mt-6 flex-1"><NavTree role={effectiveRole} /></div>
         <SidebarFooter />
       </aside>
 
-      <div className="flex-1 min-w-0 lg:pl-[280px] print:pl-0 flex flex-col">
+      <div className="flex-1 min-w-0 xl:pl-[280px] print:pl-0 flex flex-col">
         <header className="sticky top-0 z-30 print:hidden">
           {/* 1층 — 데모 툴바 (모바일·태블릿): 지금 누구로 보는지 · 실시간 시각 */}
-          <div className="lg:hidden ax-sidebar h-9 px-4 md:px-6 flex items-center gap-2 text-[0.8rem]" data-tour="ax-demo-bar">
+          <div className="xl:hidden ax-sidebar h-9 px-4 md:px-6 flex items-center gap-2 text-[0.8rem]" data-tour="ax-demo-bar">
             <Badge tone="demo" size="sm">데모</Badge>
             <span className="min-w-0 truncate" style={{ color: "var(--sidebar-muted)" }}>{ROLE_NAME[effectiveRole]} 화면</span>
             <span className="ml-auto shrink-0"><LiveClock compact light /></span>
           </div>
           {/* 2층 — 메인 헤더: [☰] [로고] ····· [고객 플랫폼 보기] */}
           <div className="bg-white/95 backdrop-blur border-b border-neutral-border">
-            <div className="h-14 lg:h-[64px] px-4 md:px-6 flex items-center gap-2 md:gap-3">
-              <button onClick={() => setDrawer(true)} className="press lg:hidden h-11 w-11 -ml-2.5 shrink-0 inline-flex items-center justify-center rounded-xl hover:bg-neutral-canvas active:bg-neutral-border/60" aria-label="메뉴 열기"><Menu size={22} /></button>
-              <Link href="/ax" className="lg:hidden inline-flex items-center h-11 min-w-0 font-black tracking-tight text-[1.1rem] whitespace-nowrap" aria-label="AX 운영화면 홈">MORFIT <span className="ml-1 text-theme-primary">AX</span></Link>
+            <div className="h-14 xl:h-[64px] px-4 md:px-6 flex items-center gap-2 md:gap-3">
+              <button onClick={() => setDrawer(true)} className="press xl:hidden h-11 w-11 -ml-2.5 shrink-0 inline-flex items-center justify-center rounded-xl hover:bg-neutral-canvas active:bg-neutral-border/60" aria-label="메뉴 열기"><Menu size={22} /></button>
+              <Link href="/ax" className="xl:hidden inline-flex items-center h-11 min-w-0 font-black tracking-tight text-[1.1rem] whitespace-nowrap" aria-label="AX 운영화면 홈">MORFIT <span className="ml-1 text-theme-primary">AX</span></Link>
+              {/* 고정 사이드바는 1280px(xl)부터 — 1024px에서 사이드바 280px를 빼면 본문이 744px뿐이라 lg 그리드가 깨진다(D-32) */}
               <div className="hidden xl:block"><LiveClock /></div>
-              <div className="hidden lg:block xl:hidden"><LiveClock compact /></div>
               <div className="ml-auto flex items-center gap-2 min-w-0">
-                <div className="hidden lg:flex items-center gap-2">
+                <div className="hidden xl:flex items-center gap-2">
                   <RoleSwitcher compact />
                   <button onClick={() => setTour(true)} className="group press h-10 px-3 rounded-xl border border-neutral-border bg-white text-[0.85rem] font-semibold hover:bg-neutral-canvas hover:border-neutral-text2/50 inline-flex items-center gap-1.5 whitespace-nowrap" data-tour="tutorial-btn" title="튜토리얼" aria-label="튜토리얼"><GraduationCap size={18} className="transition-transform duration-200 group-hover:-translate-y-0.5" /><span className="hidden 2xl:inline">튜토리얼</span></button>
                   <button onClick={start} className="group press h-10 px-3 rounded-xl border border-neutral-border bg-white text-[0.85rem] font-semibold hover:bg-neutral-canvas hover:border-neutral-text2/50 inline-flex items-center gap-1.5 whitespace-nowrap" data-tour="present-btn" title="시연 모드" aria-label="시연 모드"><Play size={16} className="transition-transform duration-200 group-hover:scale-110" /><span className="hidden 2xl:inline">시연</span></button>
@@ -236,7 +236,7 @@ export function AxShell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 px-4 md:px-6 xl:px-8 py-5 md:py-7 pb-[calc(84px+env(safe-area-inset-bottom))] lg:pb-10 max-w-[1720px] w-full mx-auto">
+        <main className="flex-1 px-4 md:px-6 xl:px-8 py-5 md:py-7 pb-[calc(84px+env(safe-area-inset-bottom))] xl:pb-10 max-w-[1720px] w-full mx-auto">
           <SectionTabs role={effectiveRole} />
           <div key={pathname} className="animate-rise">{children}</div>
           {/* 미래AI랩 브릿지 — 모든 AX 화면 하단 공통 (인쇄 시 제외) */}
@@ -245,7 +245,7 @@ export function AxShell({ children }: { children: ReactNode }) {
       </div>
 
       {/* 모바일 하단 탭 — 자주 쓰는 4개 + 더보기(전체 메뉴) */}
-      <nav className="lg:hidden print:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border pb-[env(safe-area-inset-bottom)]" aria-label="AX 하단 메뉴">
+      <nav className="xl:hidden print:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border pb-[env(safe-area-inset-bottom)]" aria-label="AX 하단 메뉴">
         <ul className="grid grid-cols-5 h-[64px]">
           {bottom.map(([key, label]) => {
             const i = navByKey(key);

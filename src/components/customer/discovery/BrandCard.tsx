@@ -59,7 +59,7 @@ export function BrandCard({ brand, following, onToggle, className }: { brand: Br
           <div className="absolute inset-0 p-3 md:p-4 flex flex-col justify-between">
             <div className="flex items-start justify-between gap-2">
               <span className="text-[0.78rem] font-bold tracking-[0.16em] text-white/80">{moods.map((m) => MOOD_LABEL[m]).join(" · ") || "BRAND"}</span>
-              {isNewBrand(brand) && <Badge tone="dark" size="sm">NEW 입점</Badge>}
+              {isNewBrand(brand) && <Badge tone="dark" size="sm">신규 입점</Badge>}
             </div>
             <p className="text-white font-black text-[1.25rem] md:text-[1.45rem] tracking-tight leading-none drop-shadow-sm group-hover:underline underline-offset-4">{brand.name}</p>
           </div>

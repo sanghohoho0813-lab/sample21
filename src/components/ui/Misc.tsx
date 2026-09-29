@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
 import { HelpCircle } from "lucide-react";
+import { AutoFit } from "@/components/ui/AutoFit";
 import { cn } from "@/lib/cn";
 import { krw } from "@/lib/format";
 
@@ -39,9 +40,9 @@ export function Term({ children, term }: { children?: ReactNode; term: string })
 export function Price({ price, original, className, size = "md" }: { price: number; original?: number; className?: string; size?: "sm" | "md" | "lg" }) {
   const rate = original && original > price ? Math.round(((original - price) / original) * 100) : 0;
   return (
-    <span className={cn("inline-flex items-baseline gap-1.5 flex-wrap", className)}>
+    <span className={cn("inline-flex items-baseline gap-1.5 flex-wrap max-w-full min-w-0", className)}>
       {rate > 0 && <span className={cn("font-bold text-semantic-error", size === "lg" ? "text-[1.15rem]" : "text-[0.95rem]")}>{rate}%</span>}
-      <span className={cn("font-bold tabular", size === "lg" ? "text-[1.5rem]" : size === "sm" ? "text-[0.95rem]" : "text-[1.05rem]")}>{krw(price)}</span>
+      <span className={cn("font-bold tabular min-w-0 max-w-full", size === "lg" ? "text-[1.5rem]" : size === "sm" ? "text-[0.95rem]" : "text-[1.05rem]")}><AutoFit>{krw(price)}</AutoFit></span>
       {rate > 0 && original && <span className="text-neutral-text2 line-through text-[0.82rem] tabular">{krw(original)}</span>}
     </span>
   );

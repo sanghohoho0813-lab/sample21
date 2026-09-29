@@ -24,11 +24,11 @@ import { cn } from "@/lib/cn";
 /** 단계별 데모 포인트 · Loop 매핑 · 예상 소요(초) */
 const STEP_META: { loop: string; tone: Tone; shows: string; sec: number }[] = [
   { loop: "문제 정의", tone: "neutral", shows: "왜 AX인가 — 끊긴 데이터가 품절·과잉재고를 만든다", sec: 25 },
-  { loop: "Discovery", tone: "neutral", shows: "고객 화면 첫인상 — 멀티브랜드 탐색 (Editorial Commerce)", sec: 15 },
-  { loop: "Discovery", tone: "neutral", shows: "랭킹에서 반응이 빠른 상품 발견", sec: 15 },
+  { loop: "탐색", tone: "neutral", shows: "고객 화면 첫인상 — 멀티브랜드 탐색 (Editorial Commerce)", sec: 15 },
+  { loop: "탐색", tone: "neutral", shows: "랭킹에서 반응이 빠른 상품 발견", sec: 15 },
   { loop: "순환 3 · 핏", tone: "info", shows: "핏 프로필 → 추천 사이즈 + 이유 + 주의점 (규칙 기반, AI 준비)", sec: 25 },
   { loop: "순환 1 · 시작", tone: "accent", shows: "품절 임박 옵션에 재입고 알림 신청 → 수요신호 발생", sec: 20 },
-  { loop: "Surface 전환", tone: "neutral", shows: "같은 데이터가 AX 운영화면 KPI·브리핑으로 보임", sec: 15 },
+  { loop: "화면 전환", tone: "neutral", shows: "같은 데이터가 AX 운영화면 KPI·브리핑으로 보임", sec: 15 },
   { loop: "순환 1 · 신호", tone: "accent", shows: "수요 레이더에 방금 신청한 알림이 +1 반영", sec: 20 },
   { loop: "순환 1 · 과제", tone: "accent", shows: "재입고 과제 카드 — 무엇/왜/데이터/주의/승인자", sec: 25 },
   { loop: "순환 1 · 실행", tone: "accent", shows: "확인 → 실행중 → 완료 시 재고 증가 + 고객 알림 발송", sec: 20 },
@@ -110,9 +110,9 @@ function PresentBody() {
       <Card pad="lg" className="!bg-brand-black text-white !border-transparent">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-5 items-center">
           <div className="min-w-0">
-            <p className="text-[0.78rem] font-bold tracking-wider text-theme-highlight">GUIDED JOURNEY · {PRESENT_STEPS.length} STEPS</p>
+            <p className="text-[0.78rem] font-bold tracking-wider text-theme-highlight">시연 순서 · {PRESENT_STEPS.length}단계</p>
             <h2 className="mt-1 text-[1.4rem] md:text-[1.8rem] font-bold leading-tight">고객의 클릭이 MD의 과제가 되고, 다시 고객에게 돌아오는 3~5분</h2>
-            <p className="mt-2 text-[0.92rem] text-white/75 leading-relaxed max-w-2xl">시작하면 화면 하단에 컨트롤러가 나타나고 단계마다 실제 route로 이동합니다. 👉 안내가 있는 단계는 직접 클릭해 보여주세요. 언제든 ESC로 종료할 수 있습니다.</p>
+            <p className="mt-2 text-[0.92rem] text-white/75 leading-relaxed max-w-2xl">시작하면 화면 하단에 컨트롤러가 나타나고 단계마다 실제 화면으로 이동합니다. 👉 안내가 있는 단계는 직접 클릭해 보여주세요. 언제든 ESC로 종료할 수 있습니다.</p>
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[0.82rem] text-white/70">
               <span className="inline-flex items-center gap-1.5"><Clock3 size={14} />예상 {Math.floor(TOTAL_SEC / 60)}분 {TOTAL_SEC % 60}초 (설명 속도에 따라 3~5분)</span>
               <span className="inline-flex items-center gap-1.5"><Keyboard size={14} />← / → 이동 · ESC 종료</span>
@@ -134,7 +134,7 @@ function PresentBody() {
         {/* Steps */}
         <Card pad="md">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <div><h3 className="text-[1.15rem] font-bold">16단계 한눈에 보기</h3><p className="text-[0.85rem] text-neutral-text2">각 단계의 route와 무엇을 보여주는지. 번호 옆 버튼으로 특정 단계부터 시작할 수 있습니다.</p></div>
+            <div><h3 className="text-[1.15rem] font-bold">16단계 한눈에 보기</h3><p className="text-[0.85rem] text-neutral-text2">각 단계의 화면 경로와 무엇을 보여주는지. 번호 옆 버튼으로 특정 단계부터 시작할 수 있습니다.</p></div>
             <Badge tone="neutral" size="sm">총 {Math.floor(TOTAL_SEC / 60)}분 {TOTAL_SEC % 60}초</Badge>
           </div>
           <ol className="space-y-2">

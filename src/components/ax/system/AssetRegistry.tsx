@@ -21,7 +21,7 @@ export function AssetRegistry() {
           <span className="ml-auto text-[0.85rem] text-neutral-text2 tabular">등록 {registered} / {total}</span>
         </div>
         <p className="mt-2 text-[0.92rem] leading-relaxed text-neutral-text2">
-          Google Drive 「샘플 21. 의류」 폴더의 자산이 준비되면 아래 파일명 그대로 넣습니다. 그 전까지 모든 이미지 자리는 상품 색상으로 만든 <span className="font-semibold text-neutral-text">Gradient Placeholder</span>가 채우며, 빈 박스는 나오지 않습니다.
+          Google Drive 「샘플 21. 의류」 폴더의 자산이 준비되면 아래 파일명 그대로 넣습니다. 그 전까지 모든 이미지 자리는 상품 색상으로 만든 <span className="font-semibold text-neutral-text">그라데이션 임시 이미지</span>가 채우며, 빈 박스는 나오지 않습니다.
         </p>
         <ol className="mt-3 space-y-1.5 text-[0.9rem] list-decimal pl-5">
           <li>Drive에서 파일을 내려받아 <code className="rounded bg-white px-1.5 py-0.5 text-[0.82rem] border border-neutral-border">/public/images/&lt;파일명&gt;</code> 에 저장</li>

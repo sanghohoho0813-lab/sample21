@@ -227,7 +227,7 @@ function Dashboard() {
 
       {/* Demand Radar preview + Evidence */}
       <div className="grid lg:grid-cols-5 gap-5">
-        <SectionCard className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">수요 레이더 <Term term="수요 신호">Top 5</Term></span>} desc="조회·찜·장바구니·재입고 신청을 옵션 단위 수요 점수로 계산" right={<AxLink href="/ax/inventory">재고·재입고</AxLink>}>
+        <SectionCard className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">수요 레이더 <Term term="수요 신호">상위 5</Term></span>} desc="조회·찜·장바구니·재입고 신청을 옵션 단위 수요 점수로 계산" right={<AxLink href="/ax/inventory">재고·재입고</AxLink>}>
           <ul className="divide-y divide-neutral-border">
             {radar.map(({ v, score, status }) => {
               const p = PRODUCT_BY_ID[v.productId];

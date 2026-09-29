@@ -6,6 +6,7 @@ import { THEMES, type ThemeId } from "@/lib/theme";
 import { useApp, type FontScale } from "@/lib/store";
 import { Segmented, Toggle } from "@/components/ui/Form";
 import { Badge } from "@/components/ui/Badge";
+import { AutoFit } from "@/components/ui/AutoFit";
 import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 
@@ -71,11 +72,11 @@ export function PreviewStrip() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="rounded-cardlg bg-white border border-neutral-border shadow-card p-4">
           <p className="text-[0.8rem] font-semibold text-neutral-text2">KPI 카드 (샘플)</p>
-          <p className="mt-1 text-[1.5rem] font-bold tabular leading-none">4,120만원</p>
+          <p className="mt-1 text-[1.5rem] font-bold tabular leading-none"><AutoFit>4,120만원</AutoFit></p>
           <p className="mt-2 inline-flex items-center gap-1 text-[0.8rem] font-semibold text-semantic-success"><ArrowUpRight size={14} />12.4% <span className="text-neutral-text2 font-normal">샘플</span></p>
         </div>
         <div className="rounded-cardlg bg-white border border-neutral-border shadow-card p-4 flex flex-col justify-center gap-2">
-          <button type="button" onClick={() => toast("미리보기 버튼", "Primary 색이 테마를 따릅니다.", "info")} className="h-11 rounded-xl bg-theme-primary text-white font-semibold hover:brightness-110 active:scale-[0.98] transition-all duration-fast">Primary 버튼</button>
+          <button type="button" onClick={() => toast("미리보기 버튼", "주 색상이 테마를 따릅니다.", "info")} className="h-11 rounded-xl bg-theme-primary text-white font-semibold hover:brightness-110 active:scale-[0.98] transition-all duration-fast">주 색상 버튼</button>
           <div className="flex flex-wrap gap-2"><Badge tone="accent">관심 상승</Badge><Badge tone="primary">Primary</Badge></div>
         </div>
         <div className="rounded-cardlg bg-theme-shell p-4 flex flex-col justify-center gap-2">
@@ -84,10 +85,10 @@ export function PreviewStrip() {
             <span className="text-white font-semibold text-[0.9rem]">경영 대시보드</span>
             <span className="ml-auto h-1.5 w-1.5 rounded-full bg-theme-highlight" />
           </div>
-          <p className="text-[0.78rem] font-bold text-theme-highlight">사이드바 pill · Highlight</p>
+          <p className="text-[0.78rem] font-bold text-theme-highlight">사이드바 강조 · 포인트 색</p>
         </div>
         <div className="rounded-cardlg bg-theme-soft p-4">
-          <p className="text-[0.8rem] font-bold text-theme-primary">Soft 배경 · 인사이트</p>
+          <p className="text-[0.8rem] font-bold text-theme-primary">옅은 배경 · 인사이트</p>
           <p className="mt-1 text-[0.9rem] text-neutral-text leading-snug">품절 위험 옵션 <span className="font-bold text-theme-primary">7개</span>를 먼저 확인하세요. (샘플)</p>
           <div className="mt-2 flex gap-1.5"><span className="h-2 w-12 rounded-full bg-theme-secondary" /><span className="h-2 w-8 rounded-full bg-theme-accent" /></div>
         </div>
@@ -105,7 +106,7 @@ export function DisplaySettings() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="rounded-2xl border border-neutral-border bg-white p-4">
         <p className="font-bold">글자 크기</p>
-        <p className="text-[0.82rem] text-neutral-text2">Root 글자 크기가 바뀌어 전체 화면이 함께 커지거나 작아집니다.</p>
+        <p className="text-[0.82rem] text-neutral-text2">기본 글자 크기가 바뀌어 전체 화면이 함께 커지거나 작아집니다.</p>
         <Segmented
           className="mt-3"
           value={fontScale}

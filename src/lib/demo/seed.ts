@@ -451,11 +451,11 @@ export const SEED_ACTIONS: AXAction[] = [
 export const SEED_EVIDENCE: EvidenceLog[] = [
   { id: "ev-001", type: "BASELINE", title: "기준값 측정 지점 정의", detail: "구매전환율·찜→구매·재입고알림→구매·반품률·재고일수·MD 분석시간의 측정 지점을 정의했습니다. 실제 값은 실증 1~2주차에 측정합니다.", at: isoDaysAgo(14, 10), actor: "미래AI랩", source: "DEMO", status: "pilot-ready", kpiDelta: "기준값: 미측정 · 실증 필요" },
   { id: "ev-002", type: "ACTION", title: "그래픽 후디 블랙 L 재입고 승인·실행", detail: "수요 엔진 추천 → MD 승인 → 40개 입고 완료.", at: isoDaysAgo(0, 9, 10), actor: "최서준 MD", actionId: "act-007", productId: "p-current-hoodie", source: "DEMO", status: "demo" },
-  { id: "ev-003", type: "CUSTOMER", title: "재입고 알림 9명 중 4명 구매 (데모)", detail: "재입고 알림 발송 후 24시간 내 4건 구매. 시뮬레이션 값이며 실제 성과가 아닙니다.", at: isoDaysAgo(0, 9, 30), actor: "System", actionId: "act-007", productId: "p-current-hoodie", source: "SIMULATION", status: "demo", kpiDelta: "재입고 알림→구매 4/9 (시뮬레이션)" },
+  { id: "ev-003", type: "CUSTOMER", title: "재입고 알림 9명 중 4명 구매 (데모)", detail: "재입고 알림 발송 후 24시간 내 4건 구매. 시뮬레이션 값이며 실제 성과가 아닙니다.", at: isoDaysAgo(0, 9, 30), actor: "시스템", actionId: "act-007", productId: "p-current-hoodie", source: "SIMULATION", status: "demo", kpiDelta: "재입고 알림→구매 4/9 (시뮬레이션)" },
   { id: "ev-004", type: "ACTION", title: "에어 메쉬 러너 핏 안내 수정", detail: "'발볼이 좁게 나와 5mm 크게 권장' 안내를 상품 상세 상단에 노출.", at: isoDaysAgo(3, 16), actor: "최서준 MD", actionId: "act-009", productId: "p-current-runner", source: "DEMO", status: "demo" },
   { id: "ev-005", type: "RISK", title: "와이드 스트레이트 데님 핏 위험도 상승", detail: "사이즈 작음 반품 비율 82%. 핏 안내 강화 과제 진행 중.", at: isoDaysAgo(2, 10), actor: "핏 엔진", actionId: "act-004", productId: SCENARIO.B_PRODUCT, source: "DEMO", status: "demo" },
-  { id: "ev-006", type: "ADOPTION", title: "주간 과제 처리율 (데모)", detail: "생성 12건 중 완료 2건·진행 2건·확인 1건·보류 1건·무시 1건. 실제 채택률은 실증에서 측정합니다.", at: isoDaysAgo(0, 7), actor: "System", source: "SIMULATION", status: "demo", kpiDelta: "과제 실행률 2/12 (시뮬레이션)" },
+  { id: "ev-006", type: "ADOPTION", title: "주간 과제 처리율 (데모)", detail: "생성 12건 중 완료 2건·진행 2건·확인 1건·보류 1건·무시 1건. 실제 채택률은 실증에서 측정합니다.", at: isoDaysAgo(0, 7), actor: "시스템", source: "SIMULATION", status: "demo", kpiDelta: "과제 실행률 2/12 (시뮬레이션)" },
   { id: "ev-007", type: "EFFICIENCY", title: "MD 주간 분석시간 측정 항목 준비", detail: "판매·재고·찜·반품을 화면별로 비교하던 시간을 실행 센터 확인 시간과 비교하는 측정표를 준비했습니다.", at: isoDaysAgo(7, 10), actor: "미래AI랩", source: "DEMO", status: "pilot-ready" },
-  { id: "ev-008", type: "REVENUE", title: "NOVE STUDIO 브랜드위크 캠페인 전후 비교 (데모)", detail: "캠페인 전 주 매출 920만원 → 진행 중 1,380만원. 시뮬레이션 데이터입니다.", at: isoDaysAgo(1, 18), actor: "System", source: "SIMULATION", status: "demo", kpiDelta: "+50% (시뮬레이션)" },
+  { id: "ev-008", type: "REVENUE", title: "NOVE STUDIO 브랜드위크 캠페인 전후 비교 (데모)", detail: "캠페인 전 주 매출 920만원 → 진행 중 1,380만원. 시뮬레이션 데이터입니다.", at: isoDaysAgo(1, 18), actor: "시스템", source: "SIMULATION", status: "demo", kpiDelta: "+50% (시뮬레이션)" },
 ];
 

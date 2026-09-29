@@ -45,7 +45,7 @@ export function OptionPicker({ product, colorIdx, size, onColor, onSize, compact
           {sizeAction}
         </div>
         {colorIdx === null ? <p className="text-[0.88rem] text-neutral-text2">색상을 먼저 선택하면 사이즈별 재고를 보여드립니다.</p> : (
-          <div className={cn("grid gap-2", product.categoryId === "shoes" ? "grid-cols-3 sm:grid-cols-5" : single ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-4")}>
+          <div className={cn("grid gap-2", product.categoryId === "shoes" ? "grid-cols-3 sm:grid-cols-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : single ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-4")}>
             {product.sizes.map((s) => {
               const v = variants.find((x) => x.color === product.colors[colorIdx] && x.size === s);
               const st = v ? stockState(v, store) : null;

@@ -79,7 +79,7 @@ function DetailInner() {
 
   return (
     <div className="space-y-6">
-      <Link href="/ax/products" className="tap inline-flex items-center gap-1 text-[0.88rem] font-semibold text-neutral-text2 hover:text-neutral-text"><ArrowLeft size={16} />상품·SKU 목록</Link>
+      <Link href="/ax/products" className="tap inline-flex items-center gap-1 text-[0.88rem] font-semibold text-neutral-text2 hover:text-neutral-text"><ArrowLeft size={16} />상품·옵션 목록</Link>
       <div className="rounded-cardlg bg-white border border-neutral-border shadow-card p-5 md:p-6 flex flex-col md:flex-row gap-5">
         <ProductImage colors={product.colors} label={product.name} className="w-full md:w-40 shrink-0" ratio="aspect-[4/5] md:aspect-[3/4]" />
         <div className="min-w-0 flex-1">
@@ -107,7 +107,7 @@ function DetailInner() {
         <div className="grid lg:grid-cols-2 gap-5">
           <SectionCard title="기본정보">
             <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-[0.92rem]">
-              {[["브랜드", `${brand.name} (${brand.sourcing === "purchase" ? "사입" : "입점·위탁"})`], ["카테고리", CATEGORY_NAME[product.categoryId]], ["성별", product.gender === "men" ? "남성" : product.gender === "women" ? "여성" : "공용"], ["핏", `${FIT_LABEL[product.fit]} · ${SIZING_LABEL[product.sizing]}`], ["색상", product.colors.join(" · ")], ["사이즈", product.sizes.join(" · ")], ["시즌", `${product.season} · 종료까지 ${product.seasonEndsInDays}일`], ["등록일", fmtDate(product.createdAt)], ["소재", product.material], ["세탁", product.care], ["평점", `${product.rating} (${num(product.reviewCount)}개 리뷰)`], ["리드타임", `${brand.leadTimeDays}일 (브랜드 공급)`]].map(([k, v]) => (
+              {[["브랜드", `${brand.name} (${brand.sourcing === "purchase" ? "사입" : "입점·위탁"})`], ["카테고리", CATEGORY_NAME[product.categoryId]], ["성별", product.gender === "men" ? "남성" : product.gender === "women" ? "여성" : "공용"], ["핏", `${FIT_LABEL[product.fit]} · ${SIZING_LABEL[product.sizing]}`], ["색상", product.colors.join(" · ")], ["사이즈", product.sizes.join(" · ")], ["시즌", `${product.season === "ALL" ? "사계절" : product.season === "SS" ? "SS (봄·여름)" : "FW (가을·겨울)"} · 종료까지 ${product.seasonEndsInDays}일`], ["등록일", fmtDate(product.createdAt)], ["소재", product.material], ["세탁", product.care], ["평점", `${product.rating} (${num(product.reviewCount)}개 리뷰)`], ["리드타임", `${brand.leadTimeDays}일 (브랜드 공급)`]].map(([k, v]) => (
                 <div key={k}><dt className="text-[0.78rem] font-semibold text-neutral-text2">{k}</dt><dd className="mt-0.5">{v}</dd></div>
               ))}
             </dl>

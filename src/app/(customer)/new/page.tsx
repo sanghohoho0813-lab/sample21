@@ -34,7 +34,7 @@ export default function NewPage() {
 
   return (
     <Container className="py-6 md:py-10 animate-fadeIn">
-      <PageTitle title={<span className="inline-flex items-center gap-3">신상품 <Badge tone="dark">NEW</Badge></span>} desc={`최근 30일 안에 등록된 상품 ${total}개 · 최신순`} right={<Freshness source="DEMO" />} />
+      <PageTitle title={<span className="inline-flex items-center gap-3">신상품 <Badge tone="dark">신상</Badge></span>} desc={`최근 30일 안에 등록된 상품 ${total}개 · 최신순`} right={<Freshness source="DEMO" />} />
       <Hydrated fallback={<SkeletonGrid n={8} />}>
         {groups.length === 0 ? (
           <EmptyState title="최근 30일 신상품이 없습니다" desc="랭킹에서 지금 반응이 좋은 상품을 확인해보세요." action={<Button variant="brand" href="/ranking">랭킹 보기</Button>} />

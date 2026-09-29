@@ -6,6 +6,7 @@ import { aiStatus } from "@/lib/ai";
 import { AIReadyBadge } from "@/components/ax/AIReady";
 import { Badge, type Tone } from "@/components/ui/Badge";
 import { Term } from "@/components/ui/Misc";
+import { ERROR_COST_LABEL } from "@/components/ax/core/shared";
 
 export const ENGINES: { no: string; name: string; method: string; automation: "L2" | "L3"; errorCost: "LOW" | "MID" | "HIGH"; does: string; inputs: string; actionTypes: string }[] = [
   { no: "1", name: "수요·재입고", method: "규칙 + 통계", automation: "L3", errorCost: "MID", does: "옵션(색상×사이즈)별 수요점수와 재입고 우선순위·수량을 계산", inputs: "판매속도 변화 · 찜 증가 · 재고일수 · 재입고 신청 · 장바구니 · 리드타임", actionTypes: "재입고 · 물량 재배분" },
@@ -37,7 +38,7 @@ export function AIEngines() {
             <div className="mt-2 flex flex-wrap gap-1.5">
               <Badge tone="accent" size="sm">{e.method}</Badge>
               <Badge tone="info" size="sm"><Term term={e.automation}>{e.automation}</Term></Badge>
-              <Badge tone={COST_TONE[e.errorCost]} size="sm">Error 비용 {e.errorCost}</Badge>
+              <Badge tone={COST_TONE[e.errorCost]} size="sm">{ERROR_COST_LABEL[e.errorCost]}</Badge>
             </div>
             <p className="mt-2 text-[0.9rem] leading-relaxed">{e.does}</p>
             <dl className="mt-2 space-y-1 text-[0.82rem] text-neutral-text2">
@@ -55,7 +56,7 @@ export function AIEngines() {
         <div className="flex flex-wrap items-center gap-2">
           <KeyRound size={18} className="text-theme-primary" />
           <span className="font-bold">LLM 연결 가이드</span>
-          <span className="ml-auto inline-flex items-center gap-2 text-[0.85rem] font-semibold"><Sparkles size={14} className="text-theme-primary" />1순위 연결 = AI Briefing (경영 대시보드)</span>
+          <span className="ml-auto inline-flex items-center gap-2 text-[0.85rem] font-semibold"><Sparkles size={14} className="text-theme-primary" />1순위 연결 = AI 브리핑 (경영 대시보드)</span>
         </div>
         <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div>

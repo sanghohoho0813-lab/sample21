@@ -272,10 +272,11 @@ export const useApp = create<AppState>()(
     }),
     {
       name: "morfit-demo-v1",
-      version: 3,
+      // v4: 화면 문구 한글화(D-28)로 시드의 담당자·엔진 이름이 바뀜 → 이전 저장본은 새 시드로 초기화
+      version: 4,
       storage: createJSONStorage(() => (typeof window !== "undefined" ? window.localStorage : noopStorage)),
       partialize: (s) => { const { hydrated: _h, ...rest } = s; void _h; return rest as AppState; },
-      migrate: (persisted, version) => (version < 3 ? ({} as AppState) : (persisted as AppState)),
+      migrate: (persisted, version) => (version < 4 ? ({} as AppState) : (persisted as AppState)),
       onRehydrateStorage: () => (state) => { state?.setHydrated(true); },
     },
   ),

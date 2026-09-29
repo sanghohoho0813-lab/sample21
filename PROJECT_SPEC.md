@@ -44,20 +44,34 @@ FRONT REFERENCE   : PENDING (Google Drive 「샘플 21. 의류」 폴더 비어 
 ## 1. Customer IA
 ```
 Header  : 홈 · 랭킹 · 신상품 · 브랜드 · 남성 · 여성 · 스타일 찾기 · 세일 | 검색 · 알림 · 찜 · 장바구니 · 마이
-Mobile  : Bottom Nav = 홈 / 카테고리(Sheet) / 검색(Sheet) / 찜 / 마이, Hamburger = 전체 메뉴 Drawer
+Mobile  : ☰(왼쪽) = 전체 메뉴 Drawer · Bottom Nav = 홈 / 카테고리(Sheet) / 검색(Sheet) / 찜 / 마이
+Drawer  : 1차 7개 (최대 2단계, D-27)
+          홈 · 랭킹 · 신상품·세일 ▸[신상품, 세일] · 카테고리 ▸[남성, 여성, 전체 상품, 카테고리 7]
+          · 브랜드 · 스타일 찾기 · 내 쇼핑 ▸[마이페이지, 주문·배송, 찜, 장바구니, 재입고 알림]
+          + 확장 기능 보기(접힘 · 예정 5) · 하단 고정 CTA [AX 운영화면 보기](데모 역할만)
 Routes  : / · /ranking · /new · /brands · /brands/[slug] · /shop(?gender,category,sale,...) · /search(?q) · /style
           /products/[id] · /wishlist · /cart · /checkout · /checkout/complete/[orderId]
           /my · /my/orders · /my/orders/[id] · /my/restock · /my/profile · /next/[slug]
-Demo Control Bar (대표·관리자 Role만): [시연] [스마트폰 보기] [Business AX 보기]
+데모 바 (대표·관리자·MD·운영 역할만): 데모 · 시연 · 스마트폰 보기 · [AX 운영화면 보기]
 ```
 
 ## 2. Business AX IA
 ```
-01 경영 대시보드 /ax · 02 Growth & Action Center /ax/actions · 03 매출·마진 /ax/sales · 04 상품·SKU /ax/products(+/[id])
-05 재고·재입고 /ax/inventory (Demand Radar) · 06 고객·재구매 /ax/customers · 07 핏·반품 /ax/fit-returns · 08 캠페인·기획전 /ax/campaigns
-09 브랜드·파트너 /ax/brands · 10 주문·배송 /ax/orders · 11 AX Evidence /ax/evidence · 12 기획의도 /ax/why · 13 시연 모드 /ax/present · 14 설정 /ax/settings
-Sidebar 280px(Theme Shell) · Topbar: 실시간 시계 · 역할(대표/MD/운영) · 튜토리얼 · 시연 · 스마트폰 보기 · [고객 화면 보기]
-Mobile  : Bottom Nav = 대시보드 / Action / 재고 / 주문 / 더보기(Drawer)
+1차 8개 (최대 2단계, D-27) — src/lib/roles.ts NAV_TREE
+경영 대시보드 /ax
+실행 센터 /ax/actions
+상품·재고 ▸ 상품·옵션 /ax/products(+/[id]) · 재고·재입고 /ax/inventory (수요 레이더) · 브랜드·입점사 /ax/brands
+주문·고객 ▸ 주문·배송 /ax/orders · 고객·재구매 /ax/customers · 핏·반품 /ax/fit-returns
+매출·마케팅 ▸ 매출·마진 /ax/sales · 캠페인·기획전 /ax/campaigns
+성과 증빙 /ax/evidence (+ 증빙 리포트 /ax/evidence/pack)
+소개·시연 ▸ 기획의도 /ax/why · 시연 모드 /ax/present
+설정 /ax/settings
+
+Header  : (<1280px) 1층 데모 툴바[데모 · {역할} 화면 · 시계] / 2층 메인[☰(왼쪽) · MORFIT AX · 고객 플랫폼 보기]
+          (≥1280px, 고정 사이드바 280px) 시계 · 역할 · 튜토리얼 · 시연 · 스마트폰 보기 · [고객 플랫폼 보기]  (D-32)
+Content : 묶음 안 화면이면 본문 위 섹션 탭(형제 화면 이동)
+Mobile·Tablet(<1280px): Bottom Nav = 대시보드 / 실행 / 재고 / 주문 / 더보기(Drawer)
+Drawer  : 로고 + 닫기 / 보는 사람(역할) · 메뉴 트리 · 데모 도구 / 하단 고정 CTA [고객 플랫폼 보기]
 ```
 
 ## 3. Roles / Permission (src/lib/roles.ts)
@@ -81,7 +95,7 @@ view_home · search_product · select_category · view_product · select_color �
 
 ## 7. Visual Direction
 - Customer: Black/White/Warm Ivory/Cobalt `#315CF5` · Editorial · Image-led(사진은 추후, gradient placeholder) · 굵은 제목 · 1280px · 모바일 2열 · Pure White Form/Checkout/My
-- AX: Theme 01 Deep Navy Blue 기본, 9 Canonical Theme 전부 동작(Settings) · Root 19px · Sidebar 280px · KPI→Insight→Action→Evidence 우선 · Pure White Raised Surface · Error Red = 의미색만
+- AX: Theme 01 Deep Navy Blue 기본, 9 Canonical Theme 전부 동작(Settings) · Root 19px · Sidebar 280px(1280px 이상 고정) · KPI→Insight→Action→Evidence 우선 · Pure White Raised Surface · Error Red = 의미색만
 - PROJECT SIGNATURE: ① Editorial Commerce Discovery ② Fit Signal ③ Demand Radar ④ Closed Loop Timeline
 
 ## 8. CORE / CONDITIONAL / PLUS

@@ -185,7 +185,7 @@ function CustomersBody() {
             <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">고객 화면에서 찜·장바구니·재입고 신청·주문을 하면 아래 숫자가 바로 바뀝니다 (데이터 순환). 개인정보 없음 · 가상 고객.</p>
           </div>
         </div>
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="mt-4 flex flex-col lg:flex-row lg:items-center gap-3">
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 flex-1 min-w-0">
             <Stat label="찜" value={<span className="inline-flex items-center gap-1"><Heart size={16} className="text-neutral-text2" />{me.wishlistCount}</span>} />
             <Stat label="장바구니" value={<span className="inline-flex items-center gap-1"><ShoppingCart size={16} className="text-neutral-text2" />{me.cartCount}</span>} />

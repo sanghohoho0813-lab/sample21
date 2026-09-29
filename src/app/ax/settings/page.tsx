@@ -128,7 +128,7 @@ function SettingsBody() {
   return (
     <div className="space-y-6">
       {/* 01 화면 */}
-      <SettingsCard id="settings-theme" no="01" title="화면" tour="settings-theme" desc={<>9개 기본 테마는 사이드바·버튼·강조색(6색)만 바꿉니다. <span className="font-semibold text-neutral-text">본문·표·폼의 Neutral 색은 테마와 분리</span>되어 읽기 편한 상태가 유지됩니다.</>} badge={<Badge tone="accent" size="sm">현재 {themeDef.no} {themeDef.name}</Badge>}>
+      <SettingsCard id="settings-theme" no="01" title="화면" tour="settings-theme" desc={<>9개 기본 테마는 사이드바·버튼·강조색(6색)만 바꿉니다. <span className="font-semibold text-neutral-text">본문·표·폼의 무채색은 테마와 분리</span>되어 읽기 편한 상태가 유지됩니다.</>} badge={<Badge tone="accent" size="sm">현재 {themeDef.no} {themeDef.name}</Badge>}>
         <div className="space-y-5">
           <ThemePicker />
           <PreviewStrip />
@@ -197,7 +197,7 @@ function SettingsBody() {
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="rounded-2xl border border-neutral-border bg-white p-4">
-              <p className="text-[0.8rem] font-bold text-neutral-text2">Data Source</p>
+              <p className="text-[0.8rem] font-bold text-neutral-text2">데이터 출처</p>
               <div className="mt-1 flex flex-wrap items-center gap-2"><Badge tone="demo">데모 저장소</Badge><code className="text-[0.85rem] break-anywhere">src/lib/demo/seed.ts</code></div>
               <p className="mt-2 text-[0.85rem] text-neutral-text2">결정론적 시드(PRNG). 주문 → 옵션 판매 → 일별 매출 순서로 계산해 숫자끼리 모순이 없습니다.</p>
             </div>

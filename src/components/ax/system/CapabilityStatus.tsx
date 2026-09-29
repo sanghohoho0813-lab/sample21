@@ -3,9 +3,9 @@ import { Badge, type Tone } from "@/components/ui/Badge";
 
 export const CAPABILITY_GROUPS: { status: "LIVE" | "DEMO" | "READY" | "NEXT"; tone: Tone; title: string; desc: string; items: string[] }[] = [
   { status: "LIVE", tone: "live", title: "실제 연결됨", desc: "외부 시스템과 실제로 연결된 기능", items: [] },
-  { status: "DEMO", tone: "demo", title: "실동작 (가상 데이터)", desc: "지금 화면에서 실제로 동작하지만 데이터는 데모 저장소", items: ["고객 플랫폼 핵심 여정 (탐색·핏·찜·재입고·주문·마이)", "AX 운영화면 핵심 흐름 (KPI → 인사이트 → 과제 → 증빙)", "4개 데이터 순환 고리 (재입고·주문·핏·재구매)", "규칙 기반 엔진 4개 · 역할 · 9 테마 · Device 미리보기", "증빙 리포트 데모 미리보기 (인쇄 · JSON)"] },
-  { status: "READY", tone: "ready", title: "연결 지점 준비됨", desc: "인터페이스는 있고, 키·계약이 생기면 연결", items: ["Supabase (Auth · DB · RLS)", "Analytics (행동 수집 어댑터)", "AI API — /api/ai/explain Route 준비됨 · ANTHROPIC_API_KEY 설정 시 경영 브리핑 설명만 연결됨", "알림 (이메일 · 카카오)", "외부 채널 연동", "배송 API", "결제 (PG)"] },
-  { status: "NEXT", tone: "next", title: "향후 확장", desc: "이번 범위 밖 — 미리보기 페이지로만 노출", items: ["브랜드 파트너센터", "멤버십", "광고 · 기획전 상품", "개인화 고도화", "수요예측 모델", "Push 알림", "Native App", "B2B 단체구매"] },
+  { status: "DEMO", tone: "demo", title: "실동작 (가상 데이터)", desc: "지금 화면에서 실제로 동작하지만 데이터는 데모 저장소", items: ["고객 플랫폼 핵심 여정 (탐색·핏·찜·재입고·주문·마이)", "AX 운영화면 핵심 흐름 (KPI → 인사이트 → 과제 → 증빙)", "4개 데이터 순환 고리 (재입고·주문·핏·재구매)", "규칙 기반 엔진 4개 · 역할 · 9 테마 · 기기 미리보기", "증빙 리포트 데모 미리보기 (인쇄 · JSON)"] },
+  { status: "READY", tone: "ready", title: "연결 지점 준비됨", desc: "인터페이스는 있고, 키·계약이 생기면 연결", items: ["Supabase (Auth · DB · RLS)", "행동 분석 (행동 수집 어댑터)", "AI API — /api/ai/explain Route 준비됨 · ANTHROPIC_API_KEY 설정 시 경영 브리핑 설명만 연결됨", "알림 (이메일 · 카카오)", "외부 채널 연동", "배송 API", "결제 (PG)"] },
+  { status: "NEXT", tone: "next", title: "향후 확장", desc: "이번 범위 밖 — 미리보기 페이지로만 노출", items: ["브랜드 파트너센터", "멤버십", "광고 · 기획전 상품", "개인화 고도화", "수요예측 모델", "푸시 알림", "네이티브 앱", "B2B 단체구매"] },
 ];
 
 const CAPABILITY_LABEL = { LIVE: "연결됨", DEMO: "데모", READY: "연결 준비", NEXT: "예정" } as const;

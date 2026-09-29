@@ -33,7 +33,7 @@ interface BrandStat { brand: Brand; products: number; revenue30d: number; orders
 export function BrandsPage() {
   return (
     <>
-      <PageHeader title="브랜드·파트너" desc="브랜드별 매출·마진(또는 수수료)·반품·품절위험을 한 화면에서 비교합니다. 파트너가 직접 로그인하는 파트너센터는 예정 단계입니다."
+      <PageHeader title="브랜드·입점사" desc="브랜드별 매출·마진(또는 수수료)·반품·품절위험을 한 화면에서 비교합니다. 파트너가 직접 로그인하는 파트너센터는 예정 단계입니다."
         badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><BrandsBody /></Hydrated>
     </>

@@ -1,6 +1,7 @@
 "use client";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { AutoFit } from "@/components/ui/AutoFit";
 
 /** wrap: 긴 설명 열만 줄바꿈 허용(기본은 한 줄) · mobileFull: 모바일 카드에서 한 줄 전체 폭 */
 export interface Column<T> { key: string; header: ReactNode; cell: (row: T) => ReactNode; align?: "left" | "right" | "center"; width?: string; hideOnMobile?: boolean; primary?: boolean; wrap?: boolean; mobileFull?: boolean }
@@ -25,7 +26,9 @@ export function DataTable<T>({ rows, columns, rowKey, onRowClick, empty, classNa
               <tr key={rowKey(r)} onClick={onRowClick ? () => onRowClick(r) : undefined} className={cn("group border-t border-neutral-border hover-row", onRowClick && "cursor-pointer")}>
                 {columns.map((c) => (
                   <td key={c.key} className={cn("px-4 align-middle", dense ? "py-2.5" : "py-3.5", c.align === "right" && "text-right tabular", c.align === "center" && "text-center",
-                    c.primary ? "min-w-[13rem] max-w-[24rem] break-keep" : c.wrap ? "min-w-[10rem] max-w-[22rem] break-keep" : "whitespace-nowrap")}>{c.cell(r)}</td>
+                    c.primary || c.wrap ? "break-keep" : "whitespace-nowrap")}>
+                    {c.primary ? <div className="min-w-[13rem] max-w-[24rem]">{c.cell(r)}</div> : c.wrap ? <div className="min-w-[10rem] max-w-[22rem]">{c.cell(r)}</div> : c.cell(r)}
+                  </td>
                 ))}
               </tr>
             ))}
@@ -38,12 +41,12 @@ export function DataTable<T>({ rows, columns, rowKey, onRowClick, empty, classNa
           const rest = columns.filter((c) => c !== primary && !c.hideOnMobile);
           return (
             <div key={rowKey(r)} onClick={onRowClick ? () => onRowClick(r) : undefined} className={cn("rounded-2xl border border-neutral-border bg-white p-4 active:bg-neutral-canvas transition-all duration-200 hover:border-neutral-text2/40 hover:shadow-card active:scale-[0.99]", onRowClick && "cursor-pointer")}>
-              <div className="font-semibold text-[1rem] mb-3 min-w-0 break-keep [overflow-wrap:anywhere]">{primary.cell(r)}</div>
+              <div className="font-semibold text-[1rem] mb-3 min-w-0 break-keep [overflow-wrap:break-word]">{primary.cell(r)}</div>
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                 {rest.map((c) => (
                   <div key={c.key} className={cn("min-w-0", c.mobileFull && "col-span-2")}>
                     <dt className="text-[0.78rem] text-neutral-text2 leading-snug break-keep">{c.header}</dt>
-                    <dd className="mt-0.5 text-[0.9rem] leading-snug tabular min-w-0 break-keep [overflow-wrap:anywhere]">{c.cell(r)}</dd>
+                    <dd className="mt-0.5 text-[0.9rem] leading-snug tabular min-w-0 break-keep [overflow-wrap:break-word]">{c.align === "right" ? <AutoFit>{c.cell(r)}</AutoFit> : c.cell(r)}</dd>
                   </div>
                 ))}
               </dl>

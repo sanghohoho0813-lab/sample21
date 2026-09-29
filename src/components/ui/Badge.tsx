@@ -20,8 +20,9 @@ const tones: Record<Tone, string> = {
 
 export function Badge({ tone = "neutral", className, children, size = "md" }: { tone?: Tone; className?: string; children: ReactNode; size?: "sm" | "md" }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full font-semibold leading-none whitespace-nowrap", size === "sm" ? "px-2 py-1 text-[0.78rem]" : "px-2.5 py-1.5 text-[0.8rem]", tones[tone], className)}>
-      {children}
+    <span className={cn("inline-flex items-center gap-1 rounded-full font-semibold leading-none whitespace-nowrap max-w-full", size === "sm" ? "px-2 py-1 text-[0.78rem]" : "px-2.5 py-1.5 text-[0.8rem]", tones[tone], className)} title={typeof children === "string" ? children : undefined}>
+      {/* 긴 이름(브랜드·상품)은 칸을 넘지 않고 말줄임 — 전체 이름은 title로 */}
+      {typeof children === "string" ? <span className="min-w-0 truncate">{children}</span> : children}
     </span>
   );
 }

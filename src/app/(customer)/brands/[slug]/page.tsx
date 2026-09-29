@@ -65,7 +65,7 @@ function BrandBody({ slug }: { slug: string }) {
         <Container className="absolute inset-0 flex flex-col justify-end pb-5 md:pb-8">
           <div className="flex items-center gap-2 mb-2">
             {moods.map((m) => <Badge key={m} tone="dark" size="sm" className="bg-white/15 backdrop-blur border border-white/25">{m}</Badge>)}
-            {isNewBrand(brand) && <Badge tone="dark" size="sm">NEW 입점</Badge>}
+            {isNewBrand(brand) && <Badge tone="dark" size="sm">신규 입점</Badge>}
           </div>
           <h1 className="text-white font-black text-[2rem] md:text-[3rem] tracking-tight leading-none drop-shadow-sm">{brand.name}</h1>
         </Container>

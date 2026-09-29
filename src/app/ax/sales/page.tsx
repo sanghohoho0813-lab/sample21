@@ -164,7 +164,7 @@ function SalesInner() {
       </SectionCard>
 
       <div className="grid lg:grid-cols-2 gap-5">
-        <SectionCard title="브랜드별 매출" desc="상품 판매가 기준 (배송비 제외)" right={<AxLink href="/ax/brands">브랜드·파트너</AxLink>}>
+        <SectionCard title="브랜드별 매출" desc="상품 판매가 기준 (배송비 제외)" right={<AxLink href="/ax/brands">브랜드·입점사</AxLink>}>
           {byBrand.length === 0 ? <EmptyState title="데이터 없음" /> : (
             <div className="w-full" style={{ height: Math.max(220, byBrand.length * 34) }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -220,7 +220,7 @@ function SalesInner() {
 
       <SectionCard title="상품별 매출·할인·반품·마진" desc="위험 = 매출은 높지만 마진이 낮거나 반품이 많음 · 기회 = 마진이 높고 판매속도 상승" right={<AxLink href="/ax/products">상품·SKU</AxLink>}>
         <DataTable rows={rows.slice(0, 25)} columns={columns} rowKey={(r) => r.id} onRowClick={(r) => router.push(`/ax/products/${r.id}`)} dense empty={<EmptyState title="이 기간에 판매된 상품이 없습니다" />} />
-        {rows.length > 25 && <p className="mt-2 text-[0.82rem] text-neutral-text2">매출 상위 25개 상품만 표시 · 전체는 상품·SKU에서 확인</p>}
+        {rows.length > 25 && <p className="mt-2 text-[0.82rem] text-neutral-text2">매출 상위 25개 상품만 표시 · 전체는 상품·옵션에서 확인</p>}
       </SectionCard>
 
       <SectionCard title="프로모션 전후 비교" desc="캠페인 직전 기간 매출 vs 캠페인 매출 · 할인비용·추정 마진·반품 (시뮬레이션)" right={<AxLink href="/ax/campaigns">캠페인·기획전</AxLink>}>

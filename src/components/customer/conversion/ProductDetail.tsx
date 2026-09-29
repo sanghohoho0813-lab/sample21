@@ -32,7 +32,7 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
         {slot === 1 && <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }} />}
         {slot === 2 && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }} />}
         <div className="absolute right-3 top-3 flex items-center gap-1.5"><span className="rounded-full bg-white/85 px-2.5 py-1 text-[0.78rem] font-bold text-brand-black">{cur.label}</span></div>
-        <div className="absolute left-3 top-3"><span className="rounded-full bg-brand-black/70 px-2.5 py-1 text-[0.78rem] font-semibold text-white">사진 준비중 · 컬러 프리뷰</span></div>
+        <div className="absolute left-3 top-3"><span className="rounded-full bg-brand-black/70 px-2.5 py-1 text-[0.78rem] font-semibold text-white">사진 준비중 · 색상 미리보기</span></div>
       </ProductImage>
       <div className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
         {SLOTS.map((s, i) => (
@@ -192,7 +192,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const lowSelected = !!st && st.purchasable && st.key === "low";
   const related = PRODUCTS.filter((p) => p.brandId === product.brandId && p.id !== product.id).slice(0, 4);
   const alsoViewed = PRODUCTS.filter((p) => p.categoryId === product.categoryId && p.id !== product.id && p.brandId !== product.brandId).map((p) => ({ p, s: productAgg(p, store).rankScore })).sort((a, b) => b.s - a.s).slice(0, 4).map((x) => x.p);
-  const badge = agg.worst === "rising" || product.tags.includes("급상승") ? { t: "급상승", tone: "accent" as const } : product.tags.includes("베스트") ? { t: "BEST", tone: "dark" as const } : Date.now() - new Date(product.createdAt).getTime() < 30 * 86400000 ? { t: "NEW", tone: "dark" as const } : null;
+  const badge = agg.worst === "rising" || product.tags.includes("급상승") ? { t: "급상승", tone: "accent" as const } : product.tags.includes("베스트") ? { t: "베스트", tone: "dark" as const } : Date.now() - new Date(product.createdAt).getTime() < 30 * 86400000 ? { t: "신상", tone: "dark" as const } : null;
 
   const RestockCta = ({ full, tour }: { full?: boolean; tour?: string }) => subscribed ? (
     <Button variant="secondary" size="lg" full={full} className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")} onClick={() => router.push("/my/restock")} icon={<Bell size={18} className="hidden sm:block" />} data-tour={tour} aria-label="재입고 알림 신청 완료 · 내 재입고 알림 목록 보기">신청 완료 · 목록 보기</Button>
@@ -226,12 +226,13 @@ export function ProductDetail({ product }: { product: Product }) {
                   <span className="font-bold tabular">{price.toLocaleString("ko-KR")}원</span>
                 </div>
               )}
-              <div className="mt-4 flex gap-2">
+              {/* 구매 박스가 좁은 태블릿(768)에서는 '바로 주문'이 다음 줄로 내려가 전체 폭을 쓴다 */}
+              <div className="mt-4 flex flex-wrap gap-2">
                 <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
                 {soldoutSelected ? <RestockCta tour="c-restock" /> : (
                   <>
-                    <Button variant="outline" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={addCart} icon={<ShoppingBag size={18} className="hidden sm:block" />}>장바구니</Button>
-                    <Button variant="brand" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={buyNow} icon={<Zap size={18} className="hidden sm:block" />}>바로 주문</Button>
+                    <Button variant="outline" size="lg" className="flex-1 basis-[7rem] min-w-0 !px-3 sm:!px-6 md:!px-3 xl:!px-6" onClick={addCart} icon={<ShoppingBag size={18} className="hidden sm:block md:hidden lg:block" />}>장바구니</Button>
+                    <Button variant="brand" size="lg" className="flex-1 basis-[7rem] min-w-0 !px-3 sm:!px-6 md:!px-3 xl:!px-6" onClick={buyNow} icon={<Zap size={18} className="hidden sm:block md:hidden lg:block" />}>바로 주문</Button>
                   </>
                 )}
               </div>

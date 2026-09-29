@@ -12,8 +12,12 @@ npm run dev        # http://localhost:3000
 npm run build && npm start
 npm run typecheck
 npm run qa:shots     # 8개 폭 × 전 Route 스크린샷 + overflow/404 리포트 (프로덕션 서버 권장 · QA_SHOTS=0 이면 overflow만)
-npm run qa:journey   # Whole-Hybrid Acceptance Journey 23 Step 자동 검증 (4 Loop + Evidence Pack)
+npm run qa:journey   # Whole-Hybrid Acceptance Journey 25 Step 자동 검증 (4 Loop + Evidence Pack)
 npm run qa:a11y      # 접근 가능한 이름 · 모바일 터치 타겟 · Hover 커버리지 자동 점검 → qa-output/qa-a11y.json
+npm run qa:layout    # 8폭 × 34 Route 레이아웃 결함(가로 넘침·한글 세로 쪼개짐·숫자/날짜 줄바꿈·잘림) → qa-output/qa-layout-*.json
+                     #   QA_DRAWER=1 햄버거 연 상태 · QA_STRESS=1 긴 상품명/브랜드명/고객명
+npm run qa:english   # 화면에 남은 영문 단어 수집(한글 UI 점검) → qa-output/qa-english.json
+npm run lint         # ESLint (next/core-web-vitals + typescript)
 ```
 
 ## 구조

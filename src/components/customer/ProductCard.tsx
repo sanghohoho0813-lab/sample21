@@ -18,7 +18,7 @@ export function ProductCard({ product, rank, reason, className, compact }: { pro
   const agg = productAgg(product, store);
   const brand = BRAND_BY_ID[product.brandId];
   const isNew = Date.now() - new Date(product.createdAt).getTime() < 30 * 86400000;
-  const badge = agg.worst === "rising" || product.tags.includes("급상승") ? { t: "급상승", tone: "accent" as const } : agg.worst === "low" ? { t: "품절 임박", tone: "warning" as const } : agg.worst === "soldout" ? { t: "일부 품절", tone: "neutral" as const } : isNew ? { t: "NEW", tone: "dark" as const } : product.tags.includes("베스트") ? { t: "BEST", tone: "dark" as const } : null;
+  const badge = agg.worst === "rising" || product.tags.includes("급상승") ? { t: "급상승", tone: "accent" as const } : agg.worst === "low" ? { t: "품절 임박", tone: "warning" as const } : agg.worst === "soldout" ? { t: "일부 품절", tone: "neutral" as const } : isNew ? { t: "신상", tone: "dark" as const } : product.tags.includes("베스트") ? { t: "베스트", tone: "dark" as const } : null;
   return (
     <div className={cn("group relative", className)}>
       <Link href={`/products/${product.id}`} className="block" onClick={() => store.track("view_product", { productId: product.id })}>

@@ -23,6 +23,8 @@ import { Button } from "@/components/ui/Button";
 import { Term, Freshness } from "@/components/ui/Misc";
 import { SkeletonCard } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
+import { ERROR_COST_LABEL } from "@/components/ax/core/shared";
+import { EVIDENCE_TYPE_LABEL } from "@/components/ax/ops/shared";
 
 const INDEX: WhyIndexItem[] = [
   { id: "why-01", no: "01", title: "MORFIT의 현재" },
@@ -199,7 +201,7 @@ function WhyBody() {
 
       {/* 08 */}
       <WhySection id="why-08" no="08" title="MORFIT에서 AX란 무엇인가" lead="AX는 'AI를 붙이는 일'이 아닙니다. 고객 행동을 신호로 바꾸고, 신호를 과제로 바꾸고, 과제의 결과를 다시 고객에게 돌려보내는 운영 방식의 전환입니다.">
-        <FlowChips steps={[{ label: "ELIMINATE", sub: "채널별 중복 확인 제거" }, { label: "STANDARDIZE", sub: "상품·옵션·반품사유·과제 상태 통일" }, { label: "DIGITIZE", sub: "고객 행동 기록" }, { label: "AUTOMATE", sub: "계산·알림·상태 자동" }, { label: "AI", sub: "설명·복합판단만" }]} />
+        <FlowChips steps={[{ label: "제거", sub: "채널별 중복 확인 제거" }, { label: "표준화", sub: "상품·옵션·반품사유·과제 상태 통일" }, { label: "디지털화", sub: "고객 행동 기록" }, { label: "자동화", sub: "계산·알림·상태 자동" }, { label: "AI", sub: "설명·복합판단만" }]} />
         <P>순서가 중요합니다. 기준을 통일한 다음에야 자동화가 의미를 갖고, 자동화가 돌아간 뒤에야 AI가 설명할 재료가 생깁니다. 자동발주(L4)는 없고 모든 과제는 사람이 승인합니다.</P>
         <QuoteLine>“AI가 추천했습니다”가 아니라 “이 숫자 때문에 지금 이 옵션을 봐야 합니다”라고 말하는 시스템.</QuoteLine>
         <Tailor>MORFIT의 네 엔진(수요·핏·할인·재구매)은 전부 규칙과 수식입니다. LLM은 <Term term="AI 준비">AI 준비</Term> 상태로, 연결되더라도 계산이 아니라 경영 브리핑의 문장만 맡습니다. <AIReadyBadge kind="briefing" className="ml-1 align-middle" /></Tailor>
@@ -295,7 +297,7 @@ function WhyBody() {
           { tag: "고객", title: "재입고 알림 신청", desc: "블랙 M 품절 임박 → 고객이 재입고 알림 신청" },
           { tag: "AX 신호", title: "수요 레이더 반영", desc: "재입고 신청 +1 · 수요 점수 상승" },
           { tag: "과제", title: "act-001 재입고 검토", desc: "확인 → 실행중 → 완료 (MD 승인)" },
-          { tag: "결과", title: "재고 +수량 반영", desc: "옵션 상태 '입고 완료' · 증빙 RESULT 기록" },
+          { tag: "결과", title: "재고 +수량 반영", desc: "옵션 상태 '입고 완료' · 증빙 '결과' 기록" },
           { tag: "고객", title: "재입고 알림 도착", desc: "알림함 + 옵션 상태 변경 → 구매" },
         ]} />
         {d.act001 && (
@@ -304,7 +306,7 @@ function WhyBody() {
               <Badge tone="accent" size="sm">과제 사례 · {d.act001.id}</Badge>
               <UrgencyBadge urgency={d.act001.urgency} />
               <ActionStatusBadge status={d.act001.status} size="sm" />
-              <span className="ml-auto text-[0.78rem] text-neutral-text2">{d.act001.automation} · Error 비용 {d.act001.errorCost} · 담당 {d.act001.ownerName}</span>
+              <span className="ml-auto text-[0.78rem] text-neutral-text2">{d.act001.automation} · {ERROR_COST_LABEL[d.act001.errorCost]} · 담당 {d.act001.ownerName}</span>
             </div>
             <p className="mt-2 font-bold text-[1.05rem] leading-snug">{d.act001.title}</p>
             <p className="mt-1 text-[0.85rem] text-neutral-text2">트리거 · {d.act001.trigger}</p>
@@ -324,7 +326,7 @@ function WhyBody() {
           <ul className="space-y-2">
             {evidenceExamples.map((e) => (
               <li key={e.id} className="rounded-2xl border border-neutral-border bg-white px-4 py-3">
-                <div className="flex flex-wrap items-center gap-2"><Badge tone={e.type === "RESULT" || e.type === "CUSTOMER" ? "success" : e.type === "RISK" ? "error" : "info"} size="sm">{e.type}</Badge><span className="font-bold text-[0.92rem]">{e.title}</span><span className="ml-auto text-[0.78rem] text-neutral-text2">{relTime(e.at)} · {e.actor}</span></div>
+                <div className="flex flex-wrap items-center gap-2"><Badge tone={e.type === "RESULT" || e.type === "CUSTOMER" ? "success" : e.type === "RISK" ? "error" : "info"} size="sm">{EVIDENCE_TYPE_LABEL[e.type]}</Badge><span className="font-bold text-[0.92rem]">{e.title}</span><span className="ml-auto text-[0.78rem] text-neutral-text2">{relTime(e.at)} · {e.actor}</span></div>
                 <p className="mt-1 text-[0.85rem] text-neutral-text2 leading-relaxed">{e.detail}{e.kpiDelta && <span className="ml-1 font-semibold text-neutral-text">({e.kpiDelta})</span>}</p>
               </li>
             ))}
@@ -360,7 +362,7 @@ function WhyBody() {
         ]} />
         <div className="rounded-2xl bg-neutral-canvas p-4 text-[0.88rem] leading-relaxed">
           <p className="font-bold">2026 정책환경</p>
-          <p className="mt-1 text-neutral-text2">정책자금·정부지원 설명은 실증 이후 성장 Story에서만 연결합니다 (보장 표현 금지). 이 페이지는 사업 자체의 비용·매출 논리만 다룹니다 — 품절 손실·과잉재고·분석시간·사이즈 반품·재구매 누락은 외부 자금 없이도 비용과 매출로 직접 연결되기 때문입니다.</p>
+          <p className="mt-1 text-neutral-text2">정책자금·정부지원 설명은 실증 이후 성장 스토리에서만 연결합니다 (보장 표현 금지). 이 페이지는 사업 자체의 비용·매출 논리만 다룹니다 — 품절 손실·과잉재고·분석시간·사이즈 반품·재구매 누락은 외부 자금 없이도 비용과 매출로 직접 연결되기 때문입니다.</p>
         </div>
         <ImageSlot asset="why_ax_03_growth.jpg" label="확장 방향 — 데이터가 쌓일수록 브랜드와 고객이 함께 늘어나는 구조" gradient={CATEGORIES[0].gradient} caption="성장 단계" />
         <Tailor>데모의 모든 숫자는 시뮬레이션이며 개선율을 말하지 않습니다. 증빙의 기준값 항목은 “미측정 · 실증 필요”으로 남겨두었습니다 — 실증에서 채울 빈칸입니다.</Tailor>

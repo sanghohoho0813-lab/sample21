@@ -163,7 +163,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
           {/* Live data strip */}
           {live && (
             <div>
-              <p className="text-[0.8rem] font-semibold text-neutral-text2 mb-2 inline-flex items-center gap-1.5"><Cpu size={14} />지금 데이터 (seed + 고객 행동 반영)</p>
+              <p className="text-[0.8rem] font-semibold text-neutral-text2 mb-2 inline-flex items-center gap-1.5"><Cpu size={14} />지금 데이터 (기본 데이터 + 고객 행동 반영)</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">{live.map((l) => <StatPill key={l.label} label={l.label} value={l.value} sub={l.sub} tone={l.tone} />)}</div>
             </div>
           )}

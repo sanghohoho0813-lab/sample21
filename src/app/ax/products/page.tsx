@@ -66,10 +66,10 @@ function ProductsInner() {
     { key: "name", header: "상품", primary: true, cell: (a) => (
       <span className="flex items-center gap-3 min-w-0">
         <ProductImage colors={a.product.colors} ratio="aspect-square" className="hidden md:block h-11 w-11 shrink-0 !rounded-lg" label={a.product.name} />
-        <span className="min-w-0"><span className="block text-[0.78rem] text-neutral-text2 font-semibold">{BRAND_BY_ID[a.product.brandId].name} · {CATEGORY_NAME[a.product.categoryId]}</span><span className="font-semibold leading-snug">{a.product.name}</span>{isNew(a) && <Badge tone="accent" size="sm" className="ml-1.5">NEW</Badge>}</span>
+        <span className="min-w-0"><span className="block text-[0.78rem] text-neutral-text2 font-semibold">{BRAND_BY_ID[a.product.brandId].name} · {CATEGORY_NAME[a.product.categoryId]}</span><span className="font-semibold leading-snug">{a.product.name}</span>{isNew(a) && <Badge tone="accent" size="sm" className="ml-1.5">신상</Badge>}</span>
       </span>
     ) },
-    { key: "price", header: "정상가 · 판매가", align: "right", cell: (a) => <span className="tabular">{a.price < a.product.price ? <><span className="text-neutral-text2 line-through text-[0.8rem] mr-1">{krw(a.product.price)}</span><span className="font-semibold">{krw(a.price)}</span><span className="block text-[0.78rem] text-semantic-error font-semibold">-{pct(discountRate(a.product, app), 0)}</span></> : <span className="font-semibold">{krw(a.price)}</span>}</span> },
+    { key: "price", header: "정상가 · 판매가", align: "right", cell: (a) => <span className="tabular">{a.price < a.product.price ? <><span className="text-neutral-text2 line-through text-[0.8rem] mr-1 whitespace-nowrap">{krw(a.product.price)}</span><span className="font-semibold whitespace-nowrap">{krw(a.price)}</span><span className="block text-[0.78rem] text-semantic-error font-semibold">-{pct(discountRate(a.product, app), 0)}</span></> : <span className="font-semibold whitespace-nowrap">{krw(a.price)}</span>}</span> },
     ...(showMargin ? [{ key: "margin", header: "원가 · 마진율", align: "right", cell: (a: ProductAgg) => <span className="tabular">{krwShort(a.product.cost)}<span className={`block text-[0.78rem] font-semibold ${a.marginRate < 0.5 ? "text-semantic-warning" : "text-semantic-success"}`}>{pct(a.marginRate, 0)}</span></span> } as Column<ProductAgg>] : []),
     { key: "options", header: "옵션", align: "right", cell: (a) => <span className="tabular">{a.variants.length}<span className="block text-[0.78rem] text-neutral-text2">품절 {a.soldout}</span></span> },
     { key: "stock", header: "현재고", align: "right", cell: (a) => <span className={`tabular font-semibold ${a.stock <= 10 ? "text-semantic-warning" : ""}`}>{num(a.stock)}{a.incoming > 0 && <span className="block text-[0.78rem] text-neutral-text2 font-normal">+{a.incoming} 예정</span>}</span> },
@@ -84,7 +84,7 @@ function ProductsInner() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={<>상품 · <Term term="SKU">SKU</Term></>} desc="상품 단위로 판매속도·재고·찜·재입고 신청·반품률을 비교합니다. 행을 누르면 옵션(색상×사이즈) 단위 상세로 이동합니다." badge={<Badge tone="demo" size="sm">데모</Badge>} right={<Freshness source="DEMO" />} />
+      <PageHeader title={<>상품·<Term term="SKU">옵션</Term></>} desc="상품 단위로 판매속도·재고·찜·재입고 신청·반품률을 비교합니다. 행을 누르면 옵션(색상×사이즈) 단위 상세로 이동합니다." badge={<Badge tone="demo" size="sm">데모</Badge>} right={<Freshness source="DEMO" />} />
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 stagger">
         <KpiCard label="전체 상품" value={num(summary.total)} sub={`브랜드 ${BRANDS.length}개`} icon={<Shirt size={18} />} accent={ICON_ACCENTS.operations} />

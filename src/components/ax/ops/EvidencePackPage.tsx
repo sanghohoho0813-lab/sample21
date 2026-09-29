@@ -21,8 +21,8 @@ import { Card } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Kpi";
 import { toast } from "@/components/ui/Toast";
 import { ActionStatusBadge } from "@/components/ax/StatusBadges";
-import { ACTION_TYPE_LABEL, ENGINE_LABEL } from "@/components/ax/core/shared";
-import { EVIDENCE_TYPE_LABEL, EvidenceTypeBadge, NoteCard, PageSkeleton, SourceBadge } from "./shared";
+import { ACTION_TYPE_LABEL, ENGINE_LABEL, ERROR_COST_LABEL } from "@/components/ax/core/shared";
+import { EvidenceTypeBadge, NoteCard, PageSkeleton, SourceBadge } from "./shared";
 import { cn } from "@/lib/cn";
 
 const STATUS_ORDER: Record<AXAction["status"], number> = { done: 0, "in-progress": 1, confirmed: 2, recommended: 3, hold: 4, dismissed: 5 };
@@ -130,7 +130,7 @@ function PackBody() {
         desc="대표 보고용 한 묶음 — 기준값 → 발생 조건 → 추천 → 승인 → 과제 → 결과 → KPI 변화 → 데이터 출처 → 기록. 인쇄하면 A4 리포트, JSON으로 내보내면 실증 리포트의 재료가 됩니다."
         right={<div className="flex flex-wrap items-center gap-2 print:hidden"><Button variant="outline" href="/ax/evidence" icon={<ArrowLeft size={16} />}>증빙으로</Button><Button variant="outline" onClick={exportJson} icon={<FileJson size={16} />}>JSON 내보내기</Button><Button onClick={print} icon={<Printer size={16} />}>인쇄 · PDF</Button></div>} />
 
-      <NoteCard tone="warning" icon={<Flag size={16} />}><b>기준값: 미측정 · 실증 필요</b> — 이 Pack은 구조와 기록 방식을 보여주는 데모 미리보기입니다. “개선율” 칸은 모두 <b>실증 후 확인</b>이며, 실증 1~2주차 기준값이 측정된 뒤에만 채워집니다.</NoteCard>
+      <NoteCard tone="warning" icon={<Flag size={16} />}><b>기준값: 미측정 · 실증 필요</b> — 이 리포트는 구조와 기록 방식을 보여주는 데모 미리보기입니다. “개선율” 칸은 모두 <b>실증 후 확인</b>이며, 실증 1~2주차 기준값이 측정된 뒤에만 채워집니다.</NoteCard>
 
       <nav aria-label="리포트 목차" className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap print:hidden">
         {TOC.map(([id, label], i) => <a key={id} href={`#pack-${id}`} className="inline-flex shrink-0 items-center gap-1.5 h-10 px-3.5 rounded-full border border-neutral-border bg-white text-[0.85rem] font-semibold hover:border-neutral-text2 hover:bg-neutral-canvas transition-all"><span className="text-neutral-text2 tabular">{i}</span>{label}</a>)}
@@ -144,7 +144,7 @@ function PackBody() {
           <Stat label="데이터 단계" value={<span className="text-[1rem]">데모</span>} sub={`증빙 ${num(evidence.length)}건 · 데모 ${sources.DEMO} · 시뮬레이션 ${sources.SIMULATION} · 연결됨 ${sources.LIVE}`} />
           <Stat label="대상 기간" value={<span className="text-[1rem]">최근 30 · 90일</span>} sub="기준값은 실증 1~2주차" />
         </div>
-        <p className="mt-3 text-[0.85rem] text-neutral-text2 leading-relaxed">Primary Constraint — 옵션(색상×사이즈) 단위 수요신호가 MD 판단에 닿지 않아 품절 손실과 과잉재고가 동시에 생긴다. 이 Pack은 그 신호가 과제가 되고, 과제가 결과가 되어 고객에게 돌아갔는지를 기록한다.</p>
+        <p className="mt-3 text-[0.85rem] text-neutral-text2 leading-relaxed">핵심 제약 — 옵션(색상×사이즈) 단위 수요신호가 MD 판단에 닿지 않아 품절 손실과 과잉재고가 동시에 생긴다. 이 리포트는 그 신호가 과제가 되고, 과제가 결과가 되어 고객에게 돌아갔는지를 기록한다.</p>
       </PackSection>
 
       {/* 1 Baseline */}
@@ -159,13 +159,13 @@ function PackBody() {
             const results = resultsOf(a); const feedback = customerOf(a); const f = funnelOf(a);
             return (
               <div key={a.id} className="rounded-2xl border border-neutral-border bg-white p-4 md:p-5 print-avoid">
-                <div className="flex items-center gap-2 flex-wrap"><Badge tone="accent">{a.id}</Badge><Badge tone="neutral" size="sm">{ACTION_TYPE_LABEL[a.type]}</Badge><ActionStatusBadge status={a.status} /><span className="text-[0.8rem] text-neutral-text2">{ENGINE_LABEL[a.engine]} · {a.automation} · Error 비용 {a.errorCost}</span><span className="ml-auto text-[0.8rem] text-neutral-text2">담당 {a.ownerName}</span></div>
+                <div className="flex items-center gap-2 flex-wrap"><Badge tone="accent">{a.id}</Badge><Badge tone="neutral" size="sm">{ACTION_TYPE_LABEL[a.type]}</Badge><ActionStatusBadge status={a.status} /><span className="text-[0.8rem] text-neutral-text2">{ENGINE_LABEL[a.engine]} · {a.automation} · {ERROR_COST_LABEL[a.errorCost]}</span><span className="ml-auto text-[0.8rem] text-neutral-text2">담당 {a.ownerName}</span></div>
                 <p className="mt-2 font-bold text-[1.02rem] leading-snug">{a.title}</p>
                 <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-3 text-[0.88rem]">
-                  <div className="rounded-xl bg-neutral-canvas p-3"><p className="text-[0.78rem] font-bold text-neutral-text2 tracking-wide">TRIGGER</p><p className="mt-0.5">{a.trigger}</p><p className="mt-2 text-[0.78rem] font-bold text-neutral-text2 tracking-wide">RECOMMENDATION · 근거 {a.reasons.length}</p><ul className="mt-0.5 list-disc pl-5 space-y-0.5">{a.reasons.map((r) => <li key={r}>{r}</li>)}</ul><p className="mt-2"><span className="font-semibold">기대 효과</span> {a.expectedImpact}{a.quantity ? ` · 수량 ${a.quantity}` : ""}{a.discountRate ? ` · 할인 ${Math.round(a.discountRate * 100)}%` : ""}</p>{a.caution && <p className="mt-1 text-neutral-text2">주의 · {a.caution}</p>}</div>
-                  <div className="rounded-xl bg-neutral-canvas p-3"><p className="text-[0.78rem] font-bold text-neutral-text2 tracking-wide">APPROVAL · ACTION 이력</p>
+                  <div className="rounded-xl bg-neutral-canvas p-3"><p className="text-[0.78rem] font-bold text-neutral-text2 tracking-wide">발생 조건</p><p className="mt-0.5">{a.trigger}</p><p className="mt-2 text-[0.78rem] font-bold text-neutral-text2 tracking-wide">추천 근거 {a.reasons.length}</p><ul className="mt-0.5 list-disc pl-5 space-y-0.5">{a.reasons.map((r) => <li key={r}>{r}</li>)}</ul><p className="mt-2"><span className="font-semibold">기대 효과</span> {a.expectedImpact}{a.quantity ? ` · 수량 ${a.quantity}` : ""}{a.discountRate ? ` · 할인 ${Math.round(a.discountRate * 100)}%` : ""}</p>{a.caution && <p className="mt-1 text-neutral-text2">주의 · {a.caution}</p>}</div>
+                  <div className="rounded-xl bg-neutral-canvas p-3"><p className="text-[0.78rem] font-bold text-neutral-text2 tracking-wide">승인 · 실행 이력</p>
                     <ul className="mt-0.5 space-y-1">{a.statusHistory.map((h, i) => <li key={i} className="flex flex-wrap gap-x-2"><span className="tabular text-neutral-text2 whitespace-nowrap">{fmtDate(h.at, "datetime")}</span><span className="font-semibold">{HIST_LABEL[h.status]}</span><span>{h.actor}</span>{h.note && <span className="text-neutral-text2">· {h.note}</span>}</li>)}</ul>
-                    <p className="mt-2 text-[0.78rem] font-bold text-neutral-text2 tracking-wide">RESULT · 고객 반영</p>
+                    <p className="mt-2 text-[0.78rem] font-bold text-neutral-text2 tracking-wide">결과 · 고객 반영</p>
                     {results.length === 0 && feedback.length === 0 ? <p className="mt-0.5 text-neutral-text2">아직 결과 기록 없음 — {a.status === "done" ? "완료 처리만 기록됨" : "실행 후 재고·가격·핏 안내 변화가 기록됩니다"}.</p> : (
                       <ul className="mt-0.5 space-y-1">{[...results, ...feedback].sort((x, y) => x.at.localeCompare(y.at)).map((e) => <li key={e.id} className="flex flex-wrap gap-x-2 items-baseline"><EvidenceTypeBadge type={e.type} /><span>{e.title}</span>{e.kpiDelta && <span className="text-neutral-text2 tabular">· {e.kpiDelta}</span>}</li>)}</ul>
                     )}
@@ -211,7 +211,7 @@ function PackBody() {
       <PackSection id="pack-log" no="6" title={`증빙 기록 · ${num(evidence.length)}건 (시간순)`} desc="10가지 유형의 기록 전체. 인쇄 시 여러 장으로 이어집니다.">
         <PackTable head={["시각", "유형", "제목 · 내용", "담당", "출처", "연결"]} rows={evidence.map((e: EvidenceLog) => [
           <span key="t" className="tabular whitespace-nowrap text-neutral-text2">{fmtDate(e.at, "datetime")}</span>,
-          <span key="ty" className="inline-flex flex-col gap-1"><EvidenceTypeBadge type={e.type} /><span className="text-[0.78rem] text-neutral-text2">{EVIDENCE_TYPE_LABEL[e.type]}</span></span>,
+          <EvidenceTypeBadge key="ty" type={e.type} />,
           <span key="ti" className="block min-w-[16rem]"><span className="font-semibold">{e.title}</span><span className="block text-neutral-text2 text-[0.82rem] leading-snug mt-0.5">{e.detail}</span>{e.kpiDelta && <span className="block text-[0.8rem] tabular mt-0.5"><Flag size={11} className="inline mr-1" />{e.kpiDelta}</span>}</span>,
           <span key="a" className="whitespace-nowrap">{e.actor}</span>,
           <span key="s" className="inline-flex flex-col gap-1"><SourceBadge source={e.source} /><Badge tone={e.status === "live" ? "live" : e.status === "pilot-ready" ? "ready" : "demo"} size="sm">{e.status === "live" ? "실제 데이터" : e.status === "pilot-ready" ? "실증 준비" : "데모"}</Badge></span>,

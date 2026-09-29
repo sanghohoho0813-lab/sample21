@@ -147,8 +147,12 @@ button, [role="button"] { cursor: pointer; }
 .ph-img {
   position: relative;
   overflow: hidden;
+  container-type: inline-size;
   background: linear-gradient(135deg, var(--ph-a, #e9e7e1), var(--ph-b, #cfcbc2));
 }
+/* 플레이스홀더 캡션: 좁은 썸네일(7rem 미만)에서는 글자가 세로로 쪼개지므로 숨김, 넓어도 한 줄 말줄임 */
+.ph-cap { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@container (max-width: 7rem) { .ph-cap { display: none; } }
 .ph-img::after {
   content: "";
   position: absolute; inset: 0;

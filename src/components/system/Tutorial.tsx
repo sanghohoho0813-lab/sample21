@@ -62,7 +62,7 @@ export function Tutorial({ steps, open, onClose, storageFlag }: { steps: TourSte
       {!rect && <div className="absolute inset-0 bg-[#0b1830]/62" onClick={() => finish(false)} aria-hidden />}
       {rect && <div className="absolute inset-0" onClick={() => finish(false)} aria-hidden />}
       <div className={cn("absolute z-[90] rounded-cardlg bg-white shadow-lift p-5 animate-scaleIn")} style={{ top, left, width: popW }}>
-        <p className="text-[0.78rem] font-bold tracking-wide text-theme-primary">STEP {i + 1} / {steps.length}</p>
+        <p className="text-[0.78rem] font-bold tracking-wide text-theme-primary">{i + 1} / {steps.length} 단계</p>
         <h4 className="mt-1 text-[1.1rem] font-bold">{step.title}</h4>
         <p className="mt-1.5 text-[0.9rem] text-neutral-text2 leading-relaxed">{step.body}</p>
         <div className="mt-4 flex items-center justify-between gap-2">

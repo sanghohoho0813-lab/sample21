@@ -46,13 +46,13 @@ function Hero() {
           </div>
           <ul className="mt-7 md:mt-8 grid grid-cols-3 gap-2 max-w-[32rem]" aria-label="MORFIT 특징">
             {[
-              { v: `${BRANDS.length}`, l: "브랜드 · 4가지 무드" },
-              { v: `${PRODUCTS.length}`, l: `상품 · ${num(VARIANT_COUNT)} 옵션` },
+              { v: `${BRANDS.length}`, l: "브랜드 · 4가지\u00a0무드" },
+              { v: `${PRODUCTS.length}`, l: `상품 · ${num(VARIANT_COUNT)}\u00a0옵션` },
               { v: "핏 추천", l: "내 사이즈 기준" },
             ].map((s) => (
               <li key={s.l} className="rounded-2xl bg-white/70 border border-neutral-border px-3 py-2.5">
                 <p className="font-black text-[1.15rem] md:text-[1.3rem] leading-none tabular">{s.v}</p>
-                <p className="mt-1 text-[0.78rem] md:text-[0.78rem] text-neutral-text2 font-semibold">{s.l}</p>
+                <p className="mt-1 text-[0.78rem] text-neutral-text2 font-semibold break-keep">{s.l}</p>
               </li>
             ))}
           </ul>
@@ -146,7 +146,7 @@ function NewBrandsSection() {
             <Link key={b.id} href={`/brands/${b.slug}`} className="group block rounded-cardlg overflow-hidden border border-neutral-border bg-white hover-lift">
               <GradientImage gradient={b.gradient} ratio="aspect-[4/5] md:aspect-[4/3]" asset={BRAND_ASSET[b.slug]} overlay label={`${b.name} 브랜드 이미지`} className="rounded-none">
                 <div className="absolute inset-0 p-3 flex flex-col justify-between">
-                  <div>{newer ? <Badge tone="dark" size="sm">NEW 입점</Badge> : <Badge tone="neutral" size="sm">입점 {daysBetween(b.joinedAt, now)}일차</Badge>}</div>
+                  <div>{newer ? <Badge tone="dark" size="sm">신규 입점</Badge> : <Badge tone="neutral" size="sm">입점 {daysBetween(b.joinedAt, now)}일차</Badge>}</div>
                   <p className="text-white font-black text-[1.15rem] md:text-[1.3rem] tracking-tight leading-none group-hover:underline underline-offset-4">{b.name}</p>
                 </div>
               </GradientImage>

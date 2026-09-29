@@ -97,7 +97,7 @@ export function SectionCard({ title, desc, right, children, tour, className, pad
 }
 
 /** KPI value wrapper for md KpiCards in `grid-cols-2 lg:grid-cols-4` rows: scales the number to the column width
- *  (360px 2-col → 1.25rem · 1024px 4-col with 280px sidebar → 1.35rem · 1280px → 1.7rem · ≥1536px → full size). */
+ *  (360px 2-col → 1.25rem · 1024px 4-col → 1.35rem · 1280px 4-col with 280px sidebar → 1.7rem · ≥1536px → full size). */
 export function Big({ children }: { children: ReactNode }) {
   return <span className="text-[1.25rem] sm:text-[length:inherit] lg:text-[1.35rem] xl:text-[1.7rem] 2xl:text-[length:inherit] break-keep">{children}</span>;
 }
@@ -135,9 +135,11 @@ export function MiniBar({ value, tone = "primary", className, showValue = true }
 export const demandTone = (score: number): "error" | "warning" | "primary" | "success" => (score >= 70 ? "error" : score >= 45 ? "warning" : score >= 25 ? "primary" : "success");
 
 export function EntityChip({ href, children, tone = "neutral" }: { href?: string; children: ReactNode; tone?: "neutral" | "accent" | "info" }) {
-  const cls = cn("inline-flex items-center gap-1 rounded-full px-2.5 h-10 md:h-7 text-[0.78rem] font-semibold border transition-colors duration-fast whitespace-nowrap max-w-full", tone === "accent" ? "bg-theme-soft border-transparent text-theme-primary hover:brightness-95" : tone === "info" ? "bg-[#e8f0fe] border-transparent text-[#1d4ed8]" : "bg-neutral-canvas border-neutral-border text-neutral-text hover:border-neutral-text2");
-  if (href) return <Link href={href} className={cn(cls, "press group")} onClick={(e) => e.stopPropagation()}>{children}<ChevronRight size={12} className="opacity-60 nudge-x" /></Link>;
-  return <span className={cls}>{children}</span>;
+  const cls = cn("inline-flex items-center gap-1 rounded-full px-2.5 h-10 md:h-7 text-[0.78rem] font-semibold border transition-colors duration-fast whitespace-nowrap max-w-full min-w-0", tone === "accent" ? "bg-theme-soft border-transparent text-theme-primary hover:brightness-95" : tone === "info" ? "bg-[#e8f0fe] border-transparent text-[#1d4ed8]" : "bg-neutral-canvas border-neutral-border text-neutral-text hover:border-neutral-text2");
+  const label = <span className="min-w-0 truncate">{children}</span>;
+  const title = typeof children === "string" ? children : undefined;
+  if (href) return <Link href={href} title={title} className={cn(cls, "press group")} onClick={(e) => e.stopPropagation()}>{label}<ChevronRight size={12} className="shrink-0 opacity-60 nudge-x" /></Link>;
+  return <span className={cls} title={title}>{label}</span>;
 }
 
 /** Related product / option / brand / segment chips for an Action. */
