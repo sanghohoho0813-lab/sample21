@@ -64,7 +64,7 @@ function RankingBody({ tab, period, basis }: { tab: Tab; period: Period; basis: 
         {list.map(({ agg, metric }, i) => (
           <div key={agg.product.id} className="min-w-0">
             <ProductCard product={agg.product} rank={i + 1} reason={`${b.label} ${num(metric)}${b.unit}`} />
-            <div className="mt-1.5 flex items-center justify-between gap-2 text-[0.75rem] text-neutral-text2">
+            <div className="mt-1.5 flex items-center justify-between gap-2 text-[0.78rem] text-neutral-text2">
               <span className="tabular">직전 7일 대비</span>
               <RankChange velocity={agg.velocity} />
             </div>
@@ -104,7 +104,7 @@ export default function RankingPage() {
           </div>
         </div>
         <p className="flex items-start gap-1.5 text-[0.85rem] text-neutral-text2"><Info size={15} className="mt-0.5 shrink-0" /><span><strong className="text-neutral-text">{b.label} 기준</strong> · {b.desc} 순위 변화(▲▼)는 직전 7일 대비 판매 변화로 계산합니다.</span></p>
-        <p className="text-[0.8rem] text-neutral-text2 inline-flex items-center gap-2"><Badge tone="demo" size="sm">DEMO</Badge>이 랭킹은 시연용 Demo 데이터로 계산된 값이며 실제 판매 실적이 아닙니다.</p>
+        <p className="text-[0.8rem] text-neutral-text2 inline-flex items-center gap-2"><Badge tone="demo" size="sm">데모</Badge>이 랭킹은 시연용 데모 데이터로 계산된 값이며 실제 판매 실적이 아닙니다.</p>
       </div>
 
       <div data-tour="c-ranking" className="mt-6 md:mt-8">

@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/cn";
 
 const GROUPS: { key: keyof typeof ASSET_PACK; title: string; desc: string }[] = [
-  { key: "customer", title: "Customer Front", desc: "히어로 · 에디토리얼 · 카테고리 · 브랜드 · 핏 · 주문" },
-  { key: "ax", title: "Business AX", desc: "커버 · MD 업무 · 재고 · 쇼룸 · Evidence · Why AX 3장" },
+  { key: "customer", title: "고객 플랫폼", desc: "히어로 · 에디토리얼 · 카테고리 · 브랜드 · 핏 · 주문" },
+  { key: "ax", title: "AX 운영화면", desc: "커버 · MD 업무 · 재고 · 쇼룸 · 증빙 · 기획의도 3장" },
 ];
 
 export function AssetRegistry() {
@@ -16,7 +16,7 @@ export function AssetRegistry() {
     <div className="space-y-4">
       <div className="rounded-2xl bg-neutral-canvas p-4 md:p-5">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge tone="ready">READY</Badge>
+          <Badge tone="ready">연결 준비</Badge>
           <span className="font-bold">사진은 추후 적용</span>
           <span className="ml-auto text-[0.85rem] text-neutral-text2 tabular">등록 {registered} / {total}</span>
         </div>

@@ -12,7 +12,7 @@ export function TechAssets() {
   return (
     <div className="space-y-4">
       <div className="rounded-2xl bg-neutral-canvas p-4 md:p-5">
-        <div className="flex items-center gap-2 flex-wrap"><Badge tone="neutral">해당없음</Badge><span className="font-bold">Demo 프로젝트</span></div>
+        <div className="flex items-center gap-2 flex-wrap"><Badge tone="neutral">해당없음</Badge><span className="font-bold">데모 프로젝트</span></div>
         <p className="mt-2 text-[0.92rem] leading-relaxed text-neutral-text2">
           MORFIT은 시연을 위해 만든 <span className="font-semibold text-neutral-text">가상 회사</span>입니다. 이 영역은 실제 출원·확인·인증이 <span className="font-semibold text-neutral-text">완료된 자산만</span> 표시한다는 원칙을 따르며, 확인되지 않은 항목을 있는 것처럼 적지 않습니다. 실제 기업에 적용할 때는 아래 구조에 검증된 자산만 채웁니다.
         </p>

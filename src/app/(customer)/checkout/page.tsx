@@ -58,13 +58,13 @@ function CheckoutForm() {
     if (!/^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(phone.trim())) err.phone = "휴대폰 번호 형식을 확인해주세요. (예: 010-1234-5678)";
     if (address.trim().length < 5) err.address = "배송지 주소를 입력해주세요.";
     if (request === "직접 입력" && !customRequest.trim()) err.request = "배송 요청사항을 입력해주세요.";
-    if (!agree) err.agree = "DEMO 주문 안내에 동의해주세요.";
+    if (!agree) err.agree = "데모 주문 안내에 동의해주세요.";
     setErrors(err);
     if (Object.keys(err).length) { toast("입력 내용을 확인해주세요", Object.values(err)[0], "warning"); return; }
     setSubmitting(true);
     const memo = request === "직접 입력" ? customRequest.trim() : request;
     const order = store.placeOrder({ address: `${address.trim()}${detail.trim() ? ` ${detail.trim()}` : ""}`, memo: `${memo} · 주문자 ${name.trim()} ${phone.trim()}${cp.code ? ` · 쿠폰 ${cp.code}` : ""}`, couponRate: cp.rate, payment });
-    toast("DEMO 주문이 완료되었습니다", `주문번호 ${order.id} · Business AX에 즉시 반영`);
+    toast("데모 주문이 완료되었습니다", `주문번호 ${order.id} · AX 운영화면에 즉시 반영`);
     router.push(`/checkout/complete/${order.id}`);
   };
 
@@ -91,14 +91,14 @@ function CheckoutForm() {
         </section>
 
         <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
-          <h2 className="font-bold text-[1.05rem] flex items-center gap-2 mb-1"><CreditCard size={18} />결제수단 <Badge tone="ready" size="sm">Preview</Badge><DemoBadge /></h2>
+          <h2 className="font-bold text-[1.05rem] flex items-center gap-2 mb-1"><CreditCard size={18} />결제수단 <Badge tone="ready" size="sm">미리보기</Badge><DemoBadge /></h2>
           <p className="text-[0.85rem] text-neutral-text2 mb-4">PG 연동 전 단계입니다. 선택만 기록되고 실제 결제는 일어나지 않습니다.</p>
           <div className="grid sm:grid-cols-3 gap-3" role="radiogroup" aria-label="결제수단">
             {PAYMENTS.map((p) => { const Icon = p.icon; const on = payment === p.key; return (
               <label key={p.key} className={cn("cursor-pointer rounded-2xl border p-4 flex flex-col gap-1 transition-all duration-fast hover:border-neutral-text2 active:scale-[0.99]", on ? "border-brand-black bg-brand-black text-white" : "border-neutral-border bg-white")}>
                 <input type="radio" name="payment" value={p.key} checked={on} onChange={() => setPayment(p.key)} className="sr-only" />
                 <span className="flex items-center gap-2 font-bold"><Icon size={18} />{p.label}</span>
-                <span className={cn("text-[0.78rem]", on ? "text-white/70" : "text-neutral-text2")}>{p.desc} · DEMO</span>
+                <span className={cn("text-[0.78rem]", on ? "text-white/70" : "text-neutral-text2")}>{p.desc} · 데모</span>
               </label>
             ); })}
           </div>
@@ -116,10 +116,10 @@ function CheckoutForm() {
         {cp.code && <p className="text-[0.82rem] text-brand-accent font-semibold">{cp.code} 쿠폰 적용 · {cp.rate}% 할인 ({krw(cDisc)})</p>}
         <label className={cn("flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-colors", errors.agree ? "border-semantic-error" : "border-neutral-border hover:bg-brand-ivory")}>
           <input type="checkbox" name="agree" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 accent-[#111111]" />
-          <span className="text-[0.88rem] leading-relaxed"><span className="font-bold">DEMO 주문 안내에 동의합니다.</span><br /><span className="text-neutral-text2">실제 결제·배송이 이루어지지 않는 시연용 주문이며, 주문 데이터는 Business AX 화면에 반영됩니다.</span></span>
+          <span className="text-[0.88rem] leading-relaxed"><span className="font-bold">데모 주문 안내에 동의합니다.</span><br /><span className="text-neutral-text2">실제 결제·배송이 이루어지지 않는 시연용 주문이며, 주문 데이터는 AX 운영화면에 반영됩니다.</span></span>
         </label>
         {errors.agree && <p className="text-[0.82rem] text-semantic-error -mt-2">{errors.agree}</p>}
-        <Button type="submit" variant="brand" size="lg" full loading={submitting} icon={<ShieldCheck size={18} />}>DEMO 주문 완료</Button>
+        <Button type="submit" variant="brand" size="lg" full loading={submitting} icon={<ShieldCheck size={18} />}>데모 주문 완료</Button>
         <p className="text-[0.78rem] text-neutral-text2 leading-relaxed">주문 즉시 재고가 차감되고 운영팀 주문 목록에 나타납니다. 결제 대기 상태로 시작되며 운영직원이 상태를 변경합니다.</p>
       </aside>
     </form>
@@ -127,11 +127,11 @@ function CheckoutForm() {
 }
 
 export default function CheckoutPage() {
-  useDocumentTitle("주문서 (DEMO)");
+  useDocumentTitle("주문서 (데모)");
   return (
     <Container className="py-6 md:py-10">
-      <div className="rounded-cardlg bg-brand-black text-white px-5 py-4 mb-6 flex items-start gap-3"><DemoBadge label="DEMO CHECKOUT" /><p className="text-[0.9rem] leading-relaxed">DEMO CHECKOUT — 실제 결제는 연결되지 않으며, 주문 흐름을 보여주는 시연입니다.</p></div>
-      <PageTitle title="주문서" desc="주문자·배송지·결제수단을 확인하고 DEMO 주문을 완료하세요." />
+      <div className="rounded-cardlg bg-brand-black text-white px-5 py-4 mb-6 flex items-start gap-3"><DemoBadge label="데모 주문서" /><p className="text-[0.9rem] leading-relaxed">데모 주문서 — 실제 결제는 연결되지 않으며, 주문 흐름을 보여주는 시연입니다.</p></div>
+      <PageTitle title="주문서" desc="주문자·배송지·결제수단을 확인하고 데모 주문을 완료하세요." />
       <Suspense fallback={<SkeletonCard lines={6} />}>
         <Hydrated fallback={<div className="grid lg:grid-cols-[minmax(0,1fr)_380px] gap-6"><div className="space-y-5"><SkeletonCard lines={3} /><SkeletonCard lines={4} /><SkeletonCard lines={3} /></div><SkeletonCard lines={6} /></div>}><CheckoutForm /></Hydrated>
       </Suspense>

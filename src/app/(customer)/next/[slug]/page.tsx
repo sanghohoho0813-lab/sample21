@@ -64,7 +64,7 @@ export default function NextPreviewPage() {
 
         <div className="mt-6 rounded-2xl border border-semantic-warning/40 bg-[#fff7ed] px-4 py-3.5 flex items-start gap-3" role="note">
           <AlertTriangle size={18} className="mt-0.5 shrink-0 text-semantic-warning" />
-          <p className="text-[0.9rem] leading-relaxed"><strong>현재 구현되지 않은 기능입니다. 계약 범위와 혼동하지 마세요.</strong> 이 화면은 확장 방향을 설명하는 Preview이며, 버튼·데이터·화면 흐름은 아직 존재하지 않습니다.</p>
+          <p className="text-[0.9rem] leading-relaxed"><strong>현재 구현되지 않은 기능입니다. 계약 범위와 혼동하지 마세요.</strong> 이 화면은 확장 방향을 설명하는 미리보기이며, 버튼·데이터·화면 흐름은 아직 존재하지 않습니다.</p>
         </div>
 
         <div className="mt-8 grid md:grid-cols-12 gap-6">
@@ -78,14 +78,14 @@ export default function NextPreviewPage() {
               <ul className="space-y-2">
                 {content.capabilities.map((c) => (
                   <li key={c} className="flex items-start gap-2.5 rounded-xl border border-neutral-border bg-white px-3.5 py-3">
-                    <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-neutral-text2" /><span className="font-semibold text-[0.95rem]">{c}</span><Badge tone="next" size="sm" className="ml-auto shrink-0">NEXT</Badge>
+                    <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-neutral-text2" /><span className="font-semibold text-[0.95rem]">{c}</span><Badge tone="next" size="sm" className="ml-auto shrink-0">예정</Badge>
                   </li>
                 ))}
               </ul>
             </section>
             <section>
               <h2 className="text-[1.1rem] font-bold mb-2">지금 사용할 수 있는 것</h2>
-              <p className="text-[0.9rem] text-neutral-text2 leading-relaxed">현재 Demo에서는 탐색(홈·랭킹·브랜드·검색), 핏 프로필 추천, 찜·재입고 알림, DEMO 주문까지 실제로 동작합니다. 위 확장 기능은 이 데이터 기반 위에 순차적으로 추가될 예정입니다.</p>
+              <p className="text-[0.9rem] text-neutral-text2 leading-relaxed">현재 데모에서는 탐색(홈·랭킹·브랜드·검색), 핏 프로필 추천, 찜·재입고 알림, 데모 주문까지 실제로 동작합니다. 위 확장 기능은 이 데이터 기반 위에 순차적으로 추가될 예정입니다.</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button variant="brand" href="/">홈으로</Button>
                 <Button variant="outline" href="/ranking">랭킹 보기</Button>
@@ -95,7 +95,7 @@ export default function NextPreviewPage() {
           <div className="md:col-span-5">
             <GradientImage gradient={content.gradient} ratio="aspect-[4/3]" overlay label={`${menu.label} 미리보기 이미지`} className="rounded-cardlg">
               <div className="absolute inset-0 p-5 flex flex-col justify-end text-white">
-                <p className="text-[0.68rem] font-bold tracking-[0.18em] text-white/70">PREVIEW ONLY</p>
+                <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/70">PREVIEW ONLY</p>
                 <p className="mt-1 font-black text-[1.3rem] leading-tight">{menu.label}</p>
                 <p className="mt-1 text-[0.82rem] text-white/80">화면·데이터 없음 · 설명용</p>
               </div>

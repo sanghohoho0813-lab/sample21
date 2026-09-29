@@ -62,7 +62,7 @@ export function Tutorial({ steps, open, onClose, storageFlag }: { steps: TourSte
       {!rect && <div className="absolute inset-0 bg-[#0b1830]/62" onClick={() => finish(false)} aria-hidden />}
       {rect && <div className="absolute inset-0" onClick={() => finish(false)} aria-hidden />}
       <div className={cn("absolute z-[90] rounded-cardlg bg-white shadow-lift p-5 animate-scaleIn")} style={{ top, left, width: popW }}>
-        <p className="text-[0.75rem] font-bold tracking-wide text-theme-primary">STEP {i + 1} / {steps.length}</p>
+        <p className="text-[0.78rem] font-bold tracking-wide text-theme-primary">STEP {i + 1} / {steps.length}</p>
         <h4 className="mt-1 text-[1.1rem] font-bold">{step.title}</h4>
         <p className="mt-1.5 text-[0.9rem] text-neutral-text2 leading-relaxed">{step.body}</p>
         <div className="mt-4 flex items-center justify-between gap-2">
@@ -80,9 +80,9 @@ export function Tutorial({ steps, open, onClose, storageFlag }: { steps: TourSte
 
 export const AX_TOUR: TourStep[] = [
   { route: "/ax", target: "kpi-row", title: "경영 대시보드", body: "매출·마진·품절위험·재구매를 한눈에 봅니다. KPI를 누르면 상세로 이어집니다." },
-  { route: "/ax", target: "ai-briefing", title: "AI 브리핑 (AI Ready)", body: "지금은 규칙 기반으로 우선순위를 요약합니다. LLM을 연결하면 자연어 설명이 붙습니다." },
-  { route: "/ax/actions", target: "action-list", title: "Growth & Action Center", body: "고객 행동에서 만들어진 추천을 확인·승인·실행합니다. 완료되면 고객 화면에도 반영됩니다." },
-  { route: "/ax/inventory", target: "demand-radar", title: "Demand Radar", body: "조회·찜·장바구니·재입고 신청을 옵션 단위 수요신호로 봅니다. 여기서 재입고 Action이 시작됩니다." },
+  { route: "/ax", target: "ai-briefing", title: "AI 브리핑 (AI 준비)", body: "지금은 규칙 기반으로 우선순위를 요약합니다. LLM을 연결하면 자연어 설명이 붙습니다." },
+  { route: "/ax/actions", target: "action-list", title: "실행 센터", body: "고객 행동에서 만들어진 추천을 확인·승인·실행합니다. 완료되면 고객 화면에도 반영됩니다." },
+  { route: "/ax/inventory", target: "demand-radar", title: "수요 레이더", body: "조회·찜·장바구니·재입고 신청을 옵션 단위 수요신호로 봅니다. 여기서 재입고 과제가 시작됩니다." },
   { route: "/ax/settings", target: "settings-theme", title: "설정", body: "9개 테마, 글자 크기, 역할 전환, 데모 초기화가 실제로 동작합니다." },
 ];
 

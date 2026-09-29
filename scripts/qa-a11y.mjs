@@ -27,7 +27,7 @@ for (const width of (process.env.QA_WIDTHS ?? "1280,390").split(",").map(Number)
   for (const route of ROUTES) {
     await page.goto(BASE + route, { waitUntil: "networkidle", timeout: 60000 }).catch(() => {});
     await page.waitForTimeout(1200); await dismissTour(page); await page.waitForTimeout(200); await dismissTour(page);
-    const items = await page.evaluate((mobile) => {
+    const items = await page.evaluate(() => {
       const txt = (el) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
       const accName = (el) => {
         const lb = el.getAttribute("aria-labelledby"); if (lb) { const t = lb.split(/\s+/).map((id) => txt(document.getElementById(id))).join(" ").trim(); if (t) return t; }
@@ -52,7 +52,7 @@ for (const width of (process.env.QA_WIDTHS ?? "1280,390").split(",").map(Number)
         idx++;
       }
       return out;
-    }, mobile);
+    });
     report.scanned.elements += items.length; report.scanned.routes += 1;
     for (const it of items) {
       if (it.hidden) continue;

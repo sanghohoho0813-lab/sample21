@@ -31,8 +31,8 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
       <ProductImage colors={product.colors} variant={colorIdx} label={`${product.name} · ${product.colors[colorIdx]} · ${cur.label}`} ratio="aspect-[3/4]" className="rounded-2xl md:rounded-cardlg">
         {slot === 1 && <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }} />}
         {slot === 2 && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }} />}
-        <div className="absolute right-3 top-3 flex items-center gap-1.5"><span className="rounded-full bg-white/85 px-2.5 py-1 text-[0.72rem] font-bold text-brand-black">{cur.label}</span></div>
-        <div className="absolute left-3 top-3"><span className="rounded-full bg-brand-black/70 px-2.5 py-1 text-[0.72rem] font-semibold text-white">사진 준비중 · 컬러 프리뷰</span></div>
+        <div className="absolute right-3 top-3 flex items-center gap-1.5"><span className="rounded-full bg-white/85 px-2.5 py-1 text-[0.78rem] font-bold text-brand-black">{cur.label}</span></div>
+        <div className="absolute left-3 top-3"><span className="rounded-full bg-brand-black/70 px-2.5 py-1 text-[0.78rem] font-semibold text-white">사진 준비중 · 컬러 프리뷰</span></div>
       </ProductImage>
       <div className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
         {SLOTS.map((s, i) => (
@@ -41,14 +41,14 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
               {i === 1 && <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }} />}
               {i === 2 && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }} />}
             </ProductImage>
-            <span className="absolute inset-x-0 bottom-0 bg-white/85 text-[0.68rem] font-bold text-center py-0.5 text-brand-black">{s.label}</span>
+            <span className="absolute inset-x-0 bottom-0 bg-white/85 text-[0.78rem] font-bold text-center py-0.5 text-brand-black">{s.label}</span>
           </button>
         ))}
         <span className="w-px bg-neutral-border shrink-0 my-2" aria-hidden />
         {product.colors.map((c, i) => (
           <button key={c} type="button" onClick={() => onColor(i)} aria-label={`색상 ${c} 이미지`} aria-pressed={colorIdx === i} className={cn("relative w-[72px] shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-fast active:scale-95", colorIdx === i ? "border-brand-black" : "border-transparent hover:border-neutral-border")}>
             <ProductImage colors={product.colors} variant={i} label={c} ratio="aspect-[3/4]" className="rounded-lg" />
-            <span className="absolute inset-x-0 bottom-0 bg-white/85 text-[0.68rem] font-bold text-center py-0.5 text-brand-black">{c}</span>
+            <span className="absolute inset-x-0 bottom-0 bg-white/85 text-[0.78rem] font-bold text-center py-0.5 text-brand-black">{c}</span>
           </button>
         ))}
       </div>
@@ -63,7 +63,7 @@ function SizeGuide({ product, selectedSize, recommended }: { product: Product; s
   const unit = product.categoryId === "shoes" ? "cm (발길이 기준)" : "cm";
   return (
     <div className="rounded-cardlg border border-neutral-border bg-white overflow-hidden">
-      <div className="px-5 pt-5 pb-3 flex flex-wrap items-center justify-between gap-2"><p className="font-bold text-[1.05rem]">사이즈 가이드 <span className="text-[0.82rem] font-normal text-neutral-text2">단위 {unit} · 측정 방법에 따라 1~2cm 차이</span></p><div className="flex gap-1.5 text-[0.75rem]"><span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-brand-black" />선택</span><span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-brand-accent" />추천</span></div></div>
+      <div className="px-5 pt-5 pb-3 flex flex-wrap items-center justify-between gap-2"><p className="font-bold text-[1.05rem]">사이즈 가이드 <span className="text-[0.82rem] font-normal text-neutral-text2">단위 {unit} · 측정 방법에 따라 1~2cm 차이</span></p><div className="flex gap-1.5 text-[0.78rem]"><span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-brand-black" />선택</span><span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-brand-accent" />추천</span></div></div>
       <div className="overflow-x-auto">
         <table className="w-full text-[0.9rem] min-w-[420px]">
           <thead><tr className="bg-brand-ivory text-neutral-text2"><th className="px-4 py-2.5 text-left font-semibold whitespace-nowrap">사이즈</th>{keys.map((k) => <th key={k} className="px-4 py-2.5 text-right font-semibold whitespace-nowrap">{k}</th>)}</tr></thead>
@@ -72,7 +72,7 @@ function SizeGuide({ product, selectedSize, recommended }: { product: Product; s
               const sel = s === selectedSize, rec = s === recommended;
               return (
                 <tr key={s} className={cn("border-t border-neutral-border", sel && "bg-brand-black text-white", !sel && rec && "bg-brand-accent/10")}>
-                  <td className="px-4 py-2.5 font-bold whitespace-nowrap">{s}{rec && <span className={cn("ml-1.5 text-[0.7rem] font-bold rounded px-1 py-0.5 align-middle", sel ? "bg-white/20 text-white" : "bg-brand-accent text-white")}>추천</span>}</td>
+                  <td className="px-4 py-2.5 font-bold whitespace-nowrap">{s}{rec && <span className={cn("ml-1.5 text-[0.78rem] font-bold rounded px-1 py-0.5 align-middle", sel ? "bg-white/20 text-white" : "bg-brand-accent text-white")}>추천</span>}</td>
                   {keys.map((k) => <td key={k} className="px-4 py-2.5 text-right tabular">{product.measurements[s]?.[k] ?? "-"}</td>)}
                 </tr>
               );
@@ -96,8 +96,8 @@ function Reviews({ product }: { product: Product }) {
   return (
     <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
-        <div><p className="font-bold text-[1.05rem] flex items-center gap-2">리뷰 <DemoBadge label="DEMO 리뷰" /></p><p className="text-[0.85rem] text-neutral-text2 mt-0.5">실제 고객 리뷰가 아닌 시연용 예시입니다.</p></div>
-        <div className="flex items-center gap-2"><span className="text-[2rem] font-black leading-none tabular">{product.rating}</span><div><StarRow n={Math.round(product.rating)} /><p className="text-[0.78rem] text-neutral-text2 tabular">리뷰 {product.reviewCount}개 (Demo)</p></div></div>
+        <div><p className="font-bold text-[1.05rem] flex items-center gap-2">리뷰 <DemoBadge label="데모 리뷰" /></p><p className="text-[0.85rem] text-neutral-text2 mt-0.5">실제 고객 리뷰가 아닌 시연용 예시입니다.</p></div>
+        <div className="flex items-center gap-2"><span className="text-[2rem] font-black leading-none tabular">{product.rating}</span><div><StarRow n={Math.round(product.rating)} /><p className="text-[0.78rem] text-neutral-text2 tabular">리뷰 {product.reviewCount}개 (데모)</p></div></div>
       </div>
       {(product.categoryId !== "bag" && product.categoryId !== "acc") && (
         <div className="grid grid-cols-3 gap-3 mb-5">
@@ -181,7 +181,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const restock = () => {
     if (!variant) return;
     store.subscribeRestock(variant.id);
-    toast("재입고 알림을 신청했습니다", "Business AX 수요신호에 반영");
+    toast("재입고 알림을 신청했습니다", "AX 운영화면 수요신호에 반영");
   };
   const wish = () => {
     const on = store.toggleWishlist(product.id, variant?.id ?? null);
@@ -213,7 +213,7 @@ export function ProductDetail({ product }: { product: Product }) {
               <h1 className="text-[1.5rem] md:text-[1.8rem] font-bold tracking-tight leading-tight">{product.name}</h1>
               <p className="text-neutral-text2 mt-1">{product.subtitle}</p>
               <div className="mt-3 flex items-center gap-3 text-[0.85rem] text-neutral-text2"><span className="inline-flex items-center gap-1"><Star size={14} className="text-brand-black" fill="currentColor" /><span className="font-semibold text-neutral-text tabular">{product.rating}</span> · 리뷰 {product.reviewCount}</span><span className="inline-flex items-center gap-1"><Heart size={14} /> 찜 {agg.wishlist7d} (7일)</span></div>
-              <div className="mt-4"><Price price={price} original={product.price} size="lg" />{store.salePriceOverride[product.id] && <p className="mt-1 text-[0.82rem] text-brand-accent font-semibold">MD 할인 적용 · 가격이 방금 조정되었습니다 (DEMO)</p>}</div>
+              <div className="mt-4"><Price price={price} original={product.price} size="lg" />{store.salePriceOverride[product.id] && <p className="mt-1 text-[0.82rem] text-brand-accent font-semibold">MD 할인 적용 · 가격이 방금 조정되었습니다 (데모)</p>}</div>
               <div className="mt-3 flex items-start gap-2 rounded-xl bg-brand-ivory px-4 py-3 text-[0.9rem]"><Truck size={18} className="mt-0.5 shrink-0" /><div><p className="font-bold">{etaLabel(free)}</p><p className="text-neutral-text2 text-[0.82rem]">{free ? "무료배송 · 오늘 자정 전 주문 시" : `배송비 3,000원 · ${FREE_SHIP_MIN.toLocaleString("ko-KR")}원 이상 구매 시 무료`}</p></div></div>
             </div>
 
@@ -244,7 +244,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   </div>
                 </div>
               )}
-              {soldoutSelected && <p className="mt-3 text-[0.82rem] text-neutral-text2 leading-relaxed">품절 옵션의 재입고 알림 신청은 Business AX의 <span className="font-semibold text-neutral-text">Demand Radar</span> 수요신호가 되어 MD의 재입고 판단에 바로 반영됩니다. 입고되면 알림으로 알려드립니다.</p>}
+              {soldoutSelected && <p className="mt-3 text-[0.82rem] text-neutral-text2 leading-relaxed">품절 옵션의 재입고 알림 신청은 AX 운영화면의 <span className="font-semibold text-neutral-text">수요 레이더</span> 수요신호가 되어 MD의 재입고 판단에 바로 반영됩니다. 입고되면 알림으로 알려드립니다.</p>}
             </div>
 
             <FitSignal product={product} selectedSize={size} onPickSize={pickSize} />
@@ -261,7 +261,7 @@ export function ProductDetail({ product }: { product: Product }) {
               <p className="font-bold flex items-center gap-2"><Shirt size={16} />핏 정보</p>
               <div className="mt-3 flex flex-wrap gap-2"><Badge tone="dark">{FIT_LABEL[product.fit]}</Badge><Badge tone={product.sizing === "true" ? "success" : "warning"}>{SIZING_LABEL[product.sizing]}</Badge></div>
               <p className="text-[0.85rem] text-neutral-text2 mt-2">{FIT_DESC[product.fit]}</p>
-              <div className="mt-3 grid grid-cols-3 text-[0.72rem] text-neutral-text2 text-center"><span>작음</span><span>정사이즈</span><span>큼</span></div>
+              <div className="mt-3 grid grid-cols-3 text-[0.78rem] text-neutral-text2 text-center"><span>작음</span><span>정사이즈</span><span>큼</span></div>
               <div className="relative h-2 rounded-full bg-brand-ivory mt-1"><span className={cn("absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-brand-black border-2 border-white shadow-card", product.sizing === "small" ? "left-[12%]" : product.sizing === "large" ? "left-[82%]" : "left-[47%]")} /></div>
               <p className="text-[0.88rem] mt-3 leading-relaxed">{fitNote}</p>
             </div>

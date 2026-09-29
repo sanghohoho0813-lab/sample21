@@ -41,10 +41,10 @@ const SEGMENT_META: Record<SegmentId, { meaning: string; icon: ReactNode; accent
 
 function segmentCta(seg: SegmentId, role: Role): { label: string; href?: string; next?: boolean } | null {
   switch (seg) {
-    case "cycle-due": return { label: "재구매 캠페인 Action 보기", href: "/ax/actions?open=act-005" };
-    case "wish-no-buy": return { label: "리마인드 Action 보기", href: "/ax/actions?open=act-006" };
+    case "cycle-due": return { label: "재구매 캠페인 과제 보기", href: "/ax/actions?open=act-005" };
+    case "wish-no-buy": return { label: "리마인드 과제 보기", href: "/ax/actions?open=act-006" };
     case "restock-waiting": return { label: "재입고 현황 보기", href: "/ax/inventory" };
-    case "post-return-drop": return { label: "케어 Action 보기", href: "/ax/actions?open=act-011" };
+    case "post-return-drop": return { label: "케어 과제 보기", href: "/ax/actions?open=act-011" };
     case "vip": return { label: "VIP 감사 메시지", next: true };
     case "first-purchase": return can(role, "campaign-create") ? { label: "첫 구매 캠페인 보기", href: "/ax/campaigns" } : null;
     case "brand-loyal": return can(role, "brand-margin") ? { label: "브랜드 현황 보기", href: "/ax/brands" } : null;
@@ -74,7 +74,7 @@ function churnRisk(c: Row): { level: "high" | "mid" | "low"; note: string } {
 
 function suggestionsFor(c: Row, role: Role): { title: string; reason: string; href?: string; next?: boolean }[] {
   const out: { title: string; reason: string; href?: string; next?: boolean }[] = [];
-  if (c.restockWaiting > 0) out.push({ title: "재입고 알림 우선 발송", reason: `재입고 대기 ${c.restockWaiting}건 — 입고 완료 시 자동 알림(Loop 1)`, href: "/ax/inventory" });
+  if (c.restockWaiting > 0) out.push({ title: "재입고 알림 우선 발송", reason: `재입고 대기 ${c.restockWaiting}건 — 입고 완료 시 자동 알림(순환 1)`, href: "/ax/inventory" });
   if (c.segment === "cycle-due" || (c.avgCycleDays && c.daysSince !== null && c.daysSince >= c.avgCycleDays)) out.push({ title: "재구매 추천 메시지", reason: `평균 주기 ${c.avgCycleDays ?? "-"}일 · 경과 ${c.daysSince ?? "-"}일 — 지금이 재구매 타이밍`, href: "/ax/actions?open=act-005" });
   if (c.wishlistCount >= 3 && c.orderCount === 0) out.push({ title: "찜 상품 리마인드", reason: `찜 ${c.wishlistCount}개, 구매 없음 — 찜 상품 소폭 할인 안내`, href: "/ax/actions?open=act-006" });
   else if (c.cartCount > 0) out.push({ title: "장바구니 리마인드", reason: `장바구니 ${c.cartCount}개 보관 중 — 재고 소진 전 안내`, href: "/ax/actions?open=act-006" });
@@ -169,7 +169,7 @@ function CustomersBody() {
     <div className="animate-fadeIn">
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-4 stagger">
-        <KpiCard label="전체 고객" value={num(kpi.total)} icon={<Users size={18} />} accent={ICON_ACCENTS.customer} sub="가상 고객 (DEMO)" />
+        <KpiCard label="전체 고객" value={num(kpi.total)} icon={<Users size={18} />} accent={ICON_ACCENTS.customer} sub="가상 고객 (데모)" />
         <KpiCard label="구매 고객" value={num(kpi.buyers)} icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} sub="90일 내 1회 이상 주문" />
         <KpiCard label="신규 30일" value={num(kpi.newCust30)} icon={<UserPlus size={18} />} accent={ICON_ACCENTS.overview} sub="최근 30일 가입" />
         <KpiCard label="사이즈 프로필 완성률" value={pct(kpi.profileRate, 0)} icon={<Ruler size={18} />} accent={ICON_TONE.t7} sub="핏 프로필 입력 고객 비율" />
@@ -181,8 +181,8 @@ function CustomersBody() {
         <div className="flex items-start gap-3 min-w-0">
           <span className="h-12 w-12 shrink-0 rounded-2xl bg-theme-soft text-theme-primary flex items-center justify-center font-black text-[1.1rem]">{DEMO_CUSTOMER_NAME[0]}</span>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap"><p className="font-bold text-[1.05rem]">현재 시연 고객 · {DEMO_CUSTOMER_NAME}</p><Badge tone="primary" size="sm">LIVE 상태</Badge><Badge tone="accent" size="sm">{SEGMENT_LABEL[me.segment]}</Badge></div>
-            <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">고객 화면에서 찜·장바구니·재입고 신청·주문을 하면 아래 숫자가 바로 바뀝니다 (Closed Loop). 개인정보 없음 · 가상 고객.</p>
+            <div className="flex items-center gap-2 flex-wrap"><p className="font-bold text-[1.05rem]">현재 시연 고객 · {DEMO_CUSTOMER_NAME}</p><Badge tone="primary" size="sm">연결됨 상태</Badge><Badge tone="accent" size="sm">{SEGMENT_LABEL[me.segment]}</Badge></div>
+            <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">고객 화면에서 찜·장바구니·재입고 신청·주문을 하면 아래 숫자가 바로 바뀝니다 (데이터 순환). 개인정보 없음 · 가상 고객.</p>
           </div>
         </div>
         <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -190,7 +190,7 @@ function CustomersBody() {
             <Stat label="찜" value={<span className="inline-flex items-center gap-1"><Heart size={16} className="text-neutral-text2" />{me.wishlistCount}</span>} />
             <Stat label="장바구니" value={<span className="inline-flex items-center gap-1"><ShoppingCart size={16} className="text-neutral-text2" />{me.cartCount}</span>} />
             <Stat label="재입고 대기" value={<span className="inline-flex items-center gap-1"><BellRing size={16} className="text-neutral-text2" />{me.restockWaiting}</span>} />
-            <Stat label="주문" value={<span className="inline-flex items-center gap-1"><PackageCheck size={16} className="text-neutral-text2" />{me.orderCount}</span>} sub={`DEMO 주문 ${store.orders.length}건`} />
+            <Stat label="주문" value={<span className="inline-flex items-center gap-1"><PackageCheck size={16} className="text-neutral-text2" />{me.orderCount}</span>} sub={`데모 주문 ${store.orders.length}건`} />
             <Stat label="반품" value={<span className="inline-flex items-center gap-1"><Undo2 size={16} className="text-neutral-text2" />{me.returnCount}</span>} />
           </div>
           <Button variant="outline" onClick={() => setOpenId(DEMO_CUSTOMER_ID)} icon={<ChevronRight size={16} />} className="sm:shrink-0">상세 보기</Button>
@@ -198,7 +198,7 @@ function CustomersBody() {
       </Card>
 
       {/* Segments */}
-      <SectionBlock title="세그먼트 7" desc="규칙으로 나눈 고객 그룹입니다. 각 그룹마다 지금 할 수 있는 행동이 다릅니다 (Engine 4 · Repeat · RULE+STAT).">
+      <SectionBlock title="세그먼트 7" desc="규칙으로 나눈 고객 그룹입니다. 각 그룹마다 지금 할 수 있는 행동이 다릅니다 (엔진 4 · 재구매 · 규칙+통계).">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {SEGMENTS.map((s) => {
             const meta = SEGMENT_META[s];
@@ -215,7 +215,7 @@ function CustomersBody() {
                 <p className="text-[0.88rem] text-neutral-text2 leading-relaxed flex-1">{meta.meaning}</p>
                 <div className="flex flex-wrap gap-2">
                   {cta && (cta.next ? (
-                    <Button size="sm" variant="secondary" onClick={() => setNextOpen(true)} className="!whitespace-normal !h-auto min-h-[36px] py-1.5 max-w-full">{cta.label}<Badge tone="next" size="sm">NEXT</Badge></Button>
+                    <Button size="sm" variant="secondary" onClick={() => setNextOpen(true)} className="!whitespace-normal !h-auto min-h-[36px] py-1.5 max-w-full">{cta.label}<Badge tone="next" size="sm">예정</Badge></Button>
                   ) : (
                     <Button size="sm" variant="primary" href={cta.href} className="!whitespace-normal !h-auto min-h-[36px] py-1.5 max-w-full text-center">{cta.label}</Button>
                   ))}
@@ -228,19 +228,19 @@ function CustomersBody() {
       </SectionBlock>
 
       {/* Scenario D */}
-      <SectionBlock title={<span className="inline-flex items-center gap-2"><Zap size={20} className="text-theme-primary" />Scenario D · AERNO 구매주기 도래 {num(scenarioD.length)}명</span>}
-        desc="AERNO를 2회 이상 구매한 고객 중 평균 구매주기(45일)가 돌아온 고객입니다. 이 세그먼트가 act-005 재구매 캠페인 Action의 근거가 되고, Action 실행 시 캠페인 cp-06이 진행 상태로 바뀌며 고객 My Page에 추천이 나타납니다 (Loop 4)." tour="segment-d"
-        right={<Button href="/ax/actions?open=act-005" icon={<ChevronRight size={16} />}>재구매 캠페인 Action 보기</Button>}>
+      <SectionBlock title={<span className="inline-flex items-center gap-2"><Zap size={20} className="text-theme-primary" />시나리오 D · AERNO 구매주기 도래 {num(scenarioD.length)}명</span>}
+        desc="AERNO를 2회 이상 구매한 고객 중 평균 구매주기(45일)가 돌아온 고객입니다. 이 세그먼트가 act-005 재구매 캠페인 과제의 근거가 되고, 과제 실행 시 캠페인 cp-06이 진행 상태로 바뀌며 고객 마이페이지에 추천이 나타납니다 (순환 4)." tour="segment-d"
+        right={<Button href="/ax/actions?open=act-005" icon={<ChevronRight size={16} />}>재구매 캠페인 과제 보기</Button>}>
         <Card pad="md">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             <Stat label="대상 고객" value={`${num(scenarioD.length)}명`} sub="주기 40~52일 경과" />
             <Stat label="평균 구매주기" value="45일" sub="AERNO 2회 이상 구매" />
-            <Stat label="과거 재구매 전환율" value="18%" sub="Demo 집계 (SIMULATION)" />
-            <Stat label="예상 재구매" value="7~9건" sub="객단가 12만원 기준 · VALIDATE LATER" />
+            <Stat label="과거 재구매 전환율" value="18%" sub="데모 집계 (시뮬레이션)" />
+            <Stat label="예상 재구매" value="7~9건" sub="객단가 12만원 기준 · 실증 후 확인" />
           </div>
           <p className="text-[0.85rem] text-neutral-text2 mb-3">샘플 6명 (전체 {num(scenarioD.length)}명 중) · 이름은 가상 데이터입니다.</p>
           <DataTable rows={scenarioD.slice(0, 6)} columns={dColumns} rowKey={(r) => r.id} onRowClick={(r) => setOpenId(r.id)} dense />
-          <NoteCard className="mt-4">캠페인 발송 여부는 MD가 승인합니다 (L2 · 시스템은 추천만). 발송 후 실제 재구매율은 실증 단계에서 Baseline과 비교합니다 — 지금 숫자는 시뮬레이션입니다.</NoteCard>
+          <NoteCard className="mt-4">캠페인 발송 여부는 MD가 승인합니다 (L2 · 시스템은 추천만). 발송 후 실제 재구매율은 실증 단계에서 기준값과 비교합니다 — 지금 숫자는 시뮬레이션입니다.</NoteCard>
         </Card>
       </SectionBlock>
 
@@ -269,16 +269,16 @@ function CustomersBody() {
       </SectionBlock>
 
       {/* Detail drawer */}
-      <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `${displayName(open.name, role)} 고객` : ""} width="max-w-lg">
+      <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `${displayName(open.name, role)} 고객` : ""} width="w-full max-w-lg">
         {open && <CustomerDetail c={open} role={role} orders={orders.filter((o) => o.customerId === open.id)} onNext={() => setNextOpen(true)} />}
       </Drawer>
 
-      <Modal open={nextOpen} onClose={() => setNextOpen(false)} title="VIP 감사 메시지 · NEXT" size="sm">
+      <Modal open={nextOpen} onClose={() => setNextOpen(false)} title="VIP 감사 메시지 · 예정" size="sm">
         <div className="space-y-3 text-[0.92rem] leading-relaxed">
-          <div className="flex items-center gap-2"><Badge tone="next">NEXT</Badge><span className="font-bold">아직 구현되지 않은 기능입니다</span></div>
-          <p className="text-neutral-text2">VIP 고객에게 감사 메시지·선공개 혜택을 보내는 기능은 멤버십(NEXT 5) 단계에서 알림톡·이메일 연동과 함께 제공될 예정입니다. 지금은 세그먼트 규칙과 대상 인원만 계산합니다.</p>
-          <p className="text-neutral-text2">Demo에서 할 수 있는 것: 고객 목록에서 VIP 세그먼트를 확인하고, 캠페인·기획전에서 세그먼트 캠페인 초안을 만들어 볼 수 있습니다.</p>
-          <div className="flex gap-2 pt-1"><Button variant="outline" href="/next/membership" size="sm">멤버십 Preview</Button><Button size="sm" onClick={() => setNextOpen(false)}>확인</Button></div>
+          <div className="flex items-center gap-2"><Badge tone="next">예정</Badge><span className="font-bold">아직 구현되지 않은 기능입니다</span></div>
+          <p className="text-neutral-text2">VIP 고객에게 감사 메시지·선공개 혜택을 보내는 기능은 멤버십(예정 5) 단계에서 알림톡·이메일 연동과 함께 제공될 예정입니다. 지금은 세그먼트 규칙과 대상 인원만 계산합니다.</p>
+          <p className="text-neutral-text2">데모에서 할 수 있는 것: 고객 목록에서 VIP 세그먼트를 확인하고, 캠페인·기획전에서 세그먼트 캠페인 초안을 만들어 볼 수 있습니다.</p>
+          <div className="flex gap-2 pt-1"><Button variant="outline" href="/next/membership" size="sm">멤버십 미리보기</Button><Button size="sm" onClick={() => setNextOpen(false)}>확인</Button></div>
         </div>
       </Modal>
     </div>
@@ -294,7 +294,7 @@ function CustomerDetail({ c, role, orders, onNext }: { c: Row; role: Role; order
     <div className="space-y-5">
       <div className="flex items-center gap-2 flex-wrap">
         <Badge tone="accent">{SEGMENT_LABEL[c.segment]}</Badge>
-        {c.live && <Badge tone="primary">시연 고객 · LIVE</Badge>}
+        {c.live && <Badge tone="primary">시연 고객 · 연결됨</Badge>}
         <Badge tone="demo" size="sm">개인정보 없음 · 가상 고객</Badge>
       </div>
       <dl className="rounded-xl border border-neutral-border px-4">
@@ -312,7 +312,7 @@ function CustomerDetail({ c, role, orders, onNext }: { c: Row; role: Role; order
           <Stat label="누적 주문" value={`${num(c.orderCount)}회`} sub={`누적 ${krwShort(c.totalSpend)}`} />
           <Stat label="평균 구매주기" value={c.avgCycleDays ? `${c.avgCycleDays}일` : "-"} sub={c.daysSince !== null ? `최근 구매 후 ${c.daysSince}일` : "구매 없음"} />
           <Stat label="90일 주문" value={`${num(orders.length)}건`} sub={krwShort(spent)} />
-          <Stat label="추정 가치" value={krwShort(c.ltv)} sub="규칙 계산 (DEMO)" />
+          <Stat label="추정 가치" value={krwShort(c.ltv)} sub="규칙 계산 (데모)" />
         </div>
         {orders.length > 0 ? (
           <ul className="mt-3 space-y-2">
@@ -349,7 +349,7 @@ function CustomerDetail({ c, role, orders, onNext }: { c: Row; role: Role; order
           {sug.map((s) => (
             <li key={s.title} className="rounded-xl border border-neutral-border p-3">
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="font-semibold text-[0.95rem] inline-flex items-center gap-1.5">{s.title}{s.next && <Badge tone="next" size="sm">NEXT</Badge>}</span>
+                <span className="font-semibold text-[0.95rem] inline-flex items-center gap-1.5">{s.title}{s.next && <Badge tone="next" size="sm">예정</Badge>}</span>
                 {s.next ? <Button size="sm" variant="secondary" onClick={onNext}>설명 보기</Button> : s.href ? <Button size="sm" variant="outline" href={s.href}>{s.href.startsWith("/my") ? "고객 화면" : "이동"}</Button> : null}
               </div>
               <p className="text-[0.85rem] text-neutral-text2 mt-1">이유: {s.reason}</p>
@@ -358,7 +358,7 @@ function CustomerDetail({ c, role, orders, onNext }: { c: Row; role: Role; order
         </ul>
         <p className="mt-2 text-[0.8rem] text-neutral-text2 inline-flex items-center gap-1"><Clock size={12} />규칙 기반 제안 · 실행은 담당자가 결정합니다 (L2).</p>
       </div>
-      <p className="text-[0.78rem] text-neutral-text2">{relTime(c.joinedAt)} 가입 · 가상 고객 · DEMO</p>
+      <p className="text-[0.78rem] text-neutral-text2">{relTime(c.joinedAt)} 가입 · 가상 고객 · 데모</p>
     </div>
   );
 }

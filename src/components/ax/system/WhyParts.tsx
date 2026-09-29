@@ -55,7 +55,7 @@ export function FlowChips({ steps, tone = "neutral" }: { steps: { label: string;
         <li key={`${s.label}-${i}`} className="flex items-center gap-1.5">
           <span className={cn("inline-flex flex-col items-start rounded-full border px-3.5 py-1.5 text-[0.88rem] font-semibold leading-tight", tone === "primary" ? "border-theme-primary/30 bg-theme-soft text-neutral-text" : "border-neutral-border bg-white")}>
             {s.label}
-            {s.sub && <span className="text-[0.7rem] font-medium text-neutral-text2">{s.sub}</span>}
+            {s.sub && <span className="text-[0.78rem] font-medium text-neutral-text2">{s.sub}</span>}
           </span>
           {i < steps.length - 1 && <ArrowRight size={16} className="text-neutral-text2/70 shrink-0" aria-hidden />}
         </li>
@@ -109,7 +109,7 @@ export function ImageSlot({ asset, label, gradient, caption }: { asset: string; 
       <GradientImage gradient={gradient} asset={asset} label={label} ratio="aspect-[21/9]" overlay className="rounded-2xl">
         <div className="absolute inset-0 flex items-end p-4 md:p-5">
           <div>
-            <p className="text-[0.7rem] font-bold tracking-wider text-white/75 uppercase">{asset.replace(".jpg", "")}</p>
+            <p className="text-[0.78rem] font-bold tracking-wider text-white/75 uppercase">{asset.replace(".jpg", "")}</p>
             <p className="text-white font-bold text-[1rem] md:text-[1.15rem] leading-snug">{label}</p>
           </div>
         </div>
@@ -124,7 +124,7 @@ export function NumberCase({ title, badge, rows, note, tone = "neutral" }: { tit
     <div className={cn("rounded-2xl border bg-white p-4", tone === "risk" ? "border-semantic-error/30" : tone === "primary" ? "border-theme-primary/30" : "border-neutral-border")}>
       <div className="flex flex-wrap items-center gap-2"><p className="font-bold leading-snug">{title}</p>{badge}</div>
       <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2">
-        {rows.map((r) => <div key={r.k} className="min-w-0"><dt className="text-[0.75rem] text-neutral-text2">{r.k}</dt><dd className="font-bold tabular text-[1rem] leading-tight">{r.v}</dd></div>)}
+        {rows.map((r) => <div key={r.k} className="min-w-0"><dt className="text-[0.78rem] text-neutral-text2">{r.k}</dt><dd className="font-bold tabular text-[1rem] leading-tight">{r.v}</dd></div>)}
       </dl>
       {note && <p className="mt-3 text-[0.82rem] text-neutral-text2 leading-relaxed">{note}</p>}
     </div>

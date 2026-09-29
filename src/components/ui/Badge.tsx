@@ -14,18 +14,18 @@ const tones: Record<Tone, string> = {
   dark: "bg-brand-black text-white",
   demo: "bg-[#fff7d6] text-[#8a6d00] border border-[#f3e4a6]",
   next: "bg-[#f1f1f4] text-[#5b6472] border border-dashed border-[#c9ccd3]",
-  ready: "bg-[#eef2ff] text-[#4338ca] border border-[#dfe3ff]",
+  ready: "bg-white text-theme-primary border border-theme-primary/30",
   live: "bg-[#e6f6ec] text-[#15803d] border border-[#bfe8cc]",
 };
 
 export function Badge({ tone = "neutral", className, children, size = "md" }: { tone?: Tone; className?: string; children: ReactNode; size?: "sm" | "md" }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full font-semibold leading-none whitespace-nowrap", size === "sm" ? "px-2 py-1 text-[0.72rem]" : "px-2.5 py-1.5 text-[0.8rem]", tones[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1 rounded-full font-semibold leading-none whitespace-nowrap", size === "sm" ? "px-2 py-1 text-[0.78rem]" : "px-2.5 py-1.5 text-[0.8rem]", tones[tone], className)}>
       {children}
     </span>
   );
 }
 
-export function DemoBadge({ label = "DEMO" }: { label?: string }) {
+export function DemoBadge({ label = "데모" }: { label?: string }) {
   return <Badge tone="demo" size="sm">{label}</Badge>;
 }

@@ -26,6 +26,7 @@ import { Freshness, Term } from "@/components/ui/Misc";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/States";
 import { Button } from "@/components/ui/Button";
+import { EVIDENCE_TYPE_LABEL, SOURCE_LABEL } from "@/components/ax/ops/shared";
 
 const PERIODS: Period[] = ["today", "7d", "30d", "90d"];
 const DAYS: Record<Period, number> = { today: 1, "7d": 7, "30d": 30, "90d": 90 };
@@ -88,7 +89,7 @@ function Dashboard() {
       openActions: ak.open, highActions: ak.high, topDemandOption: radar[0] ? `${PRODUCT_BY_ID[radar[0].v.productId].name} ${radar[0].v.color} ${radar[0].v.size}` : null, dataSource: "DEMO",
     } }, fallback);
     setAiText(res); setAiLoading(false);
-    if (res.status !== "LIVE") toast("AI READY — LLM 미연결", res.note ?? "규칙 기반 요약을 그대로 표시합니다. 서버에 ANTHROPIC_API_KEY를 설정하면 LIVE로 바뀝니다.", "info");
+    if (res.status !== "LIVE") toast("AI 준비 — LLM 미연결", res.note ?? "규칙 기반 요약을 그대로 표시합니다. 서버에 ANTHROPIC_API_KEY를 설정하면 연결됨으로 바뀝니다.", "info");
   };
 
   /* ------------------------------ Actions / evidence ------------------------------ */
@@ -118,8 +119,8 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="경영 대시보드" desc={role === "ops" ? "오늘 처리할 주문·반품·재입고 문의와 담당 Action을 한 화면에서 확인합니다." : "무엇이 잘되고, 어디서 돈이 새고, 무엇을 먼저 봐야 하는지 10초 안에 확인합니다."}
-        badge={<Badge tone="demo" size="sm">DEMO</Badge>}
+      <PageHeader title="경영 대시보드" desc={role === "ops" ? "오늘 처리할 주문·반품·재입고 문의와 담당 과제를 한 화면에서 확인합니다." : "무엇이 잘되고, 어디서 돈이 새고, 무엇을 먼저 봐야 하는지 10초 안에 확인합니다."}
+        badge={<Badge tone="demo" size="sm">데모</Badge>}
         right={<div className="flex flex-col items-start md:items-end gap-2"><Segmented value={period} onChange={setPeriod} options={PERIODS.map((p) => ({ value: p, label: PERIOD_LABEL[p].replace("최근 ", "") }))} /><Freshness source="DEMO" /></div>} />
 
       {role === "ops" ? (
@@ -129,11 +130,11 @@ function Dashboard() {
             <KpiCard size="lg" label="오늘 처리할 주문" value={num(ops.todo.length)} sub={`결제대기·상품준비 · 배송 중 ${num(ops.shipping)}건`} href="/ax/orders" icon={<PackageCheck size={18} />} accent={ICON_ACCENTS.operations} />
             <KpiCard size="lg" label="반품 요청" value={num(ops.returnReq)} sub="처리 대기 반품·교환" href="/ax/fit-returns" icon={<RotateCcw size={18} />} accent={ICON_ACCENTS.risk} />
             <KpiCard size="lg" label="재입고 문의" value={num(inv.restockRequests)} sub={`고객 알림 대기 ${num(ops.waitingSubs)}건 포함`} href="/ax/inventory" icon={<Boxes size={18} />} accent={ICON_ACCENTS.sales} />
-            <KpiCard size="lg" label="담당 Action" value={num(todayActions.length)} sub={`긴급 ${num(todayActions.filter((a) => a.urgency === "high").length)}건`} href="/ax/actions" icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} />
+            <KpiCard size="lg" label="담당 과제" value={num(todayActions.length)} sub={`긴급 ${num(todayActions.filter((a) => a.urgency === "high").length)}건`} href="/ax/actions" icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} />
           </div>
           <div className="grid lg:grid-cols-2 gap-5">
-            <SectionCard title="오늘 처리할 주문" desc="상태를 바꾸면 고객 My Page에 바로 반영됩니다." right={<AxLink href="/ax/orders">주문·배송</AxLink>}>
-              {ops.todo.length === 0 ? <EmptyState title="처리할 주문이 없습니다" desc="새 DEMO 주문이 들어오면 여기에 표시됩니다." /> : (
+            <SectionCard title="오늘 처리할 주문" desc="상태를 바꾸면 고객 마이페이지에 바로 반영됩니다." right={<AxLink href="/ax/orders">주문·배송</AxLink>}>
+              {ops.todo.length === 0 ? <EmptyState title="처리할 주문이 없습니다" desc="새 데모 주문이 들어오면 여기에 표시됩니다." /> : (
                 <ul className="divide-y divide-neutral-border">
                   {ops.todo.slice(0, 6).map((o) => (
                     <li key={o.id} className="py-3 flex items-center justify-between gap-3">
@@ -144,8 +145,8 @@ function Dashboard() {
                 </ul>
               )}
             </SectionCard>
-            <SectionCard title="오늘의 Action" desc="운영팀 담당 + 재입고 Action" right={<AxLink href="/ax/actions">Action Center</AxLink>}>
-              {todayActions.length === 0 ? <EmptyState title="처리할 Action이 없습니다" /> : <div className="space-y-3">{todayActions.map((a) => <ActionCard key={a.id} action={a} compact />)}</div>}
+            <SectionCard title="오늘의 과제" desc="운영팀 담당 + 재입고 과제" right={<AxLink href="/ax/actions">실행 센터</AxLink>}>
+              {todayActions.length === 0 ? <EmptyState title="처리할 과제가 없습니다" /> : <div className="space-y-3">{todayActions.map((a) => <ActionCard key={a.id} action={a} compact />)}</div>}
             </SectionCard>
           </div>
         </>
@@ -173,36 +174,36 @@ function Dashboard() {
             <KpiCard label="반품률" value={<Big>{pct(k.returnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 ÷ 판매 ${num(k.cur.units)}개`} href="/ax/fit-returns" />
             <KpiCard label="사이즈 관련 반품률" value={<Big>{pct(k.fitReturnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 중 사이즈·핏 사유`} href="/ax/fit-returns" icon={<Ruler size={18} />} accent={ICON_TONE.t7} />
             <KpiCard label="재입고 신청" value={<Big>{num(inv.restockRequests)}</Big>} sub="옵션별 재입고 알림 신청 누적" href="/ax/inventory" />
-            <KpiCard label="미처리 Action" value={<Big>{num(ak.open)}</Big>} sub={`긴급 ${num(ak.high)}건 · 완료율 ${pct(ak.executionRate, 0)}`} href="/ax/actions" icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} />
+            <KpiCard label="미처리 과제" value={<Big>{num(ak.open)}</Big>} sub={`긴급 ${num(ak.high)}건 · 완료율 ${pct(ak.executionRate, 0)}`} href="/ax/actions" icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} />
           </div>
         </>
       )}
 
       {/* AI 브리핑 + 오늘의 Action */}
       <div className="grid lg:grid-cols-5 gap-5">
-        <SectionCard tour="ai-briefing" className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">AI 브리핑 <AIReadyBadge kind="briefing" label={llm?.configured ? "AI LIVE" : undefined} /></span>} desc={llm?.configured ? `규칙 기반 요약 + LLM 설명 (${llm.model}) · 숫자는 코드가 계산` : "규칙 기반 요약 · LLM 연결 시 자연어 설명 추가"}>
+        <SectionCard tour="ai-briefing" className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">AI 브리핑 <AIReadyBadge kind="briefing" label={llm?.configured ? "AI 연결됨" : undefined} /></span>} desc={llm?.configured ? `규칙 기반 요약 + LLM 설명 (${llm.model}) · 숫자는 코드가 계산` : "규칙 기반 요약 · LLM 연결 시 자연어 설명 추가"}>
           <p className="text-[1.15rem] md:text-[1.3rem] font-bold leading-snug tracking-tight">{briefing.headline}</p>
           <ul className="mt-4 space-y-2">
             {briefing.points.map((p) => <li key={p} className="flex gap-2.5 text-[0.95rem] leading-relaxed"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-theme-primary shrink-0" />{p}</li>)}
           </ul>
           <div className="mt-4 rounded-xl bg-theme-soft px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
             <p className="text-[0.95rem] font-semibold">다음 행동 · {briefing.next}</p>
-            <Button size="sm" href="/ax/actions" icon={<Zap size={16} />}>Action Center 열기</Button>
+            <Button size="sm" href="/ax/actions" icon={<Zap size={16} />} className="shrink-0">실행 센터 열기</Button>
           </div>
           <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
-            <p className="text-[0.78rem] text-neutral-text2 inline-flex items-center gap-1.5 flex-wrap"><Badge tone={llm?.configured ? "live" : "ready"} size="sm">{llm === null ? "LLM 확인 중" : llm.configured ? "LLM 연결됨" : "LLM 미연결 · AI READY"}</Badge>숫자는 코드로 계산됨 (AI 아님){llm?.configured ? ` · 설명만 ${llm.model}` : " · 서버 ANTHROPIC_API_KEY 설정 시 자연어 설명 활성"}</p>
-            <Button size="sm" variant="outline" onClick={runAi} loading={aiLoading} icon={<Wand2 size={15} />} data-tour="ai-explain" aria-label="AI 설명 생성">{llm?.configured ? "AI 설명 생성" : "AI 설명 생성 (READY 확인)"}</Button>
+            <p className="text-[0.78rem] text-neutral-text2 inline-flex items-center gap-1.5 flex-wrap"><Badge tone={llm?.configured ? "live" : "ready"} size="sm">{llm === null ? "LLM 확인 중" : llm.configured ? "LLM 연결됨" : "LLM 미연결 · AI 준비"}</Badge>숫자는 코드로 계산됨 (AI 아님){llm?.configured ? ` · 설명만 ${llm.model}` : " · 서버 ANTHROPIC_API_KEY 설정 시 자연어 설명 활성"}</p>
+            <Button size="sm" variant="outline" onClick={runAi} loading={aiLoading} icon={<Wand2 size={15} />} data-tour="ai-explain" aria-label="AI 설명 생성">{llm?.configured ? "AI 설명 생성" : "AI 설명 생성 (연결 준비 확인)"}</Button>
           </div>
           {aiText && (
             <div className={`mt-3 rounded-xl border p-4 ${aiText.status === "LIVE" ? "border-theme-primary/40 bg-theme-soft/60" : "border-dashed border-neutral-border bg-neutral-canvas"}`} aria-live="polite">
-              <div className="flex items-center gap-2 flex-wrap mb-2"><Badge tone={aiText.status === "LIVE" ? "live" : "ready"} size="sm">{aiText.status === "LIVE" ? "AI LIVE" : "AI READY"}</Badge><span className="text-[0.8rem] text-neutral-text2">{aiText.model}{aiText.usage ? ` · 토큰 in ${aiText.usage.input} / out ${aiText.usage.output}` : ""}</span></div>
+              <div className="flex items-center gap-2 flex-wrap mb-2"><Badge tone={aiText.status === "LIVE" ? "live" : "ready"} size="sm">{aiText.status === "LIVE" ? "AI 연결됨" : "AI 준비"}</Badge><span className="text-[0.8rem] text-neutral-text2">{aiText.model}{aiText.usage ? ` · 토큰 in ${aiText.usage.input} / out ${aiText.usage.output}` : ""}</span></div>
               <pre className="whitespace-pre-wrap font-sans text-[0.92rem] leading-relaxed">{aiText.text}</pre>
               {aiText.note && <p className="mt-2 text-[0.8rem] text-neutral-text2">{aiText.note}</p>}
             </div>
           )}
         </SectionCard>
-        <SectionCard className="lg:col-span-2" title="오늘의 Action" desc="긴급도 순 · 미처리 4건" right={<AxLink href="/ax/actions">전체</AxLink>}>
-          {todayActions.length === 0 ? <EmptyState title="처리할 Action이 없습니다" desc="새 추천이 생기면 여기에 표시됩니다." /> : <div className="space-y-3">{todayActions.map((a, i) => <ActionCard key={a.id} action={a} compact tour={i === 0 ? "dash-action-first" : undefined} />)}</div>}
+        <SectionCard className="lg:col-span-2" title="오늘의 과제" desc="긴급도 순 · 미처리 4건" right={<AxLink href="/ax/actions">전체</AxLink>}>
+          {todayActions.length === 0 ? <EmptyState title="처리할 과제가 없습니다" desc="새 추천이 생기면 여기에 표시됩니다." /> : <div className="space-y-3">{todayActions.map((a, i) => <ActionCard key={a.id} action={a} compact tour={i === 0 ? "dash-action-first" : undefined} />)}</div>}
         </SectionCard>
       </div>
 
@@ -226,7 +227,7 @@ function Dashboard() {
 
       {/* Demand Radar preview + Evidence */}
       <div className="grid lg:grid-cols-5 gap-5">
-        <SectionCard className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">Demand Radar <Term term="Demand Signal">Top 5</Term></span>} desc="조회·찜·장바구니·재입고 신청을 옵션 단위 수요 점수로 계산" right={<AxLink href="/ax/inventory">재고·재입고</AxLink>}>
+        <SectionCard className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">수요 레이더 <Term term="수요 신호">Top 5</Term></span>} desc="조회·찜·장바구니·재입고 신청을 옵션 단위 수요 점수로 계산" right={<AxLink href="/ax/inventory">재고·재입고</AxLink>}>
           <ul className="divide-y divide-neutral-border">
             {radar.map(({ v, score, status }) => {
               const p = PRODUCT_BY_ID[v.productId];
@@ -245,13 +246,13 @@ function Dashboard() {
             })}
           </ul>
         </SectionCard>
-        <SectionCard className="lg:col-span-2" title="최근 Evidence" desc="추천 → 승인 → 실행 → 결과 기록" right={<AxLink href="/ax/evidence">전체</AxLink>}>
-          {evidence.length === 0 ? <EmptyState title="Evidence가 없습니다" /> : (
+        <SectionCard className="lg:col-span-2" title="최근 증빙" desc="추천 → 승인 → 실행 → 결과 기록" right={<AxLink href="/ax/evidence">전체</AxLink>}>
+          {evidence.length === 0 ? <EmptyState title="증빙이 없습니다" /> : (
             <ul className="space-y-3">
               {evidence.map((e) => (
                 <li key={e.id}>
                   <Link href={`/ax/evidence?id=${e.id}`} className="block rounded-xl border border-neutral-border p-3.5 hover:border-neutral-text2 transition-colors">
-                    <div className="flex flex-wrap items-center gap-2 mb-1"><Badge tone={e.type === "RESULT" || e.type === "REVENUE" ? "success" : e.type === "RISK" || e.type === "EXCEPTION" ? "warning" : "info"} size="sm">{e.type}</Badge><Badge tone={e.source === "SIMULATION" ? "demo" : "neutral"} size="sm">{e.source}</Badge><span className="ml-auto text-[0.75rem] text-neutral-text2 tabular">{relTime(e.at)}</span></div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1"><Badge tone={e.type === "RESULT" || e.type === "REVENUE" ? "success" : e.type === "RISK" || e.type === "EXCEPTION" ? "warning" : "info"} size="sm">{EVIDENCE_TYPE_LABEL[e.type]}</Badge><Badge tone={e.source === "SIMULATION" ? "demo" : "neutral"} size="sm">{SOURCE_LABEL[e.source]}</Badge><span className="ml-auto text-[0.78rem] text-neutral-text2 tabular">{relTime(e.at)}</span></div>
                     <p className="font-semibold text-[0.92rem] leading-snug">{e.title}</p>
                     <p className="text-[0.8rem] text-neutral-text2 mt-0.5 leading-snug">{e.detail}</p>
                   </Link>

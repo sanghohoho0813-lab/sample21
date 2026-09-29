@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { ArrowDownRight, ArrowUpRight, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { ICON_TONE, tint } from "@/lib/theme";
+import { AutoFit } from "./AutoFit";
 
 export function KpiCard({ label, value, delta, deltaLabel = "직전 기간 대비", href, icon, accent, sub, size = "md", tour, invert }: {
   label: string; value: ReactNode; delta?: number; deltaLabel?: string; href?: string; icon?: ReactNode; accent?: string; sub?: ReactNode; size?: "md" | "lg"; tour?: string; invert?: boolean;
@@ -12,16 +13,16 @@ export function KpiCard({ label, value, delta, deltaLabel = "직전 기간 대�
   const inner = (
     <div className={cn("group h-full rounded-cardlg bg-white border border-neutral-border shadow-card p-5 flex flex-col gap-3", href ? "hover-lift hover:border-neutral-text2/40" : "transition-colors duration-200 hover:border-neutral-text2/25")} data-tour={tour}>
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[0.9rem] font-semibold text-neutral-text2">{label}</span>
-        {icon && <span className="tile h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: tint(accent ?? ICON_TONE.t3, 14), color: accent ?? ICON_TONE.t3 }}>{icon}</span>}
+        <span className="min-w-0 text-[0.9rem] font-semibold text-neutral-text2 break-keep leading-snug">{label}</span>
+        {icon && <span className="tile h-9 w-9 shrink-0 rounded-xl flex items-center justify-center" style={{ background: tint(accent ?? ICON_TONE.t3, 14), color: accent ?? ICON_TONE.t3 }}>{icon}</span>}
       </div>
-      <div className={cn("font-bold tracking-tight tabular leading-none transition-transform duration-200 group-hover:-translate-y-[1px]", size === "lg" ? "text-[2.3rem] md:text-[2.6rem]" : "text-[1.8rem] md:text-[2rem]")}>{value}</div>
+      <div className={cn("font-bold tracking-tight tabular leading-none transition-transform duration-200 group-hover:-translate-y-[1px]", size === "lg" ? "text-[2.3rem] md:text-[2.6rem]" : "text-[1.8rem] md:text-[2rem]")}><AutoFit>{value}</AutoFit></div>
       <div className="flex items-center justify-between gap-2 min-h-[22px]">
         {delta !== undefined ? (
-          <span className={cn("inline-flex items-center gap-1 text-[0.85rem] font-semibold", good ? "text-semantic-success" : "text-semantic-error")}>
-            {delta >= 0 ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}{Math.abs(delta * 100).toFixed(1)}%<span className="text-neutral-text2 font-normal ml-1">{deltaLabel}</span>
+          <span className={cn("inline-flex flex-wrap items-center gap-x-1 text-[0.85rem] font-semibold min-w-0", good ? "text-semantic-success" : "text-semantic-error")}>
+            {delta >= 0 ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}<span className="whitespace-nowrap">{Math.abs(delta * 100).toFixed(1)}%</span><span className="text-neutral-text2 font-normal ml-1 break-keep">{deltaLabel}</span>
           </span>
-        ) : <span className="text-[0.85rem] text-neutral-text2">{sub}</span>}
+        ) : <span className="min-w-0 text-[0.85rem] text-neutral-text2 break-keep leading-snug">{sub}</span>}
         {href && <ChevronRight size={18} className="nudge-x text-neutral-text2 group-hover:text-theme-primary" />}
       </div>
     </div>
@@ -31,10 +32,10 @@ export function KpiCard({ label, value, delta, deltaLabel = "직전 기간 대�
 
 export function Stat({ label, value, sub, className }: { label: string; value: ReactNode; sub?: ReactNode; className?: string }) {
   return (
-    <div className={cn("rounded-xl bg-neutral-canvas px-4 py-3 transition-colors duration-200 hover:bg-theme-soft/70", className)}>
-      <p className="text-[0.8rem] text-neutral-text2 font-semibold">{label}</p>
-      <p className="text-[1.25rem] font-bold tabular leading-tight mt-0.5">{value}</p>
-      {sub && <p className="text-[0.8rem] text-neutral-text2 mt-0.5">{sub}</p>}
+    <div className={cn("min-w-0 rounded-xl bg-neutral-canvas px-4 py-3 transition-colors duration-200 hover:bg-theme-soft/70", className)}>
+      <p className="text-[0.8rem] text-neutral-text2 font-semibold break-keep leading-snug">{label}</p>
+      <p className="text-[1.25rem] font-bold tabular leading-tight mt-0.5"><AutoFit>{value}</AutoFit></p>
+      {sub && <p className="text-[0.8rem] text-neutral-text2 mt-0.5 break-keep leading-snug">{sub}</p>}
     </div>
   );
 }

@@ -63,7 +63,7 @@ export function FitProfileForm({ compact, onSaved, submitLabel = "저장하고 �
       )}
       {errors.form && <p className="text-[0.85rem] text-semantic-error">{errors.form}</p>}
       <Button type="submit" variant="brand" full icon={<Ruler size={16} />}>{submitLabel}</Button>
-      <p className="text-[0.78rem] text-neutral-text2 leading-relaxed">입력한 정보는 이 기기의 DEMO 저장소에만 보관되며 개인화 추천에 사용됩니다. 실제 개인정보는 저장하지 않습니다.</p>
+      <p className="text-[0.78rem] text-neutral-text2 leading-relaxed">입력한 정보는 이 기기의 데모 저장소에만 보관되며 개인화 추천에 사용됩니다. 실제 개인정보는 저장하지 않습니다.</p>
     </form>
   );
 }
@@ -86,7 +86,7 @@ export function FitSignal({ product, selectedSize, onPickSize }: { product: Prod
       <div className="px-5 pt-5 pb-3 flex flex-wrap items-center gap-2">
         <span className="h-9 w-9 rounded-xl bg-brand-accent/10 text-brand-accent inline-flex items-center justify-center"><Ruler size={18} /></span>
         <div className="min-w-0 flex-1">
-          <p className="font-bold text-[1.05rem] leading-tight">핏 추천 Preview <span className="text-neutral-text2 font-semibold text-[0.85rem]">· 규칙 기반</span></p>
+          <p className="font-bold text-[1.05rem] leading-tight">핏 추천 미리보기 <span className="text-neutral-text2 font-semibold text-[0.85rem]">· 규칙 기반</span></p>
           <p className="text-[0.82rem] text-neutral-text2">키·몸무게·평소 사이즈·상품 실측·반품 데이터로 계산</p>
         </div>
         <AIReadyBadge kind="fit" />
@@ -103,7 +103,7 @@ export function FitSignal({ product, selectedSize, onPickSize }: { product: Prod
             <div className="rounded-2xl bg-brand-black text-white px-6 py-5 flex flex-col items-center justify-center min-w-[150px]">
               <p className="text-[0.78rem] font-semibold text-white/70">추천 사이즈</p>
               <p className="text-[2.6rem] font-black leading-none mt-1 tabular">{result.size ?? "—"}</p>
-              {!result.size && <p className="text-[0.75rem] text-white/70 mt-1 text-center">평소 mm 기준</p>}
+              {!result.size && <p className="text-[0.78rem] text-white/70 mt-1 text-center">평소 mm 기준</p>}
             </div>
             <div className="rounded-2xl border border-neutral-border p-4 flex flex-col justify-center gap-2">
               <div className="flex items-center justify-between gap-2 text-[0.9rem]"><span className="font-bold">신뢰도</span><Badge tone={CONF_TONE[result.confidence] === "primary" ? "accent" : CONF_TONE[result.confidence]} size="sm">{CONF_LABEL[result.confidence]} · {Math.round(result.confidenceScore * 100)}%</Badge></div>

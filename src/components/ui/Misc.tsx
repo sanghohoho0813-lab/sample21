@@ -13,13 +13,13 @@ export const GLOSSARY: Record<string, string> = {
   마진: "판매가에서 원가와 할인비용을 뺀 이익",
   전환율: "상품을 본 고객 중 실제로 주문한 비율",
   재구매율: "2회 이상 구매한 고객의 비율",
-  "Demand Signal": "조회·찜·장바구니·재입고 신청을 합쳐 계산한 '이 옵션을 원하는 정도'",
-  "Fit Risk": "사이즈·핏 때문에 반품될 위험 (사이즈 관련 반품 ÷ 판매수량)",
-  Evidence: "어떤 추천이 언제 승인·실행되고 어떤 결과가 났는지 남긴 기록",
+  "수요 신호": "조회·찜·장바구니·재입고 신청을 합쳐 계산한 '이 옵션을 원하는 정도'",
+  "핏 위험도": "사이즈·핏 때문에 반품될 위험 (사이즈 관련 반품 ÷ 판매수량)",
+  증빙: "어떤 추천이 언제 승인·실행되고 어떤 결과가 났는지 남긴 기록",
   RLS: "사용자마다 볼 수 있는 데이터를 나누는 보안 기능",
   L3: "시스템이 준비하고 사람이 최종 승인하는 자동화 단계",
   L2: "시스템이 추천만 하고 실행은 사람이 하는 단계",
-  "AI Ready": "지금은 규칙 기반으로 동작하고, 나중에 AI(LLM)를 연결할 자리",
+  "AI 준비": "지금은 규칙 기반으로 동작하고, 나중에 AI(LLM)를 연결할 자리",
 };
 
 export function Term({ children, term }: { children?: ReactNode; term: string }) {
@@ -62,7 +62,7 @@ export function Freshness({ source = "DEMO", at, className }: { source?: "DEMO" 
   useEffect(() => { const d = at ? new Date(at) : new Date(); setTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`); }, [at]);
   return (
     <span className={cn("inline-flex items-center gap-2 text-[0.8rem] text-neutral-text2", className)}>
-      <span className={cn("rounded-md px-1.5 py-0.5 font-bold text-[0.72rem]", source === "LIVE" ? "bg-[#e6f6ec] text-[#15803d]" : "bg-[#fff7d6] text-[#8a6d00]")}>{source === "DEMO" ? "DEMO DATA" : source}</span>
+      <span className={cn("rounded-md px-1.5 py-0.5 font-bold text-[0.78rem]", source === "LIVE" ? "bg-[#e6f6ec] text-[#15803d]" : "bg-[#fff7d6] text-[#8a6d00]")}>{source === "DEMO" ? "데모 데이터" : source === "SIMULATION" ? "시뮬레이션" : "실제 데이터"}</span>
       <span className="tabular">마지막 업데이트 {time ?? "--:--:--"}</span>
     </span>
   );

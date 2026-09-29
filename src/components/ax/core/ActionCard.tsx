@@ -84,21 +84,21 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
   const effectText = (status: ActionStatus): string => {
     const waiting = action.variantId ? restockSubs.filter((r) => r.variantId === action.variantId && r.status === "waiting").length : 0;
     if ((action.type === "restock" || action.type === "rebalance") && action.variantId) {
-      if (status === "confirmed") return "옵션 상태 '재입고 검토'로 변경 · 고객 상품 화면에 표시 · Evidence 기록";
+      if (status === "confirmed") return "옵션 상태 '재입고 검토'로 변경 · 고객 상품 화면에 표시 · 증빙 기록";
       if (status === "in-progress") return "옵션 상태 '재입고 진행'으로 변경 · 고객 화면 '입고 준비 중' 표시";
       if (status === "done") return `재고 +${action.quantity ?? 20} 반영 · 재입고 알림 ${waiting}명 발송 · 고객 화면 상태 '입고 완료' 변경`;
     }
     if (action.type === "markdown" && status === "done") {
       const p = action.productId ? PRODUCT_BY_ID[action.productId] : null;
       const rate = action.discountRate ?? 0.15;
-      return p ? `판매가 ${krw(p.price)} → ${krw(Math.round(p.price * (1 - rate) / 1000) * 1000)} 반영 · 세일 목록 노출 · Evidence(REVENUE) 기록` : "할인가 반영";
+      return p ? `판매가 ${krw(p.price)} → ${krw(Math.round(p.price * (1 - rate) / 1000) * 1000)} 반영 · 세일 목록 노출 · 증빙(REVENUE) 기록` : "할인가 반영";
     }
-    if (action.type === "fit-guide" && status === "done") return "상품 상세 핏 안내 변경 · 핏 추천 규칙 +1 사이즈 보정 · Evidence 기록";
-    if (action.type === "segment-campaign" && (status === "in-progress" || status === "done")) return status === "done" ? "캠페인 cp-06 종료 처리 · 결과는 Evidence에서 비교" : "캠페인 cp-06 진행 시작 · 대상 고객 42명에게 추천 알림 발송";
+    if (action.type === "fit-guide" && status === "done") return "상품 상세 핏 안내 변경 · 핏 추천 규칙 +1 사이즈 보정 · 증빙 기록";
+    if (action.type === "segment-campaign" && (status === "in-progress" || status === "done")) return status === "done" ? "캠페인 cp-06 종료 처리 · 결과는 증빙에서 비교" : "캠페인 cp-06 진행 시작 · 대상 고객 42명에게 추천 알림 발송";
     if (action.type === "cart-reminder" && (status === "in-progress" || status === "done")) return "장바구니 리마인드 알림 발송 · 고객 알림함에 표시";
-    if (status === "hold") return "보류 처리 · Evidence(EXCEPTION) 기록 · 다시 검토 가능";
-    if (status === "dismissed") return "무시 처리 · 사유가 Evidence(EXCEPTION)에 기록됨";
-    return "상태 변경이 Evidence Log에 기록되었습니다";
+    if (status === "hold") return "보류 처리 · 증빙(EXCEPTION) 기록 · 다시 검토 가능";
+    if (status === "dismissed") return "무시 처리 · 사유가 증빙(EXCEPTION)에 기록됨";
+    return "상태 변경이 증빙 기록에 기록되었습니다";
   };
 
   const change = (status: ActionStatus, note?: string) => {
@@ -145,7 +145,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
             <Badge tone="neutral" size="sm">{ACTION_TYPE_LABEL[action.type]}</Badge>
             <ActionStatusBadge status={action.status} size="sm" />
             <Badge tone="neutral" size="sm"><Term term={action.automation}>{action.automation}</Term></Badge>
-            {action.engine === "demand" && <Badge tone="ready" size="sm">Demand Engine</Badge>}
+            {action.engine === "demand" && <Badge tone="ready" size="sm">수요 엔진</Badge>}
           </div>
           <h3 className="font-bold text-[1.1rem] md:text-[1.2rem] leading-snug tracking-tight">{action.title}</h3>
           <p className="mt-1.5 text-[0.9rem] text-neutral-text2 leading-snug"><span className="font-semibold text-neutral-text">트리거</span> · {action.trigger}</p>
@@ -163,7 +163,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
           {/* Live data strip */}
           {live && (
             <div>
-              <p className="text-[0.8rem] font-semibold text-neutral-text2 mb-2 inline-flex items-center gap-1.5"><Cpu size={14} />지금 데이터 (seed + 고객 Event 반영)</p>
+              <p className="text-[0.8rem] font-semibold text-neutral-text2 mb-2 inline-flex items-center gap-1.5"><Cpu size={14} />지금 데이터 (seed + 고객 행동 반영)</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">{live.map((l) => <StatPill key={l.label} label={l.label} value={l.value} sub={l.sub} tone={l.tone} />)}</div>
             </div>
           )}
@@ -177,7 +177,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
               <div className="rounded-xl bg-theme-soft p-4">
                 <p className="font-bold text-[0.92rem] mb-1">예상 영향</p>
                 <p className="text-[0.9rem] leading-snug">{action.expectedImpact}</p>
-                <p className="mt-1.5 text-[0.75rem] text-neutral-text2">DEMO 추정치 · 실제 개선율은 실증에서 측정 (Baseline 필요)</p>
+                <p className="mt-1.5 text-[0.78rem] text-neutral-text2">데모 추정치 · 실제 개선율은 실증에서 측정 (기준값 필요)</p>
               </div>
               {action.caution && <div className="rounded-xl bg-[#fff1e6] p-4 text-[0.88rem] leading-snug text-[#b45309] flex gap-2"><AlertTriangle size={16} className="shrink-0 mt-0.5" /><span><span className="font-bold">주의</span> · {action.caution}</span></div>}
             </div>
@@ -185,7 +185,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.82rem] text-neutral-text2">
-            <span className="inline-flex items-center gap-1.5"><Cpu size={14} />{ENGINE_LABEL[action.engine]}{action.engine === "demand" && <AIReadyBadge kind="demand" className="h-10 md:h-7 px-2.5 text-[0.75rem]" />}</span>
+            <span className="inline-flex items-center gap-1.5"><Cpu size={14} />{ENGINE_LABEL[action.engine]}{action.engine === "demand" && <AIReadyBadge kind="demand" className="h-10 md:h-7 px-2.5 text-[0.78rem]" />}</span>
             <span>자동화 <Term term={action.automation}>{action.automation}</Term> · {action.automation === "L3" ? "시스템 준비 → 사람 승인" : "추천만 · 사람이 실행"}</span>
             <span>{ERROR_COST_LABEL[action.errorCost]}</span>
             <span>담당 <span className="font-semibold text-neutral-text">{action.ownerName}</span> · 추천일 {fmtDate(action.recommendedAt, "datetime")}</span>
@@ -204,7 +204,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
                   </li>
                 ))}
               </ol>
-              {action.status === "done" && <Link href={`/ax/evidence?actionId=${action.id}`} className="mt-3 inline-flex items-center gap-1 text-[0.88rem] font-semibold text-theme-primary hover:underline underline-offset-4"><FileCheck2 size={15} />이 Action의 Evidence 보기</Link>}
+              {action.status === "done" && <Link href={`/ax/evidence?actionId=${action.id}`} className="mt-3 inline-flex items-center gap-1 text-[0.88rem] font-semibold text-theme-primary hover:underline underline-offset-4"><FileCheck2 size={15} />이 과제의 증빙 보기</Link>}
             </div>
           )}
 
@@ -221,15 +221,15 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
             {action.status === "dismissed" && <Button size="md" variant="ghost" onClick={() => change("recommended")} icon={<RotateCcw size={18} />}>다시 검토</Button>}
             {action.status === "done" && <span className="inline-flex items-center gap-1.5 text-[0.88rem] font-semibold text-semantic-success"><CheckCircle2 size={16} />완료됨 · 고객 화면 반영</span>}
             {isOpen && <span className="text-[0.78rem] text-neutral-text2 ml-auto">승인자: {actor} (현재 역할)</span>}
-            {product && <Link href={`/products/${product.id}`} className="tap inline-flex items-center text-[0.82rem] font-semibold text-neutral-text2 hover:text-theme-primary">고객 화면 보기</Link>}
+            {product && <Link href={`/products/${product.id}`} className="tap inline-flex items-center text-[0.82rem] font-semibold text-neutral-text2 hover:text-theme-primary">고객 플랫폼에서 보기</Link>}
           </div>
         </div>
       )}
 
       {/* Dismiss modal */}
-      <Modal open={dismissOpen} onClose={() => setDismissOpen(false)} title="Action 무시 — 이유를 남겨주세요" size="sm"
+      <Modal open={dismissOpen} onClose={() => setDismissOpen(false)} title="과제 무시 — 이유를 남겨주세요" size="sm"
         footer={<div className="flex gap-2 justify-end"><Button variant="outline" onClick={() => setDismissOpen(false)}>취소</Button><Button variant="danger" disabled={!reason.trim()} onClick={() => { change("dismissed", reason.trim()); setDismissOpen(false); setReason(""); }}>무시 처리</Button></div>}>
-        <p className="text-[0.9rem] text-neutral-text2 mb-3">이유는 Evidence(EXCEPTION)에 기록되어 추천 규칙을 개선하는 데 쓰입니다.</p>
+        <p className="text-[0.9rem] text-neutral-text2 mb-3">이유는 증빙(EXCEPTION)에 기록되어 추천 규칙을 개선하는 데 쓰입니다.</p>
         <Textarea label="무시 이유" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="예: 브랜드 정책상 할인 불가 / CS 직접 응대로 대체" />
       </Modal>
 

@@ -33,8 +33,8 @@ export function OrderTimeline({ order, tour }: { order: Order; tour?: string }) 
               {(i < ORDER_STATUS_FLOW.length - 1 || terminal) && <span className={cn("w-0.5 flex-1 min-h-[16px] mt-1", i < reached || (terminal && i <= reached) ? "bg-brand-black" : "bg-neutral-border")} />}
             </div>
             <div className={cn("min-w-0 -mt-0.5", !passed && "text-neutral-text2")}>
-              <p className={cn("font-bold text-[0.95rem] leading-snug", current && "text-brand-black")}>{ORDER_STATUS_LABEL[s]}{current && <span className="ml-2 text-[0.72rem] font-bold text-white bg-brand-accent rounded-md px-1.5 py-0.5 align-middle">현재</span>}</p>
-              <p className="text-[0.8rem] text-neutral-text2 tabular">{at ? fmtDate(at, "datetime") : passed ? "처리됨" : s === "pending" ? "DEMO 결제 · 실제 결제 없음" : "예정"}</p>
+              <p className={cn("font-bold text-[0.95rem] leading-snug", current && "text-brand-black")}>{ORDER_STATUS_LABEL[s]}{current && <span className="ml-2 text-[0.78rem] font-bold text-white bg-brand-accent rounded-md px-1.5 py-0.5 align-middle">현재</span>}</p>
+              <p className="text-[0.8rem] text-neutral-text2 tabular">{at ? fmtDate(at, "datetime") : passed ? "처리됨" : s === "pending" ? "데모 결제 · 실제 결제 없음" : "예정"}</p>
             </div>
           </li>
         );
@@ -42,7 +42,7 @@ export function OrderTimeline({ order, tour }: { order: Order; tour?: string }) 
       {terminal && (
         <li className="flex gap-3">
           <div className="flex flex-col items-center"><span className="h-7 w-7 rounded-full flex items-center justify-center bg-semantic-error text-white shrink-0"><TerminalIcon size={14} /></span></div>
-          <div className="-mt-0.5"><p className="font-bold text-[0.95rem] text-semantic-error">{ORDER_STATUS_LABEL[terminal]}<span className="ml-2 text-[0.72rem] font-bold text-white bg-semantic-error rounded-md px-1.5 py-0.5 align-middle">현재</span></p><p className="text-[0.8rem] text-neutral-text2 tabular">{atOf(terminal) ? fmtDate(atOf(terminal)!, "datetime") : ""}</p></div>
+          <div className="-mt-0.5"><p className="font-bold text-[0.95rem] text-semantic-error">{ORDER_STATUS_LABEL[terminal]}<span className="ml-2 text-[0.78rem] font-bold text-white bg-semantic-error rounded-md px-1.5 py-0.5 align-middle">현재</span></p><p className="text-[0.8rem] text-neutral-text2 tabular">{atOf(terminal) ? fmtDate(atOf(terminal)!, "datetime") : ""}</p></div>
         </li>
       )}
     </ol>

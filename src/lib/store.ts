@@ -123,7 +123,7 @@ export const useApp = create<AppState>()(
         set((s) => ({ restockSubs: [sub, ...s.restockSubs], restockDelta: { ...s.restockDelta, [variantId]: (s.restockDelta[variantId] ?? 0) + 1 } }));
         get().track("subscribe_restock", { productId: v.productId, variantId });
         const p = PRODUCT_BY_ID[v.productId];
-        get().addEvidence({ type: "CUSTOMER", title: `재입고 알림 신청 · ${p.name} ${v.color} ${v.size}`, detail: `고객 ${DEMO_CUSTOMER_NAME}이 품절 옵션의 재입고 알림을 신청했습니다. Demand Radar 수요신호에 즉시 반영됩니다.`, actor: DEMO_CUSTOMER_NAME, productId: p.id, customerId: DEMO_CUSTOMER_ID, source: "DEMO", status: "demo" });
+        get().addEvidence({ type: "CUSTOMER", title: `재입고 알림 신청 · ${p.name} ${v.color} ${v.size}`, detail: `고객 ${DEMO_CUSTOMER_NAME}이 품절 옵션의 재입고 알림을 신청했습니다. 수요 레이더 수요신호에 즉시 반영됩니다.`, actor: DEMO_CUSTOMER_NAME, productId: p.id, customerId: DEMO_CUSTOMER_ID, source: "DEMO", status: "demo" });
         return sub;
       },
       cancelRestock: (id) => set((s) => {
@@ -156,7 +156,7 @@ export const useApp = create<AppState>()(
         const at = nowIso();
         const d = new Date();
         const id = `MF${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}-${String(get().orders.length + 1).padStart(2, "0")}${Math.floor(Math.random() * 90 + 10)}`;
-        const order: Order = { id, customerId: DEMO_CUSTOMER_ID, customerName: DEMO_CUSTOMER_NAME, createdAt: at, status: "pending", items, subtotal, discount: coupon + items.reduce((s, i) => s + i.discount * i.qty, 0), shippingFee, total, channel: typeof window !== "undefined" && window.innerWidth < 768 ? "mobile" : "web", address, memo: memo ? `${memo} · 결제수단(DEMO): ${payment}` : `결제수단(DEMO): ${payment}`, source: "DEMO", statusHistory: [{ status: "pending", at, actor: DEMO_CUSTOMER_NAME }] };
+        const order: Order = { id, customerId: DEMO_CUSTOMER_ID, customerName: DEMO_CUSTOMER_NAME, createdAt: at, status: "pending", items, subtotal, discount: coupon + items.reduce((s, i) => s + i.discount * i.qty, 0), shippingFee, total, channel: typeof window !== "undefined" && window.innerWidth < 768 ? "mobile" : "web", address, memo: memo ? `${memo} · 결제수단(데모): ${payment}` : `결제수단(데모): ${payment}`, source: "DEMO", statusHistory: [{ status: "pending", at, actor: DEMO_CUSTOMER_NAME }] };
         // Loop 1 완결: 재입고 알림을 받았던(또는 기다리던) 옵션을 이 주문에서 구매하면 '구매 완료'로 닫는다 (D-17)
         const bought = new Set(items.map((i) => i.variantId));
         const closing = get().restockSubs.filter((r) => bought.has(r.variantId) && r.status !== "purchased");
@@ -167,13 +167,13 @@ export const useApp = create<AppState>()(
           return { orders: [order, ...s.orders], cart: [], inventoryDelta: inv, restockSubs };
         });
         get().track("complete_demo_order", { orderId: id, total });
-        get().pushNotification({ title: "DEMO 주문이 접수되었습니다", body: `주문번호 ${id} · ${items.length}개 상품 · 운영팀 확인 후 상품준비로 전환됩니다.`, kind: "order", href: `/my/orders/${id}` });
-        get().addEvidence({ type: "CUSTOMER", title: `DEMO 주문 접수 ${id}`, detail: `${DEMO_CUSTOMER_NAME} 고객 주문 ${items.length}건 · 합계 ${total.toLocaleString("ko-KR")}원. 주문·매출·재고에 즉시 반영되었습니다.`, actor: DEMO_CUSTOMER_NAME, orderId: id, customerId: DEMO_CUSTOMER_ID, source: "DEMO", status: "demo" });
+        get().pushNotification({ title: "데모 주문이 접수되었습니다", body: `주문번호 ${id} · ${items.length}개 상품 · 운영팀 확인 후 상품준비로 전환됩니다.`, kind: "order", href: `/my/orders/${id}` });
+        get().addEvidence({ type: "CUSTOMER", title: `데모 주문 접수 ${id}`, detail: `${DEMO_CUSTOMER_NAME} 고객 주문 ${items.length}건 · 합계 ${total.toLocaleString("ko-KR")}원. 주문·매출·재고에 즉시 반영되었습니다.`, actor: DEMO_CUSTOMER_NAME, orderId: id, customerId: DEMO_CUSTOMER_ID, source: "DEMO", status: "demo" });
         for (const r of closing) {
           const v = VARIANT_BY_ID[r.variantId]; const p = PRODUCT_BY_ID[v.productId];
           const restockAction = get().actions.find((a) => a.variantId === r.variantId && (a.type === "restock" || a.type === "rebalance"));
           const viaNotice = r.status === "notified";
-          get().addEvidence({ type: "RESULT", title: `재입고 알림 → 구매 전환 · ${p.name} ${v.color} ${v.size}`, detail: viaNotice ? `재입고 알림을 받은 고객이 해당 옵션을 구매했습니다 (알림 ${r.notifiedAt ? new Date(r.notifiedAt).toLocaleString("ko-KR") : "-"} → 주문 ${id}). 재입고 Action이 매출로 이어진 첫 기록입니다.` : `재입고 알림 대기 중이던 고객이 해당 옵션을 구매했습니다 (주문 ${id}).`, actor: DEMO_CUSTOMER_NAME, actionId: restockAction?.id, productId: p.id, orderId: id, customerId: DEMO_CUSTOMER_ID, kpiDelta: viaNotice ? "알림→구매 전환 1건 (Baseline 대비: VALIDATE LATER)" : "대기→구매 1건", source: "DEMO", status: "demo" });
+          get().addEvidence({ type: "RESULT", title: `재입고 알림 → 구매 전환 · ${p.name} ${v.color} ${v.size}`, detail: viaNotice ? `재입고 알림을 받은 고객이 해당 옵션을 구매했습니다 (알림 ${r.notifiedAt ? new Date(r.notifiedAt).toLocaleString("ko-KR") : "-"} → 주문 ${id}). 재입고 과제가 매출로 이어진 첫 기록입니다.` : `재입고 알림 대기 중이던 고객이 해당 옵션을 구매했습니다 (주문 ${id}).`, actor: DEMO_CUSTOMER_NAME, actionId: restockAction?.id, productId: p.id, orderId: id, customerId: DEMO_CUSTOMER_ID, kpiDelta: viaNotice ? "알림→구매 전환 1건 (기준값 대비: 실증 후 확인)" : "대기→구매 1건", source: "DEMO", status: "demo" });
         }
         return order;
       },
@@ -185,7 +185,7 @@ export const useApp = create<AppState>()(
         get().updateOrderStatus(orderId, "return-requested", DEMO_CUSTOMER_NAME);
         get().track("request_return", { productId: v.productId, variantId, reason });
         const p = PRODUCT_BY_ID[v.productId];
-        get().addEvidence({ type: "RISK", title: `반품 요청 · ${p.name} (${reason})`, detail: `고객 반품 사유가 구조화되어 Fit Risk 계산에 반영되었습니다.`, actor: DEMO_CUSTOMER_NAME, productId: p.id, orderId, source: "DEMO", status: "demo" });
+        get().addEvidence({ type: "RISK", title: `반품 요청 · ${p.name} (${reason})`, detail: `고객 반품 사유가 구조화되어 핏 위험도 계산에 반영되었습니다.`, actor: DEMO_CUSTOMER_NAME, productId: p.id, orderId, source: "DEMO", status: "demo" });
         return rr;
       },
 
@@ -201,10 +201,10 @@ export const useApp = create<AppState>()(
         const action = get().actions.find((a) => a.id === id);
         if (!action) return;
         const at = nowIso();
-        set((s) => ({ actions: s.actions.map((a) => (a.id === id ? { ...a, status, statusHistory: [...a.statusHistory, { status, at, actor, note }], resultNote: status === "done" ? (note ?? a.resultNote ?? "실행 완료 (Demo)") : a.resultNote } : a)) }));
+        set((s) => ({ actions: s.actions.map((a) => (a.id === id ? { ...a, status, statusHistory: [...a.statusHistory, { status, at, actor, note }], resultNote: status === "done" ? (note ?? a.resultNote ?? "실행 완료 (데모)") : a.resultNote } : a)) }));
         const evType: EvidenceType = status === "done" ? "RESULT" : status === "dismissed" || status === "hold" ? "EXCEPTION" : "ACTION";
         const statusLabel: Record<ActionStatus, string> = { recommended: "추천됨", confirmed: "확인", "in-progress": "실행중", done: "완료", hold: "보류", dismissed: "무시" };
-        get().addEvidence({ type: evType, title: `${action.title} → ${statusLabel[status]}`, detail: note ? `${actor}: ${note}` : `${actor}이(가) Action 상태를 '${statusLabel[status]}'(으)로 변경했습니다.`, actor, actionId: id, productId: action.productId, source: "DEMO", status: "demo" });
+        get().addEvidence({ type: evType, title: `${action.title} → ${statusLabel[status]}`, detail: note ? `${actor}: ${note}` : `${actor}이(가) 과제 상태를 '${statusLabel[status]}'(으)로 변경했습니다.`, actor, actionId: id, productId: action.productId, source: "DEMO", status: "demo" });
 
         // ---- Side effects: the loop closes back to the customer ----
         if (action.type === "restock" || action.type === "rebalance") {
@@ -222,7 +222,7 @@ export const useApp = create<AppState>()(
                 get().pushNotification({ title: "기다리던 상품이 재입고되었습니다", body: `${p.name} · ${v.color} · ${v.size} 옵션이 다시 준비되었습니다. 지금 구매할 수 있어요.`, kind: "restock", href: `/products/${p.id}?color=${v.color}&size=${v.size}` });
               }
               const v = VARIANT_BY_ID[vid]; const p = PRODUCT_BY_ID[v.productId];
-              get().addEvidence({ type: "RESULT", title: `${p.name} ${v.color} ${v.size} 재고 +${qty} 반영`, detail: `재입고 Action 완료 → 재고 반영 → 재입고 알림 ${waiting.length}명 발송 (고객 화면 상태 변경).`, actor, actionId: id, productId: p.id, kpiDelta: `재고 ${qty} 증가 · 알림 ${waiting.length}건`, source: "DEMO", status: "demo" });
+              get().addEvidence({ type: "RESULT", title: `${p.name} ${v.color} ${v.size} 재고 +${qty} 반영`, detail: `재입고 과제 완료 → 재고 반영 → 재입고 알림 ${waiting.length}명 발송 (고객 화면 상태 변경).`, actor, actionId: id, productId: p.id, kpiDelta: `재고 ${qty} 증가 · 알림 ${waiting.length}건`, source: "DEMO", status: "demo" });
             }
           }
         }
@@ -231,7 +231,7 @@ export const useApp = create<AppState>()(
           const rate = action.discountRate ?? 0.15;
           const newPrice = Math.round(p.price * (1 - rate) / 1000) * 1000;
           set((s) => ({ salePriceOverride: { ...s.salePriceOverride, [p.id]: newPrice } }));
-          get().addEvidence({ type: "REVENUE", title: `${p.name} 할인 ${Math.round(rate * 100)}% 적용`, detail: `판매가 ${p.price.toLocaleString("ko-KR")}원 → ${newPrice.toLocaleString("ko-KR")}원. 고객 화면 가격과 세일 목록에 즉시 반영. 판매·마진 변화는 실증에서 비교합니다.`, actor, actionId: id, productId: p.id, kpiDelta: "BASELINE 대비 변화: VALIDATE LATER", source: "DEMO", status: "pilot-ready" });
+          get().addEvidence({ type: "REVENUE", title: `${p.name} 할인 ${Math.round(rate * 100)}% 적용`, detail: `판매가 ${p.price.toLocaleString("ko-KR")}원 → ${newPrice.toLocaleString("ko-KR")}원. 고객 화면 가격과 세일 목록에 즉시 반영. 판매·마진 변화는 실증에서 비교합니다.`, actor, actionId: id, productId: p.id, kpiDelta: "기준값 대비 변화: 실증 후 확인", source: "DEMO", status: "pilot-ready" });
         }
         if (action.type === "fit-guide" && status === "done" && action.productId) {
           const p = PRODUCT_BY_ID[action.productId];
@@ -239,7 +239,7 @@ export const useApp = create<AppState>()(
             ? "⚠️ 허리가 타이트하게 나온 상품입니다. 최근 구매 고객의 82%가 '사이즈 작음'으로 교환했습니다. 평소 사이즈보다 한 치수 크게 선택하세요. 논워시 원단이라 첫 세탁 후 약 1cm 추가로 줄어듭니다."
             : `${p.fitNote} (핏 안내 보강 · 실측·반품 데이터 기준)`;
           set((s) => ({ fitNoteOverride: { ...s.fitNoteOverride, [p.id]: improved } }));
-          get().addEvidence({ type: "RESULT", title: `${p.name} 핏 안내 변경 반영`, detail: "상품 상세의 핏 안내와 핏 추천 규칙(+1 사이즈 보정)이 변경되었습니다. 이후 반품률 비교는 실증 단계에서 측정합니다.", actor, actionId: id, productId: p.id, kpiDelta: "Fit Return Rate: VALIDATE LATER", source: "DEMO", status: "pilot-ready" });
+          get().addEvidence({ type: "RESULT", title: `${p.name} 핏 안내 변경 반영`, detail: "상품 상세의 핏 안내와 핏 추천 규칙(+1 사이즈 보정)이 변경되었습니다. 이후 반품률 비교는 실증 단계에서 측정합니다.", actor, actionId: id, productId: p.id, kpiDelta: "사이즈 반품률: 실증 후 확인", source: "DEMO", status: "pilot-ready" });
         }
         if (action.type === "segment-campaign" && (status === "in-progress" || status === "done")) {
           set((s) => ({ campaignStatusOverride: { ...s.campaignStatusOverride, "cp-06": status === "done" ? "ended" : "running" } }));
@@ -265,7 +265,7 @@ export const useApp = create<AppState>()(
         const label: Record<OrderStatus, string> = { pending: "결제대기", preparing: "상품준비중", shipped: "출고완료", "in-transit": "배송중", delivered: "배송완료", cancelled: "취소", "return-requested": "반품요청", "exchange-requested": "교환요청" };
         const isMine = own || SEED_ORDERS.find((o) => o.id === orderId)?.customerId === DEMO_CUSTOMER_ID;
         if (isMine && actor !== DEMO_CUSTOMER_NAME) get().pushNotification({ title: `주문 ${orderId} · ${label[status]}`, body: status === "shipped" ? "상품이 출고되었습니다. 배송 조회를 확인하세요." : status === "delivered" ? "배송이 완료되었습니다. 사이즈는 잘 맞으셨나요?" : `주문 상태가 '${label[status]}'(으)로 변경되었습니다.`, kind: "order", href: `/my/orders/${orderId}` });
-        get().addEvidence({ type: "ACTION", title: `주문 ${orderId} → ${label[status]}`, detail: `${actor}이(가) 주문 상태를 변경했습니다. 고객 My Page 주문상태에 동시에 반영됩니다.`, actor, orderId, source: "DEMO", status: "demo" });
+        get().addEvidence({ type: "ACTION", title: `주문 ${orderId} → ${label[status]}`, detail: `${actor}이(가) 주문 상태를 변경했습니다. 고객 마이페이지 주문상태에 동시에 반영됩니다.`, actor, orderId, source: "DEMO", status: "demo" });
       },
 
       resetDemo: () => set({ ...initialCustomer(), role: "owner", tutorialDone: false, customerTourDone: false, lastResetAt: nowIso() }),

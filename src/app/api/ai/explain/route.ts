@@ -20,7 +20,7 @@ const SYSTEM = [
   "입력으로 받은 KPI 숫자(JSON)만 근거로 대표·MD가 10초 안에 읽을 수 있는 한국어 브리핑을 씁니다.",
   "규칙: 숫자를 새로 만들거나 추정하지 않습니다. 입력에 없는 사실을 단정하지 않습니다. 과장·보장 표현을 쓰지 않습니다.",
   "형식: 1문장 헤드라인 → 핵심 3~4개 불릿 → '다음 행동' 1문장. 총 6줄 이내. 마크다운 기호(#, **)는 쓰지 않습니다.",
-  "모든 수치는 DEMO/SIMULATION 데이터이며 실제 성과가 아님을 마지막 줄에 짧게 덧붙입니다.",
+  "모든 수치는 데모/시뮬레이션 데이터이며 실제 성과가 아님을 마지막 줄에 짧게 덧붙입니다.",
 ].join("\n");
 
 const configured = () => !!process.env.ANTHROPIC_API_KEY;
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       thinking: { type: "adaptive" },
       output_config: { effort: "low" },
       system: SYSTEM,
-      messages: [{ role: "user", content: `다음 KPI를 바탕으로 ${kind === "briefing" ? "경영 브리핑" : kind === "action-reason" ? "Action 추천 근거 설명" : "핏 추천 설명"}을 작성해 주세요.\n${payload}` }],
+      messages: [{ role: "user", content: `다음 KPI를 바탕으로 ${kind === "briefing" ? "경영 브리핑" : kind === "action-reason" ? "과제 추천 근거 설명" : "핏 추천 설명"}을 작성해 주세요.\n${payload}` }],
     });
     const text = res.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map((b) => b.text).join("\n").trim();
     if (!text) return NextResponse.json({ status: "AI_READY", text: fallback, model: MODEL, note: "LLM 응답이 비어 있어 규칙 기반 텍스트를 표시합니다." });

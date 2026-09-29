@@ -118,7 +118,7 @@ function BrandBody({ slug }: { slug: string }) {
                     <span className="min-w-0 flex-1">
                       <span className="block font-black tracking-tight group-hover:underline underline-offset-4">{b.name}</span>
                       <span className="block text-[0.85rem] text-neutral-text2 line-clamp-1">{b.tagline}</span>
-                      <span className="block text-[0.75rem] text-neutral-text2 tabular mt-0.5">팔로워 {num(b.followers)}</span>
+                      <span className="block text-[0.78rem] text-neutral-text2 tabular mt-0.5">팔로워 {num(b.followers)}</span>
                     </span>
                     <ChevronRight size={18} className="text-neutral-text2 group-hover:text-neutral-text shrink-0" />
                   </Link>

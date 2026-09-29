@@ -59,7 +59,7 @@ export function SampleBridgeCTA({
         <div className="relative grid gap-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[0.72rem] font-bold tracking-[0.12em]", skin.badge)}>
+              <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[0.78rem] font-bold tracking-[0.12em]", skin.badge)}>
                 <Sparkles size={12} />{MIRAE_COPY.badge}
               </span>
               <span className="text-[0.88rem] font-semibold text-neutral-text2">{MIRAE_COPY.madeBy}</span>
@@ -123,18 +123,18 @@ export function SampleBridgeMini({
 }: Omit<SampleBridgeProps, "surface">) {
   return (
     <div className={cn("no-print", className)}>
-      <p className="px-1 text-[0.68rem] font-bold tracking-[0.14em]" style={{ color: "var(--sidebar-label)" }}>{MIRAE_COPY.badge}</p>
+      <p className="px-1 text-[0.78rem] font-bold tracking-[0.14em]" style={{ color: "var(--sidebar-label)" }}>{MIRAE_COPY.badge}</p>
       <a href={consultHref} {...EXTERNAL} aria-label={MIRAE_ARIA.consult}
         className="sheen-idle group mt-1.5 flex items-center justify-center gap-1.5 h-10 rounded-lg bg-white/[0.14] border border-white/[0.16] text-white text-[0.82rem] font-bold transition-all duration-200 hover:bg-white/[0.22] hover:border-white/[0.3] active:scale-[0.98]">
         {MIRAE_COPY.consult}<ArrowRight size={14} className="nudge-x" />
       </a>
       <div className="mt-1.5 flex items-center gap-1">
         <a href={samplesHref} {...EXTERNAL} aria-label={MIRAE_ARIA.samples}
-          className="flex-1 inline-flex items-center justify-center gap-1 h-9 rounded-lg text-[0.75rem] font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-white/[0.1]" style={{ color: "var(--sidebar-muted)" }}>
+          className="flex-1 inline-flex items-center justify-center gap-1 h-9 rounded-lg text-[0.78rem] font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-white/[0.1]" style={{ color: "var(--sidebar-muted)" }}>
           다른 샘플<ExternalLink size={11} className="opacity-60" />
         </a>
         <a href={homeHref} {...EXTERNAL} aria-label={MIRAE_ARIA.home}
-          className="flex-1 inline-flex items-center justify-center gap-1 h-9 rounded-lg text-[0.75rem] font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-white/[0.1]" style={{ color: "var(--sidebar-muted)" }}>
+          className="flex-1 inline-flex items-center justify-center gap-1 h-9 rounded-lg text-[0.78rem] font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-white/[0.1]" style={{ color: "var(--sidebar-muted)" }}>
           홈페이지<ExternalLink size={11} className="opacity-60" />
         </a>
       </div>

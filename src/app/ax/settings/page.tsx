@@ -66,8 +66,8 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <PageHeader
         title="설정"
-        badge={<Badge tone="demo" size="sm">DEMO</Badge>}
-        desc="테마·글자 크기·역할·데모 초기화가 실제로 동작합니다. 실제 연결이 필요한 항목은 READY로 표시했습니다."
+        badge={<Badge tone="demo" size="sm">데모</Badge>}
+        desc="테마·글자 크기·역할·데모 초기화가 실제로 동작합니다. 실제 연결이 필요한 항목은 연결 준비로 표시했습니다."
         right={<Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" />}><Freshness source="DEMO" /></Hydrated>}
       />
       <nav aria-label="설정 섹션" className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap">
@@ -119,16 +119,16 @@ function SettingsBody() {
     { label: "상품", value: PRODUCTS.length },
     { label: "옵션 (SKU)", value: VARIANTS.length, sub: "색상 × 사이즈" },
     { label: "고객", value: CUSTOMERS.length, sub: "가상 · 개인정보 없음" },
-    { label: "주문 (90일)", value: SEED_ORDERS.length + orders.length, sub: orders.length ? `시드 ${num(SEED_ORDERS.length)} + DEMO ${orders.length}` : "시드" },
-    { label: "반품", value: RETURNS.length + returns.length, sub: returns.length ? `시드 ${RETURNS.length} + DEMO ${returns.length}` : "시드" },
+    { label: "주문 (90일)", value: SEED_ORDERS.length + orders.length, sub: orders.length ? `시드 ${num(SEED_ORDERS.length)} + 데모 ${orders.length}` : "시드" },
+    { label: "반품", value: RETURNS.length + returns.length, sub: returns.length ? `시드 ${RETURNS.length} + 데모 ${returns.length}` : "시드" },
     { label: "캠페인", value: CAMPAIGNS.length },
-    { label: "Action", value: actions.length, sub: changedActions ? `상태 변경 ${changedActions}건` : "시드 상태" },
+    { label: "과제", value: actions.length, sub: changedActions ? `상태 변경 ${changedActions}건` : "시드 상태" },
   ];
 
   return (
     <div className="space-y-6">
       {/* 01 화면 */}
-      <SettingsCard id="settings-theme" no="01" title="화면" tour="settings-theme" desc={<>9개 Canonical Theme는 사이드바·버튼·강조색(6색)만 바꿉니다. <span className="font-semibold text-neutral-text">본문·표·폼의 Neutral 색은 테마와 분리</span>되어 읽기 편한 상태가 유지됩니다.</>} badge={<Badge tone="accent" size="sm">현재 {themeDef.no} {themeDef.name}</Badge>}>
+      <SettingsCard id="settings-theme" no="01" title="화면" tour="settings-theme" desc={<>9개 기본 테마는 사이드바·버튼·강조색(6색)만 바꿉니다. <span className="font-semibold text-neutral-text">본문·표·폼의 Neutral 색은 테마와 분리</span>되어 읽기 편한 상태가 유지됩니다.</>} badge={<Badge tone="accent" size="sm">현재 {themeDef.no} {themeDef.name}</Badge>}>
         <div className="space-y-5">
           <ThemePicker />
           <PreviewStrip />
@@ -137,18 +137,18 @@ function SettingsBody() {
       </SettingsCard>
 
       {/* 02 사용자·권한 */}
-      <SettingsCard id="settings-roles" no="02" title="사용자 · 권한" desc="역할을 바꾸면 메뉴·KPI·Action 담당이 즉시 달라집니다. 고객 역할은 Business AX에 접근할 수 없습니다." badge={<Badge tone="ready" size="sm">Supabase Auth · RLS READY</Badge>}>
+      <SettingsCard id="settings-roles" no="02" title="사용자 · 권한" desc="역할을 바꾸면 메뉴·KPI·과제 담당이 즉시 달라집니다. 고객 역할은 AX 운영화면에 접근할 수 없습니다." badge={<Badge tone="ready" size="sm">Supabase 인증 · RLS 연결 준비</Badge>}>
         <div className="space-y-5">
           <div className="rounded-2xl border border-neutral-border bg-white p-4 flex flex-col md:flex-row md:items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="font-bold">Role Preview</p>
+              <p className="font-bold">역할 미리보기</p>
               <p className="text-[0.85rem] text-neutral-text2">현재 <span className="font-semibold text-neutral-text">{ROLE_NAME[effRole]}</span> ({ROLE_LABEL[effRole]}) 로 보고 있습니다.</p>
             </div>
             <RoleSwitcher />
           </div>
           <div>
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <p className="font-bold">Permission Matrix</p>
+              <p className="font-bold">권한표</p>
               <PermissionLegend />
             </div>
             <PermissionMatrix highlight={effRole} />
@@ -156,19 +156,19 @@ function SettingsBody() {
           <div className="rounded-2xl bg-neutral-canvas p-4 text-[0.9rem] leading-relaxed">
             <p className="flex items-center gap-2 font-bold"><ShieldCheck size={16} className="text-theme-primary" /><Term term="RLS">RLS</Term>란?</p>
             <p className="mt-1 text-neutral-text2">Row Level Security — 같은 표를 보더라도 <span className="font-semibold text-neutral-text">사용자마다 볼 수 있는 행이 다르게</span> 걸러지는 데이터베이스 보안 기능입니다. 예를 들어 운영직원은 전체 손익 행을 아예 받지 못하고, 고객은 본인 주문만 받습니다.</p>
-            <p className="mt-2 text-neutral-text2">지금은 브라우저의 역할 값으로 화면만 나눕니다. 실제 Supabase Auth/RLS 연결 시 <code className="rounded bg-white px-1.5 py-0.5 text-[0.82rem] border border-neutral-border">profiles.role</code> + RLS Policy로 전환합니다 <Badge tone="ready" size="sm">READY</Badge></p>
+            <p className="mt-2 text-neutral-text2">지금은 브라우저의 역할 값으로 화면만 나눕니다. 실제 Supabase 인증/RLS 연결 시 <code className="rounded bg-white px-1.5 py-0.5 text-[0.82rem] border border-neutral-border">profiles.role</code> + RLS Policy로 전환합니다 <Badge tone="ready" size="sm">연결 준비</Badge></p>
           </div>
         </div>
       </SettingsCard>
 
       {/* 03 데모 */}
-      <SettingsCard id="settings-demo" no="03" title="데모" desc="Demo/Live 상태와 시연 준비 도구입니다. 모든 데이터는 가상이며 실제 성과가 아닙니다." badge={<Badge tone="demo" size="sm">DEMO DATA</Badge>}>
+      <SettingsCard id="settings-demo" no="03" title="데모" desc="데모/연결됨 상태와 시연 준비 도구입니다. 모든 데이터는 가상이며 실제 성과가 아닙니다." badge={<Badge tone="demo" size="sm">데모 데이터</Badge>}>
         <div className="space-y-5">
           <CapabilityStatus />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
             <div className="rounded-2xl border border-neutral-border bg-white p-4 flex flex-col">
               <p className="font-bold">데모 초기화</p>
-              <p className="mt-1 text-[0.85rem] text-neutral-text2 flex-1">찜·장바구니·주문·Action 상태·알림·재고 변경·튜토리얼이 시드 상태로 돌아갑니다.</p>
+              <p className="mt-1 text-[0.85rem] text-neutral-text2 flex-1">찜·장바구니·주문·과제 상태·알림·재고 변경·튜토리얼이 시드 상태로 돌아갑니다.</p>
               <p className="mt-2 text-[0.82rem] text-neutral-text2">현재 변경 사항 <span className={changes ? "font-bold text-theme-primary" : "font-bold"}>{num(changes)}건</span>{lastResetAt ? ` · 마지막 초기화 ${relTime(lastResetAt)}` : " · 초기화 기록 없음"}</p>
               <DemoResetButton variant="brand" className="mt-3" full />
             </div>
@@ -182,7 +182,7 @@ function SettingsBody() {
             </div>
             <div className="rounded-2xl border border-neutral-border bg-white p-4 flex flex-col">
               <p className="font-bold">시연 모드</p>
-              <p className="mt-1 text-[0.85rem] text-neutral-text2 flex-1">고객 화면 ↔ Business AX를 오가는 16단계 Guided Journey (3~5분). 슬라이드가 아니라 실제 화면을 이동합니다.</p>
+              <p className="mt-1 text-[0.85rem] text-neutral-text2 flex-1">고객 화면 ↔ AX 운영화면을 오가는 16단계 안내형 시연 (3~5분). 슬라이드가 아니라 실제 화면을 이동합니다.</p>
               <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
                 <Button onClick={startPresent} icon={<Play size={16} />} full>시연 모드 시작</Button>
                 <Button variant="outline" href="/ax/present" full>시연 로비 보기</Button>
@@ -193,12 +193,12 @@ function SettingsBody() {
       </SettingsCard>
 
       {/* 04 데이터 */}
-      <SettingsCard id="settings-data" no="04" title="데이터" desc="Demo Repository(정적 시드) + 브라우저 저장 변경분을 합쳐 화면을 만듭니다. Supabase 전환 시 store action만 교체합니다.">
+      <SettingsCard id="settings-data" no="04" title="데이터" desc="데모 저장소(정적 시드) + 브라우저 저장 변경분을 합쳐 화면을 만듭니다. Supabase 전환 시 store action만 교체합니다.">
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="rounded-2xl border border-neutral-border bg-white p-4">
               <p className="text-[0.8rem] font-bold text-neutral-text2">Data Source</p>
-              <div className="mt-1 flex flex-wrap items-center gap-2"><Badge tone="demo">DEMO Repository</Badge><code className="text-[0.85rem] break-anywhere">src/lib/demo/seed.ts</code></div>
+              <div className="mt-1 flex flex-wrap items-center gap-2"><Badge tone="demo">데모 저장소</Badge><code className="text-[0.85rem] break-anywhere">src/lib/demo/seed.ts</code></div>
               <p className="mt-2 text-[0.85rem] text-neutral-text2">결정론적 시드(PRNG). 주문 → 옵션 판매 → 일별 매출 순서로 계산해 숫자끼리 모순이 없습니다.</p>
             </div>
             <div className="rounded-2xl border border-neutral-border bg-white p-4">
@@ -208,14 +208,14 @@ function SettingsBody() {
             </div>
           </div>
           <div>
-            <p className="font-bold mb-2">Demo 규모</p>
+            <p className="font-bold mb-2">데모 규모</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {sizes.map((s) => <Stat key={s.label} label={s.label} value={num(s.value)} sub={s.sub} />)}
             </div>
           </div>
           <div className="rounded-2xl bg-neutral-canvas p-4 flex flex-col md:flex-row md:items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="font-bold flex items-center gap-2"><FileSpreadsheet size={18} className="text-theme-primary" />CSV 가져오기 <Badge tone="ready" size="sm">READY</Badge></p>
+              <p className="font-bold flex items-center gap-2"><FileSpreadsheet size={18} className="text-theme-primary" />CSV 가져오기 <Badge tone="ready" size="sm">연결 준비</Badge></p>
               <p className="mt-1 text-[0.85rem] text-neutral-text2">상품·옵션·주문 CSV 형식을 확인하고, 파일을 올려 열 구조를 미리 볼 수 있습니다. 실제 반영은 Supabase 연결 후 가능합니다.</p>
             </div>
             <Button variant="outline" onClick={() => setCsvOpen(true)} icon={<FileSpreadsheet size={16} />}>CSV 가져오기 열기</Button>
@@ -225,7 +225,7 @@ function SettingsBody() {
       </SettingsCard>
 
       {/* 05 AI */}
-      <SettingsCard id="settings-ai" no="05" title="AI" desc="추천·우선순위는 전부 규칙과 수식으로 계산합니다. LLM은 '설명'만 맡을 예정이며 아직 연결하지 않았습니다." badge={<Badge tone="ready" size="sm">AI READY</Badge>}>
+      <SettingsCard id="settings-ai" no="05" title="AI" desc="추천·우선순위는 전부 규칙과 수식으로 계산합니다. LLM은 '설명'만 맡을 예정이며 아직 연결하지 않았습니다." badge={<Badge tone="ready" size="sm">AI 준비</Badge>}>
         <AIEngines />
       </SettingsCard>
 
@@ -235,12 +235,12 @@ function SettingsBody() {
       </SettingsCard>
 
       {/* 07 이미지 자산 */}
-      <SettingsCard id="settings-assets" no="07" title="이미지 자산" badge={<Badge tone="ready" size="sm">READY</Badge>}>
+      <SettingsCard id="settings-assets" no="07" title="이미지 자산" badge={<Badge tone="ready" size="sm">연결 준비</Badge>}>
         <AssetRegistry />
       </SettingsCard>
 
       <p className="text-center text-[0.82rem] text-neutral-text2">
-        <Link href="/ax" className="font-semibold text-neutral-text hover:text-theme-primary">경영 대시보드로 돌아가기</Link> · <Link href="/ax/why" className="font-semibold text-neutral-text hover:text-theme-primary">기획의도 (Why AX)</Link> · <Link href="/ax/present" className="font-semibold text-neutral-text hover:text-theme-primary">시연 모드</Link>
+        <Link href="/ax" className="font-semibold text-neutral-text hover:text-theme-primary">경영 대시보드로 돌아가기</Link> · <Link href="/ax/why" className="font-semibold text-neutral-text hover:text-theme-primary">기획의도</Link> · <Link href="/ax/present" className="font-semibold text-neutral-text hover:text-theme-primary">시연 모드</Link>
       </p>
     </div>
   );

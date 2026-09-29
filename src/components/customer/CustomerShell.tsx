@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode, type FormEvent } from "react";
-import { Search, Heart, ShoppingBag, User, Menu, Bell, Home, LayoutGrid, ChevronRight, Sparkles, ExternalLink, Play, Smartphone } from "lucide-react";
+import { Search, Heart, ShoppingBag, User, Menu, Bell, Home, LayoutGrid, ChevronRight, ChevronDown, ArrowRight, Play, Trophy, Tag, Store, Ruler, Package, Sparkles } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { BRANDS, CATEGORIES } from "@/lib/demo/seed";
 import { cn } from "@/lib/cn";
@@ -25,6 +25,23 @@ export const NEXT_MENUS = [
   { slug: "b2b", label: "B2B 단체구매", desc: "기업·단체 유니폼·단체복 견적" },
 ];
 
+/* ------------------------------------------------------------------
+   고객 플랫폼 정보구조 (UI/UX 안정화 v1.0) — 햄버거 1차 메뉴 7개, 최대 2단계.
+   고객은 '행동' 기준으로 찾는다: 둘러보기 · 카테고리 · 브랜드 · 스타일 찾기 · 내 쇼핑.
+   향후 확장(예정) 기능은 '확장 기능 보기' 안으로 접어 시각적 중요도를 한 단계 낮춘다.
+------------------------------------------------------------------- */
+type DrawerLeaf = { href: string; label: string };
+type DrawerEntry = { id: string; label: string; icon: React.ComponentType<{ size?: number }>; href?: string; children?: DrawerLeaf[] };
+const DRAWER_TREE: DrawerEntry[] = [
+  { id: "home", label: "홈", icon: Home, href: "/" },
+  { id: "ranking", label: "랭킹", icon: Trophy, href: "/ranking" },
+  { id: "new", label: "신상품·세일", icon: Tag, children: [{ href: "/new", label: "신상품" }, { href: "/shop?sale=1", label: "세일" }] },
+  { id: "category", label: "카테고리", icon: LayoutGrid, children: [{ href: "/shop?gender=men", label: "남성" }, { href: "/shop?gender=women", label: "여성" }, { href: "/shop", label: "전체 상품" }] },
+  { id: "brands", label: "브랜드", icon: Store, href: "/brands" },
+  { id: "style", label: "스타일 찾기", icon: Ruler, href: "/style" },
+  { id: "my", label: "내 쇼핑", icon: Package, children: [{ href: "/my", label: "마이페이지" }, { href: "/my/orders", label: "주문·배송" }, { href: "/wishlist", label: "찜" }, { href: "/cart", label: "장바구니" }, { href: "/my/restock", label: "재입고 알림" }] },
+];
+
 const NAV = [
   { href: "/ranking", label: "랭킹" }, { href: "/new", label: "신상품" }, { href: "/brands", label: "브랜드" },
   { href: "/shop?gender=men", label: "남성" }, { href: "/shop?gender=women", label: "여성" }, { href: "/style", label: "스타일 찾기" }, { href: "/shop?sale=1", label: "세일" },
@@ -39,15 +56,67 @@ function DemoControlBar() {
   return (
     <div className="bg-brand-black text-white text-[0.8rem] no-print" data-tour="c-demo-bar">
       <div className="mx-auto max-w-[1280px] px-4 h-9 flex items-center gap-3">
-        <Badge tone="demo" size="sm">DEMO</Badge>
-        <span className="hidden sm:inline text-white/80">대표·관리자 시연 모드 · 일반 고객에게는 보이지 않습니다</span>
+        <Badge tone="demo" size="sm">데모</Badge>
+        <span className="hidden sm:inline text-white/80">대표·관리자 시연용 · 일반 고객에게는 보이지 않습니다</span>
         <span className="hidden md:inline-flex text-white/70"><LiveClock compact light /></span>
         <div className="ml-auto flex items-center gap-1">
           <button onClick={start} className="h-10 md:h-7 px-2.5 rounded-lg hover:bg-white/10 inline-flex items-center gap-1 font-semibold"><Play size={12} />시연</button>
           <DevicePreviewButton light className="h-10 md:h-7 px-2.5 text-[0.8rem]" />
-          <Link href="/ax" className="press h-10 md:h-7 px-2.5 rounded-lg bg-white text-brand-black inline-flex items-center gap-1 font-bold hover:bg-brand-ivory hover:shadow-raised transition-all duration-200" data-tour="c-surface-switch"><ExternalLink size={12} />Business AX 보기</Link>
+          <Link href="/ax" className="group press h-10 md:h-7 px-2.5 rounded-lg bg-white text-brand-black inline-flex items-center gap-1 font-bold whitespace-nowrap hover:bg-brand-ivory hover:shadow-raised transition-all duration-200" data-tour="c-surface-switch">AX 운영화면 보기<ArrowRight size={13} className="nudge-x" /></Link>
         </div>
       </div>
+    </div>
+  );
+}
+
+function DrawerNav({ pathname, onNavigate }: { pathname: string; onNavigate: () => void }) {
+  const isHere = (href: string) => { const [path, q] = href.split("?"); if (pathname !== path) return false; if (!q) return typeof window === "undefined" || !window.location.search || path !== "/shop"; return typeof window !== "undefined" && window.location.search.includes(q); };
+  const initial = DRAWER_TREE.find((e) => e.children?.some((c) => isHere(c.href)))?.id;
+  const [open, setOpen] = useState<string | null>(initial ?? null);
+  const ROW = "group relative flex w-full items-center gap-3 min-h-[48px] px-3 rounded-xl text-[1rem] font-semibold transition-colors";
+  return (
+    <nav aria-label="전체 메뉴" className="space-y-0.5">
+      {DRAWER_TREE.map((e) => {
+        const Icon = e.icon;
+        if (e.href) {
+          const active = isHere(e.href);
+          return <Link key={e.id} href={e.href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={cn(ROW, active ? "bg-neutral-canvas" : "hover:bg-neutral-canvas active:bg-neutral-canvas")}><span aria-hidden className={cn("absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-full bg-brand-black transition-all", active ? "h-5" : "h-0")} /><span className="text-neutral-text2"><Icon size={20} /></span>{e.label}</Link>;
+        }
+        const isOpen = open === e.id;
+        return (
+          <div key={e.id}>
+            <button type="button" onClick={() => setOpen(isOpen ? null : e.id)} aria-expanded={isOpen} className={cn(ROW, "hover:bg-neutral-canvas")}>
+              <span className="text-neutral-text2"><Icon size={20} /></span><span className="flex-1 text-left">{e.label}</span>
+              <ChevronDown size={18} className={cn("text-neutral-text2 transition-transform duration-200", isOpen && "rotate-180")} />
+            </button>
+            {isOpen && (
+              <ul className="ml-[1.35rem] pl-4 border-l border-neutral-border mb-1 space-y-0.5 stagger stagger-sm">
+                {e.children!.map((c) => { const active = isHere(c.href); return <li key={c.href}><Link href={c.href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={cn("relative flex items-center min-h-[44px] px-3 rounded-lg text-[0.95rem]", active ? "bg-neutral-canvas font-semibold" : "text-neutral-text2 hover:bg-neutral-canvas hover:text-neutral-text")}><span aria-hidden className={cn("absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-full bg-brand-black", active ? "h-4" : "h-0")} />{c.label}</Link></li>; })}
+                {e.id === "category" && (
+                  <li className="pt-1.5 pb-1 px-1"><div className="flex flex-wrap gap-1.5">{CATEGORIES.map((c) => <Link key={c.id} href={`/shop?category=${c.id}`} onClick={onNavigate} className="press h-10 px-3 rounded-full border border-neutral-border text-[0.85rem] font-semibold inline-flex items-center hover:bg-neutral-canvas">{c.name}</Link>)}</div></li>
+                )}
+              </ul>
+            )}
+          </div>
+        );
+      })}
+    </nav>
+  );
+}
+
+/** 향후 확장(예정) — 기본은 접어두고, 펼치면 한 단계 낮은 톤으로 보여준다 */
+function DrawerNext() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-4 pt-4 border-t border-neutral-border">
+      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="flex w-full items-center gap-2 min-h-[44px] px-3 rounded-xl text-[0.9rem] font-semibold text-neutral-text2 hover:bg-neutral-canvas">
+        <Sparkles size={16} /><span className="flex-1 text-left">확장 기능 보기</span><Badge tone="next" size="sm">예정 {NEXT_MENUS.length}</Badge><ChevronDown size={16} className={cn("transition-transform duration-200", open && "rotate-180")} />
+      </button>
+      {open && (
+        <ul className="mt-1 space-y-0.5 stagger stagger-sm">
+          {NEXT_MENUS.map((n) => <li key={n.slug}><Link href={`/next/${n.slug}`} className="flex items-center justify-between gap-2 min-h-[44px] px-3 rounded-lg text-[0.9rem] text-neutral-text2 hover:bg-neutral-canvas hover:text-neutral-text"><span className="min-w-0 break-keep">{n.label}</span><Badge tone="next" size="sm">예정</Badge></Link></li>)}
+        </ul>
+      )}
     </div>
   );
 }
@@ -63,7 +132,7 @@ function NotificationsButton() {
     <>
       <button onClick={() => setOpen(true)} aria-label={`알림 ${unread}개`} className="relative h-11 w-11 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" data-tour="c-notifications">
         <Bell size={22} />
-        {unread > 0 && <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-accent text-white text-[0.68rem] font-bold flex items-center justify-center">{unread}</span>}
+        {unread > 0 && <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-accent text-white text-[0.78rem] font-bold flex items-center justify-center">{unread}</span>}
       </button>
       <Drawer open={open} onClose={() => setOpen(false)} title="알림" footer={notifications.some((n) => !n.read) ? <button onClick={markAllRead} className="tap text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text">모두 읽음</button> : undefined}>
         {notifications.length === 0 ? <p className="text-neutral-text2 py-10 text-center">아직 알림이 없습니다.</p> : (
@@ -109,6 +178,8 @@ export function CustomerShell({ children }: { children: ReactNode }) {
   const customerTourDone = useApp((s) => s.customerTourDone);
   const setCustomerTourDone = useApp((s) => s.setCustomerTourDone);
   const inFrame = useIsPreviewFrame();
+  const role = useApp((s) => s.role);
+  const showDemo = hydrated && role !== "customer" && !inFrame;
   const cartCount = hydrated ? cart.reduce((s, c) => s + c.qty, 0) : 0;
   const wishCount = hydrated ? wishlist.length : 0;
   useEffect(() => { setMenu(false); setCats(false); setSearch(false); }, [pathname]);
@@ -134,8 +205,8 @@ export function CustomerShell({ children }: { children: ReactNode }) {
             <div className="ml-auto xl:ml-0 flex items-center gap-0.5 shrink-0">
               <button onClick={() => setSearch(true)} className="xl:hidden h-11 w-11 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="검색"><Search size={22} /></button>
               <NotificationsButton />
-              <Link href="/wishlist" className="hidden md:inline-flex relative h-11 w-11 items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label={`찜 ${wishCount}개`}><Heart size={22} />{wishCount > 0 && <span className="absolute top-1.5 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-black text-white text-[0.68rem] font-bold flex items-center justify-center">{wishCount}</span>}</Link>
-              <Link href="/cart" className="relative h-11 w-11 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label={`장바구니 ${cartCount}개`} data-tour="c-cart"><ShoppingBag size={22} />{cartCount > 0 && <span className="absolute top-1.5 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-accent text-white text-[0.68rem] font-bold flex items-center justify-center">{cartCount}</span>}</Link>
+              <Link href="/wishlist" className="hidden md:inline-flex relative h-11 w-11 items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label={`찜 ${wishCount}개`}><Heart size={22} />{wishCount > 0 && <span className="absolute top-1.5 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-black text-white text-[0.78rem] font-bold flex items-center justify-center">{wishCount}</span>}</Link>
+              <Link href="/cart" className="relative h-11 w-11 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label={`장바구니 ${cartCount}개`} data-tour="c-cart"><ShoppingBag size={22} />{cartCount > 0 && <span className="absolute top-1.5 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-accent text-white text-[0.78rem] font-bold flex items-center justify-center">{cartCount}</span>}</Link>
               <Link href="/my" className="hidden md:inline-flex h-11 w-11 items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="마이페이지"><User size={22} /></Link>
             </div>
           </div>
@@ -154,14 +225,14 @@ export function CustomerShell({ children }: { children: ReactNode }) {
           <div className="col-span-2 md:col-span-1">
             <p className="font-black text-[1.4rem] tracking-tight">MORFIT<span className="text-brand-accent">.</span></p>
             <p className="mt-2 text-neutral-text2 leading-relaxed">취향과 사이즈에 맞는 패션을 발견하는 멀티브랜드 커머스.<br />본 서비스는 미래AI랩 AX 시연용 가상 플랫폼입니다.</p>
-            <div className="mt-3"><Badge tone="demo" size="sm">DEMO · 실제 결제 없음</Badge></div>
+            <div className="mt-3"><Badge tone="demo" size="sm">데모 · 실제 결제 없음</Badge></div>
           </div>
           <div>
             <p className="font-bold mb-3">쇼핑</p>
             <ul className="space-y-2 text-neutral-text2">{NAV.map((n) => <li key={n.href}><Link href={n.href} className="hover:text-neutral-text">{n.label}</Link></li>)}</ul>
           </div>
           <div>
-            <p className="font-bold mb-3 flex items-center gap-2">향후 확장 <Badge tone="next" size="sm">NEXT</Badge></p>
+            <p className="font-bold mb-3 flex items-center gap-2 text-neutral-text2">향후 확장 <Badge tone="next" size="sm">예정</Badge></p>
             <ul className="space-y-2 text-neutral-text2">{NEXT_MENUS.map((n) => <li key={n.slug}><Link href={`/next/${n.slug}`} className="tap hover:text-neutral-text inline-flex items-center gap-1">{n.label}<ChevronRight size={14} /></Link></li>)}</ul>
           </div>
           <div>
@@ -171,33 +242,38 @@ export function CustomerShell({ children }: { children: ReactNode }) {
             </ul>
           </div>
         </div>
-        <div className="border-t border-neutral-border"><div className="mx-auto max-w-[1280px] px-4 py-4 text-[0.8rem] text-neutral-text2 flex flex-wrap gap-x-4 gap-y-1">© MORFIT (가상 브랜드) · 미래AI랩 AX + Platform Unified v3.0 · 타사 상표·UI 미사용</div></div>
+        <div className="border-t border-neutral-border"><div className="mx-auto max-w-[1280px] px-4 py-4 text-[0.82rem] text-neutral-text2 flex flex-wrap gap-x-4 gap-y-1">© MORFIT (가상 브랜드) · 미래AI랩 AX·플랫폼 표준 v3.0 · 타사 상표·UI 미사용</div></div>
       </footer>
 
       {/* Mobile bottom navigation: 홈 / 카테고리 / 검색 / 찜 / 마이 */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border safe-bottom" aria-label="하단 메뉴">
         <ul className="grid grid-cols-5 h-[64px]">
-          <li><Link href="/" className={cn("h-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold active:bg-neutral-canvas", pathname === "/" ? "text-brand-black" : "text-neutral-text2")}><Home size={22} />홈</Link></li>
-          <li><button onClick={() => setCats(true)} className="h-full w-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold text-neutral-text2 active:bg-neutral-canvas"><LayoutGrid size={22} />카테고리</button></li>
-          <li><button onClick={() => setSearch(true)} className={cn("h-full w-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold active:bg-neutral-canvas", pathname === "/search" ? "text-brand-black" : "text-neutral-text2")}><Search size={22} />검색</button></li>
-          <li><Link href="/wishlist" className={cn("h-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold active:bg-neutral-canvas relative", pathname === "/wishlist" ? "text-brand-black" : "text-neutral-text2")}><Heart size={22} />찜{wishCount > 0 && <span className="absolute top-2 right-[22%] h-2 w-2 rounded-full bg-brand-accent" />}</Link></li>
-          <li><Link href="/my" className={cn("h-full flex flex-col items-center justify-center gap-0.5 text-[0.7rem] font-semibold active:bg-neutral-canvas", pathname.startsWith("/my") ? "text-brand-black" : "text-neutral-text2")}><User size={22} />마이</Link></li>
+          {([
+            { key: "home", label: "홈", icon: Home, href: "/", active: pathname === "/" },
+            { key: "cat", label: "카테고리", icon: LayoutGrid, onClick: () => setCats(true), active: pathname === "/shop" },
+            { key: "search", label: "검색", icon: Search, onClick: () => setSearch(true), active: pathname === "/search" },
+            { key: "wish", label: "찜", icon: Heart, href: "/wishlist", active: pathname === "/wishlist", dot: wishCount > 0 },
+            { key: "my", label: "마이", icon: User, href: "/my", active: pathname.startsWith("/my") },
+          ] as { key: string; label: string; icon: React.ComponentType<{ size?: number }>; href?: string; onClick?: () => void; active: boolean; dot?: boolean }[]).map((t) => {
+            const cls = cn("relative h-full w-full flex flex-col items-center justify-center gap-0.5 text-[0.78rem] font-semibold transition-colors active:bg-neutral-canvas", t.active ? "text-brand-black" : "text-neutral-text2");
+            const inner = (<><span aria-hidden className={cn("absolute top-0 h-[3px] rounded-b-full bg-brand-black transition-all duration-200", t.active ? "w-8 opacity-100" : "w-0 opacity-0")} /><t.icon size={22} />{t.label}{t.dot && <span className="absolute top-2 right-[22%] h-2 w-2 rounded-full bg-brand-accent" />}</>);
+            return <li key={t.key}>{t.href ? <Link href={t.href} aria-current={t.active ? "page" : undefined} className={cls}>{inner}</Link> : <button type="button" onClick={t.onClick} className={cls}>{inner}</button>}</li>;
+          })}
         </ul>
       </nav>
 
-      <Drawer open={menu} onClose={() => setMenu(false)} side="left" title="전체 메뉴" width="max-w-[320px]">
-        <SearchBox className="mb-5" onDone={() => setMenu(false)} />
-        <ul className="space-y-1">
-          {NAV.map((n) => <li key={n.href}><Link href={n.href} className="flex items-center justify-between h-12 px-2 rounded-xl font-semibold hover:bg-neutral-canvas active:bg-neutral-canvas">{n.label}<ChevronRight size={18} className="text-neutral-text2" /></Link></li>)}
-        </ul>
-        <p className="mt-6 mb-2 text-[0.8rem] font-bold text-neutral-text2 tracking-wide">카테고리</p>
-        <ul className="grid grid-cols-2 gap-1">{CATEGORIES.map((c) => <li key={c.id}><Link href={`/shop?category=${c.id}`} className="block h-11 leading-[44px] px-2 rounded-xl hover:bg-neutral-canvas">{c.name}</Link></li>)}</ul>
-        <p className="mt-6 mb-2 text-[0.8rem] font-bold text-neutral-text2 tracking-wide flex items-center gap-2">향후 확장 <Badge tone="next" size="sm">NEXT</Badge></p>
-        <ul className="space-y-1">{NEXT_MENUS.map((n) => <li key={n.slug}><Link href={`/next/${n.slug}`} className="flex items-center justify-between h-11 px-2 rounded-xl text-neutral-text2 hover:bg-neutral-canvas">{n.label}<Sparkles size={14} /></Link></li>)}</ul>
-        <div className="mt-6 flex items-center gap-2"><Smartphone size={14} className="text-neutral-text2" /><DevicePreviewButton /></div>
+      <Drawer open={menu} onClose={() => setMenu(false)} side="left" title={<span className="font-black tracking-tight text-[1.35rem]">MORFIT<span className="text-brand-accent">.</span></span>}
+        footer={showDemo ? <Link href="/ax" onClick={() => setMenu(false)} className="press flex w-full items-center justify-center gap-2 h-12 rounded-xl bg-brand-black text-white text-[0.95rem] font-bold hover:bg-[#2a2a2a] transition-colors" data-tour="c-drawer-ax-cta">AX 운영화면 보기<ArrowRight size={18} /></Link> : undefined}>
+        <SearchBox className="mb-4" onDone={() => setMenu(false)} />
+        <DrawerNav pathname={pathname} onNavigate={() => setMenu(false)} />
+        <DrawerNext />
+        {showDemo && <div className="mt-5 pt-4 border-t border-neutral-border flex items-center gap-2"><span className="text-[0.82rem] font-semibold text-neutral-text2">데모 도구</span><DevicePreviewButton labelAlways /></div>}
       </Drawer>
 
       <BottomSheet open={cats} onClose={() => setCats(false)} title="카테고리">
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          {[["/shop?gender=men", "남성"], ["/shop?gender=women", "여성"], ["/shop", "전체 상품"]].map(([href, label]) => <Link key={href} href={href} className="press h-12 rounded-xl border border-neutral-border font-semibold inline-flex items-center justify-center hover:bg-neutral-canvas">{label}</Link>)}
+        </div>
         <div className="grid grid-cols-2 gap-2">
           {CATEGORIES.map((c) => <Link key={c.id} href={`/shop?category=${c.id}`} className="rounded-2xl p-4 font-semibold active:scale-[0.98] transition-transform" style={{ background: `linear-gradient(135deg, ${c.gradient[0]}22, ${c.gradient[1]}55)` }}>{c.name}</Link>)}
         </div>

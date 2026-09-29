@@ -18,14 +18,14 @@ function CompleteContent({ orderId }: { orderId: string }) {
   const store = useApp();
   const order = store.orders.find((o) => o.id === orderId);
   if (!order) {
-    return <EmptyState icon={<PackageSearch size={22} />} title="주문 정보를 찾을 수 없습니다" desc={`주문번호 '${orderId}'는 이 기기의 DEMO 주문 목록에 없습니다. 데모를 초기화했거나 다른 기기에서 주문했을 수 있습니다.`} action={<div className="flex gap-2"><Button variant="brand" href="/my/orders">주문내역 보기</Button><Button variant="outline" href="/ranking">쇼핑 계속</Button></div>} />;
+    return <EmptyState icon={<PackageSearch size={22} />} title="주문 정보를 찾을 수 없습니다" desc={`주문번호 '${orderId}'는 이 기기의 데모 주문 목록에 없습니다. 데모를 초기화했거나 다른 기기에서 주문했을 수 있습니다.`} action={<div className="flex gap-2"><Button variant="brand" href="/my/orders">주문내역 보기</Button><Button variant="outline" href="/ranking">쇼핑 계속</Button></div>} />;
   }
   const itemCount = order.items.reduce((s, i) => s + i.qty, 0);
   return (
     <div className="max-w-[720px] mx-auto space-y-5">
       <div className="rounded-cardlg border border-neutral-border bg-white p-6 md:p-8 text-center shadow-card">
         <span className="mx-auto h-16 w-16 rounded-full bg-semantic-success/10 text-semantic-success inline-flex items-center justify-center animate-scaleIn"><CheckCircle2 size={36} /></span>
-        <h1 className="mt-4 text-[1.6rem] md:text-[1.9rem] font-bold tracking-tight">DEMO 주문이 완료되었습니다</h1>
+        <h1 className="mt-4 text-[1.6rem] md:text-[1.9rem] font-bold tracking-tight">데모 주문이 완료되었습니다</h1>
         <p className="mt-1 text-neutral-text2">{order.customerName}님, 주문해 주셔서 감사합니다. 실제 결제는 이루어지지 않았습니다.</p>
         <div className="mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-xl bg-brand-ivory px-4 py-2.5 text-[0.9rem]"><span className="text-neutral-text2">주문번호</span><span className="font-black tabular text-[1.05rem]">{order.id}</span><OrderStatusBadge status={order.status} /><DemoBadge /></div>
         <p className="mt-2 text-[0.82rem] text-neutral-text2 tabular">{fmtDate(order.createdAt, "datetime")} · {order.channel === "mobile" ? "모바일" : "웹"} 주문</p>
@@ -44,8 +44,8 @@ function CompleteContent({ orderId }: { orderId: string }) {
       </div>
 
       <div className="rounded-cardlg border border-brand-accent/30 bg-brand-accent/5 p-5 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex-1"><p className="font-bold flex items-center gap-2"><Badge tone="accent" size="sm">Closed Loop 2</Badge>이 주문은 Business AX 주문·매출·재고에 즉시 반영되었습니다</p><p className="text-[0.85rem] text-neutral-text2 mt-1">운영팀이 상품준비 → 출고 → 배송 상태로 바꾸면 My Page 주문상태와 알림에 그대로 나타납니다.</p></div>
-        {store.role !== "customer" && <Link href="/ax/orders" className="inline-flex items-center gap-1 text-[0.85rem] font-bold text-brand-accent hover:underline underline-offset-2 whitespace-nowrap"><ExternalLink size={14} />(대표·관리자) Business AX에서 보기</Link>}
+        <div className="flex-1"><p className="font-bold flex items-center gap-2"><Badge tone="accent" size="sm">데이터 순환 2</Badge>이 주문은 AX 운영화면 주문·매출·재고에 즉시 반영되었습니다</p><p className="text-[0.85rem] text-neutral-text2 mt-1">운영팀이 상품준비 → 출고 → 배송 상태로 바꾸면 마이페이지 주문상태와 알림에 그대로 나타납니다.</p></div>
+        {store.role !== "customer" && <Link href="/ax/orders" className="inline-flex items-center gap-1 text-[0.85rem] font-bold text-brand-accent hover:underline underline-offset-2 whitespace-nowrap"><ExternalLink size={14} />AX 운영화면 보기</Link>}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
@@ -59,7 +59,7 @@ function CompleteContent({ orderId }: { orderId: string }) {
 export default function CompletePage() {
   const params = useParams<{ orderId: string }>();
   const orderId = decodeURIComponent(String(params?.orderId ?? ""));
-  useDocumentTitle("주문 완료 (DEMO)");
+  useDocumentTitle("주문 완료 (데모)");
   return (
     <Container className="py-8 md:py-12">
       <Hydrated fallback={<div className="max-w-[720px] mx-auto space-y-5"><SkeletonCard lines={3} /><SkeletonCard lines={5} /></div>}><CompleteContent orderId={orderId} /></Hydrated>

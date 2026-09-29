@@ -108,12 +108,14 @@ export function NoteCard({ children, tone = "neutral", icon, className }: { chil
   );
 }
 
+export const SOURCE_LABEL: Record<DataSource, string> = { DEMO: "데모", SIMULATION: "시뮬레이션", LIVE: "실제 데이터" };
+
 export function SourceBadge({ source, size = "sm" }: { source: DataSource; size?: "sm" | "md" }) {
-  return <Badge tone={source === "LIVE" ? "live" : "demo"} size={size}>{source}</Badge>;
+  return <Badge tone={source === "LIVE" ? "live" : "demo"} size={size}>{SOURCE_LABEL[source]}</Badge>;
 }
 
 export const EVIDENCE_TYPE_LABEL: Record<EvidenceType, string> = {
-  BASELINE: "기준선", ACTION: "실행", RESULT: "결과", ADOPTION: "채택", CUSTOMER: "고객",
+  BASELINE: "기준값", ACTION: "실행", RESULT: "결과", ADOPTION: "채택", CUSTOMER: "고객",
   EFFICIENCY: "효율", REVENUE: "매출", SCALE: "확장", RISK: "위험", EXCEPTION: "예외",
 };
 export const EVIDENCE_TYPE_TONE: Record<EvidenceType, Tone> = {
@@ -123,7 +125,7 @@ export const EVIDENCE_TYPE_TONE: Record<EvidenceType, Tone> = {
 export const EVIDENCE_TYPES: EvidenceType[] = ["BASELINE", "ACTION", "RESULT", "ADOPTION", "CUSTOMER", "EFFICIENCY", "REVENUE", "SCALE", "RISK", "EXCEPTION"];
 
 export function EvidenceTypeBadge({ type, size = "sm" }: { type: EvidenceType; size?: "sm" | "md" }) {
-  return <Badge tone={EVIDENCE_TYPE_TONE[type]} size={size}>{type} · {EVIDENCE_TYPE_LABEL[type]}</Badge>;
+  return <Badge tone={EVIDENCE_TYPE_TONE[type]} size={size}>{EVIDENCE_TYPE_LABEL[type]}</Badge>;
 }
 
 /** Simple definition list row used inside drawers. */

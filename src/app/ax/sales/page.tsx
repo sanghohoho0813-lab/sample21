@@ -109,9 +109,9 @@ function SalesInner() {
     { key: "units", header: "수량", align: "right", cell: (r) => num(r.units) },
     { key: "discount", header: "할인", align: "right", cell: (r) => krwShort(r.discount) },
     { key: "returns", header: "반품", align: "right", cell: (r) => <span className={r.returns / Math.max(1, r.units) > 0.15 ? "text-semantic-error font-semibold" : ""}>{num(r.returns)}건</span> },
-    ...(showMargin ? [{ key: "margin", header: "추정 마진", align: "right", cell: (r: Row) => <span className="tabular">{krwShort(r.margin)}<span className="block text-[0.75rem] text-neutral-text2">{pct(r.marginRate, 0)}</span></span> } as Column<Row>] : []),
+    ...(showMargin ? [{ key: "margin", header: "추정 마진", align: "right", cell: (r: Row) => <span className="tabular">{krwShort(r.margin)}<span className="block text-[0.78rem] text-neutral-text2">{pct(r.marginRate, 0)}</span></span> } as Column<Row>] : []),
     { key: "flag", header: "위험/기회", cell: (r) => r.flag === "risk" ? <span className="inline-flex items-center gap-1.5"><Badge tone="error" size="sm">위험</Badge><span className="hidden lg:inline text-[0.8rem] text-neutral-text2">매출 높고 마진 낮음</span></span> : r.flag === "opp" ? <span className="inline-flex items-center gap-1.5"><Badge tone="success" size="sm">기회</Badge><span className="hidden lg:inline text-[0.8rem] text-neutral-text2">마진 높고 판매 {signed(r.velocity, 0)}</span></span> : <span className="text-neutral-text2 text-[0.82rem]">-</span> },
-    { key: "act", header: "", align: "right", cell: (r) => <Button size="sm" variant="outline" href={`/ax/actions?product=${r.id}`} onClick={(e) => e.stopPropagation()}>Action 보기</Button> },
+    { key: "act", header: "", align: "right", cell: (r) => <Button size="sm" variant="outline" href={`/ax/actions?product=${r.id}`} onClick={(e) => e.stopPropagation()}>과제 보기</Button> },
   ];
 
   const camps = useMemo(() => CAMPAIGNS.filter((c) => c.revenue > 0 || c.beforeRevenue > 0), []);
@@ -119,15 +119,15 @@ function SalesInner() {
   if (!can(role, "brand-margin") && !can(role, "company-pnl")) {
     return (
       <div className="space-y-6">
-        <PageHeader title="매출·마진" badge={<Badge tone="demo" size="sm">DEMO</Badge>} right={<Freshness source="DEMO" />} />
-        <EmptyState icon={<Lock size={22} />} title="권한 없음 — 운영직원은 매출·마진을 볼 수 없습니다" desc="매출·손익과 브랜드·상품 마진은 대표·MD 권한입니다. 설정 > Permission Matrix에서 역할별 권한을 확인할 수 있습니다. 상단 역할 전환으로 대표/MD로 바꾸면 이 화면을 볼 수 있습니다." action={<div className="flex gap-2"><Button variant="outline" href="/ax/settings">권한 보기</Button><Button href="/ax/orders">주문·배송으로 이동</Button></div>} />
+        <PageHeader title="매출·마진" badge={<Badge tone="demo" size="sm">데모</Badge>} right={<Freshness source="DEMO" />} />
+        <EmptyState icon={<Lock size={22} />} title="권한 없음 — 운영직원은 매출·마진을 볼 수 없습니다" desc="매출·손익과 브랜드·상품 마진은 대표·MD 권한입니다. 설정 > 권한표에서 역할별 권한을 확인할 수 있습니다. 상단 역할 전환으로 대표/MD로 바꾸면 이 화면을 볼 수 있습니다." action={<div className="flex gap-2"><Button variant="outline" href="/ax/settings">권한 보기</Button><Button href="/ax/orders">주문·배송으로 이동</Button></div>} />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <PageHeader title="매출·마진" desc="기간과 채널을 바꿔 매출·할인·반품·마진을 확인하고, 상품별 위험·기회를 Action으로 연결합니다." badge={<Badge tone="demo" size="sm">DEMO</Badge>}
+      <PageHeader title="매출·마진" desc="기간과 채널을 바꿔 매출·할인·반품·마진을 확인하고, 상품별 위험·기회를 과제로 연결합니다." badge={<Badge tone="demo" size="sm">데모</Badge>}
         right={<div className="flex flex-col items-start md:items-end gap-2"><div className="flex flex-wrap gap-2"><Segmented value={period} onChange={setPeriod} options={PERIODS.map((x) => ({ value: x, label: PERIOD_LABEL[x].replace("최근 ", "") }))} /><Segmented value={channel} onChange={setChannel} options={(["all", "web", "mobile"] as Channel[]).map((c) => ({ value: c, label: CHANNEL_LABEL[c] }))} /></div><Freshness source="DEMO" /></div>} />
 
       {role === "md" && <RoleNote>MD 화면 — 회사 전체 손익(추정 마진 합계)은 대표 권한이라 숨겼습니다. 상품·브랜드 마진은 표시됩니다.</RoleNote>}
@@ -223,7 +223,7 @@ function SalesInner() {
         {rows.length > 25 && <p className="mt-2 text-[0.82rem] text-neutral-text2">매출 상위 25개 상품만 표시 · 전체는 상품·SKU에서 확인</p>}
       </SectionCard>
 
-      <SectionCard title="프로모션 전후 비교" desc="캠페인 직전 기간 매출 vs 캠페인 매출 · 할인비용·추정 마진·반품 (SIMULATION)" right={<AxLink href="/ax/campaigns">캠페인·기획전</AxLink>}>
+      <SectionCard title="프로모션 전후 비교" desc="캠페인 직전 기간 매출 vs 캠페인 매출 · 할인비용·추정 마진·반품 (시뮬레이션)" right={<AxLink href="/ax/campaigns">캠페인·기획전</AxLink>}>
         <DataTable rows={camps} rowKey={(c) => c.id} dense onRowClick={() => router.push("/ax/campaigns")} columns={[
           { key: "name", header: "캠페인", primary: true, cell: (c) => <span className="font-semibold">{c.name}<span className="block text-[0.78rem] font-normal text-neutral-text2">할인 {pct(c.discountRate, 0)} · {c.status === "running" ? "진행 중" : c.status === "ended" ? "종료" : c.status === "scheduled" ? "예정" : "초안"}</span></span> },
           { key: "before", header: "전 매출", align: "right", cell: (c) => (c.beforeRevenue ? krwShort(c.beforeRevenue) : "-") },
@@ -233,11 +233,11 @@ function SalesInner() {
           ...(showMargin ? [{ key: "margin", header: "추정 마진", align: "right", cell: (c) => krwShort(c.estMargin) } as Column<(typeof camps)[number]>] : []),
           { key: "returns", header: "반품", align: "right", cell: (c) => `${num(c.returns)}건` },
         ]} />
-        <InfoNote className="mt-3">전후 비교는 시뮬레이션 값이며 실제 개선율이 아닙니다. Baseline 측정 후 실증(12주)에서 검증합니다.</InfoNote>
+        <InfoNote className="mt-3">전후 비교는 시뮬레이션 값이며 실제 개선율이 아닙니다. 기준값 측정 후 실증(12주)에서 검증합니다.</InfoNote>
       </SectionCard>
 
       {/* Unit Economics 측정 설계 (Scale) */}
-      <SectionCard title="Unit Economics 측정 설계" desc="지금 계산 가능한 단위경제 항목과, 실증에서 측정할 CAC · LTV · Payback 의 정의·측정 지점" right={<AxLink href="/ax/evidence/pack">Evidence Pack</AxLink>}>
+      <SectionCard title="단위 경제성 측정 설계" desc="지금 계산 가능한 단위경제 항목과, 실증에서 측정할 CAC · LTV · 회수 기간 의 정의·측정 지점" right={<AxLink href="/ax/evidence/pack">증빙 리포트</AxLink>}>
         <UnitEconomicsPanel showMargin={showCompanyMargin} />
       </SectionCard>
     </div>

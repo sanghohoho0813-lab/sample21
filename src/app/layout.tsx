@@ -4,7 +4,7 @@ import { AppProviders } from "@/components/system/AppProviders";
 
 export const metadata: Metadata = {
   title: { default: "MORFIT — 멀티브랜드 패션 플랫폼", template: "%s | MORFIT" },
-  description: "여러 브랜드를 한곳에서. 취향과 사이즈에 맞는 패션을 발견하는 멀티브랜드 커머스 MORFIT (DEMO).",
+  description: "여러 브랜드를 한곳에서. 취향과 사이즈에 맞는 패션을 발견하는 멀티브랜드 커머스 MORFIT (데모).",
   openGraph: { title: "MORFIT — 멀티브랜드 패션 플랫폼", description: "취향과 사이즈에 맞는 패션을 발견하세요.", type: "website", locale: "ko_KR", siteName: "MORFIT" },
   icons: { icon: "/favicon.svg" },
 };

@@ -122,7 +122,7 @@ export function FitProfileForm({ onSaved }: { onSaved?: (p: FitProfile) => void 
           <div className="grid grid-cols-2 gap-2">
             {BODY_TYPES.map((b) => (
               <button key={b.value} type="button" aria-pressed={draft.bodyType === b.value} onClick={() => set({ bodyType: draft.bodyType === b.value ? null : b.value })} className={cn("rounded-xl border px-3 py-2.5 text-left transition-all duration-fast active:scale-[0.98] min-h-[56px]", draft.bodyType === b.value ? "border-brand-black bg-brand-black text-white" : "border-neutral-border bg-white hover:border-neutral-text2")}>
-                <span className="block font-semibold text-[0.9rem]">{b.label}</span><span className={cn("block text-[0.75rem]", draft.bodyType === b.value ? "text-white/75" : "text-neutral-text2")}>{b.desc}</span>
+                <span className="block font-semibold text-[0.9rem]">{b.label}</span><span className={cn("block text-[0.78rem]", draft.bodyType === b.value ? "text-white/75" : "text-neutral-text2")}>{b.desc}</span>
               </button>
             ))}
           </div>

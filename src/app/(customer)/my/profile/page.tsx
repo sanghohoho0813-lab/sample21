@@ -16,7 +16,7 @@ import { INTERESTS_KEY, useDocumentTitle, useLocalPref } from "@/components/cust
 
 function InterestsCard() {
   const [prefs, setPrefs] = useLocalPref<{ ids: string[] }>(INTERESTS_KEY, { ids: [] });
-  const toggle = (id: string) => { const on = prefs.ids.includes(id); const ids = on ? prefs.ids.filter((x) => x !== id) : [...prefs.ids, id]; setPrefs({ ids }); toast(on ? "관심 카테고리에서 제외했습니다" : "관심 카테고리에 추가했습니다", "추천 상품에 반영됩니다 (DEMO)", on ? "info" : "success"); };
+  const toggle = (id: string) => { const on = prefs.ids.includes(id); const ids = on ? prefs.ids.filter((x) => x !== id) : [...prefs.ids, id]; setPrefs({ ids }); toast(on ? "관심 카테고리에서 제외했습니다" : "관심 카테고리에 추가했습니다", "추천 상품에 반영됩니다 (데모)", on ? "info" : "success"); };
   return (
     <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
       <p className="font-bold flex items-center gap-2 mb-1"><LayoutGrid size={16} />관심 카테고리</p>
@@ -48,9 +48,9 @@ function ProfileContent() {
           <p className="font-bold flex items-center gap-2"><ShieldCheck size={16} />데이터 사용 안내</p>
           <ul className="list-disc pl-5 space-y-1 text-neutral-text2 leading-relaxed">
             <li>키·몸무게·평소 사이즈·선호 핏은 <span className="font-semibold text-neutral-text">개인화 추천(핏 추천·추천상품)</span>에만 사용됩니다.</li>
-            <li>실제 개인정보는 저장하지 않으며, 입력값은 이 브라우저의 DEMO 저장소에만 남습니다.</li>
-            <li>Business AX에는 개인을 식별할 수 없는 집계값(체형대별 선택 비율 등)만 반영됩니다.</li>
-            <li>데모 초기화(Business AX 설정)를 하면 모든 값이 지워집니다.</li>
+            <li>실제 개인정보는 저장하지 않으며, 입력값은 이 브라우저의 데모 저장소에만 남습니다.</li>
+            <li>AX 운영화면에는 개인을 식별할 수 없는 집계값(체형대별 선택 비율 등)만 반영됩니다.</li>
+            <li>데모 초기화(AX 운영화면 설정)를 하면 모든 값이 지워집니다.</li>
           </ul>
         </div>
       </div>

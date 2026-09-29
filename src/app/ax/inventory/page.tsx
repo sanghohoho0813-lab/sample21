@@ -60,11 +60,11 @@ function InventoryInner() {
   const slow = useMemo(() => PRODUCTS.map((p) => ({ p, m: markdownReview(p, app), action: app.actions.find((a) => a.type === "markdown" && a.productId === p.id && a.status !== "dismissed") })).filter((x) => x.m.shouldReview).sort((a, b) => b.m.stockValue - a.m.stockValue), [app]);
   const incoming = useMemo(() => rows.filter((r) => r.v.incoming > 0).sort((a, b) => a.dos - b.dos), [rows]);
 
-  const requestReview = (label: string) => toast("검토 요청 (Demo)", `${label} · MD 승인 대기 Action은 시연 시나리오에서 제공됩니다. 실제 서비스에서는 Demand Engine이 자동으로 추천을 생성합니다.`, "info");
+  const requestReview = (label: string) => toast("검토 요청 (데모)", `${label} · MD 승인 대기 과제는 시연 시나리오에서 제공됩니다. 실제 서비스에서는 수요 엔진이 자동으로 추천을 생성합니다.`, "info");
 
   return (
     <div className="space-y-6">
-      <PageHeader title="재고·재입고" desc="옵션(색상×사이즈) 단위 수요신호로 어떤 옵션을 언제 확보할지, 무엇을 할인할지 먼저 봅니다." badge={<Badge tone="demo" size="sm">DEMO</Badge>} right={<Freshness source="DEMO" />} />
+      <PageHeader title="재고·재입고" desc="옵션(색상×사이즈) 단위 수요신호로 어떤 옵션을 언제 확보할지, 무엇을 할인할지 먼저 봅니다." badge={<Badge tone="demo" size="sm">데모</Badge>} right={<Freshness source="DEMO" />} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 stagger">
         <KpiCard size="lg" label="품절위험 옵션" value={<BigLg>{num(inv.lowRisk)}</BigLg>} sub={`품절 임박 ${counts.low} · 품절 ${counts.soldout} · 7일 추정손실 ${krwShort(inv.lostSales7d)}`} icon={<AlertTriangle size={18} />} accent={ICON_ACCENTS.risk} />
@@ -77,8 +77,8 @@ function InventoryInner() {
       <section data-tour="demand-radar" className="rounded-cardlg bg-white border border-neutral-border shadow-card p-5 md:p-6 space-y-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
           <div>
-            <h2 className="text-[1.25rem] md:text-[1.4rem] font-bold tracking-tight inline-flex items-center gap-2"><Radar size={22} className="text-theme-primary" />Demand Radar <AIReadyBadge kind="demand" /></h2>
-            <p className="mt-1 text-neutral-text2 text-[0.92rem]"><Term term="Demand Signal">Demand Score</Term> = 판매속도 변화 30% + 찜 변화 20% + 재고 압박 25% + 재입고 신청 15% + 장바구니 10% · 규칙 기반 (0~100)</p>
+            <h2 className="text-[1.25rem] md:text-[1.4rem] font-bold tracking-tight inline-flex items-center gap-2"><Radar size={22} className="text-theme-primary" />수요 레이더 <AIReadyBadge kind="demand" /></h2>
+            <p className="mt-1 text-neutral-text2 text-[0.92rem]"><Term term="수요 신호">수요 점수</Term> = 판매속도 변화 30% + 찜 변화 20% + 재고 압박 25% + 재입고 신청 15% + 장바구니 10% · 규칙 기반 (0~100)</p>
           </div>
           <p className="text-[0.82rem] text-neutral-text2 tabular">{num(filtered.length)}개 옵션 · 점수 높은 순</p>
         </div>
@@ -100,7 +100,7 @@ function InventoryInner() {
             <div className="hidden md:block overflow-x-auto rounded-cardlg border border-neutral-border">
               <table className="w-full text-[0.88rem]">
                 <thead><tr className="bg-neutral-canvas text-neutral-text2 text-left">
-                  {["상품 · 옵션", "Demand Score", "7일 판매", "찜 7일", "장바구니", "재입고 신청", "현재고", "예상 소진", "리드타임", "상태", "추천", "Action"].map((h, i) => <th key={h} className={cn("px-3 py-2.5 font-semibold whitespace-nowrap", i >= 2 && i <= 8 && "text-right")}>{h}</th>)}
+                  {["상품 · 옵션", "수요 점수", "7일 판매", "찜 7일", "장바구니", "재입고 신청", "현재고", "예상 소진", "리드타임", "상태", "추천", "Action"].map((h, i) => <th key={h} className={cn("px-3 py-2.5 font-semibold whitespace-nowrap", i >= 2 && i <= 8 && "text-right")}>{h}</th>)}
                 </tr></thead>
                 <tbody>
                   {shown.map((r) => <RadarTr key={r.v.id} r={r} onRequest={requestReview} tourable={!mobile} />)}
@@ -113,13 +113,13 @@ function InventoryInner() {
           </>
         )}
         <InfoNote className="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
-          <span><span className="font-semibold text-neutral-text">자동발주 없음</span> · 추천 후 사람이 승인합니다 (<Term term="L3">L3</Term>). 재입고 우선순위 = 재고 위험 45% + Demand 25% + 마진 15% + 재입고 신청 15%.</span>
-          <AxLink href="/ax/actions?type=restock">재입고 Action 보기</AxLink>
+          <span><span className="font-semibold text-neutral-text">자동발주 없음</span> · 추천 후 사람이 승인합니다 (<Term term="L3">L3</Term>). 재입고 우선순위 = 재고 위험 45% + 수요 25% + 마진 15% + 재입고 신청 15%.</span>
+          <AxLink href="/ax/actions?type=restock">재입고 과제 보기</AxLink>
         </InfoNote>
       </section>
 
       {/* 저회전·과잉 */}
-      <SectionCard title="저회전 · 과잉 재고" desc="재고일수가 시즌 잔여기간의 절반을 넘고 판매속도가 둔화된 상품 · Markdown Engine 검토 대상" right={<AxLink href="/ax/actions?type=markdown">할인 Action</AxLink>}>
+      <SectionCard title="저회전 · 과잉 재고" desc="재고일수가 시즌 잔여기간의 절반을 넘고 판매속도가 둔화된 상품 · 할인 엔진 검토 대상" right={<AxLink href="/ax/actions?type=markdown">할인 과제</AxLink>}>
         {slow.length === 0 ? <EmptyState title="할인 검토 대상이 없습니다" /> : (
           <DataTable rows={slow} rowKey={(x) => x.p.id} dense columns={[
             { key: "p", header: "상품", primary: true, cell: (x) => <Link href={`/ax/products/${x.p.id}?tab=insight`} className="font-semibold hover:text-theme-primary">{x.p.name}<span className="block text-[0.78rem] font-normal text-neutral-text2">{BRAND_BY_ID[x.p.brandId].name} · 재고 {num(x.m.stock)}개</span></Link> },
@@ -129,7 +129,7 @@ function InventoryInner() {
             ...(showCost ? [{ key: "value", header: "재고원가", align: "right" as const, cell: (x: (typeof slow)[number]) => <span className="tabular font-semibold">{krwShort(x.m.stockValue)}</span> }] : []),
             { key: "cur", header: "현재 할인", align: "right", cell: (x) => pct(x.m.currentRate, 0) },
             { key: "sug", header: "제안 할인율", align: "right", cell: (x) => <span className="font-semibold text-theme-primary tabular">{pct(x.m.suggestedRate, 0)}</span> },
-            { key: "act", header: "Action", cell: (x) => x.action ? <Link href={`/ax/actions?open=${x.action.id}`} className="tap inline-flex items-center gap-1 font-semibold text-theme-primary hover:underline underline-offset-4 text-[0.85rem]"><ActionStatusBadge status={x.action.status} size="sm" />열기</Link> : <Button size="sm" variant="outline" onClick={() => requestReview(x.p.name)}>검토 요청</Button> },
+            { key: "act", header: "과제", cell: (x) => x.action ? <Link href={`/ax/actions?open=${x.action.id}`} className="tap inline-flex items-center gap-1 font-semibold text-theme-primary hover:underline underline-offset-4 text-[0.85rem]"><ActionStatusBadge status={x.action.status} size="sm" />열기</Link> : <Button size="sm" variant="outline" onClick={() => requestReview(x.p.name)}>검토 요청</Button> },
           ]} />
         )}
       </SectionCard>
@@ -154,7 +154,7 @@ function InventoryInner() {
 /* ------------------------------ Radar rows ------------------------------ */
 function ActionCell({ r, onRequest }: { r: RadarRow; onRequest: (label: string) => void }) {
   const p = PRODUCT_BY_ID[r.v.productId];
-  if (r.actionId) return <Link href={`/ax/actions?open=${r.actionId}`} className="tap inline-flex items-center gap-1 text-[0.82rem] font-semibold text-theme-primary hover:underline underline-offset-4 whitespace-nowrap"><Zap size={13} />Action 열기</Link>;
+  if (r.actionId) return <Link href={`/ax/actions?open=${r.actionId}`} className="tap inline-flex items-center gap-1 text-[0.82rem] font-semibold text-theme-primary hover:underline underline-offset-4 whitespace-nowrap"><Zap size={13} />과제 열기</Link>;
   return <button onClick={() => onRequest(`${p.name} ${r.v.color} ${r.v.size}`)} className="h-10 md:h-8 px-2.5 rounded-lg border border-neutral-border bg-white text-[0.8rem] font-semibold hover:bg-neutral-canvas whitespace-nowrap">검토 요청</button>;
 }
 
@@ -169,11 +169,11 @@ function RadarTr({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label: s
       <td className="px-3 py-2.5 text-right tabular">{r.v.wishlist7d} <UnitDelta cur={r.v.wishlist7d} prev={r.v.wishlistPrev7d} /></td>
       <td className="px-3 py-2.5 text-right tabular">{r.v.cart7d}</td>
       <td className={cn("px-3 py-2.5 text-right tabular", r.v.restockRequests >= 5 && "font-bold text-theme-primary")} data-field="restockRequests">{r.v.restockRequests}</td>
-      <td className={cn("px-3 py-2.5 text-right tabular font-semibold", r.v.stock <= 0 ? "text-semantic-error" : r.dos <= 4 && "text-semantic-warning")}>{r.v.stock}{r.v.incoming > 0 && <span className="block text-[0.72rem] font-normal text-neutral-text2">+{r.v.incoming}</span>}</td>
+      <td className={cn("px-3 py-2.5 text-right tabular font-semibold", r.v.stock <= 0 ? "text-semantic-error" : r.dos <= 4 && "text-semantic-warning")}>{r.v.stock}{r.v.incoming > 0 && <span className="block text-[0.78rem] font-normal text-neutral-text2">+{r.v.incoming}</span>}</td>
       <td className="px-3 py-2.5 text-right tabular">{r.v.stock <= 0 ? <span className="text-semantic-error font-semibold">품절</span> : `${r.dos}일`}</td>
       <td className="px-3 py-2.5 text-right tabular">{r.rp.leadTime}일</td>
       <td className="px-3 py-2.5"><InventoryStatusBadge status={r.status} /></td>
-      <td className="px-3 py-2.5 whitespace-nowrap"><span className="tabular font-semibold">{r.rp.score}점</span><span className="block text-[0.75rem] text-neutral-text2">{r.rp.suggestedQty > 0 ? `검토수량 ${num(r.rp.suggestedQty)}` : "수량 없음"}</span></td>
+      <td className="px-3 py-2.5 whitespace-nowrap"><span className="tabular font-semibold">{r.rp.score}점</span><span className="block text-[0.78rem] text-neutral-text2">{r.rp.suggestedQty > 0 ? `검토수량 ${num(r.rp.suggestedQty)}` : "수량 없음"}</span></td>
       <td className="px-3 py-2.5"><ActionCell r={r} onRequest={onRequest} /></td>
     </tr>
   );
@@ -200,7 +200,7 @@ function RadarCard({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label:
         <div className="flex justify-between"><dt className="text-neutral-text2">리드타임</dt><dd className="tabular">{r.rp.leadTime}일</dd></div>
         <div className="flex justify-between"><dt className="text-neutral-text2">추천</dt><dd className="tabular font-semibold">{r.rp.score}점{r.rp.suggestedQty > 0 ? ` · ${num(r.rp.suggestedQty)}개` : ""}</dd></div>
       </dl>
-      <div className="mt-3 flex items-center justify-between"><span className="text-[0.75rem] text-neutral-text2">판매속도 {signed(Math.max(-1, (r.v.sales7d - r.v.salesPrev7d) / Math.max(1, r.v.salesPrev7d)), 0)} · 판매가 {krwShort(r.price)}</span><ActionCell r={r} onRequest={onRequest} /></div>
+      <div className="mt-3 flex items-center justify-between"><span className="text-[0.78rem] text-neutral-text2">판매속도 {signed(Math.max(-1, (r.v.sales7d - r.v.salesPrev7d) / Math.max(1, r.v.salesPrev7d)), 0)} · 판매가 {krwShort(r.price)}</span><ActionCell r={r} onRequest={onRequest} /></div>
     </div>
   );
 }

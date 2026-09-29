@@ -134,8 +134,8 @@ export function CsvImportModal({ open, onClose }: { open: boolean; onClose: () =
   const cur = FILES[fileKey];
 
   return (
-    <Modal open={open} onClose={close} title={<span className="inline-flex items-center gap-2">CSV 가져오기 <Badge tone="ready" size="sm">READY</Badge></span>} size="lg"
-      footer={<div className="flex flex-col sm:flex-row sm:items-center gap-2"><p className="text-[0.82rem] text-neutral-text2 sm:mr-auto">실제 반영은 Supabase 연결 후 가능 (READY). 지금은 미리보기만 하며 Demo 데이터는 바뀌지 않습니다.</p><Button variant="outline" onClick={close}>닫기</Button></div>}>
+    <Modal open={open} onClose={close} title={<span className="inline-flex items-center gap-2">CSV 가져오기 <Badge tone="ready" size="sm">연결 준비</Badge></span>} size="lg"
+      footer={<div className="flex flex-col sm:flex-row sm:items-center gap-2"><p className="text-[0.82rem] text-neutral-text2 sm:mr-auto">실제 반영은 Supabase 연결 후 가능 (연결 준비). 지금은 미리보기만 하며 데모 데이터는 바뀌지 않습니다.</p><Button variant="outline" onClick={close}>닫기</Button></div>}>
       <div className="space-y-4">
         <Segmented value={tab} onChange={setTab} options={[{ value: "sample", label: "샘플 파일 보기" }, { value: "fields", label: "필드 구조 보기" }, { value: "upload", label: "업로드" }]} />
 
@@ -147,7 +147,7 @@ export function CsvImportModal({ open, onClose }: { open: boolean; onClose: () =
 
         {tab === "sample" && (
           <div className="space-y-2">
-            <p className="text-[0.88rem] text-neutral-text2"><span className="font-semibold text-neutral-text">{cur.file}</span> · {cur.title} — 첫 줄은 열 이름, 이후 한 줄이 한 건입니다. (샘플 값은 Demo 시나리오)</p>
+            <p className="text-[0.88rem] text-neutral-text2"><span className="font-semibold text-neutral-text">{cur.file}</span> · {cur.title} — 첫 줄은 열 이름, 이후 한 줄이 한 건입니다. (샘플 값은 데모 시나리오)</p>
             <MiniTable header={cur.fields.map((f) => f.name)} rows={cur.rows} />
           </div>
         )}
@@ -185,7 +185,7 @@ export function CsvImportModal({ open, onClose }: { open: boolean; onClose: () =
                   <Badge tone="demo" size="sm" className="ml-auto">미리보기만</Badge>
                 </div>
                 <MiniTable header={parsed.header} rows={parsed.rows} />
-                <p className="text-[0.82rem] text-neutral-text2">처음 5행만 표시합니다. 실제 반영은 Supabase 연결 후 가능 (READY) — Demo 스토어는 변경되지 않았습니다.</p>
+                <p className="text-[0.82rem] text-neutral-text2">처음 5행만 표시합니다. 실제 반영은 Supabase 연결 후 가능 (연결 준비) — 데모 스토어는 변경되지 않았습니다.</p>
               </div>
             ) : !error && (
               <EmptyState title="아직 선택한 파일이 없습니다" desc="샘플 파일 형식에 맞춘 CSV를 올리면 열 이름과 처음 5행을 확인할 수 있습니다." className="py-8" />

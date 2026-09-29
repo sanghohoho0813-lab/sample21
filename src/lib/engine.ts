@@ -67,7 +67,7 @@ export function recommendFit(p: Product, profile: FitProfile, fitNoteOverride?: 
   if (p.fit === "oversized") cautions.push("오버핏 상품은 한 치수 작게 선택해도 여유가 있습니다.");
   score = Math.max(0.3, Math.min(0.95, score));
   const confidence = score >= 0.8 ? "high" : score >= 0.6 ? "mid" : "low";
-  const peerNote = profile.height ? `키 ${Math.floor(profile.height / 5) * 5}~${Math.floor(profile.height / 5) * 5 + 4}cm 고객의 ${p.id === SCENARIO.B_PRODUCT ? 61 : 68}%가 ${base} 사이즈를 선택했습니다 (Demo 집계).` : "";
+  const peerNote = profile.height ? `키 ${Math.floor(profile.height / 5) * 5}~${Math.floor(profile.height / 5) * 5 + 4}cm 고객의 ${p.id === SCENARIO.B_PRODUCT ? 61 : 68}%가 ${base} 사이즈를 선택했습니다 (데모 집계).` : "";
   return { size: base, confidence, confidenceScore: score, reasons, cautions, peerNote, ready: true };
 }
 
@@ -99,9 +99,9 @@ export function ruleBriefing(i: BriefingInput): { headline: string; points: stri
     points: [
       `관심이 급상승한 옵션 ${i.rising}개 중 '${i.topProductName}'은 재입고 알림 신청이 누적되어 우선 검토 대상입니다.`,
       `저회전·과잉 재고 원가 ${Math.round(i.slowValue / 10000).toLocaleString("ko-KR")}만원은 시즌 종료 전 할인 검토가 필요합니다.`,
-      `사이즈 관련 반품률 ${(i.fitReturnRate * 100).toFixed(1)}% — 핏 안내 개선 Action이 진행 중입니다.`,
-      `처리 대기 Action ${i.openActions}건 (긴급 ${i.highActions}건).`,
+      `사이즈 관련 반품률 ${(i.fitReturnRate * 100).toFixed(1)}% — 핏 안내 개선 과제가 진행 중입니다.`,
+      `처리 대기 과제 ${i.openActions}건 (긴급 ${i.highActions}건).`,
     ],
-    next: "Growth & Action Center에서 긴급 Action 2건을 먼저 승인하세요.",
+    next: "실행 센터에서 긴급 과제 2건을 먼저 승인하세요.",
   };
 }

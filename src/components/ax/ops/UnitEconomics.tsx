@@ -49,12 +49,12 @@ export function unitEconomicsRows(u: UnitEconomics, showMargin: boolean): UeRow[
     { item: "사입 vs 위탁 마진 구조", formula: "브랜드 정산 방식별 매출 비중 · 마진율", now: `사입 매출 ${pct(u.sourcing.purchase.revenueShare, 0)}${showMargin ? ` (마진율 ${pct(u.sourcing.purchase.marginRate, 0)})` : ""} · 위탁 매출 ${pct(u.sourcing.consignment.revenueShare, 0)}${showMargin ? ` (마진율 ${pct(u.sourcing.consignment.marginRate, 0)})` : ""} · 위탁 평균 수수료 ${pct(u.sourcing.consignment.avgCommission, 0)}`, needs: "실제 브랜드 정산서 (월 단위)", state: "demo" },
     { item: "배송비 부담 구조", formula: "5만원 이상 무료배송 비중 · 고객 부담 배송비 / 주문", now: `무료배송 주문 ${pct(u.freeShipRatio, 0)} · 고객 부담 평균 ${krw(u.shippingPerOrder)}`, needs: "실제 택배 원가 → 무료배송 기준 재검토", state: "partial" },
     { item: "CAC (고객 획득 비용)", formula: "기간 마케팅비 ÷ 신규 구매 고객 수", now: "계산 불가 — 마케팅비 데이터 없음", needs: "광고비 원장 + 첫 구매 이벤트(first_purchase) 연결", state: "later" },
-    { item: "LTV (고객 생애 가치)", formula: "주문당 CM × 연간 구매 횟수 × 유지 기간", now: `재구매율 ${pct(u.repeat90, 1)} (90일 · DEMO) · 객단가 ${krw(u.aov)} 까지만`, needs: "12개월 코호트 재구매·이탈 실측", state: "later" },
-    { item: "Payback (회수 기간)", formula: "CAC ÷ 고객당 월 기여이익", now: "계산 불가 — CAC 필요", needs: "CAC + 월 CM 실측 후 자동 계산", state: "later" },
+    { item: "LTV (고객 생애 가치)", formula: "주문당 CM × 연간 구매 횟수 × 유지 기간", now: `재구매율 ${pct(u.repeat90, 1)} (90일 · 데모) · 객단가 ${krw(u.aov)} 까지만`, needs: "12개월 코호트 재구매·이탈 실측", state: "later" },
+    { item: "회수 기간 (회수 기간)", formula: "CAC ÷ 고객당 월 기여이익", now: "계산 불가 — CAC 필요", needs: "CAC + 월 CM 실측 후 자동 계산", state: "later" },
   ];
 }
 
-const STATE_LABEL = { demo: "DEMO 계산", partial: "부분 계산", later: "VALIDATE LATER" } as const;
+const STATE_LABEL = { demo: "데모 계산", partial: "부분 계산", later: "실증 후 확인" } as const;
 const STATE_TONE = { demo: "demo", partial: "info", later: "warning" } as const;
 
 export function UnitEconomicsPanel({ showMargin, compact }: { showMargin: boolean; compact?: boolean }) {
@@ -63,7 +63,7 @@ export function UnitEconomicsPanel({ showMargin, compact }: { showMargin: boolea
   const rows = useMemo(() => unitEconomicsRows(u, showMargin), [u, showMargin]);
   return (
     <div className="space-y-4" data-tour="unit-economics">
-      {!compact && <NoteCard tone="warning" icon={<Calculator size={16} />}><b>Unit Economics는 "측정 설계"까지만.</b> 지금 계산 가능한 항목만 값을 보여주고, CAC·LTV·Payback은 실증(Pilot)에서 마케팅비·코호트 데이터를 연결한 뒤 채웁니다. 값을 추정해 넣지 않습니다.</NoteCard>}
+      {!compact && <NoteCard tone="warning" icon={<Calculator size={16} />}><b>단위 경제성은 “측정 설계”까지만.</b> 지금 계산 가능한 항목만 값을 보여주고, CAC·LTV·회수 기간은 실증(실증)에서 마케팅비·코호트 데이터를 연결한 뒤 채웁니다. 값을 추정해 넣지 않습니다.</NoteCard>}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="객단가 (30일)" value={krw(u.aov)} sub={`주문 ${num(u.orders)}건`} />
         {showMargin ? <Stat label="주문당 매출총이익" value={krw(u.cmPerOrder)} sub={`마진율 ${pct(u.marginRate, 1)}`} /> : <Stat label="주문당 매출총이익" value={<span className="inline-flex items-center gap-1 text-neutral-text2 text-[1rem]"><Lock size={14} />대표 권한</span>} sub="MD·운영은 비공개" />}
@@ -86,7 +86,7 @@ export function UnitEconomicsPanel({ showMargin, compact }: { showMargin: boolea
           </tbody>
         </table>
       </div>
-      {!compact && <p className="text-[0.82rem] text-neutral-text2 leading-relaxed">돈 KPI 연결 — <b>Cost</b>: 품절 추정손실·저회전 재고원가·반품 처리비 / <b>Revenue</b>: 알림→구매 전환·재구매율·객단가 / <b>Scale</b>: MD 1인당 활성 SKU·관리 브랜드 수. Baseline 측정 후에만 "개선"을 말합니다.</p>}
+      {!compact && <p className="text-[0.82rem] text-neutral-text2 leading-relaxed">돈 KPI 연결 — <b>비용</b>: 품절 추정손실·저회전 재고원가·반품 처리비 / <b>매출</b>: 알림→구매 전환·재구매율·객단가 / <b>확장</b>: MD 1인당 활성 SKU·관리 브랜드 수. 기준값 측정 후에만 “개선”을 말합니다.</p>}
     </div>
   );
 }

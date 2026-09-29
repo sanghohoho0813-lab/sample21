@@ -46,8 +46,8 @@ function recommendation(a: ProductAgg, topReason: ReturnReason | null): { label:
 export function FitReturnsPage() {
   return (
     <>
-      <PageHeader title="핏·반품" desc="반품 사유를 구조화해 어떤 상품이 사이즈·핏 때문에 돌아오는지 찾고, 핏 안내와 추천 규칙을 고칩니다 (Engine 2 · Fit · RULE). 반품률이 높다고 자동으로 불이익을 주지 않습니다 — 판단은 사람이 합니다."
-        badge={<Badge tone="demo">DEMO</Badge>} right={<LiveFreshness />} />
+      <PageHeader title="핏·반품" desc="반품 사유를 구조화해 어떤 상품이 사이즈·핏 때문에 돌아오는지 찾고, 핏 안내와 추천 규칙을 고칩니다 (엔진 2 · 핏 · 규칙). 반품률이 높다고 자동으로 불이익을 주지 않습니다 — 판단은 사람이 합니다."
+        badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><FitBody /></Hydrated>
     </>
   );
@@ -99,7 +99,7 @@ function FitBody() {
   const process = (r: ReturnRequest, to: "approved" | "completed") => {
     setProcessed((p) => ({ ...p, [r.id]: to }));
     const p = PRODUCT_BY_ID[r.productId];
-    toast(`반품 ${r.id} ${to === "approved" ? "승인" : "완료 처리"} (Demo)`, `${p?.name ?? r.productId} · ${RETURN_REASON_LABEL[r.reason]} · 처리자 ${ROLE_NAME[store.role]}. 실제 회수·환불은 택배·PG 연동 후 (READY).`, "success");
+    toast(`반품 ${r.id} ${to === "approved" ? "승인" : "완료 처리"} (데모)`, `${p?.name ?? r.productId} · ${RETURN_REASON_LABEL[r.reason]} · 처리자 ${ROLE_NAME[store.role]}. 실제 회수·환불은 택배·PG 연동 후 (연결 준비).`, "success");
     if (to === "completed") store.addEvidence({ type: "ACTION", title: `반품 ${r.id} 처리 완료`, detail: `${ROLE_NAME[store.role]}이(가) 반품 요청을 완료 처리했습니다 (사유: ${RETURN_REASON_LABEL[r.reason]}). 환불·회수는 연동 예정.`, actor: ROLE_NAME[store.role], productId: r.productId, orderId: r.orderId, source: "DEMO", status: "demo" });
   };
 
@@ -112,22 +112,22 @@ function FitBody() {
     { key: "product", header: "상품", primary: true, cell: (a) => (
       <div className="min-w-0">
         <p className="font-semibold leading-snug">{a.product.name}</p>
-        <p className="text-[0.8rem] text-neutral-text2">{BRAND_BY_ID[a.product.brandId].name}{a.product.id === SCENARIO.B_PRODUCT && <Badge tone="accent" size="sm" className="ml-1.5">Scenario B</Badge>}</p>
+        <p className="text-[0.8rem] text-neutral-text2">{BRAND_BY_ID[a.product.brandId].name}{a.product.id === SCENARIO.B_PRODUCT && <Badge tone="accent" size="sm" className="ml-1.5">시나리오 B</Badge>}</p>
       </div>
     ) },
     { key: "sales", header: "판매 30일", align: "right", cell: (a) => num(a.sales30d) },
     { key: "returns", header: "반품", align: "right", cell: (a) => num(a.returns30d) },
     { key: "fit", header: "사이즈 반품", align: "right", cell: (a) => num(a.fitReturns30d) },
-    { key: "risk", header: <Term term="Fit Risk">Fit Risk</Term>, width: "150px", cell: (a) => (
+    { key: "risk", header: <Term term="핏 위험도">핏 위험도</Term>, width: "150px", cell: (a) => (
       <div className="min-w-[110px]"><div className="flex items-center justify-between text-[0.8rem] mb-1"><span className={cn("font-semibold tabular", a.fitReturnRate > 0.15 ? "text-semantic-error" : a.fitReturnRate > 0.08 ? "text-semantic-warning" : "text-neutral-text2")}>{pct(a.fitReturnRate, 1)}</span></div><Progress value={Math.min(1, a.fitReturnRate / 0.3)} tone={a.fitReturnRate > 0.15 ? "error" : a.fitReturnRate > 0.08 ? "warning" : "primary"} /></div>
     ) },
     { key: "reason", header: "반복 사유", cell: (a) => { const r = topReasonOf.get(a.product.id); return r ? <Badge tone={isSizeReason(r) ? "warning" : "neutral"} size="sm">{RETURN_REASON_LABEL[r]}</Badge> : <span className="text-neutral-text2">-</span>; } },
     { key: "sizing", header: "사이징 경향", cell: (a) => <Badge tone={SIZING_TONE[a.product.sizing]} size="sm">{SIZING_LABEL[a.product.sizing]}</Badge> },
-    { key: "note", header: "현재 핏 안내", hideOnMobile: true, width: "260px", cell: (a) => (
+    { key: "note", header: "현재 핏 안내", hideOnMobile: true, wrap: true, width: "260px", cell: (a) => (
       <div className="max-w-[260px]"><p className="text-[0.82rem] text-neutral-text2 leading-snug line-clamp-2">{effFitNote(a.product, store)}</p>{store.fitNoteOverride[a.product.id] && <Badge tone="success" size="sm" className="mt-1">개선됨</Badge>}</div>
     ) },
     { key: "reco", header: "권장 조치", cell: (a) => { const r = recommendation(a, topReasonOf.get(a.product.id) ?? null); return <Badge tone={r.tone} size="sm">{r.label}</Badge>; } },
-    { key: "action", header: "Action", cell: (a) => { const act = fitActionOf(a.product.id); return act ? <Link href={`/ax/actions?open=${act.id}`} onClick={(e) => e.stopPropagation()} className="tap inline-flex items-center gap-1 text-[0.85rem] font-semibold text-theme-primary hover:underline">{act.id}<ChevronRight size={14} /></Link> : <Badge tone="neutral" size="sm">검토 필요</Badge>; } },
+    { key: "action", header: "과제", cell: (a) => { const act = fitActionOf(a.product.id); return act ? <Link href={`/ax/actions?open=${act.id}`} onClick={(e) => e.stopPropagation()} className="tap inline-flex items-center gap-1 text-[0.85rem] font-semibold text-theme-primary hover:underline">{act.id}<ChevronRight size={14} /></Link> : <Badge tone="neutral" size="sm">검토 필요</Badge>; } },
   ];
 
   const queueColumns: Column<ReturnRequest>[] = [
@@ -139,8 +139,8 @@ function FitBody() {
     ) },
     { key: "at", header: "접수 시각", cell: (r) => <span title={fmtDate(r.createdAt, "datetime")}>{relTime(r.createdAt)}</span> },
     { key: "order", header: "주문번호", cell: (r) => <Link href={`/ax/orders?q=${r.orderId}`} onClick={(e) => e.stopPropagation()} className="hover:text-theme-primary underline-offset-2 hover:underline">{r.orderId}</Link> },
-    { key: "customer", header: "고객", cell: (r) => <span>{displayName(r.customerName ?? CUSTOMER_BY_ID[r.customerId]?.name ?? "비회원", store.role)}{!CUSTOMER_BY_ID[r.customerId] && <span className="ml-1 text-[0.72rem] text-neutral-text2">비회원</span>}</span> },
-    { key: "product", header: "상품·옵션", cell: (r) => { const p = PRODUCT_BY_ID[r.productId]; const v = VARIANT_BY_ID[r.variantId]; return <span>{p?.name ?? r.productId}{v && <span className="text-neutral-text2"> · {v.color} / {v.size}</span>}</span>; } },
+    { key: "customer", header: "고객", cell: (r) => <span>{displayName(r.customerName ?? CUSTOMER_BY_ID[r.customerId]?.name ?? "비회원", store.role)}{!CUSTOMER_BY_ID[r.customerId] && <span className="ml-1 text-[0.78rem] text-neutral-text2">비회원</span>}</span> },
+    { key: "product", header: "상품·옵션", mobileFull: true, wrap: true, cell: (r) => { const p = PRODUCT_BY_ID[r.productId]; const v = VARIANT_BY_ID[r.variantId]; return <span>{p?.name ?? r.productId}{v && <span className="text-neutral-text2"> · {v.color} / {v.size}</span>}</span>; } },
     { key: "reason", header: "사유", cell: (r) => <Badge tone={isSizeReason(r.reason) ? "warning" : "neutral"} size="sm">{RETURN_REASON_LABEL[r.reason]}</Badge> },
     { key: "status", header: "상태", hideOnMobile: true, cell: (r) => <Badge tone={RETURN_STATUS_TONE[effStatus(r)]} size="sm">{RETURN_STATUS_LABEL[effStatus(r)]}</Badge> },
     { key: "act", header: "처리", hideOnMobile: true, cell: (r) => <div className="flex gap-1.5"><QueueButtons r={r} status={effStatus(r)} onProcess={process} /></div> },
@@ -158,15 +158,15 @@ function FitBody() {
       </div>
 
       {/* Scenario B */}
-      <SectionBlock title={<span className="inline-flex items-center gap-2"><Zap size={20} className="text-theme-primary" />Scenario B · 와이드 스트레이트 데님 — 사이즈 작음 반품</span>}
-        desc="고객 반품 요청(사이즈 작음)이 구조화되어 Fit Risk가 오르고, 핏 안내 강화 Action(act-004)이 추천됩니다. Action 완료 시 상품 상세 핏 안내가 바뀌고 핏 추천 규칙에 +1 사이즈 보정이 적용됩니다 (Loop 3)." tour="fit-scenario-b"
-        right={<Button href="/ax/actions?open=act-004" icon={<ChevronRight size={16} />}>핏 안내 강화 Action 보기</Button>}>
+      <SectionBlock title={<span className="inline-flex items-center gap-2"><Zap size={20} className="text-theme-primary" />시나리오 B · 와이드 스트레이트 데님 — 사이즈 작음 반품</span>}
+        desc="고객 반품 요청(사이즈 작음)이 구조화되어 핏 위험도가 오르고, 핏 안내 강화 과제(act-004)이 추천됩니다. 과제 완료 시 상품 상세 핏 안내가 바뀌고 핏 추천 규칙에 +1 사이즈 보정이 적용됩니다 (순환 3)." tour="fit-scenario-b"
+        right={<Button href="/ax/actions?open=act-004" icon={<ChevronRight size={16} />}>핏 안내 강화 과제 보기</Button>}>
         <Card pad="md">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Stat label="판매 30일" value={`${num(B.sales30d)}개`} />
             <Stat label="반품 30일" value={`${num(B.returns30d)}건`} sub={`반품률 ${pct(B.returnRate, 0)} (카테고리 평균 6%)`} />
             <Stat label="사이즈 관련" value={`${num(B.fitReturns30d)}건`} sub={`반품 중 ${pct(safeDiv(B.fitReturns30d, Math.max(1, B.returns30d)), 0)}`} />
-            <Stat label="Action 상태" value={act004 ? <ActionStatusBadge status={act004.status} size="md" /> : "-"} sub="act-004 · 이도윤 MD" />
+            <Stat label="과제 상태" value={act004 ? <ActionStatusBadge status={act004.status} size="md" /> : "-"} sub="act-004 · 이도윤 MD" />
           </div>
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-3 items-stretch">
             <div className="rounded-xl border border-neutral-border p-4">
@@ -179,7 +179,7 @@ function FitBody() {
               <p className="text-[0.92rem] leading-relaxed">{bOverride ?? B_IMPROVED_PREVIEW}</p>
             </div>
           </div>
-          <NoteCard className="mt-4">사이즈 반품 -40%는 <b>목표</b>이지 결과가 아닙니다. 변경 후 반품률 비교는 실증 단계에서 Baseline과 비교합니다 (Fit Return Rate: VALIDATE LATER).</NoteCard>
+          <NoteCard className="mt-4">사이즈 반품 -40%는 <b>목표</b>이지 결과가 아닙니다. 변경 후 반품률 비교는 실증 단계에서 기준값과 비교합니다 (사이즈 반품률: 실증 후 확인).</NoteCard>
         </Card>
       </SectionBlock>
 
@@ -216,21 +216,21 @@ function FitBody() {
       </div>
 
       {/* Fit Risk table */}
-      <SectionBlock title={<span>Fit Risk 상품</span>} desc="사이즈 관련 반품 ÷ 판매수량 기준으로 정렬했습니다 (가방·액세서리 제외). 행을 누르면 반품 상세와 핏 안내 전문을 볼 수 있습니다."
+      <SectionBlock title={<span>핏 위험도 상품</span>} desc="사이즈 관련 반품 ÷ 판매수량 기준으로 정렬했습니다 (가방·액세서리 제외). 행을 누르면 반품 상세와 핏 안내 전문을 볼 수 있습니다."
         right={<Button variant="outline" size="sm" onClick={() => setShowAll((v) => !v)}>{showAll ? "상위 12개만" : `전체 ${fitRows.length}개 보기`}</Button>}>
         <DataTable rows={fitVisible} columns={fitColumns} rowKey={(a) => a.product.id} onRowClick={(a) => setOpenId(a.product.id)} dense />
-        <NoteCard className="mt-4" icon={<Scale size={16} />}><b>규칙:</b> Fit Risk 15% 초과 → 핏 안내 강화 · 작게 나오는 상품에 '사이즈 작음' 반복 → 추천 규칙 +1 보정 · 그 외 → 관찰. 반품률이 높다고 상품·브랜드에 자동 불이익은 없습니다. MD가 근거를 보고 판단합니다.</NoteCard>
+        <NoteCard className="mt-4" icon={<Scale size={16} />}><b>규칙:</b> 핏 위험도 15% 초과 → 핏 안내 강화 · 작게 나오는 상품에 ‘사이즈 작음’ 반복 → 추천 규칙 +1 보정 · 그 외 → 관찰. 반품률이 높다고 상품·브랜드에 자동 불이익은 없습니다. MD가 근거를 보고 판단합니다.</NoteCard>
       </SectionBlock>
 
       {/* Return queue */}
-      <SectionBlock title="반품·교환 요청 처리" desc="접수된 요청을 승인 → 완료 순서로 처리합니다. 고객 화면에서 접수된 요청은 표시가 붙습니다. 처리 상태는 이 브라우저(Demo)에만 저장됩니다."
+      <SectionBlock title="반품·교환 요청 처리" desc="접수된 요청을 승인 → 완료 순서로 처리합니다. 고객 화면에서 접수된 요청은 표시가 붙습니다. 처리 상태는 이 브라우저(데모)에만 저장됩니다."
         right={<div className="inline-flex rounded-xl bg-neutral-canvas p-1 border border-neutral-border">{(["open", "all"] as const).map((k) => <button key={k} onClick={() => setQueueFilter(k)} className={cn("h-10 md:h-9 px-3 rounded-lg text-[0.85rem] font-semibold transition-all duration-fast", queueFilter === k ? "bg-white shadow-card" : "text-neutral-text2 hover:text-neutral-text")}>{k === "open" ? `미처리 (${returns.filter((r) => effStatus(r) === "requested" || effStatus(r) === "approved").length})` : `전체 (${returns.length})`}</button>)}</div>}>
         <DataTable rows={queue.slice(0, limit)} columns={queueColumns} rowKey={(r) => r.id} dense
-          empty={<EmptyState title="처리할 요청이 없습니다" desc="모든 반품·교환 요청이 완료되었습니다. 고객 화면 My Page > 주문에서 반품을 요청하면 여기에 접수됩니다." icon={<CheckCircle2 size={22} />} action={<Button variant="outline" href="/my/orders">고객 화면에서 반품 요청해 보기</Button>} />} />
+          empty={<EmptyState title="처리할 요청이 없습니다" desc="모든 반품·교환 요청이 완료되었습니다. 고객 화면 마이페이지 > 주문에서 반품을 요청하면 여기에 접수됩니다." icon={<CheckCircle2 size={22} />} action={<Button variant="outline" href="/my/orders">고객 화면에서 반품 요청해 보기</Button>} />} />
         <MoreButton hasMore={hasMore} onClick={more} remaining={queue.length - limit} />
       </SectionBlock>
 
-      <Drawer open={!!openAgg} onClose={() => setOpenId(null)} title={openAgg?.product.name ?? ""} width="max-w-lg">
+      <Drawer open={!!openAgg} onClose={() => setOpenId(null)} title={openAgg?.product.name ?? ""} width="w-full max-w-lg">
         {openAgg && <ProductFitDetail a={openAgg} returns={returns.filter((r) => r.productId === openAgg.product.id)} topReason={topReasonOf.get(openAgg.product.id) ?? null} override={store.fitNoteOverride[openAgg.product.id]} action={fitActionOf(openAgg.product.id)} orderCount={orders.length} />}
       </Drawer>
     </div>
@@ -253,16 +253,16 @@ function ProductFitDetail({ a, returns, topReason, override, action, orderCount 
       <div className="grid grid-cols-2 gap-2">
         <Stat label="판매 30일" value={`${num(a.sales30d)}개`} />
         <Stat label="반품 30일" value={`${num(a.returns30d)}건`} sub={`반품률 ${pct(a.returnRate, 1)}`} />
-        <Stat label="사이즈 반품" value={`${num(a.fitReturns30d)}건`} sub={`Fit Risk ${pct(a.fitReturnRate, 1)}`} />
+        <Stat label="사이즈 반품" value={`${num(a.fitReturns30d)}건`} sub={`핏 위험도 ${pct(a.fitReturnRate, 1)}`} />
         <Stat label="90일 반품 기록" value={`${num(returns.length)}건`} sub={`사이즈 관련 ${sizeCount}건`} />
       </div>
       <div>
         <p className="font-bold mb-1.5">권장 조치 · 왜?</p>
         <p className="text-[0.9rem] text-neutral-text2 leading-relaxed">{reco.why}</p>
         <div className="mt-2 flex gap-2 flex-wrap">
-          {action ? <Button size="sm" href={`/ax/actions?open=${action.id}`} icon={<ChevronRight size={14} />}>{action.id} Action 보기</Button> : <Badge tone="neutral">연결된 Action 없음 · 검토 필요</Badge>}
+          {action ? <Button size="sm" href={`/ax/actions?open=${action.id}`} icon={<ChevronRight size={14} />}>{action.id} 과제 보기</Button> : <Badge tone="neutral">연결된 과제 없음 · 검토 필요</Badge>}
           <Button size="sm" variant="outline" href={`/ax/products/${a.product.id}`}>상품 상세 (AX)</Button>
-          <Button size="sm" variant="ghost" href={`/products/${a.product.id}`}>고객 화면</Button>
+          <Button size="sm" variant="ghost" href={`/products/${a.product.id}`}>고객 플랫폼에서 보기</Button>
         </div>
       </div>
       <div>
@@ -278,7 +278,7 @@ function ProductFitDetail({ a, returns, topReason, override, action, orderCount 
           </dl>
         )}
       </div>
-      <p className="text-[0.8rem] text-neutral-text2">DEMO 데이터 · 반품률이 높아도 자동 불이익 없음 · 판단은 MD</p>
+      <p className="text-[0.8rem] text-neutral-text2">데모 데이터 · 반품률이 높아도 자동 불이익 없음 · 판단은 MD</p>
     </div>
   );
 }

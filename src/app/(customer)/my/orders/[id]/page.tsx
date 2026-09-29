@@ -45,19 +45,19 @@ function OrderDetail({ id }: { id: string }) {
   const myReturns = store.returns.filter((r) => r.orderId === order.id);
   const openPicker = (setter: (v: boolean) => void) => { setPickVid(order.items[0]?.variantId ?? ""); setReason("size-small"); setNote(""); setErr(""); setter(true); };
 
-  const doCancel = () => { store.updateOrderStatus(order.id, "cancelled", DEMO_CUSTOMER_NAME); setCancelOpen(false); toast("취소 요청이 접수되었습니다", "Business AX 주문 목록에 '취소' 상태로 반영됩니다", "info"); };
+  const doCancel = () => { store.updateOrderStatus(order.id, "cancelled", DEMO_CUSTOMER_NAME); setCancelOpen(false); toast("취소 요청이 접수되었습니다", "AX 운영화면 주문 목록에 '취소' 상태로 반영됩니다", "info"); };
   const doReturn = () => {
     if (!pickVid) { setErr("반품할 상품을 선택해주세요."); return; }
     if ((reason === "other" || reason === "fit") && note.trim().length < 2) { setErr("사유를 조금 더 자세히 적어주세요."); return; }
     store.requestReturn(order.id, pickVid, reason, note.trim() || undefined);
     setReturnOpen(false);
-    toast("반품 요청이 접수되었습니다", `사유 '${RETURN_REASON_LABEL[reason]}'가 Fit Risk 계산에 반영됩니다`);
+    toast("반품 요청이 접수되었습니다", `사유 '${RETURN_REASON_LABEL[reason]}'가 핏 위험도 계산에 반영됩니다`);
   };
   const doExchange = () => {
     if (!pickVid) { setErr("교환할 상품을 선택해주세요."); return; }
     store.updateOrderStatus(order.id, "exchange-requested", DEMO_CUSTOMER_NAME);
     setExchangeOpen(false);
-    toast("교환 요청이 접수되었습니다", "운영팀 확인 후 교환 상품이 발송됩니다 (DEMO)");
+    toast("교환 요청이 접수되었습니다", "운영팀 확인 후 교환 상품이 발송됩니다 (데모)");
   };
   const ItemPicker = () => (
     <div className="space-y-2" role="radiogroup" aria-label="상품 선택">
@@ -78,8 +78,8 @@ function OrderDetail({ id }: { id: string }) {
         <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 min-w-0">
           <p className="font-bold mb-4 flex items-center gap-2">배송 진행 상태 <DemoBadge /></p>
           <OrderTimeline order={order} tour="c-order-status" />
-          <p className="mt-4 text-[0.8rem] text-neutral-text2 leading-relaxed">상태는 Business AX 주문·배송 화면에서 운영직원이 변경하며, 이 화면과 알림에 동시에 반영됩니다.</p>
-          {store.role !== "customer" && <Link href="/ax/orders" className="tap mt-2 inline-flex items-center gap-1 text-[0.82rem] font-bold text-brand-accent hover:underline underline-offset-2"><ExternalLink size={13} />(대표·관리자) Business AX에서 상태 변경</Link>}
+          <p className="mt-4 text-[0.8rem] text-neutral-text2 leading-relaxed">상태는 AX 운영화면 주문·배송 화면에서 운영직원이 변경하며, 이 화면과 알림에 동시에 반영됩니다.</p>
+          {store.role !== "customer" && <Link href="/ax/orders" className="tap mt-2 inline-flex items-center gap-1 text-[0.82rem] font-bold text-brand-accent hover:underline underline-offset-2"><ExternalLink size={13} />AX 운영화면 보기 · 상태 변경</Link>}
         </section>
 
         <div className="space-y-5 min-w-0">
@@ -90,12 +90,12 @@ function OrderDetail({ id }: { id: string }) {
           </section>
           <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 space-y-3 text-[0.92rem]">
             <div className="flex gap-3"><MapPin size={18} className="shrink-0 text-neutral-text2 mt-0.5" /><div><p className="text-[0.8rem] text-neutral-text2">배송지</p><p className="font-semibold">{order.address}</p></div></div>
-            <div className="flex gap-3"><CreditCard size={18} className="shrink-0 text-neutral-text2 mt-0.5" /><div><p className="text-[0.8rem] text-neutral-text2">결제·요청사항</p><p className="font-semibold leading-relaxed">{order.memo ?? "결제수단(DEMO): 카드"}</p></div></div>
+            <div className="flex gap-3"><CreditCard size={18} className="shrink-0 text-neutral-text2 mt-0.5" /><div><p className="text-[0.8rem] text-neutral-text2">결제·요청사항</p><p className="font-semibold leading-relaxed">{order.memo ?? "결제수단(데모): 카드"}</p></div></div>
             <dl className="pt-3 border-t border-neutral-border space-y-1.5">
               <div className="flex justify-between"><dt className="text-neutral-text2">상품금액</dt><dd className="tabular">{krw(order.subtotal + order.items.reduce((s, i) => s + i.discount * i.qty, 0))}</dd></div>
               <div className="flex justify-between"><dt className="text-neutral-text2">할인 합계</dt><dd className="tabular">{order.discount > 0 ? `−${krw(order.discount)}` : "0원"}</dd></div>
               <div className="flex justify-between"><dt className="text-neutral-text2">배송비</dt><dd className="tabular">{order.shippingFee === 0 ? "무료" : krw(order.shippingFee)}</dd></div>
-              <div className="flex justify-between pt-2 border-t border-neutral-border"><dt className="font-bold">결제금액 <Badge tone="demo" size="sm">DEMO</Badge></dt><dd className="font-black text-[1.2rem] tabular">{krw(order.total)}</dd></div>
+              <div className="flex justify-between pt-2 border-t border-neutral-border"><dt className="font-bold">결제금액 <Badge tone="demo" size="sm">데모</Badge></dt><dd className="font-black text-[1.2rem] tabular">{krw(order.total)}</dd></div>
             </dl>
           </section>
           <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
@@ -106,13 +106,13 @@ function OrderDetail({ id }: { id: string }) {
               {canAfter && <Button variant="outline" onClick={() => openPicker(setExchangeOpen)} icon={<Repeat size={16} />}>교환 요청</Button>}
               {!canCancel && !canAfter && <p className="text-[0.88rem] text-neutral-text2">{order.status === "cancelled" ? "취소된 주문입니다." : order.status === "return-requested" ? "반품 요청이 접수되어 운영팀이 확인 중입니다." : order.status === "exchange-requested" ? "교환 요청이 접수되어 운영팀이 확인 중입니다." : "출고 이후에는 취소할 수 없습니다. 배송 완료 후 반품·교환을 요청하세요."}</p>}
             </div>
-            <p className="mt-3 text-[0.8rem] text-neutral-text2">반품 사유는 구조화되어 Business AX 핏·반품(Fit Risk) 계산에 반영됩니다 — Closed Loop 3.</p>
+            <p className="mt-3 text-[0.8rem] text-neutral-text2">반품 사유는 구조화되어 AX 운영화면 핏·반품(핏 위험도) 계산에 반영됩니다 — 데이터 순환 3.</p>
           </section>
         </div>
       </div>
 
       <Modal open={cancelOpen} onClose={() => setCancelOpen(false)} title="주문을 취소할까요?" size="sm" footer={<div className="flex gap-2 justify-end"><Button variant="outline" onClick={() => setCancelOpen(false)}>돌아가기</Button><Button variant="danger" onClick={doCancel}>취소 요청</Button></div>}>
-        <p className="text-[0.95rem] leading-relaxed">주문번호 <span className="font-bold tabular">{order.id}</span>의 상품 {order.items.length}종을 취소합니다. DEMO 주문이므로 환불 절차는 없으며, 취소 상태가 Business AX에 바로 반영됩니다.</p>
+        <p className="text-[0.95rem] leading-relaxed">주문번호 <span className="font-bold tabular">{order.id}</span>의 상품 {order.items.length}종을 취소합니다. 데모 주문이므로 환불 절차는 없으며, 취소 상태가 AX 운영화면에 바로 반영됩니다.</p>
       </Modal>
 
       <Responsive open={returnOpen} onClose={() => setReturnOpen(false)} title="반품 요청" footer={<div className="flex gap-2 justify-end"><Button variant="outline" onClick={() => setReturnOpen(false)}>닫기</Button><Button variant="brand" onClick={doReturn}>반품 요청 보내기</Button></div>}>
@@ -121,7 +121,7 @@ function OrderDetail({ id }: { id: string }) {
           <Select label="반품 사유" name="reason" value={reason} onChange={(e) => setReason(e.target.value as ReturnReason)}>{REASONS.map((r) => <option key={r} value={r}>{RETURN_REASON_LABEL[r]}</option>)}</Select>
           <Textarea label="상세 내용 (선택)" name="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="예: 허리가 타이트해서 한 치수 크게 입어야 할 것 같아요" maxLength={200} />
           {err && <p className="text-[0.85rem] text-semantic-error">{err}</p>}
-          <p className="text-[0.8rem] text-neutral-text2 leading-relaxed">사이즈 관련 사유는 해당 상품의 핏 안내 개선 Action(Fit Engine)의 근거가 됩니다.</p>
+          <p className="text-[0.8rem] text-neutral-text2 leading-relaxed">사이즈 관련 사유는 해당 상품의 핏 안내 개선 과제(핏 엔진)의 근거가 됩니다.</p>
         </div>
       </Responsive>
 
@@ -130,7 +130,7 @@ function OrderDetail({ id }: { id: string }) {
           <div><p className="font-semibold text-[0.9rem] mb-2">교환할 상품</p><ItemPicker /></div>
           <Select label="교환 사유" name="exchangeReason" value={reason} onChange={(e) => setReason(e.target.value as ReturnReason)}>{REASONS.filter((r) => r !== "change-of-mind" && r !== "delivery").map((r) => <option key={r} value={r}>{RETURN_REASON_LABEL[r]}</option>)}</Select>
           {err && <p className="text-[0.85rem] text-semantic-error">{err}</p>}
-          <p className="text-[0.8rem] text-neutral-text2 leading-relaxed">운영팀이 재고를 확인한 뒤 교환 상품을 발송합니다. DEMO에서는 주문 상태만 '교환요청'으로 바뀝니다.</p>
+          <p className="text-[0.8rem] text-neutral-text2 leading-relaxed">운영팀이 재고를 확인한 뒤 교환 상품을 발송합니다. 데모에서는 주문 상태만 ‘교환요청’으로 바뀝니다.</p>
         </div>
       </Responsive>
     </div>

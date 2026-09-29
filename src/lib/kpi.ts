@@ -196,7 +196,7 @@ export function actionKpi(actions: AppState["actions"]) {
   return { created, done, open, high, executionRate: safeDiv(done, Math.max(1, created)) };
 }
 
-export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = { pending: "결제대기(DEMO)", preparing: "상품준비중", shipped: "출고완료", "in-transit": "배송중", delivered: "배송완료", cancelled: "취소", "return-requested": "반품요청", "exchange-requested": "교환요청" };
+export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = { pending: "결제대기(데모)", preparing: "상품준비중", shipped: "출고완료", "in-transit": "배송중", delivered: "배송완료", cancelled: "취소", "return-requested": "반품요청", "exchange-requested": "교환요청" };
 export const ORDER_STATUS_FLOW: OrderStatus[] = ["pending", "preparing", "shipped", "in-transit", "delivered"];
 
 export const productSeries = (productId: string) => PRODUCT_DAILY_BY_ID[productId]?.series ?? [];

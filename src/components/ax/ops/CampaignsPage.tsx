@@ -15,7 +15,7 @@ import { Badge, type Tone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DataTable, type Column } from "@/components/ui/DataTable";
-import { Input, Segmented, Select } from "@/components/ui/Form";
+import { Input, Segmented } from "@/components/ui/Form";
 import { KpiCard, Stat } from "@/components/ui/Kpi";
 import { Drawer, Modal } from "@/components/ui/Overlay";
 import { EmptyState } from "@/components/ui/States";
@@ -39,13 +39,13 @@ function draftToRow(d: CampaignDraft): Row {
 }
 
 function verdict(c: Row): { label: string; tone: Tone; why: string } {
-  if (c.isDraft) return { label: "초안", tone: "neutral", why: "저장된 초안입니다. 실제 발송·노출은 연동 예정(READY)." };
+  if (c.isDraft) return { label: "초안", tone: "neutral", why: "저장된 초안입니다. 실제 발송·노출은 연동 예정(연결 준비)." };
   if (c.orders === 0 || c.revenue === 0) return { label: c.effStatus === "scheduled" ? "예정" : "데이터 없음", tone: "neutral", why: "아직 성과 데이터가 없습니다." };
   const marginRate = safeDiv(c.estMargin, c.revenue);
   const retRate = safeDiv(c.returns, c.orders);
   if (marginRate < 0.2 || retRate > 0.12) return { label: "마진·반품 주의", tone: "warning", why: `추정 마진율 ${pct(marginRate, 0)} · 주문 대비 반품 ${pct(retRate, 0)} — 할인 폭·대상 상품 재검토` };
   if (c.beforeRevenue === 0) return { label: "관찰", tone: "info", why: "캠페인 전 매출 기준이 없어(신규) 비교하지 않습니다." };
-  if (c.revenue > c.beforeRevenue * 1.2) return { label: "효과", tone: "success", why: `캠페인 전 대비 ${signed(pctDelta(c.revenue, c.beforeRevenue), 0)} (SIMULATION · 실제 효과는 실증에서 검증)` };
+  if (c.revenue > c.beforeRevenue * 1.2) return { label: "효과", tone: "success", why: `캠페인 전 대비 ${signed(pctDelta(c.revenue, c.beforeRevenue), 0)} (시뮬레이션 · 실제 효과는 실증에서 검증)` };
   return { label: "관찰", tone: "info", why: "전후 차이가 20% 미만입니다." };
 }
 
@@ -53,7 +53,7 @@ export function CampaignsPage() {
   return (
     <>
       <PageHeader title="캠페인·기획전" desc="세그먼트·상품·할인율을 조합한 캠페인의 노출→클릭→장바구니→주문 흐름과 마진·반품을 함께 봅니다. 매출만 보고 판단하지 않습니다."
-        badge={<Badge tone="demo">DEMO</Badge>} right={<LiveFreshness />} />
+        badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><CampaignsBody /></Hydrated>
     </>
   );
@@ -83,7 +83,7 @@ function CampaignsBody() {
   const columns: Column<Row>[] = [
     { key: "name", header: "캠페인", primary: true, cell: (r) => (
       <div className="min-w-0">
-        <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold">{r.name}</span><Badge tone={STATUS_TONE[r.effStatus]} size="sm">{STATUS_LABEL[r.effStatus]}</Badge>{r.id === "cp-06" && <Badge tone={loop4Changed ? "success" : "accent"} size="sm"><Zap size={11} />Loop 4</Badge>}{r.isDraft && <Badge tone="ready" size="sm">READY · 연동 예정</Badge>}</div>
+        <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold">{r.name}</span><Badge tone={STATUS_TONE[r.effStatus]} size="sm">{STATUS_LABEL[r.effStatus]}</Badge>{r.id === "cp-06" && <Badge tone={loop4Changed ? "success" : "accent"} size="sm"><Zap size={11} />순환 4</Badge>}{r.isDraft && <Badge tone="ready" size="sm">연결 준비 · 연동 예정</Badge>}</div>
         <p className="text-[0.78rem] text-neutral-text2 mt-0.5">{r.id}</p>
       </div>
     ) },
@@ -109,9 +109,9 @@ function CampaignsBody() {
     <div className="animate-fadeIn">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
         <KpiCard label="진행중" value={num(counts.running)} icon={<Megaphone size={18} />} accent={ICON_TONE.t8} sub={`예정 ${counts.scheduled} · 종료 ${counts.ended}`} />
-        <KpiCard label="캠페인 매출 합계" value={<KpiMoney>{krwShort(totalRevenue)}</KpiMoney>} icon={<PackageCheck size={18} />} accent={ICON_TONE.t6} sub="전체 캠페인 · SIMULATION" />
+        <KpiCard label="캠페인 매출 합계" value={<KpiMoney>{krwShort(totalRevenue)}</KpiMoney>} icon={<PackageCheck size={18} />} accent={ICON_TONE.t6} sub="전체 캠페인 · 시뮬레이션" />
         <KpiCard label="평균 클릭→주문" value={pct(safeDiv(rows.reduce((s, r) => s + r.orders, 0), Math.max(1, rows.reduce((s, r) => s + r.clicks, 0))), 1)} icon={<MousePointerClick size={18} />} accent={ICON_TONE.t3} sub="주문 ÷ 클릭" />
-        <KpiCard label="내 초안" value={num(counts.draft)} icon={<CalendarDays size={18} />} accent={ICON_TONE.t7} sub="이 브라우저에 저장 · READY" />
+        <KpiCard label="내 초안" value={num(counts.draft)} icon={<CalendarDays size={18} />} accent={ICON_TONE.t7} sub="이 브라우저에 저장 · 연결 준비" />
       </div>
 
       {/* Loop 4 banner */}
@@ -119,8 +119,8 @@ function CampaignsBody() {
         <div className="flex flex-col md:flex-row md:items-center gap-3">
           <span className="h-11 w-11 rounded-2xl bg-theme-soft text-theme-primary flex items-center justify-center shrink-0"><Zap size={20} /></span>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap"><p className="font-bold">Loop 4 · 구매주기 → 재구매 캠페인 (cp-06 AERNO 재구매 감사 쿠폰)</p><Badge tone={STATUS_TONE[cp06.effStatus]}>{STATUS_LABEL[cp06.effStatus]}</Badge>{loop4Changed && <Badge tone="success" size="sm"><CheckCircle2 size={12} />Action에서 상태 변경됨</Badge>}</div>
-            <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">act-005(구매주기 도래 고객 재구매 캠페인)를 <b>실행중</b>으로 바꾸면 이 캠페인이 <b>진행중</b>이 되고 고객 My Page에 추천·알림이 나타납니다. <b>완료</b>하면 <b>종료</b>로 바뀝니다. 현재 Action 상태: {act005 ? <ActionStatusBadge status={act005.status} /> : "-"}</p>
+            <div className="flex items-center gap-2 flex-wrap"><p className="font-bold">순환 4 · 구매주기 → 재구매 캠페인 (cp-06 AERNO 재구매 감사 쿠폰)</p><Badge tone={STATUS_TONE[cp06.effStatus]}>{STATUS_LABEL[cp06.effStatus]}</Badge>{loop4Changed && <Badge tone="success" size="sm"><CheckCircle2 size={12} />과제에서 상태 변경됨</Badge>}</div>
+            <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">act-005(구매주기 도래 고객 재구매 캠페인)를 <b>실행중</b>으로 바꾸면 이 캠페인이 <b>진행중</b>이 되고 고객 마이페이지에 추천·알림이 나타납니다. <b>완료</b>하면 <b>종료</b>로 바뀝니다. 현재 과제 상태: {act005 ? <ActionStatusBadge status={act005.status} /> : "-"}</p>
           </div>
           <div className="flex gap-2 shrink-0"><Button variant="outline" onClick={() => setOpenId("cp-06")}>캠페인 상세</Button><Button href="/ax/actions?open=act-005" icon={<ChevronRight size={16} />}>act-005 보기</Button></div>
         </div>
@@ -134,14 +134,14 @@ function CampaignsBody() {
         {!canCreate && <NoteCard className="mb-4">운영 역할은 캠페인 조회만 가능합니다. 생성·마진 확인은 MD·대표 권한입니다 (설정 &gt; 권한 매트릭스).</NoteCard>}
         <DataTable rows={visible} columns={columns} rowKey={(r) => r.id} onRowClick={(r) => setOpenId(r.id)} dense
           empty={<EmptyState title="해당 상태의 캠페인이 없습니다" desc={filter === "draft" ? "'캠페인 만들기'로 초안을 저장하면 여기에 표시됩니다." : "다른 상태를 선택해 보세요."} action={canCreate && filter === "draft" ? <Button onClick={() => setCreateOpen(true)} icon={<Plus size={16} />}>캠페인 만들기</Button> : undefined} />} />
-        <NoteCard className="mt-4"><b>판정 규칙:</b> 추정 마진율 20% 미만 또는 주문 대비 반품 12% 초과 → 마진·반품 주의 · 캠페인 전 대비 매출 +20% 초과 → 효과 · 그 외 → 관찰. 모든 성과는 SIMULATION이며 실제 개선율을 뜻하지 않습니다.</NoteCard>
+        <NoteCard className="mt-4"><b>판정 규칙:</b> 추정 마진율 20% 미만 또는 주문 대비 반품 12% 초과 → 마진·반품 주의 · 캠페인 전 대비 매출 +20% 초과 → 효과 · 그 외 → 관찰. 모든 성과는 시뮬레이션이며 실제 개선율을 뜻하지 않습니다.</NoteCard>
       </SectionBlock>
 
-      <Drawer open={!!open} onClose={() => setOpenId(null)} title={open?.name ?? ""} width="max-w-lg">
+      <Drawer open={!!open} onClose={() => setOpenId(null)} title={open?.name ?? ""} width="w-full max-w-lg">
         {open && <CampaignDetail c={open} showMargin={showMargin} loop4Changed={loop4Changed} onDelete={open.isDraft ? () => { setDrafts((d) => d.filter((x) => x.id !== open.id)); setOpenId(null); toast("초안을 삭제했습니다"); } : undefined} />}
       </Drawer>
 
-      {canCreate && <CreateCampaignModal open={createOpen} onClose={() => setCreateOpen(false)} onSave={(d) => { setDrafts((p) => [d, ...p]); setCreateOpen(false); toast("캠페인 초안이 저장되었습니다", "실제 발송·노출은 연동 예정(READY)입니다. 목록의 '초안' 필터에서 확인하세요.", "success"); }} actor={ROLE_NAME[role]} />}
+      {canCreate && <CreateCampaignModal open={createOpen} onClose={() => setCreateOpen(false)} onSave={(d) => { setDrafts((p) => [d, ...p]); setCreateOpen(false); toast("캠페인 초안이 저장되었습니다", "실제 발송·노출은 연동 예정(연결 준비)입니다. 목록의 '초안' 필터에서 확인하세요.", "success"); }} actor={ROLE_NAME[role]} />}
     </div>
   );
 }
@@ -176,10 +176,10 @@ function CampaignDetail({ c, showMargin, loop4Changed, onDelete }: { c: Row; sho
   const chart = [{ name: "캠페인 전", value: c.beforeRevenue }, { name: "캠페인 중", value: c.revenue }];
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-2 flex-wrap"><Badge tone={STATUS_TONE[c.effStatus]}>{STATUS_LABEL[c.effStatus]}</Badge><Badge tone="neutral">{TYPE_LABEL[c.type]}</Badge><Badge tone={v.tone}>{v.label}</Badge>{c.isDraft && <Badge tone="ready">READY · 연동 예정</Badge>}</div>
+      <div className="flex items-center gap-2 flex-wrap"><Badge tone={STATUS_TONE[c.effStatus]}>{STATUS_LABEL[c.effStatus]}</Badge><Badge tone="neutral">{TYPE_LABEL[c.type]}</Badge><Badge tone={v.tone}>{v.label}</Badge>{c.isDraft && <Badge tone="ready">연결 준비 · 연동 예정</Badge>}</div>
       <p className="text-[0.88rem] text-neutral-text2">{c.id} · {fmtDate(c.startAt)} ~ {fmtDate(c.endAt)} · 대상 {segLabel(c.segment)} · 할인 {pct(c.discountRate, 0)}</p>
       {c.id === "cp-06" && (
-        <NoteCard tone={loop4Changed ? "info" : "neutral"} icon={<Zap size={16} />}><b>Loop 4.</b> act-005 실행중 → 이 캠페인 진행중 + 고객 알림 발송 → 완료 시 종료. {loop4Changed ? "Action Center에서 상태가 변경되어 현재 상태에 반영되었습니다." : "아직 Action이 실행되지 않아 예정 상태입니다."} <Link href="/ax/actions?open=act-005" className="underline font-semibold">act-005 보기</Link></NoteCard>
+        <NoteCard tone={loop4Changed ? "info" : "neutral"} icon={<Zap size={16} />}><b>순환 4.</b> act-005 실행중 → 이 캠페인 진행중 + 고객 알림 발송 → 완료 시 종료. {loop4Changed ? "실행 센터에서 상태가 변경되어 현재 상태에 반영되었습니다." : "아직 과제가 실행되지 않아 예정 상태입니다."} <Link href="/ax/actions?open=act-005" className="underline font-semibold">act-005 보기</Link></NoteCard>
       )}
       <NoteCard>{v.why}</NoteCard>
       <div>
@@ -187,14 +187,14 @@ function CampaignDetail({ c, showMargin, loop4Changed, onDelete }: { c: Row; sho
         {c.impressions > 0 ? <Funnel c={c} /> : <p className="text-[0.88rem] text-neutral-text2 rounded-xl bg-neutral-canvas px-4 py-3">아직 노출 데이터가 없습니다 ({c.isDraft ? "초안" : "예정"}).</p>}
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <Stat label="매출" value={krwShort(c.revenue)} sub="SIMULATION" />
+        <Stat label="매출" value={krwShort(c.revenue)} sub="시뮬레이션" />
         <Stat label="할인비용" value={krwShort(c.discountCost)} />
         {showMargin && <Stat label="추정 마진" value={krwShort(c.estMargin)} sub={c.revenue > 0 ? `마진율 ${pct(safeDiv(c.estMargin, c.revenue), 0)}` : "-"} />}
         <Stat label="반품" value={`${num(c.returns)}건`} sub={c.orders > 0 ? `주문 대비 ${pct(safeDiv(c.returns, c.orders), 0)}` : "-"} />
       </div>
       {(c.beforeRevenue > 0 || c.revenue > 0) && (
         <div>
-          <p className="font-bold mb-2">전후 비교 <span className="text-[0.8rem] font-normal text-neutral-text2">(같은 기간 길이 · SIMULATION)</span></p>
+          <p className="font-bold mb-2">전후 비교 <span className="text-[0.8rem] font-normal text-neutral-text2">(같은 기간 길이 · 시뮬레이션)</span></p>
           <div className="h-[160px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chart} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
@@ -243,7 +243,7 @@ function CreateCampaignModal({ open, onClose, onSave, actor }: { open: boolean; 
   };
   const steps = ["대상 세그먼트", "상품 선택", "할인율·기간", "미리보기·저장"];
   return (
-    <Modal open={open} onClose={close} title="캠페인 만들기 (Demo)" size="lg"
+    <Modal open={open} onClose={close} title="캠페인 만들기 (데모)" size="lg"
       footer={<div className="flex items-center justify-between gap-2">
         <span className="text-[0.82rem] text-neutral-text2">{step} / 4 · {steps[step - 1]}</span>
         <div className="flex gap-2">
@@ -252,7 +252,7 @@ function CreateCampaignModal({ open, onClose, onSave, actor }: { open: boolean; 
         </div>
       </div>}>
       <ol className="flex items-center gap-1.5 mb-5 overflow-x-auto hide-scrollbar">
-        {steps.map((s, i) => <li key={s} className={cn("flex items-center gap-1.5 whitespace-nowrap text-[0.82rem] font-semibold", i + 1 === step ? "text-theme-primary" : i + 1 < step ? "text-semantic-success" : "text-neutral-text2")}><span className={cn("h-6 w-6 rounded-full inline-flex items-center justify-center text-[0.75rem]", i + 1 === step ? "bg-theme-primary text-white" : i + 1 < step ? "bg-[#e6f6ec]" : "bg-neutral-canvas")}>{i + 1}</span>{s}{i < steps.length - 1 && <span className="w-4 h-px bg-neutral-border" />}</li>)}
+        {steps.map((s, i) => <li key={s} className={cn("flex items-center gap-1.5 whitespace-nowrap text-[0.82rem] font-semibold", i + 1 === step ? "text-theme-primary" : i + 1 < step ? "text-semantic-success" : "text-neutral-text2")}><span className={cn("h-6 w-6 rounded-full inline-flex items-center justify-center text-[0.78rem]", i + 1 === step ? "bg-theme-primary text-white" : i + 1 < step ? "bg-[#e6f6ec]" : "bg-neutral-canvas")}>{i + 1}</span>{s}{i < steps.length - 1 && <span className="w-4 h-px bg-neutral-border" />}</li>)}
       </ol>
 
       {step === 1 && (
@@ -287,13 +287,13 @@ function CreateCampaignModal({ open, onClose, onSave, actor }: { open: boolean; 
             <Input label="시작일" name="cp-start" type="date" value={startAt} onChange={(e) => setStartAt(e.target.value)} />
             <Input label="종료일" name="cp-end" type="date" value={endAt} min={startAt} onChange={(e) => setEndAt(e.target.value)} hint={!dateOk ? "종료일은 시작일 이후여야 합니다." : undefined} />
           </div>
-          {Number(rate) >= 0.15 && <NoteCard tone="warning">할인 15% 이상은 추정 마진율이 20% 아래로 내려갈 수 있습니다. 저장 후 판정 규칙에서 '마진·반품 주의'로 표시될 수 있습니다.</NoteCard>}
+          {Number(rate) >= 0.15 && <NoteCard tone="warning">할인 15% 이상은 추정 마진율이 20% 아래로 내려갈 수 있습니다. 저장 후 판정 규칙에서 ‘마진·반품 주의’로 표시될 수 있습니다.</NoteCard>}
         </div>
       )}
       {step === 4 && (
         <div className="space-y-4">
           <div className="rounded-xl border border-neutral-border p-4 space-y-2">
-            <div className="flex items-center gap-2 flex-wrap"><p className="font-bold text-[1.05rem]">{finalName}</p><Badge tone="neutral">초안</Badge><Badge tone="ready">READY · 연동 예정</Badge></div>
+            <div className="flex items-center gap-2 flex-wrap"><p className="font-bold text-[1.05rem]">{finalName}</p><Badge tone="neutral">초안</Badge><Badge tone="ready">연결 준비 · 연동 예정</Badge></div>
             <div className="grid grid-cols-2 gap-2">
               <Stat label="대상" value={segLabel(segment)} />
               <Stat label="할인율" value={`${Math.round(Number(rate) * 100)}%`} />
@@ -302,7 +302,7 @@ function CreateCampaignModal({ open, onClose, onSave, actor }: { open: boolean; 
             </div>
             {productIds.length > 0 && <ul className="flex flex-wrap gap-1.5">{productIds.map((id) => <li key={id}><Badge tone="neutral" size="sm">{PRODUCT_BY_ID[id].name}</Badge></li>)}</ul>}
           </div>
-          <NoteCard tone="info">저장하면 이 브라우저(localStorage)에 초안으로 보관됩니다. <b>실제 발송·노출은 알림톡·이메일·배너 연동 후(READY)</b> 가능하며, Demo에서는 초안 상태로만 관리합니다. 작성자: {actor}</NoteCard>
+          <NoteCard tone="info">저장하면 이 브라우저(localStorage)에 초안으로 보관됩니다. <b>실제 발송·노출은 알림톡·이메일·배너 연동 후(연결 준비)</b> 가능하며, 데모에서는 초안 상태로만 관리합니다. 작성자: {actor}</NoteCard>
         </div>
       )}
     </Modal>

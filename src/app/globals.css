@@ -160,7 +160,8 @@ button, [role="button"] { cursor: pointer; }
 .hide-scrollbar { scrollbar-width: none; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem); }
+.safe-top { padding-top: max(env(safe-area-inset-top, 0px), 1rem); }
 
 /* Customer surface */
 [data-surface="customer"] {

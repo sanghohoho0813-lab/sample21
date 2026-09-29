@@ -14,12 +14,12 @@ export function AIReadyBadge({ kind, className, label, children }: { kind: Kind;
   const c = AI_READY_COPY[kind];
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={cn("inline-flex items-center gap-1.5 rounded-full border border-[#dfe3ff] bg-[#eef2ff] px-3 h-10 md:h-9 text-[0.82rem] font-bold text-[#4338ca] hover:brightness-95 transition-all", className)} aria-haspopup="dialog">
-        <Sparkles size={14} />{label ?? (AI_STATUS === "LIVE" ? "AI LIVE" : "AI Ready")}{children}
+      <button type="button" onClick={() => setOpen(true)} className={cn("inline-flex items-center gap-1.5 rounded-full border border-theme-primary/25 bg-theme-soft px-3 h-10 md:h-9 text-[0.82rem] font-bold text-theme-primary hover:brightness-95 transition-all", className)} aria-haspopup="dialog">
+        <Sparkles size={14} />{label ?? (AI_STATUS === "LIVE" ? "AI 연결됨" : "AI 준비")}{children}
       </button>
       <Modal open={open} onClose={() => setOpen(false)} title="이 기능에는 AI API가 연결될 예정입니다" size="md">
         <div className="space-y-5 text-[0.95rem]">
-          <div className="flex items-center gap-2"><Badge tone="ready">AI READY</Badge><span className="font-bold">{c.title}</span></div>
+          <div className="flex items-center gap-2"><Badge tone="ready">AI 준비</Badge><span className="font-bold">{c.title}</span></div>
           <div><p className="font-bold mb-1.5">무엇을 보나요?</p><ul className="list-disc pl-5 space-y-1 text-neutral-text2">{c.reads.map((r) => <li key={r}>{r}</li>)}</ul></div>
           <div><p className="font-bold mb-1.5">AI가 무엇을 하나요?</p><ul className="list-disc pl-5 space-y-1 text-neutral-text2">{c.does.map((r) => <li key={r}>{r}</li>)}</ul></div>
           <div><p className="font-bold mb-1.5">왜 필요한가요?</p><p className="text-neutral-text2 leading-relaxed">{c.why}</p></div>

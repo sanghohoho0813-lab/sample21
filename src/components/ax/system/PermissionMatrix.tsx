@@ -34,7 +34,7 @@ export function PermissionMatrix({ highlight }: { highlight?: Role }) {
             {ROLES.map((r) => (
               <th key={r} scope="col" className={cn("px-2 py-2.5 text-center font-semibold whitespace-nowrap", highlight === r && "text-theme-primary")}>
                 {ROLE_LABEL[r]}
-                {highlight === r && <span className="block text-[0.68rem] font-bold">현재</span>}
+                {highlight === r && <span className="block text-[0.78rem] font-bold">현재</span>}
               </th>
             ))}
           </tr>

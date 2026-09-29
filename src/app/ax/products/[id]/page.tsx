@@ -26,11 +26,12 @@ import { EmptyState } from "@/components/ui/States";
 import { Button } from "@/components/ui/Button";
 import { ProductImage } from "@/components/ui/ProductImage";
 import { Stat } from "@/components/ui/Kpi";
+import { EVIDENCE_TYPE_LABEL, SOURCE_LABEL } from "@/components/ax/ops/shared";
 
 type Tab = "info" | "options" | "behavior" | "trend" | "returns" | "campaigns" | "insight" | "actions" | "evidence";
 const TABS: { value: Tab; label: string }[] = [
   { value: "info", label: "기본정보" }, { value: "options", label: "옵션별 판매·재고" }, { value: "behavior", label: "고객행동" }, { value: "trend", label: "판매추세" },
-  { value: "returns", label: "반품·핏" }, { value: "campaigns", label: "캠페인" }, { value: "insight", label: "AI·Logic Insight" }, { value: "actions", label: "Action History" }, { value: "evidence", label: "Evidence" },
+  { value: "returns", label: "반품·핏" }, { value: "campaigns", label: "캠페인" }, { value: "insight", label: "AI·규칙 인사이트" }, { value: "actions", label: "과제 이력" }, { value: "evidence", label: "증빙" },
 ];
 const isTab = (v: string | null): v is Tab => !!v && TABS.some((t) => t.value === v);
 const FIT_LABEL = { slim: "슬림", regular: "레귤러", relaxed: "릴랙스", oversized: "오버" };
@@ -62,8 +63,8 @@ function DetailInner() {
   if (!product || !agg || !md) {
     return (
       <div className="space-y-6">
-        <PageHeader title="상품 상세" badge={<Badge tone="demo" size="sm">DEMO</Badge>} />
-        <EmptyState title="상품을 찾을 수 없습니다" desc={`'${id}'에 해당하는 상품이 Demo Repository에 없습니다.`} action={<Button href="/ax/products" icon={<ArrowLeft size={16} />}>상품 목록으로</Button>} />
+        <PageHeader title="상품 상세" badge={<Badge tone="demo" size="sm">데모</Badge>} />
+        <EmptyState title="상품을 찾을 수 없습니다" desc={`'${id}'에 해당하는 상품이 데모 저장소에 없습니다.`} action={<Button href="/ax/products" icon={<ArrowLeft size={16} />}>상품 목록으로</Button>} />
       </div>
     );
   }
@@ -82,7 +83,7 @@ function DetailInner() {
       <div className="rounded-cardlg bg-white border border-neutral-border shadow-card p-5 md:p-6 flex flex-col md:flex-row gap-5">
         <ProductImage colors={product.colors} label={product.name} className="w-full md:w-40 shrink-0" ratio="aspect-[4/5] md:aspect-[3/4]" />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap mb-2"><Badge tone="neutral">{brand.name}</Badge><Badge tone="neutral">{CATEGORY_NAME[product.categoryId]}</Badge><InventoryStatusBadge status={agg.worst} size="md" />{discountRate(product, app) > 0 && <Badge tone="error">할인 {pct(discountRate(product, app), 0)}</Badge>}{fitChanged && <Badge tone="success">핏 안내 변경됨</Badge>}<Badge tone="demo" size="sm">DEMO</Badge></div>
+          <div className="flex items-center gap-2 flex-wrap mb-2"><Badge tone="neutral">{brand.name}</Badge><Badge tone="neutral">{CATEGORY_NAME[product.categoryId]}</Badge><InventoryStatusBadge status={agg.worst} size="md" />{discountRate(product, app) > 0 && <Badge tone="error">할인 {pct(discountRate(product, app), 0)}</Badge>}{fitChanged && <Badge tone="success">핏 안내 변경됨</Badge>}<Badge tone="demo" size="sm">데모</Badge></div>
           <h1 className="text-[1.5rem] md:text-[1.9rem] font-bold tracking-tight leading-tight">{product.name}</h1>
           <p className="text-neutral-text2 mt-1">{product.subtitle} · {product.material}</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2"><Price price={price} original={product.price} size="lg" />{showMargin && <span className="text-[0.9rem] text-neutral-text2">원가 {krw(product.cost)} · <Term term="마진">마진율</Term> <span className="font-semibold text-neutral-text">{pct(agg.marginRate, 0)}</span></span>}</div>
@@ -93,8 +94,8 @@ function DetailInner() {
             <StatPill label="반품률 (30일)" value={pct(agg.returnRate, 1)} sub={`사이즈 관련 ${pct(agg.fitReturnRate, 1)}`} tone={agg.returnRate > 0.15 ? "error" : "neutral"} />
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button size="sm" variant="outline" href={`/products/${product.id}`} icon={<ExternalLink size={15} />}>고객 화면 보기</Button>
-            <Button size="sm" variant="outline" href={`/ax/actions?product=${product.id}`} icon={<Zap size={15} />}>관련 Action {actions.length}건</Button>
+            <Button size="sm" variant="outline" href={`/products/${product.id}`} icon={<ExternalLink size={15} />}>고객 플랫폼에서 보기</Button>
+            <Button size="sm" variant="outline" href={`/ax/actions?product=${product.id}`} icon={<Zap size={15} />}>관련 과제 {actions.length}건</Button>
             <span className="ml-auto self-center"><Freshness source="DEMO" /></span>
           </div>
         </div>
@@ -122,22 +123,22 @@ function DetailInner() {
       )}
 
       {tab === "options" && (
-        <SectionCard title="옵션별 판매·재고" desc="색상×사이즈 단위 · 예상 소진일 = 현재고 ÷ 하루 평균 판매량" right={<Button size="sm" href={`/ax/actions?type=restock&product=${product.id}`} icon={<Zap size={15} />}>재입고 Action 보기</Button>}>
+        <SectionCard title="옵션별 판매·재고" desc="색상×사이즈 단위 · 예상 소진일 = 현재고 ÷ 하루 평균 판매량" right={<Button size="sm" href={`/ax/actions?type=restock&product=${product.id}`} icon={<Zap size={15} />}>재입고 과제 보기</Button>}>
           <DataTable rows={variants} rowKey={(v) => v.id} dense columns={[
             { key: "opt", header: "옵션", primary: true, cell: (v) => <span className="font-semibold">{v.color} · {v.size}</span> },
-            { key: "stock", header: "현재고", align: "right", cell: (v) => <span className={`tabular font-semibold ${v.stock <= 0 ? "text-semantic-error" : daysOfStock(v) <= 4 ? "text-semantic-warning" : ""}`}>{num(v.stock)}{v.incoming > 0 && <span className="block text-[0.75rem] font-normal text-neutral-text2">+{v.incoming} 예정</span>}</span> },
+            { key: "stock", header: "현재고", align: "right", cell: (v) => <span className={`tabular font-semibold ${v.stock <= 0 ? "text-semantic-error" : daysOfStock(v) <= 4 ? "text-semantic-warning" : ""}`}>{num(v.stock)}{v.incoming > 0 && <span className="block text-[0.78rem] font-normal text-neutral-text2">+{v.incoming} 예정</span>}</span> },
             { key: "s7", header: "7일 / 30일 판매", align: "right", cell: (v) => <span className="tabular">{v.sales7d} <UnitDelta cur={v.sales7d} prev={v.salesPrev7d} /> <span className="text-neutral-text2">/ {v.sales30d}</span></span> },
             { key: "dos", header: <Term term="재고일수">예상 소진일</Term>, align: "right", cell: (v) => (v.stock <= 0 ? <span className="text-semantic-error font-semibold">품절</span> : `${daysOfStock(v)}일`) },
             { key: "wish", header: "찜", align: "right", cell: (v) => <span className="tabular">{v.wishlist7d} <UnitDelta cur={v.wishlist7d} prev={v.wishlistPrev7d} /></span> },
             { key: "restock", header: "재입고 신청", align: "right", cell: (v) => <span className={`tabular ${v.restockRequests >= 5 ? "font-semibold text-theme-primary" : ""}`}>{num(v.restockRequests)}</span> },
             { key: "status", header: "상태", cell: (v) => <InventoryStatusBadge status={inventoryStatus(v, app)} /> },
-            { key: "action", header: "Action", cell: (v) => { const a = app.actions.find((x) => x.variantId === v.id); return a ? <Link href={`/ax/actions?open=${a.id}`} className="inline-flex items-center gap-1 text-[0.85rem] font-semibold text-theme-primary hover:underline underline-offset-4" onClick={(e) => e.stopPropagation()}><ActionStatusBadge status={a.status} size="sm" />열기</Link> : <Link href={`/ax/actions?type=restock`} className="text-[0.85rem] font-semibold text-neutral-text2 hover:text-theme-primary" onClick={(e) => e.stopPropagation()}>Action 생성 →</Link>; } },
+            { key: "action", header: "과제", cell: (v) => { const a = app.actions.find((x) => x.variantId === v.id); return a ? <Link href={`/ax/actions?open=${a.id}`} className="inline-flex items-center gap-1 text-[0.85rem] font-semibold text-theme-primary hover:underline underline-offset-4" onClick={(e) => e.stopPropagation()}><ActionStatusBadge status={a.status} size="sm" />열기</Link> : <Link href={`/ax/actions?type=restock`} className="text-[0.85rem] font-semibold text-neutral-text2 hover:text-theme-primary" onClick={(e) => e.stopPropagation()}>과제 생성 →</Link>; } },
           ]} />
         </SectionCard>
       )}
 
       {tab === "behavior" && (
-        <SectionCard title="고객행동 (30일)" desc="조회·찜·판매 일별 추이 · 고객 화면 Event가 반영됩니다">
+        <SectionCard title="고객행동 (30일)" desc="조회·찜·판매 일별 추이 · 고객 화면 행동이 반영됩니다">
           <div className="h-[260px] md:h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={series} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
@@ -191,7 +192,7 @@ function DetailInner() {
 
       {tab === "returns" && (
         <div className="grid lg:grid-cols-2 gap-5">
-          <SectionCard title={<span className="inline-flex items-center gap-2">반품 · <Term term="Fit Risk">Fit Risk</Term></span>} desc="최근 30일 · 반품 사유 분포">
+          <SectionCard title={<span className="inline-flex items-center gap-2">반품 · <Term term="핏 위험도">핏 위험도</Term></span>} desc="최근 30일 · 반품 사유 분포">
             <div className="grid grid-cols-3 gap-2 mb-4">
               <StatPill label="반품률" value={pct(agg.returnRate, 1)} tone={agg.returnRate > 0.15 ? "error" : "neutral"} />
               <StatPill label="사이즈 관련 반품률" value={pct(agg.fitReturnRate, 1)} tone={agg.fitReturnRate > 0.1 ? "warning" : "neutral"} />
@@ -210,7 +211,7 @@ function DetailInner() {
               </div>
             )}
           </SectionCard>
-          <SectionCard title={<span className="inline-flex items-center gap-2">현재 핏 안내 {fitChanged && <Badge tone="success" size="sm">변경됨</Badge>}</span>} desc="핏 안내 Action이 완료되면 여기와 고객 화면이 함께 바뀝니다" right={<AxLink href="/ax/fit-returns">핏·반품</AxLink>}>
+          <SectionCard title={<span className="inline-flex items-center gap-2">현재 핏 안내 {fitChanged && <Badge tone="success" size="sm">변경됨</Badge>}</span>} desc="핏 안내 과제가 완료되면 여기와 고객 화면이 함께 바뀝니다" right={<AxLink href="/ax/fit-returns">핏·반품</AxLink>}>
             <p className="rounded-xl bg-neutral-canvas p-4 text-[0.95rem] leading-relaxed">{fitNote}</p>
             {fitChanged && <p className="mt-2 text-[0.82rem] text-neutral-text2">변경 전: {product.fitNote}</p>}
             <div className="mt-4">
@@ -241,17 +242,17 @@ function DetailInner() {
 
       {tab === "insight" && (
         <div className="space-y-5">
-          <SectionCard title={<span className="inline-flex items-center gap-2">재입고 우선순위 <AIReadyBadge kind="demand" /></span>} desc="규칙: 재고 위험 45% + Demand Score 25% + 마진 15% + 재입고 신청 15% · 추천 수량 = 하루 판매 × (30일 + 리드타임) × 판매속도 보정 − 현재고 − 입고 예정">
+          <SectionCard title={<span className="inline-flex items-center gap-2">재입고 우선순위 <AIReadyBadge kind="demand" /></span>} desc="규칙: 재고 위험 45% + 수요 점수 25% + 마진 15% + 재입고 신청 15% · 추천 수량 = 하루 판매 × (30일 + 리드타임) × 판매속도 보정 − 현재고 − 입고 예정">
             <DataTable rows={[...variants].map((v) => ({ v, rp: restockPriority(v, app), ds: demandScore(v) })).sort((a, b) => b.rp.score - a.rp.score)} rowKey={(r) => r.v.id} dense columns={[
               { key: "opt", header: "옵션", primary: true, cell: (r) => <span className="font-semibold">{r.v.color} · {r.v.size}</span> },
               { key: "score", header: "재입고 우선순위", cell: (r) => <MiniBar value={r.rp.score} tone={demandTone(r.rp.score)} /> },
-              { key: "ds", header: <Term term="Demand Signal">Demand Score</Term>, cell: (r) => <MiniBar value={r.ds} tone={demandTone(r.ds)} /> },
+              { key: "ds", header: <Term term="수요 신호">수요 점수</Term>, cell: (r) => <MiniBar value={r.ds} tone={demandTone(r.ds)} /> },
               { key: "why", header: "설명", cell: (r) => <span className="text-[0.85rem] text-neutral-text2">{r.v.stock <= 0 ? "품절 상태" : `재고 ${r.rp.daysOfStock}일분 vs 리드타임 ${r.rp.leadTime}일`} · 판매속도 {signed(velocityDelta(r.v), 0)} · 재입고 신청 {r.v.restockRequests}건 · 마진 {pct(r.rp.margin, 0)}</span> },
               { key: "qty", header: "추천 검토수량", align: "right", cell: (r) => <span className="font-semibold tabular">{r.rp.suggestedQty > 0 ? `${num(r.rp.suggestedQty)}개` : "-"}</span> },
             ]} />
             <InfoNote className="mt-3">자동발주는 하지 않습니다. 추천 후 MD가 승인해야 실행됩니다 (<Term term="L3">L3</Term>).</InfoNote>
           </SectionCard>
-          <SectionCard title="할인 검토 (Markdown Engine)" desc="규칙: 재고일수가 시즌 잔여기간의 50%를 넘고 재고 8개 이상, 판매속도가 둔화되면 검토 · 마진 25% 이상 유지 · 최대 30%">
+          <SectionCard title="할인 검토 (할인 엔진)" desc="규칙: 재고일수가 시즌 잔여기간의 50%를 넘고 재고 8개 이상, 판매속도가 둔화되면 검토 · 마진 25% 이상 유지 · 최대 30%">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
               <StatPill label="재고일수" value={md.dos <= 0 ? "-" : `${md.dos}일`} sub={`시즌 잔여 ${product.seasonEndsInDays}일`} tone={md.shouldReview ? "warning" : "neutral"} />
               <StatPill label="재고 · 원가" value={`${num(md.stock)}개`} sub={showMargin ? krwShort(md.stockValue) : undefined} />
@@ -259,30 +260,30 @@ function DetailInner() {
               <StatPill label="현재 할인" value={pct(md.currentRate, 0)} />
               <StatPill label="제안 할인" value={pct(md.suggestedRate, 0)} tone={md.shouldReview ? "accent" : "neutral"} sub={md.shouldReview ? "검토 권장" : "검토 불필요"} />
             </div>
-            <p className="mt-3 text-[0.88rem] text-neutral-text2">{md.shouldReview ? "저회전·과잉 조건에 해당합니다. 시즌 종료 전 할인 Action을 검토하세요." : "현재 판매속도와 재고로는 할인 검토 조건에 해당하지 않습니다."}</p>
+            <p className="mt-3 text-[0.88rem] text-neutral-text2">{md.shouldReview ? "저회전·과잉 조건에 해당합니다. 시즌 종료 전 할인 과제를 검토하세요." : "현재 판매속도와 재고로는 할인 검토 조건에 해당하지 않습니다."}</p>
           </SectionCard>
         </div>
       )}
 
       {tab === "actions" && (
         <div className="space-y-4">
-          {actions.length === 0 ? <EmptyState title="이 상품의 Action이 없습니다" desc="엔진이 조건을 감지하면 추천이 생성됩니다." action={<Button variant="outline" href="/ax/actions">Action Center</Button>} /> : actions.map((a) => <ActionCard key={a.id} action={a} expanded={false} onToggle={undefined} className="[&>button]:cursor-default" />)}
-          {actions.length > 0 && <p className="text-[0.82rem] text-neutral-text2">승인·실행은 <Link href={`/ax/actions?product=${product.id}`} className="font-semibold text-theme-primary hover:underline underline-offset-4">Action Center</Link>에서 진행합니다.</p>}
+          {actions.length === 0 ? <EmptyState title="이 상품의 과제가 없습니다" desc="엔진이 조건을 감지하면 추천이 생성됩니다." action={<Button variant="outline" href="/ax/actions">실행 센터</Button>} /> : actions.map((a) => <ActionCard key={a.id} action={a} expanded={false} onToggle={undefined} className="[&>button]:cursor-default" />)}
+          {actions.length > 0 && <p className="text-[0.82rem] text-neutral-text2">승인·실행은 <Link href={`/ax/actions?product=${product.id}`} className="font-semibold text-theme-primary hover:underline underline-offset-4">실행 센터</Link>에서 진행합니다.</p>}
         </div>
       )}
 
       {tab === "evidence" && (
-        <SectionCard title="Evidence" desc="이 상품과 연결된 기록" right={<AxLink href={`/ax/evidence?productId=${product.id}`}>전체 Evidence</AxLink>}>
+        <SectionCard title="증빙" desc="이 상품과 연결된 기록" right={<AxLink href={`/ax/evidence?productId=${product.id}`}>전체 증빙</AxLink>}>
           {evidence.length === 0 ? <EmptyState title="기록이 없습니다" icon={<FileCheck2 size={22} />} /> : (
             <ol className="relative border-l border-neutral-border ml-2 space-y-4">
               {evidence.map((e) => (
                 <li key={e.id} className="pl-5 relative">
                   <span className="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full bg-theme-primary" />
-                  <div className="flex items-center gap-2 flex-wrap mb-1"><Badge tone={e.type === "RESULT" || e.type === "REVENUE" ? "success" : e.type === "RISK" || e.type === "EXCEPTION" ? "warning" : "info"} size="sm">{e.type}</Badge><Badge tone={e.source === "SIMULATION" ? "demo" : "neutral"} size="sm">{e.source}</Badge><span className="text-[0.78rem] text-neutral-text2 tabular">{fmtDate(e.at, "datetime")} · {e.actor}</span></div>
+                  <div className="flex items-center gap-2 flex-wrap mb-1"><Badge tone={e.type === "RESULT" || e.type === "REVENUE" ? "success" : e.type === "RISK" || e.type === "EXCEPTION" ? "warning" : "info"} size="sm">{EVIDENCE_TYPE_LABEL[e.type]}</Badge><Badge tone={e.source === "SIMULATION" ? "demo" : "neutral"} size="sm">{SOURCE_LABEL[e.source]}</Badge><span className="text-[0.78rem] text-neutral-text2 tabular">{fmtDate(e.at, "datetime")} · {e.actor}</span></div>
                   <p className="font-semibold">{e.title}</p>
                   <p className="text-[0.88rem] text-neutral-text2 leading-snug">{e.detail}</p>
                   {e.kpiDelta && <p className="text-[0.8rem] mt-1 text-neutral-text2">KPI: {e.kpiDelta}</p>}
-                  {e.actionId && <Link href={`/ax/actions?open=${e.actionId}`} className="text-[0.82rem] font-semibold text-theme-primary hover:underline underline-offset-4">연결 Action 열기</Link>}
+                  {e.actionId && <Link href={`/ax/actions?open=${e.actionId}`} className="text-[0.82rem] font-semibold text-theme-primary hover:underline underline-offset-4">연결 과제 열기</Link>}
                 </li>
               ))}
             </ol>
@@ -294,7 +295,7 @@ function DetailInner() {
       {agg.demand >= 60 && tab !== "insight" && (
         <InfoNote tone="accent" className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <span className="inline-flex items-center gap-2"><UrgencyBadge urgency="high" />수요 점수가 높은 옵션이 있습니다 ({num(agg.demand)}점). 재입고 우선순위를 확인하세요.</span>
-          <button onClick={() => setTab("insight")} className="tap text-[0.9rem] font-semibold text-theme-primary hover:underline underline-offset-4 text-left">AI·Logic Insight 보기 →</button>
+          <button onClick={() => setTab("insight")} className="tap text-[0.9rem] font-semibold text-theme-primary hover:underline underline-offset-4 text-left">AI·규칙 인사이트 보기 →</button>
         </InfoNote>
       )}
     </div>

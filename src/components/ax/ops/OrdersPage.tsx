@@ -43,8 +43,8 @@ const NEXT_STEP: Partial<Record<OrderStatus, { status: OrderStatus; label: strin
 export function OrdersPage() {
   return (
     <>
-      <PageHeader title="주문·배송" desc="고객 화면에서 접수된 DEMO 주문이 이 목록에 바로 나타나고, 여기서 바꾼 배송 상태는 고객 My Page에 그대로 반영됩니다 (Loop 2)."
-        badge={<Badge tone="demo">DEMO</Badge>} right={<LiveFreshness />} />
+      <PageHeader title="주문·배송" desc="고객 화면에서 접수된 데모 주문이 이 목록에 바로 나타나고, 여기서 바꾼 배송 상태는 고객 마이페이지에 그대로 반영됩니다 (순환 2)."
+        badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><OrdersBody /></Hydrated>
     </>
   );
@@ -86,9 +86,9 @@ function OrdersBody() {
 
   const change = (o: Order, status: OrderStatus) => {
     store.updateOrderStatus(o.id, status, ROLE_NAME[role]);
-    toast("고객 My Page 주문상태에 반영되었습니다", `${o.id} → ${ORDER_STATUS_LABEL[status]} · 처리자 ${ROLE_NAME[role]}`, "success");
+    toast("고객 마이페이지 주문상태에 반영되었습니다", `${o.id} → ${ORDER_STATUS_LABEL[status]} · 처리자 ${ROLE_NAME[role]}`, "success");
   };
-  const demoReturn = (o: Order) => toast(`${o.status === "exchange-requested" ? "교환" : "반품"} 처리 (Demo)`, `${o.id} · 회수·환불은 택배·PG 연동 후 처리됩니다 (READY). 핏·반품 화면에서 승인·완료를 기록할 수 있습니다.`, "info");
+  const demoReturn = (o: Order) => toast(`${o.status === "exchange-requested" ? "교환" : "반품"} 처리 (데모)`, `${o.id} · 회수·환불은 택배·PG 연동 후 처리됩니다 (연결 준비). 핏·반품 화면에서 승인·완료를 기록할 수 있습니다.`, "info");
 
   const ActionButtons = ({ o }: { o: Order }) => {
     const next = NEXT_STEP[o.status];
@@ -96,7 +96,7 @@ function OrdersBody() {
       <div className="flex flex-wrap gap-1.5">
         {next && <Button size="sm" onClick={(e) => { e.stopPropagation(); change(o, next.status); }}>{next.label}</Button>}
         {(o.status === "pending" || o.status === "preparing") && <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); change(o, "cancelled"); }} icon={<XCircle size={14} />}>취소</Button>}
-        {(o.status === "return-requested" || o.status === "exchange-requested") && <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); demoReturn(o); }} icon={<Undo2 size={14} />}>{o.status === "exchange-requested" ? "교환 처리(Demo)" : "반품 처리(Demo)"}</Button>}
+        {(o.status === "return-requested" || o.status === "exchange-requested") && <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); demoReturn(o); }} icon={<Undo2 size={14} />}>{o.status === "exchange-requested" ? "교환 처리(데모)" : "반품 처리(데모)"}</Button>}
         {!next && o.status !== "pending" && o.status !== "preparing" && o.status !== "return-requested" && o.status !== "exchange-requested" && <span className="text-[0.82rem] text-neutral-text2">처리 완료</span>}
       </div>
     );
@@ -113,7 +113,7 @@ function OrdersBody() {
     ) },
     { key: "time", header: "시간", cell: (o) => <span title={fmtDate(o.createdAt, "datetime")}>{relTime(o.createdAt)}</span> },
     { key: "customer", header: "고객", cell: (o) => displayName(o.customerName, role) },
-    { key: "items", header: "상품", cell: (o) => summarize(o) },
+    { key: "items", header: "상품", mobileFull: true, wrap: true, cell: (o) => summarize(o) },
     { key: "total", header: "금액", align: "right", cell: (o) => krw(o.total) },
     { key: "channel", header: "채널", cell: (o) => <span className="inline-flex items-center gap-1 text-neutral-text2">{o.channel === "mobile" ? <Smartphone size={14} /> : <Monitor size={14} />}{o.channel === "mobile" ? "모바일" : "웹"}</span> },
     { key: "status", header: "상태", hideOnMobile: true, cell: (o) => <OrderStatusBadge status={o.status} /> },
@@ -125,7 +125,7 @@ function OrdersBody() {
   return (
     <div className="animate-fadeIn">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-        <KpiCard label="오늘 주문" value={num(summary.today)} icon={<PackageCheck size={18} />} accent={ICON_TONE.t3} sub={`고객 화면 DEMO 주문 ${newOrders.length}건 포함`} />
+        <KpiCard label="오늘 주문" value={num(summary.today)} icon={<PackageCheck size={18} />} accent={ICON_TONE.t3} sub={`고객 화면 데모 주문 ${newOrders.length}건 포함`} />
         <KpiCard label="처리 대기" value={num(summary.waiting)} icon={<Clock size={18} />} accent={ICON_TONE.t6} sub="신규주문 + 상품준비" />
         <KpiCard label="배송중" value={num(summary.shipping)} icon={<Truck size={18} />} accent={ICON_TONE.t6} sub="출고완료 + 배송중" />
         <KpiCard label="반품·교환 요청" value={num(summary.returns)} icon={<Undo2 size={18} />} accent={ICON_TONE.t4} sub="핏·반품 화면에서 처리" href="/ax/fit-returns" />
@@ -136,8 +136,8 @@ function OrdersBody() {
         <div className="flex flex-col md:flex-row md:items-center gap-3">
           <span className="h-11 w-11 rounded-2xl bg-theme-soft text-theme-primary flex items-center justify-center shrink-0"><Zap size={20} /></span>
           <div className="min-w-0 flex-1">
-            <p className="font-bold">고객 화면에서 접수된 DEMO 주문 {newOrders.length ? `${newOrders.length}건` : "없음"}</p>
-            <p className="text-[0.88rem] text-neutral-text2 mt-0.5 leading-relaxed">{newOrders.length ? "목록 맨 위에 '고객 화면에서 접수' 표시로 나타납니다. 상태를 바꾸면 고객 My Page와 알림에 즉시 반영됩니다." : "고객 화면에서 장바구니 → 주문하면 이 목록 맨 위에 바로 나타납니다. 시연 시 '고객 화면 보기'로 주문해 보세요."}</p>
+            <p className="font-bold">고객 화면에서 접수된 데모 주문 {newOrders.length ? `${newOrders.length}건` : "없음"}</p>
+            <p className="text-[0.88rem] text-neutral-text2 mt-0.5 leading-relaxed">{newOrders.length ? "목록 맨 위에 '고객 화면에서 접수' 표시로 나타납니다. 상태를 바꾸면 고객 마이페이지와 알림에 즉시 반영됩니다." : "고객 화면에서 장바구니 → 주문하면 이 목록 맨 위에 바로 나타납니다. 시연 시 '고객 화면 보기'로 주문해 보세요."}</p>
           </div>
           {newOrders.length ? <Button variant="outline" onClick={() => setOpenId(newOrders[0].id)} icon={<ChevronRight size={16} />}>최근 주문 {newOrders[0].id}</Button> : <Button variant="outline" href="/cart" icon={<ExternalLink size={16} />}>고객 화면에서 주문하기</Button>}
         </div>
@@ -163,9 +163,9 @@ function OrdersBody() {
           empty={<EmptyState title="조건에 맞는 주문이 없습니다" desc="상태 탭·기간·검색어를 바꿔 보세요." icon={<Search size={22} />} action={<Button variant="outline" onClick={() => { setTab("all"); setQ(""); setRange("all"); }}>필터 초기화</Button>} />} />
         <MoreButton hasMore={hasMore} onClick={more} remaining={filtered.length - limit} />
       </div>
-      <NoteCard className="mt-4">상태 흐름: 결제대기(DEMO) → 상품준비 → 출고완료 → 배송중 → 배송완료. 취소는 상품준비 전까지 가능합니다. 실제 결제·택배 API는 연동 예정(READY)이며 Demo에서는 상태만 바뀝니다.</NoteCard>
+      <NoteCard className="mt-4">상태 흐름: 결제대기(데모) → 상품준비 → 출고완료 → 배송중 → 배송완료. 취소는 상품준비 전까지 가능합니다. 실제 결제·택배 API는 연동 예정(연결 준비)이며 데모에서는 상태만 바뀝니다.</NoteCard>
 
-      <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `주문 ${open.id}` : ""} width="max-w-lg" footer={open ? <ActionButtons o={open} /> : undefined}>
+      <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `주문 ${open.id}` : ""} width="w-full max-w-lg" footer={open ? <ActionButtons o={open} /> : undefined}>
         {open && <OrderDetail o={open} role={role} customerCreated={isCustomerCreated(open.id)} />}
       </Drawer>
     </div>
@@ -213,7 +213,7 @@ function OrderDetail({ o, role, customerCreated }: { o: Order; role: "owner" | "
           ))}
         </ol>
       </div>
-      {o.customerId === DEMO_CUSTOMER_ID && <NoteCard tone="info">이 주문은 시연 고객(김하늘)의 주문입니다. 상태를 바꾸면 <Link href={`/my/orders/${o.id}`} className="underline font-semibold">고객 My Page</Link>와 알림에 바로 반영됩니다.</NoteCard>}
+      {o.customerId === DEMO_CUSTOMER_ID && <NoteCard tone="info">이 주문은 시연 고객(김하늘)의 주문입니다. 상태를 바꾸면 <Link href={`/my/orders/${o.id}`} className="underline font-semibold">고객 마이페이지</Link>와 알림에 바로 반영됩니다.</NoteCard>}
     </div>
   );
 }

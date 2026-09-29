@@ -84,10 +84,10 @@ export function PreviewStrip() {
             <span className="text-white font-semibold text-[0.9rem]">경영 대시보드</span>
             <span className="ml-auto h-1.5 w-1.5 rounded-full bg-theme-highlight" />
           </div>
-          <p className="text-[0.75rem] font-bold text-theme-highlight">사이드바 pill · Highlight</p>
+          <p className="text-[0.78rem] font-bold text-theme-highlight">사이드바 pill · Highlight</p>
         </div>
         <div className="rounded-cardlg bg-theme-soft p-4">
-          <p className="text-[0.8rem] font-bold text-theme-primary">Soft 배경 · Insight</p>
+          <p className="text-[0.8rem] font-bold text-theme-primary">Soft 배경 · 인사이트</p>
           <p className="mt-1 text-[0.9rem] text-neutral-text leading-snug">품절 위험 옵션 <span className="font-bold text-theme-primary">7개</span>를 먼저 확인하세요. (샘플)</p>
           <div className="mt-2 flex gap-1.5"><span className="h-2 w-12 rounded-full bg-theme-secondary" /><span className="h-2 w-8 rounded-full bg-theme-accent" /></div>
         </div>

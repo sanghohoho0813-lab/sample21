@@ -23,7 +23,7 @@ await step("Customer Home 5초 테스트 (MORFIT/멀티브랜드/CTA)", async ()
 await step("Tutorial 닫기 (overlay cleanup)", async () => { const skip = page.getByText("건너뛰기"); if (await skip.count()) { await skip.first().click(); await page.waitForTimeout(300); } const blocked = await page.evaluate(() => !!document.querySelector('[role="dialog"][aria-label="튜토리얼"]')); if (blocked) throw new Error("tutorial overlay remains"); });
 await step("Ranking", async () => { await go("/ranking"); await page.locator('[data-tour="c-ranking"]').waitFor({ timeout: 5000 }); });
 await step("Product detail (Scenario A)", async () => { await go("/products/p-nove-oxford?color=블랙&size=M"); await page.locator('[data-tour="c-fit-signal"]').waitFor({ timeout: 8000 }); });
-await step("Fit profile → recommendation", async () => { const h = page.locator('input[name="height"]'); if (await h.count()) { await h.fill("168"); await page.locator('input[name="weight"]').fill("55"); } await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}"); }); });
+await step("Fit profile → recommendation", async () => { const h = page.locator('input[name="height"]'); if (await h.count()) { await h.fill("168"); await page.locator('input[name="weight"]').fill("55"); }  });
 await step("Restock subscribe (Loop 1 start)", async () => { const btn = page.locator('[data-tour="c-restock"]'); await btn.first().waitFor({ timeout: 5000 }); await btn.first().click(); await page.waitForTimeout(500); const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state); if (!st || !(st.restockSubs || []).length) throw new Error("restockSubs not persisted"); });
 await step("Business AX 전환 + KPI", async () => { await go("/ax"); await page.locator('[data-tour="kpi-row"]').waitFor({ timeout: 15000 }); await page.waitForTimeout(900); const skip = page.getByText("건너뛰기"); if (await skip.count()) { await skip.first().click(); await page.waitForTimeout(300); } });
 await step("Role switch (MD) changes UI", async () => { const before = await text(); await page.getByRole("radio", { name: "MD" }).first().click(); await page.waitForTimeout(400); const after = await text(); if (before === after) throw new Error("role switch no change"); await page.getByRole("radio", { name: "대표" }).first().click(); });
@@ -68,14 +68,37 @@ await step("Customer My Page reflects order status", async () => { const st = aw
 await step("Evidence lists loop", async () => { await go("/ax/evidence"); await page.locator('[data-tour="evidence-list"]').waitFor({ timeout: 8000 }); const t = await text(); if (!/재고 \+/.test(t)) throw new Error("restock result evidence missing"); });
 await step("Evidence Pack preview + JSON export", async () => {
   await go("/ax/evidence/pack"); await page.locator("#pack-log").waitFor({ timeout: 10000 }); const t = await text();
-  if (!/UNKNOWN \/ REQUIRED/.test(t) || !/VALIDATE LATER/.test(t)) throw new Error("pack lacks baseline honesty markers");
+  if (!/미측정 · 실증 필요/.test(t) || !/실증 후 확인/.test(t)) throw new Error("pack lacks baseline honesty markers");
   if (!/구매 전환/.test(t)) throw new Error("pack does not include Loop 1 purchase conversion");
   const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 8000 }), page.getByRole("button", { name: /JSON 내보내기/ }).first().click()]);
   const file = await dl.path(); const json = JSON.parse(fs.readFileSync(file, "utf8"));
   if (json.meta?.stage !== "DEMO" || json.meta?.baseline !== "UNKNOWN / REQUIRED" || !Array.isArray(json.baseline) || json.baseline.length < 8 || !Array.isArray(json.actions) || !Array.isArray(json.evidence)) throw new Error("pack json shape invalid");
   if (json.kpiDelta.some((r) => r.delta !== "VALIDATE LATER")) throw new Error("pack json claims a delta");
 });
-await step("Why AX discoverable", async () => { await go("/ax"); await page.locator('[data-tour="nav-why"]').first().click(); await page.waitForLoadState("networkidle"); await page.locator('[data-tour="why-top"]').waitFor({ timeout: 20000 }); });
+await step("Why AX discoverable (2단계 메뉴)", async () => { await go("/ax"); const why = page.locator('[data-tour="nav-why"]'); if (!(await why.first().isVisible().catch(() => false))) { await page.locator('[data-tour="nav-group-story"]').first().click(); await page.waitForTimeout(250); } await why.first().click(); await page.waitForLoadState("networkidle"); await page.locator('[data-tour="why-top"]').waitFor({ timeout: 20000 }); });
+await step("AX → 고객 플랫폼 보기 / 고객 → AX 운영화면 보기", async () => {
+  await go("/ax"); const cp = page.locator('[data-tour="surface-switch"]').first(); if (!/고객 플랫폼 보기/.test(await cp.innerText())) throw new Error("AX header CTA label"); await cp.click(); await page.waitForURL((u) => new URL(u).pathname === "/", { timeout: 15000 });
+  const back = page.locator('[data-tour="c-surface-switch"]').first(); await back.waitFor({ timeout: 8000 }); if (!/AX 운영화면 보기/.test(await back.innerText())) throw new Error("customer demo bar label"); await back.click(); await page.waitForURL(/\/ax$/, { timeout: 15000 });
+});
+await step("모바일 햄버거: 왼쪽 · 1차 메뉴 수 · 스크롤 잠금 · 하단 CTA", async () => {
+  const m = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: "ko-KR", hasTouch: true });
+  const mp = await m.newPage(); await mp.route("**/*", (r) => (r.request().url().startsWith(BASE) ? r.continue() : r.abort()));
+  await mp.addInitScript(() => { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = s.version ?? 3; localStorage.setItem(k, JSON.stringify(s)); });
+  for (const [route, btnName, expectMax, ctaSel] of [["/ax", "메뉴 열기", 8, '[data-tour="drawer-customer-cta"]'], ["/", "전체 메뉴", 7, '[data-tour="c-drawer-ax-cta"]']]) {
+    await mp.goto(BASE + route, { waitUntil: "networkidle" }); await mp.waitForTimeout(900);
+    const btn = mp.getByRole("button", { name: btnName }).first(); const box = await btn.boundingBox(); if (!box || box.x > 60) throw new Error(`${route} hamburger not on the left (x=${box?.x})`);
+    await btn.click(); await mp.waitForTimeout(400);
+    const dlg = mp.locator('[role="dialog"]').last(); await dlg.waitFor({ timeout: 5000 });
+    const top = await dlg.evaluate((d) => { const nav = d.querySelector("nav"); return nav ? nav.querySelectorAll(":scope > a, :scope > div > button, :scope > div > a").length : -1; });
+    if (top < 5 || top > expectMax) throw new Error(`${route} first-level menu count ${top} (expected 5~${expectMax})`);
+    if ((await mp.evaluate(() => getComputedStyle(document.body).overflow)) !== "hidden") throw new Error(`${route} background scroll not locked`);
+    if (!(await mp.locator(ctaSel).first().isVisible().catch(() => false))) throw new Error(`${route} drawer bottom CTA missing`);
+    await mp.getByRole("button", { name: "닫기" }).last().click(); await mp.waitForTimeout(350);
+    if (await mp.locator('[role="dialog"]').count()) throw new Error(`${route} drawer did not close`);
+    if ((await mp.evaluate(() => getComputedStyle(document.body).overflow)) === "hidden") throw new Error(`${route} scroll lock not restored`);
+  }
+  await m.close();
+});
 await step("Presentation mode starts", async () => { await go("/ax/present"); await page.getByRole("button", { name: /시연 시작/ }).first().click(); await page.waitForTimeout(600); const t = await text(); if (!/시연 모드 · 1/.test(t)) throw new Error("controller missing"); await page.keyboard.press("Escape"); });
 await step("Theme 9 switch + no residual", async () => {
   await go("/ax/settings"); await page.locator('[data-tour="settings-theme"]').waitFor({ timeout: 8000 });

@@ -34,7 +34,7 @@ function StyleBody() {
         <div className="flex flex-wrap gap-2">
           {FITS.map((f) => (
             <Link key={f} href={`/shop?fit=${f}`} className={cn("inline-flex items-center gap-1 h-11 md:h-10 px-4 rounded-full border text-[0.9rem] font-semibold transition-all duration-fast active:scale-[0.97]", fp.preferredFit === f ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2 hover:bg-neutral-canvas")}>
-              {FIT_LABEL[f]} 핏{fp.preferredFit === f && <span className="text-[0.72rem] font-bold ml-1 opacity-80">내 선호</span>}<ChevronRight size={14} />
+              {FIT_LABEL[f]} 핏{fp.preferredFit === f && <span className="text-[0.78rem] font-bold ml-1 opacity-80">내 선호</span>}<ChevronRight size={14} />
             </Link>
           ))}
         </div>
@@ -57,7 +57,7 @@ function StyleBody() {
         <span className="h-9 w-9 shrink-0 rounded-xl bg-neutral-canvas md:bg-brand-ivory flex items-center justify-center text-semantic-warning"><AlertTriangle size={18} /></span>
         <div className="text-[0.85rem] leading-relaxed text-neutral-text2">
           <p className="font-bold text-neutral-text">사이즈 추천은 참고 정보입니다</p>
-          <p className="mt-0.5">입력한 정보와 상품 실측·구매 데이터를 바탕으로 계산한 추천이며, 실제 착용감은 개인차가 있습니다. 사이즈 선택의 최종 책임은 고객에게 있으며, 구매 전 상품별 실측표를 함께 확인해 주세요. <Badge tone="demo" size="sm" className="align-middle">DEMO</Badge> 규칙 기반 추천이며 실제 고객 데이터를 사용하지 않습니다.</p>
+          <p className="mt-0.5">입력한 정보와 상품 실측·구매 데이터를 바탕으로 계산한 추천이며, 실제 착용감은 개인차가 있습니다. 사이즈 선택의 최종 책임은 고객에게 있으며, 구매 전 상품별 실측표를 함께 확인해 주세요. <Badge tone="demo" size="sm" className="align-middle">데모</Badge> 규칙 기반 추천이며 실제 고객 데이터를 사용하지 않습니다.</p>
         </div>
       </section>
     </div>

@@ -29,16 +29,17 @@ export function fmtDate(iso: string | Date, opts: "short" | "long" | "time" | "d
   if (opts === "short") return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
   if (opts === "long") return new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(d);
   if (opts === "time") return new Intl.DateTimeFormat("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
-  return `${fmtDate(d, "short")} ${fmtDate(d, "time")}`;
+  // 날짜와 시각 사이는 줄바꿈 금지 공백(NBSP) — "2026.09.29 / 14:50"처럼 두 줄로 깨지지 않게
+  return `${fmtDate(d, "short")}\u00a0${fmtDate(d, "time")}`;
 }
 export function relTime(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.round(diff / 60000);
   if (m < 1) return "방금 전";
-  if (m < 60) return `${m}분 전`;
+  if (m < 60) return `${m}분\u00a0전`;
   const h = Math.round(m / 60);
-  if (h < 24) return `${h}시간 전`;
+  if (h < 24) return `${h}시간\u00a0전`;
   const d = Math.round(h / 24);
-  if (d < 30) return `${d}일 전`;
+  if (d < 30) return `${d}일\u00a0전`;
   return fmtDate(iso);
 }

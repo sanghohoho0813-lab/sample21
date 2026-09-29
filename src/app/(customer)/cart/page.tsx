@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ShoppingBag, Minus, Plus, Trash2, Truck, Ticket, Heart, ArrowRight } from "lucide-react";
 import type { Product } from "@/lib/types";
-import { BRAND_BY_ID, PRODUCT_BY_ID, VARIANT_BY_ID } from "@/lib/demo/seed";
+import { BRAND_BY_ID, PRODUCT_BY_ID } from "@/lib/demo/seed";
 import { useApp, campaignStatus } from "@/lib/store";
 import { effPrice } from "@/lib/kpi";
 import { krw } from "@/lib/format";
@@ -102,7 +102,7 @@ function CartContent() {
           className={cn("mt-5 h-[52px] w-full rounded-xl inline-flex items-center justify-center gap-2 font-bold text-[1rem] transition-all duration-fast active:scale-[0.98]", canCheckout ? "bg-brand-black text-white hover:bg-[#2a2a2a] hover:shadow-raised" : "bg-neutral-border text-neutral-text2 cursor-not-allowed")}>
           주문하기<ArrowRight size={18} />
         </Link>
-        <p className="mt-3 text-[0.78rem] text-neutral-text2 leading-relaxed">DEMO 주문입니다. 실제 결제는 이루어지지 않으며, 주문은 Business AX 주문·매출·재고에 즉시 반영됩니다.</p>
+        <p className="mt-3 text-[0.78rem] text-neutral-text2 leading-relaxed">데모 주문입니다. 실제 결제는 이루어지지 않으며, 주문은 AX 운영화면 주문·매출·재고에 즉시 반영됩니다.</p>
       </aside>
       <OptionSheet product={sheet?.product ?? null} open={!!sheet} onClose={() => setSheet(null)} initialColorIdx={sheet?.colorIdx ?? 0} />
     </div>

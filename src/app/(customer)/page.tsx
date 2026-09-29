@@ -33,7 +33,7 @@ function Hero() {
     <section data-tour="c-hero" className="bg-brand-ivory border-b border-neutral-border">
       <Container className="py-8 md:py-14 lg:py-16 grid md:grid-cols-12 gap-8 md:gap-10 items-center">
         <div className="md:col-span-6 lg:col-span-6">
-          <p className="text-[0.74rem] md:text-[0.8rem] font-bold tracking-[0.2em] text-neutral-text2">MULTI-BRAND FASHION PLATFORM</p>
+          <p className="text-[0.78rem] md:text-[0.8rem] font-bold tracking-[0.2em] text-neutral-text2">MULTI-BRAND FASHION PLATFORM</p>
           <h1 className="mt-3 text-[2.35rem] leading-[1.05] md:text-[3.2rem] lg:text-[3.6rem] font-black tracking-tight">
             오늘의 취향을<br />브랜드 너머로
           </h1>
@@ -52,7 +52,7 @@ function Hero() {
             ].map((s) => (
               <li key={s.l} className="rounded-2xl bg-white/70 border border-neutral-border px-3 py-2.5">
                 <p className="font-black text-[1.15rem] md:text-[1.3rem] leading-none tabular">{s.v}</p>
-                <p className="mt-1 text-[0.72rem] md:text-[0.78rem] text-neutral-text2 font-semibold">{s.l}</p>
+                <p className="mt-1 text-[0.78rem] md:text-[0.78rem] text-neutral-text2 font-semibold">{s.l}</p>
               </li>
             ))}
           </ul>
@@ -60,19 +60,19 @@ function Hero() {
         <div className="md:col-span-6 grid grid-cols-3 gap-2.5 md:gap-3">
           <GradientImage gradient={["#111111", "#3d3d3d"]} ratio="aspect-[3/4]" className="col-span-2 row-span-2 rounded-cardlg" asset="hero_main.jpg" overlay label="FW 에디토리얼 메인">
             <div className="absolute bottom-4 left-4 right-4 text-white">
-              <p className="text-[0.68rem] font-bold tracking-[0.18em] text-white/75">FW EDITORIAL</p>
+              <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/75">FW EDITORIAL</p>
               <p className="mt-1 font-bold text-[1.05rem] md:text-[1.25rem] leading-tight">구조적인 미니멀리즘,<br />오늘의 아우터</p>
               <Link href="/shop?category=outer" className="tap mt-2 inline-flex items-center gap-1 text-[0.82rem] font-semibold underline-offset-4 hover:underline">아우터 보기<ArrowRight size={14} /></Link>
             </div>
           </GradientImage>
           <Link href="/brands/mellow-code" className="block group">
             <GradientImage gradient={BRAND_BY_ID["b-mellow"].gradient} ratio="aspect-[3/4]" asset="fashion_editorial_01.jpg" overlay label="MELLOW CODE 룩" className="group-hover:shadow-raised transition-shadow">
-              <span className="absolute bottom-3 left-3 text-white text-[0.72rem] font-bold tracking-wide">MELLOW CODE</span>
+              <span className="absolute bottom-3 left-3 text-white text-[0.78rem] font-bold tracking-wide">MELLOW CODE</span>
             </GradientImage>
           </Link>
           <Link href="/brands/current-type" className="block group">
             <GradientImage gradient={BRAND_BY_ID["b-current"].gradient} ratio="aspect-[3/4]" asset="fashion_editorial_02.jpg" overlay label="CURRENT TYPE 룩" className="group-hover:shadow-raised transition-shadow">
-              <span className="absolute bottom-3 left-3 text-white text-[0.72rem] font-bold tracking-wide">CURRENT TYPE</span>
+              <span className="absolute bottom-3 left-3 text-white text-[0.78rem] font-bold tracking-wide">CURRENT TYPE</span>
             </GradientImage>
           </Link>
         </div>
@@ -80,7 +80,7 @@ function Hero() {
       <div className="border-t border-neutral-border/70">
         <Container className="py-3">
           <HScroll className="items-center gap-2">
-            <span className="shrink-0 text-[0.72rem] font-bold tracking-widest text-neutral-text2 pr-1">BRANDS</span>
+            <span className="shrink-0 text-[0.78rem] font-bold tracking-widest text-neutral-text2 pr-1">BRANDS</span>
             {BRANDS.map((b) => (
               <Link key={b.id} href={`/brands/${b.slug}`} className="shrink-0 snap-start h-10 md:h-9 px-3 rounded-full bg-white border border-neutral-border text-[0.82rem] font-bold hover:border-neutral-text2 hover:bg-neutral-canvas transition-colors inline-flex items-center gap-1.5">
                 <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: `linear-gradient(135deg, ${b.gradient[0]}, ${b.gradient[1]})` }} />{b.name}
@@ -152,7 +152,7 @@ function NewBrandsSection() {
               </GradientImage>
               <div className="p-3">
                 <p className="text-[0.85rem] font-semibold leading-snug line-clamp-1">{b.tagline}</p>
-                <p className="mt-1 text-[0.75rem] text-neutral-text2 tabular">팔로워 {num(b.followers)} · 상품 {brandProductCount(b.id)}개</p>
+                <p className="mt-1 text-[0.78rem] text-neutral-text2 tabular">팔로워 {num(b.followers)} · 상품 {brandProductCount(b.id)}개</p>
               </div>
             </Link>
           );
@@ -199,7 +199,7 @@ function SeasonEditSection() {
           <Link key={e.href} href={e.href} className="group block">
             <GradientImage gradient={e.gradient} ratio="aspect-[16/9] sm:aspect-[4/5]" asset={e.asset} overlay label={e.title} className="rounded-cardlg transition-shadow group-hover:shadow-raised">
               <div className="absolute inset-0 p-4 md:p-5 flex flex-col justify-end text-white">
-                <p className="text-[0.68rem] font-bold tracking-[0.18em] text-white/75">{e.eyebrow}</p>
+                <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/75">{e.eyebrow}</p>
                 <p className="mt-1 font-black text-[1.3rem] md:text-[1.5rem] leading-tight">{e.title}</p>
                 <p className="mt-1 text-[0.85rem] text-white/85">{e.desc}</p>
                 <span className="mt-3 inline-flex items-center gap-1 text-[0.85rem] font-semibold underline-offset-4 group-hover:underline">보러가기<ArrowRight size={14} /></span>
@@ -231,7 +231,7 @@ function FitCtaSection() {
     <section data-tour="c-fit-cta" className="rounded-cardlg bg-brand-black text-white overflow-hidden">
       <div className="grid md:grid-cols-12 items-center">
         <div className="md:col-span-7 p-6 md:p-10">
-          <p className="text-[0.72rem] font-bold tracking-[0.18em] text-white/60 inline-flex items-center gap-2"><Sparkles size={14} />FIT SIGNAL</p>
+          <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/60 inline-flex items-center gap-2"><Sparkles size={14} />FIT SIGNAL</p>
           <h2 className="mt-3 text-[1.6rem] md:text-[2.1rem] font-black tracking-tight leading-tight">내 사이즈, 브랜드마다<br className="md:hidden" /> 다르다면?</h2>
           <p className="mt-3 text-white/75 leading-relaxed max-w-[30rem]">키·몸무게·평소 사이즈를 입력하면 상품마다 추천 사이즈와 그 이유를 보여드려요. 작게 나온 옷, 크게 나온 옷도 미리 알 수 있습니다.</p>
           <Hydrated fallback={<div className="mt-6 flex gap-2.5"><Skeleton className="h-[52px] w-44 rounded-xl" /><Skeleton className="h-[52px] w-32 rounded-xl" /></div>}>
@@ -242,7 +242,7 @@ function FitCtaSection() {
           <GradientImage gradient={["#315cf5", "#1e2a4a"]} ratio="aspect-[16/9] md:aspect-[4/3]" asset="fit_profile.jpg" label="핏 프로필 안내" className="rounded-2xl">
             <div className="absolute inset-0 p-4 flex flex-col justify-end">
               <div className="rounded-xl bg-white/95 text-neutral-text p-3">
-                <p className="text-[0.72rem] font-bold text-neutral-text2">예시 · 오버핏 옥스포드 셔츠</p>
+                <p className="text-[0.78rem] font-bold text-neutral-text2">예시 · 오버핏 옥스포드 셔츠</p>
                 <p className="mt-0.5 font-bold text-[0.95rem]">추천 사이즈 <span className="text-brand-accent">S</span> · 크게 나온 상품이라 한 치수 작게</p>
               </div>
             </div>

@@ -33,7 +33,7 @@ export function OptionPicker({ product, colorIdx, size, onColor, onSize, compact
                   {active && <span className="absolute inset-0 flex items-center justify-center text-white"><Check size={14} strokeWidth={3} /></span>}
                 </span>
                 <span className="text-[0.88rem] font-semibold">{c}</span>
-                {!anyStock && <span className={cn("text-[0.72rem]", active ? "text-white/70" : "text-neutral-text2")}>품절</span>}
+                {!anyStock && <span className={cn("text-[0.78rem]", active ? "text-white/70" : "text-neutral-text2")}>품절</span>}
               </button>
             );
           })}
@@ -57,7 +57,7 @@ export function OptionPicker({ product, colorIdx, size, onColor, onSize, compact
                     st && !st.purchasable && !active && "bg-brand-ivory text-neutral-text2")}>
                   <span className={cn("text-[1rem] font-bold leading-none", st && !st.purchasable && !active && "line-through decoration-neutral-text2/60")}>{single ? "FREE" : s}</span>
                   {st && st.key !== "normal" && (
-                    <span className={cn("text-[0.7rem] font-semibold leading-tight text-center", active ? "text-white/80" : st.key === "soldout" ? "text-semantic-error" : st.key === "low" ? "text-semantic-warning" : st.key === "restocked" ? "text-semantic-success" : "text-brand-accent")}>{st.short}</span>
+                    <span className={cn("text-[0.78rem] font-semibold leading-tight text-center", active ? "text-white/80" : st.key === "soldout" ? "text-semantic-error" : st.key === "low" ? "text-semantic-warning" : st.key === "restocked" ? "text-semantic-success" : "text-brand-accent")}>{st.short}</span>
                   )}
                 </button>
               );

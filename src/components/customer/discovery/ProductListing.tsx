@@ -136,7 +136,7 @@ export function ProductListing({ filters, onChange, showCategory = true, showBra
       <aside className="hidden md:block" aria-label="상품 필터">
         <div className="sticky top-[88px] max-h-[calc(100vh-104px)] overflow-y-auto pr-1 hide-scrollbar">
           <div className="flex items-center justify-between mb-4">
-            <p className="font-bold text-[1.05rem] inline-flex items-center gap-1.5"><SlidersHorizontal size={16} />필터{activeCount > 0 && <span className="ml-1 h-5 min-w-[20px] px-1.5 rounded-full bg-brand-black text-white text-[0.72rem] font-bold inline-flex items-center justify-center">{activeCount}</span>}</p>
+            <p className="font-bold text-[1.05rem] inline-flex items-center gap-1.5"><SlidersHorizontal size={16} />필터{activeCount > 0 && <span className="ml-1 h-5 min-w-[20px] px-1.5 rounded-full bg-brand-black text-white text-[0.78rem] font-bold inline-flex items-center justify-center">{activeCount}</span>}</p>
             {activeCount > 0 && <button type="button" onClick={() => onChange(clearFilters(filters))} className="text-[0.82rem] font-semibold text-neutral-text2 hover:text-neutral-text inline-flex items-center gap-1"><RotateCcw size={13} />초기화</button>}
           </div>
           <FilterPanel value={filters} onChange={onChange} showCategory={showCategory} showBrand={showBrand} />
@@ -153,7 +153,7 @@ export function ProductListing({ filters, onChange, showCategory = true, showBra
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button type="button" onClick={() => setSheet(true)} className="md:hidden h-11 px-3.5 rounded-xl border border-neutral-border bg-white text-[0.9rem] font-semibold inline-flex items-center gap-1.5 active:bg-neutral-canvas" aria-haspopup="dialog">
-              <SlidersHorizontal size={16} />필터{activeCount > 0 && <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-brand-black text-white text-[0.72rem] font-bold inline-flex items-center justify-center">{activeCount}</span>}
+              <SlidersHorizontal size={16} />필터{activeCount > 0 && <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-brand-black text-white text-[0.78rem] font-bold inline-flex items-center justify-center">{activeCount}</span>}
             </button>
             {sortSelect("sort")}
           </div>

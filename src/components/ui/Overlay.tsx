@@ -59,20 +59,22 @@ export function Modal({ open, onClose, title, children, className, hideClose, fo
   );
 }
 
-export function Drawer({ open, onClose, title, children, className, side = "right", footer, z = 50, width = "max-w-md" }: BaseProps & { side?: "left" | "right"; width?: string }) {
+/** Drawer — 모바일 메뉴 공통. 기본: 화면의 86%, 최대 380px (전체를 덮지 않음).
+ *  상단(로고·닫기) / 중단(독립 스크롤, 배경 페이지는 잠김) / 하단(footer 고정) 3단 구조. */
+export function Drawer({ open, onClose, title, children, className, side = "right", footer, z = 50, width = "w-[86vw] max-w-[380px]", headerClassName, bodyClassName, footerClassName, closeClassName }: BaseProps & { side?: "left" | "right"; width?: string; headerClassName?: string; bodyClassName?: string; footerClassName?: string; closeClassName?: string }) {
   useOverlayLifecycle(open, onClose);
   if (!open) return null;
   return (
     <Portal>
-      <div className="fixed inset-0" style={{ zIndex: z }} role="dialog" aria-modal="true">
+      <div className="fixed inset-0" style={{ zIndex: z }} role="dialog" aria-modal="true" aria-label={typeof title === "string" ? title : "메뉴"}>
         <div className="absolute inset-0 bg-[#0b1830]/55 animate-fadeIn" onClick={onClose} aria-hidden />
-        <div className={cn("absolute top-0 bottom-0 w-full bg-white shadow-lift flex flex-col", width, side === "right" ? "right-0 animate-slideLeft" : "left-0 animate-slideRight", className)}>
-          <div className="flex items-center justify-between gap-3 px-5 pt-5 pb-3 border-b border-neutral-border">
-            <h3 className="text-[1.1rem] font-bold">{title}</h3>
-            <button onClick={onClose} aria-label="닫기" className="h-10 w-10 -mr-2 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas text-neutral-text2"><X size={20} /></button>
+        <div className={cn("absolute top-0 bottom-0 bg-white shadow-lift flex flex-col", width, side === "right" ? "right-0 animate-slideLeft" : "left-0 animate-slideRight", className)}>
+          <div className={cn("flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-neutral-border safe-top", headerClassName)}>
+            <div className="min-w-0 text-[1.1rem] font-bold">{title}</div>
+            <button onClick={onClose} aria-label="닫기" className={cn("h-11 w-11 -mr-2 shrink-0 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas text-neutral-text2", closeClassName)}><X size={20} /></button>
           </div>
-          <div className="px-5 py-4 overflow-y-auto flex-1">{children}</div>
-          {footer && <div className="px-5 py-4 border-t border-neutral-border safe-bottom">{footer}</div>}
+          <div className={cn("px-5 py-4 overflow-y-auto overscroll-contain flex-1", bodyClassName)}>{children}</div>
+          {footer && <div className={cn("px-5 py-4 border-t border-neutral-border safe-bottom", footerClassName)}>{footer}</div>}
         </div>
       </div>
     </Portal>

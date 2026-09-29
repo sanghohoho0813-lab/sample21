@@ -12,7 +12,7 @@ import { Card, SectionTitle } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/States";
 import { Badge } from "@/components/ui/Badge";
 import { BRAND_BY_ID, PRODUCT_BY_ID, SEGMENT_LABEL, VARIANT_BY_ID } from "@/lib/demo/seed";
-import { ICON_ACCENTS } from "@/lib/theme";
+import { AutoFit } from "@/components/ui/AutoFit";
 import type { ActionType, AXAction, Role, Urgency } from "@/lib/types";
 
 /* ------------------------------ Chart tokens ------------------------------ */
@@ -66,8 +66,8 @@ export function ChartTip({ active, payload, label, formatter }: {
 /* ------------------------------ Action labels ------------------------------ */
 export const ACTION_TYPE_LABEL: Record<ActionType, string> = { restock: "재입고", rebalance: "재배분", markdown: "할인", "fit-guide": "핏 안내", "segment-campaign": "세그먼트 캠페인", "cart-reminder": "장바구니 리마인드" };
 export const ACTION_TYPES: ActionType[] = ["restock", "rebalance", "markdown", "fit-guide", "segment-campaign", "cart-reminder"];
-export const ENGINE_LABEL: Record<AXAction["engine"], string> = { demand: "Demand & Restock Engine", fit: "Fit Engine", markdown: "Markdown Engine", repeat: "Repeat Engine" };
-export const ENGINE_SHORT: Record<AXAction["engine"], string> = { demand: "Demand", fit: "Fit", markdown: "Markdown", repeat: "Repeat" };
+export const ENGINE_LABEL: Record<AXAction["engine"], string> = { demand: "수요·재입고 엔진", fit: "핏 엔진", markdown: "할인 엔진", repeat: "재구매 엔진" };
+export const ENGINE_SHORT: Record<AXAction["engine"], string> = { demand: "수요", fit: "핏", markdown: "할인", repeat: "재구매" };
 export const ERROR_COST_LABEL: Record<AXAction["errorCost"], string> = { LOW: "오류 비용 낮음", MID: "오류 비용 중간", HIGH: "오류 비용 높음" };
 export const URGENCY_ORDER: Record<Urgency, number> = { high: 0, mid: 1, low: 2 };
 export const OPEN_STATUSES = new Set(["recommended", "confirmed", "in-progress"]);
@@ -168,9 +168,9 @@ export function InfoNote({ children, tone = "neutral", className }: { children: 
 export function StatPill({ label, value, sub, tone }: { label: string; value: ReactNode; sub?: ReactNode; tone?: "neutral" | "warning" | "error" | "success" | "accent" }) {
   return (
     <div className="rounded-xl bg-neutral-canvas px-3.5 py-2.5 min-w-0">
-      <p className="text-[0.75rem] font-semibold text-neutral-text2">{label}</p>
-      <p className={cn("text-[1.1rem] font-bold tabular leading-tight mt-0.5", tone === "warning" && "text-semantic-warning", tone === "error" && "text-semantic-error", tone === "success" && "text-semantic-success", tone === "accent" && "text-theme-primary")}>{value}</p>
-      {sub && <p className="text-[0.75rem] text-neutral-text2 mt-0.5">{sub}</p>}
+      <p className="text-[0.78rem] font-semibold text-neutral-text2 break-keep leading-snug">{label}</p>
+      <p className={cn("text-[1.1rem] font-bold tabular leading-tight mt-0.5", tone === "warning" && "text-semantic-warning", tone === "error" && "text-semantic-error", tone === "success" && "text-semantic-success", tone === "accent" && "text-theme-primary")}><AutoFit>{value}</AutoFit></p>
+      {sub && <p className="text-[0.78rem] text-neutral-text2 mt-0.5 break-keep leading-snug">{sub}</p>}
     </div>
   );
 }

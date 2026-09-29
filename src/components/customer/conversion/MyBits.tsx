@@ -37,9 +37,9 @@ export function RecommendSection({ limit = 8, tour, title = "추천 상품", sho
       {showHead && <SectionHead title={title} desc="자주 구매한 브랜드 · 최근 본 카테고리 · 신상품을 기준으로 규칙 계산했습니다." />}
       {running && cp06 && (
         <div className="rounded-cardlg border border-brand-accent/40 bg-brand-accent/5 p-5 animate-fadeIn" onClickCapture={(e) => { const a = (e.target as HTMLElement).closest("a[href^='/products/']"); if (a) track("click_recommendation", { productId: a.getAttribute("href")?.split("/")[2]?.split("?")[0] ?? "", campaign: "cp-06" }); }}>
-          <div className="flex flex-wrap items-center gap-2 mb-1"><Badge tone="accent" size="sm">Closed Loop 4</Badge><Badge tone="live" size="sm">캠페인 진행중</Badge></div>
+          <div className="flex flex-wrap items-center gap-2 mb-1"><Badge tone="accent" size="sm">데이터 순환 4</Badge><Badge tone="live" size="sm">캠페인 진행중</Badge></div>
           <p className="font-bold text-[1.15rem] flex items-center gap-2"><Ticket size={20} className="text-brand-accent" />AERNO 재구매 감사 쿠폰 7%</p>
-          <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">지난 AERNO 구매 후 {ME?.avgCycleDays ?? 45}일이 지났어요. 장바구니에서 <span className="font-bold text-neutral-text">AERNO7</span> 쿠폰을 선택하면 7% 할인이 적용됩니다 (DEMO · {fmtDate(cp06.endAt)}까지).</p>
+          <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">지난 AERNO 구매 후 {ME?.avgCycleDays ?? 45}일이 지났어요. 장바구니에서 <span className="font-bold text-neutral-text">AERNO7</span> 쿠폰을 선택하면 7% 할인이 적용됩니다 (데모 · {fmtDate(cp06.endAt)}까지).</p>
           <div className="mt-4 grid grid-cols-3 gap-3">{aerno.map((p) => <ProductCard key={p.id} product={p} compact reason="재구매 추천" />)}</div>
         </div>
       )}
@@ -48,7 +48,7 @@ export function RecommendSection({ limit = 8, tour, title = "추천 상품", sho
           <ProductGrid products={recs.map((r) => r.product)} reasons={reasons} />
         </div>
       )}
-      <p className="text-[0.78rem] text-neutral-text2">추천 근거는 각 상품 아래에 표시됩니다 · 규칙 기반 (Repeat Engine) · <Badge tone="ready" size="sm">AI Ready</Badge></p>
+      <p className="text-[0.78rem] text-neutral-text2">추천 근거는 각 상품 아래에 표시됩니다 · 규칙 기반 (재구매 엔진) · <Badge tone="ready" size="sm">AI 준비</Badge></p>
     </section>
   );
 }
@@ -56,7 +56,7 @@ export function RecommendSection({ limit = 8, tour, title = "추천 상품", sho
 /* ------------------------------ Notification prefs ------------------------------ */
 export function NotifyPrefsCard({ className }: { className?: string }) {
   const [prefs, setPrefs, loaded] = useLocalPref<NotifyPrefs>(NOTIFY_KEY, DEFAULT_NOTIFY);
-  const set = (k: keyof NotifyPrefs, label: string) => (v: boolean) => { setPrefs({ ...prefs, [k]: v }); toast(`${label} 알림을 ${v ? "켰습니다" : "껐습니다"}`, "이 기기에만 저장됩니다 (DEMO)", v ? "success" : "info"); };
+  const set = (k: keyof NotifyPrefs, label: string) => (v: boolean) => { setPrefs({ ...prefs, [k]: v }); toast(`${label} 알림을 ${v ? "켰습니다" : "껐습니다"}`, "이 기기에만 저장됩니다 (데모)", v ? "success" : "info"); };
   return (
     <div className={cn("rounded-cardlg border border-neutral-border bg-white p-5", className)}>
       <p className="font-bold flex items-center gap-2 mb-2"><BellRing size={16} />알림 설정</p>
@@ -76,7 +76,7 @@ export function OrderList({ orders, filterable = true, limit }: { orders: Order[
   return (
     <div className="space-y-3">
       {filterable && <div className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-1">{ORDER_FILTERS.map((f) => <Chip key={f.key} active={filter === f.key} onClick={() => setFilter(f.key)}>{f.label}<span className="tabular text-[0.78rem] opacity-70">{filterOrders(orders, f.key).length}</span></Chip>)}</div>}
-      {list.length === 0 ? <EmptyState icon={<Package size={22} />} title={filter === "all" ? "아직 주문이 없습니다" : "해당 상태의 주문이 없습니다"} desc={filter === "all" ? "DEMO 주문을 완료하면 이곳에서 배송 상태를 확인할 수 있습니다." : "다른 상태를 선택해보세요."} action={filter === "all" ? <Button variant="brand" href="/ranking">상품 둘러보기</Button> : <Button variant="outline" onClick={() => setFilter("all")}>전체 보기</Button>} /> : <ul className="space-y-3">{list.map((o) => <li key={o.id}><OrderCard order={o} /></li>)}</ul>}
+      {list.length === 0 ? <EmptyState icon={<Package size={22} />} title={filter === "all" ? "아직 주문이 없습니다" : "해당 상태의 주문이 없습니다"} desc={filter === "all" ? "데모 주문을 완료하면 이곳에서 배송 상태를 확인할 수 있습니다." : "다른 상태를 선택해보세요."} action={filter === "all" ? <Button variant="brand" href="/ranking">상품 둘러보기</Button> : <Button variant="outline" onClick={() => setFilter("all")}>전체 보기</Button>} /> : <ul className="space-y-3">{list.map((o) => <li key={o.id}><OrderCard order={o} /></li>)}</ul>}
     </div>
   );
 }
@@ -90,7 +90,7 @@ export function RestockList({ limit, tour, compact }: { limit?: number; tour?: s
   const subs = store.restockSubs.slice(0, limit ?? Infinity);
   if (subs.length === 0) {
     return compact ? <p className="text-[0.88rem] text-neutral-text2">신청한 재입고 알림이 없습니다. 품절 옵션에서 <span className="font-semibold text-neutral-text">재입고 알림 신청</span>을 눌러보세요.</p>
-      : <EmptyState icon={<Bell size={22} />} title="신청한 재입고 알림이 없습니다" desc="품절된 색상·사이즈에서 '재입고 알림 신청'을 누르면 이곳에 표시되고, Business AX Demand Radar 수요신호에 즉시 반영됩니다." action={<Button variant="brand" href="/products/p-nove-oxford?color=블랙&size=M">품절 임박 상품 보기</Button>} />;
+      : <EmptyState icon={<Bell size={22} />} title="신청한 재입고 알림이 없습니다" desc="품절된 색상·사이즈에서 '재입고 알림 신청'을 누르면 이곳에 표시되고, AX 운영화면 수요 레이더 수요신호에 즉시 반영됩니다." action={<Button variant="brand" href="/products/p-nove-oxford?color=블랙&size=M">품절 임박 상품 보기</Button>} />;
   }
   return (
     <ul className="space-y-3" data-tour={tour}>
@@ -115,7 +115,7 @@ export function RestockList({ limit, tour, compact }: { limit?: number; tour?: s
                     {s.status === "notified" && <Button size="sm" variant="brand" href={href} icon={<Sparkles size={14} />}>지금 구매</Button>}
                     {s.status === "waiting" && <Button size="sm" variant="outline" href={href}>상품 보기</Button>}
                     {s.status === "purchased" && s.purchaseOrderId && <Button size="sm" variant="outline" href={`/my/orders/${s.purchaseOrderId}`}>주문 보기</Button>}
-                    {s.status !== "purchased" && <Button size="sm" variant="ghost" onClick={() => { store.cancelRestock(s.id); toast("재입고 알림을 취소했습니다", "Demand Radar 수요신호에서 제외됩니다", "info"); }} icon={<X size={14} />}>취소</Button>}
+                    {s.status !== "purchased" && <Button size="sm" variant="ghost" onClick={() => { store.cancelRestock(s.id); toast("재입고 알림을 취소했습니다", "수요 레이더 수요신호에서 제외됩니다", "info"); }} icon={<X size={14} />}>취소</Button>}
                   </div>
                 )}
               </div>
@@ -136,7 +136,7 @@ export function ProfileCard() {
     <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
       <span className="h-16 w-16 rounded-2xl bg-brand-black text-white inline-flex items-center justify-center text-[1.4rem] font-black shrink-0">{DEMO_CUSTOMER_NAME.slice(0, 1)}</span>
       <div className="min-w-0 flex-1">
-        <p className="text-[1.25rem] font-bold leading-tight">{DEMO_CUSTOMER_NAME}님 <Badge tone="demo" size="sm">DEMO 회원</Badge></p>
+        <p className="text-[1.25rem] font-bold leading-tight">{DEMO_CUSTOMER_NAME}님 <Badge tone="demo" size="sm">데모 회원</Badge></p>
         <p className="text-[0.85rem] text-neutral-text2 mt-0.5 tabular">{ME ? `${fmtDate(ME.joinedAt)} 가입 · ${ME.favoriteBrandId ? "AERNO 애호가" : "취향 탐색중"}` : "회원 정보"}</p>
         <p className="text-[0.9rem] mt-2 flex flex-wrap items-center gap-x-2 gap-y-1"><Ruler size={14} className="text-neutral-text2" />{parts.length ? parts.join(" · ") : <span className="text-neutral-text2">사이즈·취향 정보가 아직 없습니다</span>}{complete ? <Badge tone="success" size="sm">핏 프로필 완성</Badge> : <Badge tone="warning" size="sm">프로필 {parts.length ? "일부" : "미"}입력</Badge>}</p>
       </div>
