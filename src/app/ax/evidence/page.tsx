@@ -5,5 +5,9 @@ import { EvidencePage } from "@/components/ax/ops/EvidencePage";
 export const metadata = axMeta("evidence");
 
 export default function Page() {
-  return <Suspense fallback={null}><EvidencePage /></Suspense>;
+  return (
+    <Suspense fallback={null}>
+      <EvidencePage />
+    </Suspense>
+  );
 }

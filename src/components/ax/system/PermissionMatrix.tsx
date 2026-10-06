@@ -17,7 +17,10 @@ export function PermissionLegend() {
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.82rem] text-neutral-text2">
       {(Object.keys(LEVEL) as Level[]).map((k) => (
-        <span key={k} className="inline-flex items-center gap-1"><span className={cn("font-bold text-[1rem] leading-none", LEVEL[k].cls)}>{LEVEL[k].sym}</span>{LEVEL[k].label}</span>
+        <span key={k} className="inline-flex items-center gap-1">
+          <span className={cn("text-[1rem] font-bold leading-none", LEVEL[k].cls)}>{LEVEL[k].sym}</span>
+          {LEVEL[k].label}
+        </span>
       ))}
     </div>
   );
@@ -30,9 +33,18 @@ export function PermissionMatrix({ highlight }: { highlight?: Role }) {
       <table className="w-full min-w-[340px] text-[0.88rem]">
         <thead>
           <tr className="bg-neutral-canvas text-neutral-text2">
-            <th scope="col" className="px-3 py-2.5 text-left font-semibold whitespace-nowrap">권한</th>
+            <th scope="col" className="whitespace-nowrap px-3 py-2.5 text-left font-semibold">
+              권한
+            </th>
             {ROLES.map((r) => (
-              <th key={r} scope="col" className={cn("px-2 py-2.5 text-center font-semibold whitespace-nowrap", highlight === r && "text-theme-primary")}>
+              <th
+                key={r}
+                scope="col"
+                className={cn(
+                  "whitespace-nowrap px-2 py-2.5 text-center font-semibold",
+                  highlight === r && "text-theme-primary",
+                )}
+              >
                 {ROLE_LABEL[r]}
                 {highlight === r && <span className="block text-[0.78rem] font-bold">현재</span>}
               </th>
@@ -41,13 +53,20 @@ export function PermissionMatrix({ highlight }: { highlight?: Role }) {
         </thead>
         <tbody>
           {keys.map((k) => (
-            <tr key={k} className="border-t border-neutral-border hover-row">
-              <th scope="row" className="px-3 py-2.5 text-left font-semibold text-neutral-text whitespace-nowrap">{PERMISSIONS[k].label}</th>
+            <tr key={k} className="hover-row border-t border-neutral-border">
+              <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left font-semibold text-neutral-text">
+                {PERMISSIONS[k].label}
+              </th>
               {ROLES.map((r) => {
                 const lv: Level = PERMISSIONS[k].roles[r] ?? "none";
                 return (
                   <td key={r} className={cn("px-2 py-2.5 text-center", highlight === r && "bg-theme-soft/50")}>
-                    <span className={cn("font-bold text-[1.05rem] leading-none", LEVEL[lv].cls)} aria-label={`${ROLE_LABEL[r]} ${LEVEL[lv].label}`}>{LEVEL[lv].sym}</span>
+                    <span
+                      className={cn("text-[1.05rem] font-bold leading-none", LEVEL[lv].cls)}
+                      aria-label={`${ROLE_LABEL[r]} ${LEVEL[lv].label}`}
+                    >
+                      {LEVEL[lv].sym}
+                    </span>
                   </td>
                 );
               })}

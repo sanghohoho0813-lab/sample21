@@ -23,33 +23,53 @@ export function useLocalJson<T>(key: string, initial: T) {
       if (typeof window === "undefined") return initialRef.current;
       const raw = window.localStorage.getItem(key);
       return raw ? (JSON.parse(raw) as T) : initialRef.current;
-    } catch { return initialRef.current; }
+    } catch {
+      return initialRef.current;
+    }
   });
   const lastResetAt = useApp((s) => s.lastResetAt);
   const first = useRef(true);
   useEffect(() => {
-    if (first.current) { first.current = false; return; }
+    if (first.current) {
+      first.current = false;
+      return;
+    }
     setVal(initialRef.current);
-    try { window.localStorage.removeItem(key); } catch { /* ignore */ }
+    try {
+      window.localStorage.removeItem(key);
+    } catch {
+      /* ignore */
+    }
   }, [lastResetAt, key]);
-  const set = useCallback((v: T | ((p: T) => T)) => {
-    setVal((prev) => {
-      const next = typeof v === "function" ? (v as (p: T) => T)(prev) : v;
-      try { window.localStorage.setItem(key, JSON.stringify(next)); } catch { /* ignore */ }
-      return next;
-    });
-  }, [key]);
+  const set = useCallback(
+    (v: T | ((p: T) => T)) => {
+      setVal((prev) => {
+        const next = typeof v === "function" ? (v as (p: T) => T)(prev) : v;
+        try {
+          window.localStorage.setItem(key, JSON.stringify(next));
+        } catch {
+          /* ignore */
+        }
+        return next;
+      });
+    },
+    [key],
+  );
   return [val, set] as const;
 }
 
 /** Freshness renders the current time → client-only to avoid SSR text mismatch. */
 export function LiveFreshness({ source = "DEMO" }: { source?: "DEMO" | "LIVE" | "SIMULATION" }) {
-  return <Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" aria-hidden />}><Freshness source={source} /></Hydrated>;
+  return (
+    <Hydrated fallback={<span className="skeleton inline-block h-5 w-40" aria-hidden />}>
+      <Freshness source={source} />
+    </Hydrated>
+  );
 }
 
 /** Money values inside KpiCard: smaller on narrow 2-col grids so "8,986만원" never spills past the card. */
 export function KpiMoney({ children }: { children: ReactNode }) {
-  return <span className="text-[1.3rem] sm:text-[1.6rem] lg:text-[length:inherit] tabular">{children}</span>;
+  return <span className="tabular text-[1.3rem] sm:text-[1.6rem] lg:text-[length:inherit]">{children}</span>;
 }
 
 /** 가상 고객 이름 마스킹 — 대표(full 권한) 외에는 가운데 글자를 가립니다. */
@@ -63,10 +83,14 @@ export const displayName = (name: string, role: Role) => (canFull(role, "custome
 
 export function PageSkeleton({ kpis = 4 }: { kpis?: number }) {
   return (
-    <div className="space-y-6 animate-fadeIn" aria-busy="true" aria-label="불러오는 중">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="animate-fadeIn space-y-6" aria-busy="true" aria-label="불러오는 중">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {Array.from({ length: kpis }).map((_, i) => (
-          <div key={i} className="rounded-cardlg border border-neutral-border bg-white p-5 space-y-3"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-8 w-2/3" /><Skeleton className="h-3 w-1/3" /></div>
+          <div key={i} className="space-y-3 rounded-cardlg border border-neutral-border bg-white p-5">
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-8 w-2/3" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
         ))}
       </div>
       <SkeletonCard lines={4} />
@@ -76,7 +100,17 @@ export function PageSkeleton({ kpis = 4 }: { kpis?: number }) {
 }
 
 /** Desktop: inline filter card. Mobile: "필터" button → BottomSheet (same controls, re-arranged). */
-export function FilterBar({ children, activeCount = 0, className, right }: { children: ReactNode; activeCount?: number; className?: string; right?: ReactNode }) {
+export function FilterBar({
+  children,
+  activeCount = 0,
+  className,
+  right,
+}: {
+  children: ReactNode;
+  activeCount?: number;
+  className?: string;
+  right?: ReactNode;
+}) {
   const mobile = useIsMobile();
   const [open, setOpen] = useState(false);
   // PC: 필터는 접어 두고 버튼 하나로 연다 — 조건이 걸려 있으면 처음부터 펼친다
@@ -85,28 +119,71 @@ export function FilterBar({ children, activeCount = 0, className, right }: { chi
     return (
       <div className={className}>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setOpenDesk((v) => !v)} aria-expanded={openDesk} icon={<SlidersHorizontal size={15} />}>필터{activeCount ? ` ${activeCount}` : ""}</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setOpenDesk((v) => !v)}
+            aria-expanded={openDesk}
+            icon={<SlidersHorizontal size={15} />}
+          >
+            필터{activeCount ? ` ${activeCount}` : ""}
+          </Button>
           {right}
         </div>
-        {openDesk && <div className="mt-3 rounded-cardlg border border-neutral-border bg-white p-4 flex flex-wrap gap-3 items-end animate-fadeIn">{children}</div>}
+        {openDesk && (
+          <div className="mt-3 flex animate-fadeIn flex-wrap items-end gap-3 rounded-cardlg border border-neutral-border bg-white p-4">
+            {children}
+          </div>
+        )}
       </div>
     );
   }
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <Button variant="outline" onClick={() => setOpen(true)} icon={<SlidersHorizontal size={16} />} className="flex-1">필터{activeCount ? ` (${activeCount})` : ""}</Button>
+      <Button variant="outline" onClick={() => setOpen(true)} icon={<SlidersHorizontal size={16} />} className="flex-1">
+        필터{activeCount ? ` (${activeCount})` : ""}
+      </Button>
       {right}
-      <BottomSheet open={open} onClose={() => setOpen(false)} title="필터" footer={<Button full onClick={() => setOpen(false)}>적용</Button>}>
+      <BottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        title="필터"
+        footer={
+          <Button full onClick={() => setOpen(false)}>
+            적용
+          </Button>
+        }
+      >
         <div className="space-y-4 [&>*]:w-full">{children}</div>
       </BottomSheet>
     </div>
   );
 }
 
-export function NoteCard({ children, tone = "neutral", icon, className }: { children: ReactNode; tone?: "neutral" | "warning" | "info"; icon?: ReactNode; className?: string }) {
-  const tones = { neutral: "bg-neutral-canvas text-neutral-text2", warning: "bg-[#fff7d6] text-[#6b5300]", info: "bg-theme-soft text-neutral-text" };
+export function NoteCard({
+  children,
+  tone = "neutral",
+  icon,
+  className,
+}: {
+  children: ReactNode;
+  tone?: "neutral" | "warning" | "info";
+  icon?: ReactNode;
+  className?: string;
+}) {
+  const tones = {
+    neutral: "bg-neutral-canvas text-neutral-text2",
+    warning: "bg-[#fff7d6] text-[#6b5300]",
+    info: "bg-theme-soft text-neutral-text",
+  };
   return (
-    <div className={cn("rounded-xl px-4 py-3 text-[0.88rem] leading-relaxed flex gap-2.5 items-start", tones[tone], className)}>
+    <div
+      className={cn(
+        "flex items-start gap-2.5 rounded-xl px-4 py-3 text-[0.88rem] leading-relaxed",
+        tones[tone],
+        className,
+      )}
+    >
       <span className="mt-0.5 shrink-0">{icon ?? <Info size={16} />}</span>
       <div className="min-w-0 flex-1 break-words">{children}</div>
     </div>
@@ -116,42 +193,100 @@ export function NoteCard({ children, tone = "neutral", icon, className }: { chil
 export const SOURCE_LABEL: Record<DataSource, string> = { DEMO: "데모", SIMULATION: "시뮬레이션", LIVE: "실제 데이터" };
 
 export function SourceBadge({ source, size = "sm" }: { source: DataSource; size?: "sm" | "md" }) {
-  return <Badge tone={source === "LIVE" ? "live" : "demo"} size={size}>{SOURCE_LABEL[source]}</Badge>;
+  return (
+    <Badge tone={source === "LIVE" ? "live" : "demo"} size={size}>
+      {SOURCE_LABEL[source]}
+    </Badge>
+  );
 }
 
 export const EVIDENCE_TYPE_LABEL: Record<EvidenceType, string> = {
-  BASELINE: "기준값", ACTION: "실행", RESULT: "결과", ADOPTION: "채택", CUSTOMER: "고객",
-  EFFICIENCY: "효율", REVENUE: "매출", SCALE: "확장", RISK: "위험", EXCEPTION: "예외",
+  BASELINE: "기준값",
+  ACTION: "실행",
+  RESULT: "결과",
+  ADOPTION: "채택",
+  CUSTOMER: "고객",
+  EFFICIENCY: "효율",
+  REVENUE: "매출",
+  SCALE: "확장",
+  RISK: "위험",
+  EXCEPTION: "예외",
 };
 export const EVIDENCE_TYPE_TONE: Record<EvidenceType, Tone> = {
-  BASELINE: "neutral", ACTION: "info", RESULT: "success", ADOPTION: "accent", CUSTOMER: "primary",
-  EFFICIENCY: "info", REVENUE: "success", SCALE: "accent", RISK: "error", EXCEPTION: "warning",
+  BASELINE: "neutral",
+  ACTION: "info",
+  RESULT: "success",
+  ADOPTION: "accent",
+  CUSTOMER: "primary",
+  EFFICIENCY: "info",
+  REVENUE: "success",
+  SCALE: "accent",
+  RISK: "error",
+  EXCEPTION: "warning",
 };
-export const EVIDENCE_TYPES: EvidenceType[] = ["BASELINE", "ACTION", "RESULT", "ADOPTION", "CUSTOMER", "EFFICIENCY", "REVENUE", "SCALE", "RISK", "EXCEPTION"];
+export const EVIDENCE_TYPES: EvidenceType[] = [
+  "BASELINE",
+  "ACTION",
+  "RESULT",
+  "ADOPTION",
+  "CUSTOMER",
+  "EFFICIENCY",
+  "REVENUE",
+  "SCALE",
+  "RISK",
+  "EXCEPTION",
+];
 
 export function EvidenceTypeBadge({ type, size = "sm" }: { type: EvidenceType; size?: "sm" | "md" }) {
-  return <Badge tone={EVIDENCE_TYPE_TONE[type]} size={size}>{EVIDENCE_TYPE_LABEL[type]}</Badge>;
+  return (
+    <Badge tone={EVIDENCE_TYPE_TONE[type]} size={size}>
+      {EVIDENCE_TYPE_LABEL[type]}
+    </Badge>
+  );
 }
 
 /** Simple definition list row used inside drawers. */
 export function KV({ label, children, className }: { label: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <div className={cn("flex items-start justify-between gap-4 py-2 border-b border-neutral-border last:border-0", className)}>
-      <dt className="text-[0.88rem] text-neutral-text2 shrink-0">{label}</dt>
-      <dd className="text-[0.92rem] font-semibold text-right min-w-0">{children}</dd>
+    <div
+      className={cn(
+        "flex items-start justify-between gap-4 border-b border-neutral-border py-2 last:border-0",
+        className,
+      )}
+    >
+      <dt className="shrink-0 text-[0.88rem] text-neutral-text2">{label}</dt>
+      <dd className="min-w-0 text-right text-[0.92rem] font-semibold">{children}</dd>
     </div>
   );
 }
 
-export function SectionBlock({ title, desc, right, children, className, tour, id }: { title: ReactNode; desc?: ReactNode; right?: ReactNode; children: ReactNode; className?: string; tour?: string; id?: string }) {
+export function SectionBlock({
+  title,
+  desc,
+  right,
+  children,
+  className,
+  tour,
+  id,
+}: {
+  title: ReactNode;
+  desc?: ReactNode;
+  right?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  tour?: string;
+  id?: string;
+}) {
   return (
     <section className={cn("mt-8", className)} data-tour={tour} id={id}>
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-4 md:flex-wrap">
+      <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end md:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-[1.2rem] md:text-[1.35rem] font-bold tracking-tight">{title}</h2>
-          {desc && <p className="mt-1 text-neutral-text2 text-[0.9rem] leading-relaxed">{desc}</p>}
+          <h2 className="text-[1.2rem] font-bold tracking-tight md:text-[1.35rem]">{title}</h2>
+          {desc && <p className="mt-1 text-[0.9rem] leading-relaxed text-neutral-text2">{desc}</p>}
         </div>
-        {right && <div className="flex items-center gap-2 flex-wrap min-w-0 max-w-full md:shrink-0 md:justify-end">{right}</div>}
+        {right && (
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 md:shrink-0 md:justify-end">{right}</div>
+        )}
       </div>
       {children}
     </section>
@@ -161,11 +296,27 @@ export function SectionBlock({ title, desc, right, children, className, tour, id
 /** "더 보기" pagination helper */
 export function useMore(total: number, step = 30) {
   const [n, setN] = useState(step);
-  useEffect(() => { setN(step); }, [total, step]);
+  useEffect(() => {
+    setN(step);
+  }, [total, step]);
   return { limit: n, hasMore: n < total, more: () => setN((v) => v + step) };
 }
 
-export function MoreButton({ hasMore, onClick, remaining }: { hasMore: boolean; onClick: () => void; remaining: number }) {
+export function MoreButton({
+  hasMore,
+  onClick,
+  remaining,
+}: {
+  hasMore: boolean;
+  onClick: () => void;
+  remaining: number;
+}) {
   if (!hasMore) return null;
-  return <div className="mt-3 flex justify-center"><Button variant="outline" onClick={onClick}>더 보기 ({remaining}건 남음)</Button></div>;
+  return (
+    <div className="mt-3 flex justify-center">
+      <Button variant="outline" onClick={onClick}>
+        더 보기 ({remaining}건 남음)
+      </Button>
+    </div>
+  );
 }

@@ -15,7 +15,9 @@ export const SORT_OPTIONS: { value: SortKey; label: string; desc: string }[] = [
   { value: "priceAsc", label: "낮은가격순", desc: "판매가 낮은 순서" },
   { value: "priceDesc", label: "높은가격순", desc: "판매가 높은 순서" },
 ];
-export const SORT_LABEL: Record<SortKey, string> = Object.fromEntries(SORT_OPTIONS.map((s) => [s.value, s.label])) as Record<SortKey, string>;
+export const SORT_LABEL: Record<SortKey, string> = Object.fromEntries(
+  SORT_OPTIONS.map((s) => [s.value, s.label]),
+) as Record<SortKey, string>;
 
 export type GenderFilter = "men" | "women" | null;
 
@@ -34,7 +36,20 @@ export interface ListingFilters {
   q: string;
 }
 
-export const EMPTY_FILTERS: ListingFilters = { gender: null, category: null, brands: [], colors: [], sizes: [], min: null, max: null, sale: false, free: false, fit: null, sort: "recommend", q: "" };
+export const EMPTY_FILTERS: ListingFilters = {
+  gender: null,
+  category: null,
+  brands: [],
+  colors: [],
+  sizes: [],
+  min: null,
+  max: null,
+  sale: false,
+  free: false,
+  fit: null,
+  sort: "recommend",
+  q: "",
+};
 
 /** 무료배송 기준 — 금액 규칙은 lib/pricing 한 곳에서 */
 export const FREE_SHIPPING_MIN = FREE_SHIP_MIN;
@@ -46,7 +61,12 @@ export const PRICE_RANGES: { label: string; min: number | null; max: number | nu
   { label: "20만원 이상", min: 200000, max: null },
 ];
 
-export const FIT_LABEL: Record<Fit, string> = { slim: "슬림", regular: "레귤러", relaxed: "릴랙스", oversized: "오버사이즈" };
+export const FIT_LABEL: Record<Fit, string> = {
+  slim: "슬림",
+  regular: "레귤러",
+  relaxed: "릴랙스",
+  oversized: "오버사이즈",
+};
 export const FITS: Fit[] = ["slim", "regular", "relaxed", "oversized"];
 
 const CATEGORY_IDS = new Set(Object.keys(CATEGORY_NAME));
@@ -66,8 +86,18 @@ export const SHOE_SIZES: string[] = (() => {
   return [...s].sort((a, b) => Number(a) - Number(b));
 })();
 
-const list = (v: string | null) => (v ? v.split(",").map((x) => x.trim()).filter(Boolean) : []);
-const int = (v: string | null) => { if (!v) return null; const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.round(n) : null; };
+const list = (v: string | null) =>
+  v
+    ? v
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean)
+    : [];
+const int = (v: string | null) => {
+  if (!v) return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
+};
 
 export function parseFilters(sp: URLSearchParams): ListingFilters {
   const gender = sp.get("gender");
@@ -130,7 +160,20 @@ export function matchesQuery(p: Product, q: string): boolean {
   const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
   if (!tokens.length) return true;
   const b = BRAND_BY_ID[p.brandId];
-  const hay = [p.name, p.subtitle, b.name, b.tagline, ...p.tags, CATEGORY_NAME[p.categoryId], ...p.colors, FIT_LABEL[p.fit], p.material].join(" ").toLowerCase().replace(/\s+/g, " ");
+  const hay = [
+    p.name,
+    p.subtitle,
+    b.name,
+    b.tagline,
+    ...p.tags,
+    CATEGORY_NAME[p.categoryId],
+    ...p.colors,
+    FIT_LABEL[p.fit],
+    p.material,
+  ]
+    .join(" ")
+    .toLowerCase()
+    .replace(/\s+/g, " ");
   const compact = hay.replace(/\s/g, "");
   return tokens.every((t) => hay.includes(t) || compact.includes(t.replace(/\s/g, "")));
 }
@@ -159,13 +202,27 @@ export function applyFilters(aggs: ProductAgg[], f: ListingFilters): ProductAgg[
 export function sortAggs(aggs: ProductAgg[], sort: SortKey): ProductAgg[] {
   const arr = [...aggs];
   const created = (a: ProductAgg) => new Date(a.product.createdAt).getTime();
-  const recScore = (a: ProductAgg) => a.rankScore + (a.product.tags.includes("베스트") ? 40 : 0) + (isNewProduct(a.product) ? 25 : 0) + (a.price < a.product.price ? 10 : 0) + (a.worst === "rising" ? 20 : 0);
+  const recScore = (a: ProductAgg) =>
+    a.rankScore +
+    (a.product.tags.includes("베스트") ? 40 : 0) +
+    (isNewProduct(a.product) ? 25 : 0) +
+    (a.price < a.product.price ? 10 : 0) +
+    (a.worst === "rising" ? 20 : 0);
   switch (sort) {
-    case "popular": arr.sort((a, b) => b.sales7d - a.sales7d || b.views7d - a.views7d); break;
-    case "newest": arr.sort((a, b) => created(b) - created(a) || b.rankScore - a.rankScore); break;
-    case "priceAsc": arr.sort((a, b) => a.price - b.price || b.rankScore - a.rankScore); break;
-    case "priceDesc": arr.sort((a, b) => b.price - a.price || b.rankScore - a.rankScore); break;
-    default: arr.sort((a, b) => recScore(b) - recScore(a));
+    case "popular":
+      arr.sort((a, b) => b.sales7d - a.sales7d || b.views7d - a.views7d);
+      break;
+    case "newest":
+      arr.sort((a, b) => created(b) - created(a) || b.rankScore - a.rankScore);
+      break;
+    case "priceAsc":
+      arr.sort((a, b) => a.price - b.price || b.rankScore - a.rankScore);
+      break;
+    case "priceDesc":
+      arr.sort((a, b) => b.price - a.price || b.rankScore - a.rankScore);
+      break;
+    default:
+      arr.sort((a, b) => recScore(b) - recScore(a));
   }
   return arr;
 }
@@ -177,7 +234,10 @@ export function listingTitle(f: ListingFilters): { title: string; desc: string }
   if (f.brands.length === 1) return { title: BRAND_BY_ID[f.brands[0]].name, desc: BRAND_BY_ID[f.brands[0]].tagline };
   if (f.category) {
     const c = CATEGORY_NAME[f.category];
-    return { title: f.gender === "men" ? `남성 ${c}` : f.gender === "women" ? `여성 ${c}` : c, desc: "브랜드를 넘어 한 번에 비교하세요" };
+    return {
+      title: f.gender === "men" ? `남성 ${c}` : f.gender === "women" ? `여성 ${c}` : c,
+      desc: "브랜드를 넘어 한 번에 비교하세요",
+    };
   }
   if (f.gender === "men") return { title: "남성", desc: "남성 · 유니섹스 상품" };
   if (f.gender === "women") return { title: "여성", desc: "여성 · 유니섹스 상품" };

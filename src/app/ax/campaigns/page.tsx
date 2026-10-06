@@ -5,5 +5,9 @@ import { CampaignsPage } from "@/components/ax/ops/CampaignsPage";
 export const metadata = axMeta("campaigns");
 
 export default function Page() {
-  return <Suspense fallback={null}><CampaignsPage /></Suspense>;
+  return (
+    <Suspense fallback={null}>
+      <CampaignsPage />
+    </Suspense>
+  );
 }

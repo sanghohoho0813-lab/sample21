@@ -16,7 +16,9 @@ export function parseFitNumber(field: FitNumberField, raw: string): { value: num
   if (!raw.trim()) return { value: null, error: null };
   const n = Number(raw);
   const r = FIT_RANGE[field];
-  return Number.isFinite(n) && n >= r.min && n <= r.max ? { value: n, error: null } : { value: null, error: fitRangeMessage(field) };
+  return Number.isFinite(n) && n >= r.min && n <= r.max
+    ? { value: n, error: null }
+    : { value: null, error: fitRangeMessage(field) };
 }
 
 /** 국내 휴대폰·지역번호 형식 (하이픈 선택) — 010-1234-5678, 01012345678, 02-123-4567 */

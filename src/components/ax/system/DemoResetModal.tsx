@@ -20,7 +20,15 @@ export const RESET_ITEMS: { label: string; desc: string }[] = [
   { label: "튜토리얼", desc: "다음 대시보드 방문 시 튜토리얼이 다시 시작됩니다" },
 ];
 
-export function DemoResetModal({ open, onClose, redirectTo = "/ax" }: { open: boolean; onClose: () => void; redirectTo?: string | null }) {
+export function DemoResetModal({
+  open,
+  onClose,
+  redirectTo = "/ax",
+}: {
+  open: boolean;
+  onClose: () => void;
+  redirectTo?: string | null;
+}) {
   const resetDemo = useApp((s) => s.resetDemo);
   const lastResetAt = useApp((s) => s.lastResetAt);
   const router = useRouter();
@@ -39,41 +47,61 @@ export function DemoResetModal({ open, onClose, redirectTo = "/ax" }: { open: bo
       title="데모 초기화"
       size="md"
       footer={
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>취소</Button>
-          <Button variant="danger" onClick={run} icon={<RotateCcw size={16} />}>초기화 실행</Button>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button variant="outline" onClick={onClose}>
+            취소
+          </Button>
+          <Button variant="danger" onClick={run} icon={<RotateCcw size={16} />}>
+            초기화 실행
+          </Button>
         </div>
       }
     >
       <div className="space-y-4 text-[0.95rem]">
         <div className="flex items-start gap-3 rounded-xl bg-neutral-canvas p-4">
-          <AlertTriangle size={20} className="shrink-0 mt-0.5 text-semantic-warning" />
-          <p className="leading-relaxed">지금까지 데모에서 만든 변경 사항이 모두 사라지고 <span className="font-bold">처음 시연 상태</span>로 돌아갑니다. 실제 데이터가 아니므로 안전합니다.</p>
+          <AlertTriangle size={20} className="mt-0.5 shrink-0 text-semantic-warning" />
+          <p className="leading-relaxed">
+            지금까지 데모에서 만든 변경 사항이 모두 사라지고 <span className="font-bold">처음 시연 상태</span>로
+            돌아갑니다. 실제 데이터가 아니므로 안전합니다.
+          </p>
         </div>
         <div>
-          <p className="font-bold mb-2">초기화되는 항목</p>
+          <p className="mb-2 font-bold">초기화되는 항목</p>
           <ul className="space-y-1.5">
             {RESET_ITEMS.map((it) => (
               <li key={it.label} className="flex items-start gap-2">
-                <Badge tone="neutral" size="sm" className="mt-0.5 shrink-0">{it.label}</Badge>
-                <span className="text-neutral-text2 text-[0.9rem] leading-snug">{it.desc}</span>
+                <Badge tone="neutral" size="sm" className="mt-0.5 shrink-0">
+                  {it.label}
+                </Badge>
+                <span className="text-[0.9rem] leading-snug text-neutral-text2">{it.desc}</span>
               </li>
             ))}
           </ul>
         </div>
-        <p className="text-[0.85rem] text-neutral-text2">유지되는 것: 테마 · 글자 크기 · 모션 설정. 역할은 <span className="font-semibold text-neutral-text">대표</span>로 돌아갑니다.{lastResetAt && <> 마지막 초기화 {relTime(lastResetAt)}.</>}</p>
+        <p className="text-[0.85rem] text-neutral-text2">
+          유지되는 것: 테마 · 글자 크기 · 모션 설정. 역할은{" "}
+          <span className="font-semibold text-neutral-text">대표</span>로 돌아갑니다.
+          {lastResetAt && <> 마지막 초기화 {relTime(lastResetAt)}.</>}
+        </p>
       </div>
     </Modal>
   );
 }
 
 /** 버튼 + 모달 한 묶음. 라벨은 항상 "데모 초기화"로 시작한다. */
-export function DemoResetButton({ redirectTo = "/ax", children, icon, ...btn }: Omit<ButtonProps, "onClick"> & { redirectTo?: string | null }) {
+export function DemoResetButton({
+  redirectTo = "/ax",
+  children,
+  icon,
+  ...btn
+}: Omit<ButtonProps, "onClick"> & { redirectTo?: string | null }) {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   return (
     <>
-      <Button {...btn} onClick={() => setOpen(true)} icon={icon ?? <RotateCcw size={16} />}>{children ?? "데모 초기화"}</Button>
+      <Button {...btn} onClick={() => setOpen(true)} icon={icon ?? <RotateCcw size={16} />}>
+        {children ?? "데모 초기화"}
+      </Button>
       <DemoResetModal open={open} onClose={close} redirectTo={redirectTo} />
     </>
   );

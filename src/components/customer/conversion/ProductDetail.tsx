@@ -20,37 +20,116 @@ import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { OptionPicker } from "./OptionPicker";
 import { FitSignal } from "./FitSignal";
-import { FIT_LABEL, FIT_DESC, SIZING_LABEL, FREE_SHIP_MIN, etaLabel, findVariant, stockState, demoReviews, type DemoReview } from "./shared";
+import {
+  FIT_LABEL,
+  FIT_DESC,
+  SIZING_LABEL,
+  FREE_SHIP_MIN,
+  etaLabel,
+  findVariant,
+  stockState,
+  demoReviews,
+  type DemoReview,
+} from "./shared";
 import { LoopHint } from "@/components/customer/LoopHint";
 
-const SLOTS = [{ key: "front", label: "정면" }, { key: "detail", label: "디테일" }, { key: "wear", label: "착용컷" }];
+const SLOTS = [
+  { key: "front", label: "정면" },
+  { key: "detail", label: "디테일" },
+  { key: "wear", label: "착용컷" },
+];
 
 function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: number; onColor: (i: number) => void }) {
   const [slot, setSlot] = useState(0);
   const cur = SLOTS[slot];
   return (
-    <div className="md:sticky md:top-[88px] space-y-3 min-w-0">
-      <ProductImage colors={product.colors} variant={colorIdx} label={`${product.name} · ${product.colors[colorIdx]} · ${cur.label}`} caption={false} ratio="aspect-square md:aspect-[3/4]" className="rounded-2xl md:rounded-cardlg">
-        {slot === 1 && <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }} />}
-        {slot === 2 && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }} />}
-        <div className="absolute right-3 top-3 flex items-center gap-1.5"><span className="rounded-full bg-white/85 px-2.5 py-1 text-[0.78rem] font-bold text-brand-black">{cur.label}</span></div>
-        <div className="absolute left-3 top-3"><span className="rounded-full bg-brand-black/70 px-2.5 py-1 text-[0.78rem] font-semibold text-white">사진 준비중 · 색상 미리보기</span></div>
+    <div className="min-w-0 space-y-3 md:sticky md:top-[88px]">
+      <ProductImage
+        colors={product.colors}
+        variant={colorIdx}
+        label={`${product.name} · ${product.colors[colorIdx]} · ${cur.label}`}
+        caption={false}
+        ratio="aspect-square md:aspect-[3/4]"
+        className="rounded-2xl md:rounded-cardlg"
+      >
+        {slot === 1 && (
+          <div
+            className="absolute inset-0"
+            style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }}
+          />
+        )}
+        {slot === 2 && (
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }}
+          />
+        )}
+        <div className="absolute right-3 top-3 flex items-center gap-1.5">
+          <span className="rounded-full bg-white/85 px-2.5 py-1 text-[0.78rem] font-bold text-brand-black">
+            {cur.label}
+          </span>
+        </div>
+        <div className="absolute left-3 top-3">
+          <span className="rounded-full bg-brand-black/70 px-2.5 py-1 text-[0.78rem] font-semibold text-white">
+            사진 준비중 · 색상 미리보기
+          </span>
+        </div>
       </ProductImage>
-      <div className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+      <div className="hide-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
         {SLOTS.map((s, i) => (
-          <button key={s.key} type="button" onClick={() => setSlot(i)} aria-label={`${s.label} 이미지`} aria-pressed={slot === i} className={cn("relative w-[72px] shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-fast active:scale-95", slot === i ? "border-brand-black" : "border-transparent hover:border-neutral-border")}>
-            <ProductImage colors={product.colors} variant={colorIdx} label={s.label} ratio="aspect-[3/4]" className="rounded-lg">
-              {i === 1 && <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }} />}
-              {i === 2 && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }} />}
+          <button
+            key={s.key}
+            type="button"
+            onClick={() => setSlot(i)}
+            aria-label={`${s.label} 이미지`}
+            aria-pressed={slot === i}
+            className={cn(
+              "relative w-[72px] shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-fast active:scale-95",
+              slot === i ? "border-brand-black" : "border-transparent hover:border-neutral-border",
+            )}
+          >
+            <ProductImage
+              colors={product.colors}
+              variant={colorIdx}
+              label={s.label}
+              ratio="aspect-[3/4]"
+              className="rounded-lg"
+            >
+              {i === 1 && (
+                <div
+                  className="absolute inset-0"
+                  style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }}
+                />
+              )}
+              {i === 2 && (
+                <div
+                  className="absolute inset-0"
+                  style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }}
+                />
+              )}
             </ProductImage>
-            <span className="absolute inset-x-0 bottom-0 bg-white/85 text-[0.78rem] font-bold text-center py-0.5 text-brand-black">{s.label}</span>
+            <span className="absolute inset-x-0 bottom-0 bg-white/85 py-0.5 text-center text-[0.78rem] font-bold text-brand-black">
+              {s.label}
+            </span>
           </button>
         ))}
-        <span className="w-px bg-neutral-border shrink-0 my-2" aria-hidden />
+        <span className="my-2 w-px shrink-0 bg-neutral-border" aria-hidden />
         {product.colors.map((c, i) => (
-          <button key={c} type="button" onClick={() => onColor(i)} aria-label={`색상 ${c} 이미지`} aria-pressed={colorIdx === i} className={cn("relative w-[72px] shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-fast active:scale-95", colorIdx === i ? "border-brand-black" : "border-transparent hover:border-neutral-border")}>
+          <button
+            key={c}
+            type="button"
+            onClick={() => onColor(i)}
+            aria-label={`색상 ${c} 이미지`}
+            aria-pressed={colorIdx === i}
+            className={cn(
+              "relative w-[72px] shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-fast active:scale-95",
+              colorIdx === i ? "border-brand-black" : "border-transparent hover:border-neutral-border",
+            )}
+          >
             <ProductImage colors={product.colors} variant={i} label={c} ratio="aspect-[3/4]" className="rounded-lg" />
-            <span className="absolute inset-x-0 bottom-0 bg-white/85 text-[0.78rem] font-bold text-center py-0.5 text-brand-black">{c}</span>
+            <span className="absolute inset-x-0 bottom-0 bg-white/85 py-0.5 text-center text-[0.78rem] font-bold text-brand-black">
+              {c}
+            </span>
           </button>
         ))}
       </div>
@@ -58,24 +137,88 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
   );
 }
 
-function SizeGuide({ product, selectedSize, recommended }: { product: Product; selectedSize: string | null; recommended: string | null }) {
+function SizeGuide({
+  product,
+  selectedSize,
+  recommended,
+}: {
+  product: Product;
+  selectedSize: string | null;
+  recommended: string | null;
+}) {
   const sizes = product.sizes;
   const keys = Object.keys(product.measurements[sizes[0]] ?? {});
-  if (!keys.length) return <div className="rounded-cardlg border border-neutral-border bg-white p-5"><p className="font-bold">사이즈 가이드</p><p className="text-neutral-text2 text-[0.9rem] mt-1">단일 사이즈(FREE) 상품입니다. {product.fitNote}</p></div>;
+  if (!keys.length)
+    return (
+      <div className="rounded-cardlg border border-neutral-border bg-white p-5">
+        <p className="font-bold">사이즈 가이드</p>
+        <p className="mt-1 text-[0.9rem] text-neutral-text2">단일 사이즈(FREE) 상품입니다. {product.fitNote}</p>
+      </div>
+    );
   const unit = product.categoryId === "shoes" ? "cm (발길이 기준)" : "cm";
   return (
-    <div className="rounded-cardlg border border-neutral-border bg-white overflow-hidden">
-      <div className="px-5 pt-5 pb-3 flex flex-wrap items-center justify-between gap-2"><p className="font-bold text-[1.05rem]">사이즈 가이드 <span className="text-[0.82rem] font-normal text-neutral-text2">단위 {unit} · 측정 방법에 따라 1~2cm 차이</span></p><div className="flex gap-1.5 text-[0.78rem]"><span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-brand-black" />선택</span><span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-brand-accent" />추천</span></div></div>
+    <div className="overflow-hidden rounded-cardlg border border-neutral-border bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-5 pb-3 pt-5">
+        <p className="text-[1.05rem] font-bold">
+          사이즈 가이드{" "}
+          <span className="text-[0.82rem] font-normal text-neutral-text2">
+            단위 {unit} · 측정 방법에 따라 1~2cm 차이
+          </span>
+        </p>
+        <div className="flex gap-1.5 text-[0.78rem]">
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2.5 w-2.5 rounded-sm bg-brand-black" />
+            선택
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2.5 w-2.5 rounded-sm bg-brand-accent" />
+            추천
+          </span>
+        </div>
+      </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-[0.9rem] min-w-[420px]">
-          <thead><tr className="bg-brand-ivory text-neutral-text2"><th className="px-4 py-2.5 text-left font-semibold whitespace-nowrap">사이즈</th>{keys.map((k) => <th key={k} className="px-4 py-2.5 text-right font-semibold whitespace-nowrap">{k}</th>)}</tr></thead>
+        <table className="w-full min-w-[420px] text-[0.9rem]">
+          <thead>
+            <tr className="bg-brand-ivory text-neutral-text2">
+              <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold">사이즈</th>
+              {keys.map((k) => (
+                <th key={k} className="whitespace-nowrap px-4 py-2.5 text-right font-semibold">
+                  {k}
+                </th>
+              ))}
+            </tr>
+          </thead>
           <tbody>
             {sizes.map((s) => {
-              const sel = s === selectedSize, rec = s === recommended;
+              const sel = s === selectedSize,
+                rec = s === recommended;
               return (
-                <tr key={s} className={cn("border-t border-neutral-border", sel && "bg-brand-black text-white", !sel && rec && "bg-brand-accent/10")}>
-                  <td className="px-4 py-2.5 font-bold whitespace-nowrap">{s}{rec && <span className={cn("ml-1.5 text-[0.78rem] font-bold rounded px-1 py-0.5 align-middle", sel ? "bg-white/20 text-white" : "bg-brand-accent text-white")}>추천</span>}</td>
-                  {keys.map((k) => <td key={k} className="px-4 py-2.5 text-right tabular">{product.measurements[s]?.[k] ?? "-"}</td>)}
+                <tr
+                  key={s}
+                  className={cn(
+                    "border-t border-neutral-border",
+                    sel && "bg-brand-black text-white",
+                    !sel && rec && "bg-brand-accent/10",
+                  )}
+                >
+                  <td className="whitespace-nowrap px-4 py-2.5 font-bold">
+                    {s}
+                    {rec && (
+                      <span
+                        className={cn(
+                          "ml-1.5 rounded px-1 py-0.5 align-middle text-[0.78rem] font-bold",
+                          sel ? "bg-white/20 text-white" : "bg-brand-accent text-white",
+                        )}
+                      >
+                        추천
+                      </span>
+                    )}
+                  </td>
+                  {keys.map((k) => (
+                    <td key={k} className="tabular px-4 py-2.5 text-right">
+                      {product.measurements[s]?.[k] ?? "-"}
+                    </td>
+                  ))}
                 </tr>
               );
             })}
@@ -87,7 +230,18 @@ function SizeGuide({ product, selectedSize, recommended }: { product: Product; s
 }
 
 function StarRow({ n, size = 14 }: { n: number; size?: number }) {
-  return <span role="img" className="inline-flex gap-0.5" aria-label={`별점 ${n}점`}>{[1, 2, 3, 4, 5].map((i) => <Star key={i} size={size} className={i <= n ? "text-brand-black" : "text-neutral-border"} fill={i <= n ? "currentColor" : "none"} />)}</span>;
+  return (
+    <span role="img" className="inline-flex gap-0.5" aria-label={`별점 ${n}점`}>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star
+          key={i}
+          size={size}
+          className={i <= n ? "text-brand-black" : "text-neutral-border"}
+          fill={i <= n ? "currentColor" : "none"}
+        />
+      ))}
+    </span>
+  );
 }
 
 function Reviews({ product }: { product: Product }) {
@@ -97,26 +251,71 @@ function Reviews({ product }: { product: Product }) {
   const list = showAll ? reviews : reviews.slice(0, 4);
   return (
     <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
-      <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
-        <div><p className="font-bold text-[1.05rem] flex items-center gap-2">리뷰 <DemoBadge label="데모 리뷰" /></p><p className="text-[0.85rem] text-neutral-text2 mt-0.5">실제 고객 리뷰가 아닌 시연용 예시입니다.</p></div>
-        <div className="flex items-center gap-2"><span className="text-[2rem] font-black leading-none tabular">{product.rating}</span><div><StarRow n={Math.round(product.rating)} /><p className="text-[0.78rem] text-neutral-text2 tabular">리뷰 {product.reviewCount}개 (데모)</p></div></div>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="flex items-center gap-2 text-[1.05rem] font-bold">
+            리뷰 <DemoBadge label="데모 리뷰" />
+          </p>
+          <p className="mt-0.5 text-[0.85rem] text-neutral-text2">실제 고객 리뷰가 아닌 시연용 예시입니다.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="tabular text-[2rem] font-black leading-none">{product.rating}</span>
+          <div>
+            <StarRow n={Math.round(product.rating)} />
+            <p className="tabular text-[0.78rem] text-neutral-text2">리뷰 {product.reviewCount}개 (데모)</p>
+          </div>
+        </div>
       </div>
-      {(product.categoryId !== "bag" && product.categoryId !== "acc") && (
-        <div className="grid grid-cols-3 gap-3 mb-5">
-          {[["작아요", dist[0]], ["딱 맞아요", dist[1]], ["커요", dist[2]]].map(([l, v]) => <div key={l as string} className="rounded-xl bg-brand-ivory px-3 py-2.5"><p className="text-[0.78rem] text-neutral-text2">{l}</p><p className="font-bold tabular">{v}%</p><Progress value={(v as number) / 100} className="mt-1.5 h-1.5 bg-white" tone={l === "딱 맞아요" ? "success" : "warning"} label={`구매자 후기 ‘${l}’ 비율`} /></div>)}
+      {product.categoryId !== "bag" && product.categoryId !== "acc" && (
+        <div className="mb-5 grid grid-cols-3 gap-3">
+          {[
+            ["작아요", dist[0]],
+            ["딱 맞아요", dist[1]],
+            ["커요", dist[2]],
+          ].map(([l, v]) => (
+            <div key={l as string} className="rounded-xl bg-brand-ivory px-3 py-2.5">
+              <p className="text-[0.78rem] text-neutral-text2">{l}</p>
+              <p className="tabular font-bold">{v}%</p>
+              <Progress
+                value={(v as number) / 100}
+                className="mt-1.5 h-1.5 bg-white"
+                tone={l === "딱 맞아요" ? "success" : "warning"}
+                label={`구매자 후기 ‘${l}’ 비율`}
+              />
+            </div>
+          ))}
         </div>
       )}
       <ul className="divide-y divide-neutral-border">
         {list.map((r: DemoReview) => (
           <li key={r.id} className="py-4 first:pt-0 last:pb-0">
-            <div className="flex flex-wrap items-center justify-between gap-2"><div className="flex items-center gap-2"><StarRow n={r.rating} /><span className="font-semibold text-[0.9rem]">{r.name}</span></div><span className="text-[0.78rem] text-neutral-text2 tabular">{fmtDate(r.at)}</span></div>
-            <p className="text-[0.82rem] text-neutral-text2 mt-1">{r.height}cm · {r.weight}kg · {r.bodyType} · 구매 <span className="font-semibold text-neutral-text">{r.color} {r.size}</span></p>
-            <p className="text-[0.95rem] mt-1.5 leading-relaxed">{r.text}</p>
-            <p className="text-[0.78rem] text-neutral-text2 mt-1.5">도움돼요 {r.helpful}</p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <StarRow n={r.rating} />
+                <span className="text-[0.9rem] font-semibold">{r.name}</span>
+              </div>
+              <span className="tabular text-[0.78rem] text-neutral-text2">{fmtDate(r.at)}</span>
+            </div>
+            <p className="mt-1 text-[0.82rem] text-neutral-text2">
+              {r.height}cm · {r.weight}kg · {r.bodyType} · 구매{" "}
+              <span className="font-semibold text-neutral-text">
+                {r.color} {r.size}
+              </span>
+            </p>
+            <p className="mt-1.5 text-[0.95rem] leading-relaxed">{r.text}</p>
+            <p className="mt-1.5 text-[0.78rem] text-neutral-text2">도움돼요 {r.helpful}</p>
           </li>
         ))}
       </ul>
-      {reviews.length > 4 && <button type="button" onClick={() => setShowAll((v) => !v)} className="mt-4 h-11 w-full rounded-xl border border-neutral-border font-semibold hover:bg-brand-ivory active:bg-brand-ivory transition-colors">{showAll ? "접기" : `리뷰 ${reviews.length - 4}개 더 보기`}</button>}
+      {reviews.length > 4 && (
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          className="mt-4 h-11 w-full rounded-xl border border-neutral-border font-semibold transition-colors hover:bg-brand-ivory active:bg-brand-ivory"
+        >
+          {showAll ? "접기" : `리뷰 ${reviews.length - 4}개 더 보기`}
+        </button>
+      )}
     </div>
   );
 }
@@ -127,8 +326,15 @@ export function ProductDetail({ product }: { product: Product }) {
   const params = useSearchParams();
   const brand = BRAND_BY_ID[product.brandId];
   const single = product.sizes.length === 1 && product.sizes[0] === "FREE";
-  const initColor = () => { const c = params.get("color"); const i = c ? product.colors.indexOf(c) : -1; return i >= 0 ? i : 0; };
-  const initSize = () => { const s = params.get("size"); return s && product.sizes.includes(s) ? s : single ? "FREE" : null; };
+  const initColor = () => {
+    const c = params.get("color");
+    const i = c ? product.colors.indexOf(c) : -1;
+    return i >= 0 ? i : 0;
+  };
+  const initSize = () => {
+    const s = params.get("size");
+    return s && product.sizes.includes(s) ? s : single ? "FREE" : null;
+  };
   const [colorIdx, setColorIdx] = useState<number>(initColor);
   const [size, setSize] = useState<string | null>(initSize);
   const [added, setAdded] = useState<string | null>(null);
@@ -144,8 +350,12 @@ export function ProductDetail({ product }: { product: Product }) {
   }, [product.id]);
   // URL → selection (e.g. notification / presentation links)
   useEffect(() => {
-    const c = params.get("color"); const s = params.get("size");
-    if (c) { const i = product.colors.indexOf(c); if (i >= 0) setColorIdx(i); }
+    const c = params.get("color");
+    const s = params.get("size");
+    if (c) {
+      const i = product.colors.indexOf(c);
+      if (i >= 0) setColorIdx(i);
+    }
     if (s && product.sizes.includes(s)) setSize(s);
   }, [params, product]);
 
@@ -156,11 +366,20 @@ export function ProductDetail({ product }: { product: Product }) {
   const subscribed = !!variant && store.restockSubs.some((s) => s.variantId === variant.id && s.status === "waiting");
   const wished = store.wishlist.some((w) => w.productId === product.id);
   const agg = productAgg(product, store);
-  const fit = useMemo(() => recommendFit(product, store.fitProfile, store.fitNoteOverride[product.id]), [product, store.fitProfile, store.fitNoteOverride]);
+  const fit = useMemo(
+    () => recommendFit(product, store.fitProfile, store.fitNoteOverride[product.id]),
+    [product, store.fitProfile, store.fitNoteOverride],
+  );
   const fitNote = effFitNote(product, store);
 
-  const pickColor = (i: number) => { setColorIdx(i); store.track("select_color", { productId: product.id, color: product.colors[i] }); };
-  const pickSize = (s: string) => { setSize(s); store.track("select_size", { productId: product.id, size: s, variantId: findVariant(product.id, colorIdx, s)?.id }); };
+  const pickColor = (i: number) => {
+    setColorIdx(i);
+    store.track("select_color", { productId: product.id, color: product.colors[i] });
+  };
+  const pickSize = (s: string) => {
+    setSize(s);
+    store.track("select_size", { productId: product.id, size: s, variantId: findVariant(product.id, colorIdx, s)?.id });
+  };
   const requireOption = () => {
     if (variant) return true;
     toast("색상과 사이즈를 선택해주세요", undefined, "warning");
@@ -169,17 +388,30 @@ export function ProductDetail({ product }: { product: Product }) {
   };
   const [sheet, setSheet] = useState<null | "cart" | "buy">(null);
   /** 하단 구매 바(모바일) — 옵션이 정해졌으면 바로 실행, 아니면 옵션 시트 */
-  const fromBar = (mode: "cart" | "buy") => { if (!variant) { setSheet(mode); return; } if (mode === "cart") addCart(); else buyNow(); };
+  const fromBar = (mode: "cart" | "buy") => {
+    if (!variant) {
+      setSheet(mode);
+      return;
+    }
+    if (mode === "cart") addCart();
+    else buyNow();
+  };
   const addCart = () => {
     if (!requireOption() || !variant || !st) return;
-    if (!st.purchasable) { toast("품절된 옵션입니다", "재입고 알림을 신청해 주세요", "warning"); return; }
+    if (!st.purchasable) {
+      toast("품절된 옵션입니다", "재입고 알림을 신청해 주세요", "warning");
+      return;
+    }
     store.addToCart(variant.id);
     setAdded(variant.id);
     toast("장바구니에 담았습니다", `${product.name} · ${variant.color} · ${variant.size} — 장바구니에서 확인하세요`);
   };
   const buyNow = () => {
     if (!requireOption() || !variant || !st) return;
-    if (!st.purchasable) { toast("품절된 옵션입니다", "재입고 알림을 신청해 주세요", "warning"); return; }
+    if (!st.purchasable) {
+      toast("품절된 옵션입니다", "재입고 알림을 신청해 주세요", "warning");
+      return;
+    }
     store.addToCart(variant.id);
     router.push("/cart");
   };
@@ -190,67 +422,257 @@ export function ProductDetail({ product }: { product: Product }) {
   };
   const wish = () => {
     const on = store.toggleWishlist(product.id, variant?.id ?? null);
-    toast(on ? "찜 목록에 저장했습니다" : "찜을 해제했습니다", on ? (variant ? `${variant.color} · ${variant.size} 옵션과 함께 저장` : "재고와 가격 변화를 알려드릴게요") : undefined, on ? "success" : "info");
+    toast(
+      on ? "찜 목록에 저장했습니다" : "찜을 해제했습니다",
+      on
+        ? variant
+          ? `${variant.color} · ${variant.size} 옵션과 함께 저장`
+          : "재고와 가격 변화를 알려드릴게요"
+        : undefined,
+      on ? "success" : "info",
+    );
   };
 
   const soldoutSelected = !!st && !st.purchasable;
   const lowSelected = !!st && st.purchasable && st.key === "low";
   const related = PRODUCTS.filter((p) => p.brandId === product.brandId && p.id !== product.id).slice(0, 4);
-  const alsoViewed = PRODUCTS.filter((p) => p.categoryId === product.categoryId && p.id !== product.id && p.brandId !== product.brandId).map((p) => ({ p, s: productAgg(p, store).rankScore })).sort((a, b) => b.s - a.s).slice(0, 4).map((x) => x.p);
-  const badge = agg.worst === "rising" || product.tags.includes("급상승") ? { t: "급상승", tone: "accent" as const } : product.tags.includes("베스트") ? { t: "베스트", tone: "dark" as const } : Date.now() - new Date(product.createdAt).getTime() < 30 * 86400000 ? { t: "신상", tone: "dark" as const } : null;
+  const alsoViewed = PRODUCTS.filter(
+    (p) => p.categoryId === product.categoryId && p.id !== product.id && p.brandId !== product.brandId,
+  )
+    .map((p) => ({ p, s: productAgg(p, store).rankScore }))
+    .sort((a, b) => b.s - a.s)
+    .slice(0, 4)
+    .map((x) => x.p);
+  const badge =
+    agg.worst === "rising" || product.tags.includes("급상승")
+      ? { t: "급상승", tone: "accent" as const }
+      : product.tags.includes("베스트")
+        ? { t: "베스트", tone: "dark" as const }
+        : Date.now() - new Date(product.createdAt).getTime() < 30 * 86400000
+          ? { t: "신상", tone: "dark" as const }
+          : null;
 
-  const RestockCta = ({ full, tour }: { full?: boolean; tour?: string }) => subscribed ? (
-    <Button variant="secondary" size="lg" full={full} className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")} onClick={() => router.push("/my/restock")} icon={<Bell size={18} className="hidden sm:block" />} data-tour={tour} aria-label="신청 완료 · 목록 보기 (재입고 알림)">신청 완료 · 목록 보기</Button>
-  ) : (
-    <Button variant="brand" size="lg" full={full} className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")} onClick={restock} icon={<Bell size={18} className="hidden sm:block" />} data-tour={tour}>재입고 알림 신청</Button>
-  );
+  const RestockCta = ({ full, tour }: { full?: boolean; tour?: string }) =>
+    subscribed ? (
+      <Button
+        variant="secondary"
+        size="lg"
+        full={full}
+        className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")}
+        onClick={() => router.push("/my/restock")}
+        icon={<Bell size={18} className="hidden sm:block" />}
+        data-tour={tour}
+        aria-label="신청 완료 · 목록 보기 (재입고 알림)"
+      >
+        신청 완료 · 목록 보기
+      </Button>
+    ) : (
+      <Button
+        variant="brand"
+        size="lg"
+        full={full}
+        className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")}
+        onClick={restock}
+        icon={<Bell size={18} className="hidden sm:block" />}
+        data-tour={tour}
+      >
+        재입고 알림 신청
+      </Button>
+    );
 
   return (
     <div>
       <Container className="pt-4 md:pt-8">
-        <nav className="hidden md:flex items-center gap-1 text-[0.82rem] text-neutral-text2 mb-5" aria-label="경로"><Link href="/" className="hover:text-neutral-text">홈</Link><ChevronRight size={14} /><Link href={`/shop?category=${product.categoryId}`} className="hover:text-neutral-text">{CATEGORY_NAME[product.categoryId]}</Link><ChevronRight size={14} /><Link href={`/brands/${brand.slug}`} className="hover:text-neutral-text">{brand.name}</Link></nav>
-        <div className="grid md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-6 md:gap-10 items-start">
+        <nav className="mb-5 hidden items-center gap-1 text-[0.82rem] text-neutral-text2 md:flex" aria-label="경로">
+          <Link href="/" className="hover:text-neutral-text">
+            홈
+          </Link>
+          <ChevronRight size={14} />
+          <Link href={`/shop?category=${product.categoryId}`} className="hover:text-neutral-text">
+            {CATEGORY_NAME[product.categoryId]}
+          </Link>
+          <ChevronRight size={14} />
+          <Link href={`/brands/${brand.slug}`} className="hover:text-neutral-text">
+            {brand.name}
+          </Link>
+        </nav>
+        <div className="grid items-start gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:gap-10">
           <Gallery product={product} colorIdx={colorIdx} onColor={pickColor} />
 
-          <div className="space-y-6 min-w-0">
+          <div className="min-w-0 space-y-6">
             <div>
-              <div className="flex items-center gap-2 mb-2"><Link href={`/brands/${brand.slug}`} className="tap text-[0.85rem] font-bold tracking-wide text-neutral-text2 hover:text-neutral-text inline-flex items-center gap-0.5">{brand.name}<ChevronRight size={14} /></Link>{badge && <Badge tone={badge.tone} size="sm">{badge.t}</Badge>}</div>
-              <h1 className="text-[1.5rem] md:text-[1.8rem] font-bold tracking-tight leading-tight">{product.name}</h1>
-              <p className="text-neutral-text2 mt-1">{product.subtitle}</p>
-              <div className="mt-3 flex items-center gap-3 text-[0.85rem] text-neutral-text2"><span className="inline-flex items-center gap-1"><Star size={14} className="text-brand-black" fill="currentColor" /><span className="font-semibold text-neutral-text tabular">{product.rating}</span> · 리뷰 {product.reviewCount}</span><span className="inline-flex items-center gap-1"><Heart size={14} /> 찜 {agg.wishlist7d} (7일)</span></div>
-              <div className="mt-4"><Price price={price} original={product.price} size="lg" />{store.salePriceOverride[product.id] && <p className="mt-1 text-[0.82rem] text-brand-accent font-semibold">MD 할인 적용 · 가격이 방금 조정되었습니다 (데모)</p>}</div>
-              <div className="mt-3 flex items-start gap-2 rounded-xl bg-brand-ivory px-4 py-3 text-[0.9rem]"><Truck size={18} className="mt-0.5 shrink-0" /><div><p className="font-bold">{etaLabel(free)}</p><p className="text-neutral-text2 text-[0.82rem]">{free ? "무료배송 · 오늘 자정 전 주문 시" : `배송비 3,000원 · ${FREE_SHIP_MIN.toLocaleString("ko-KR")}원 이상 구매 시 무료`}</p></div></div>
+              <div className="mb-2 flex items-center gap-2">
+                <Link
+                  href={`/brands/${brand.slug}`}
+                  className="tap inline-flex items-center gap-0.5 text-[0.85rem] font-bold tracking-wide text-neutral-text2 hover:text-neutral-text"
+                >
+                  {brand.name}
+                  <ChevronRight size={14} />
+                </Link>
+                {badge && (
+                  <Badge tone={badge.tone} size="sm">
+                    {badge.t}
+                  </Badge>
+                )}
+              </div>
+              <h1 className="text-[1.5rem] font-bold leading-tight tracking-tight md:text-[1.8rem]">{product.name}</h1>
+              <p className="mt-1 text-neutral-text2">{product.subtitle}</p>
+              <div className="mt-3 flex items-center gap-3 text-[0.85rem] text-neutral-text2">
+                <span className="inline-flex items-center gap-1">
+                  <Star size={14} className="text-brand-black" fill="currentColor" />
+                  <span className="tabular font-semibold text-neutral-text">{product.rating}</span> · 리뷰{" "}
+                  {product.reviewCount}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Heart size={14} /> 찜 {agg.wishlist7d} (7일)
+                </span>
+              </div>
+              <div className="mt-4">
+                <Price price={price} original={product.price} size="lg" />
+                {store.salePriceOverride[product.id] && (
+                  <p className="mt-1 text-[0.82rem] font-semibold text-brand-accent">
+                    MD 할인 적용 · 가격이 방금 조정되었습니다 (데모)
+                  </p>
+                )}
+              </div>
+              <div className="mt-3 flex items-start gap-2 rounded-xl bg-brand-ivory px-4 py-3 text-[0.9rem]">
+                <Truck size={18} className="mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-bold">{etaLabel(free)}</p>
+                  <p className="text-[0.82rem] text-neutral-text2">
+                    {free
+                      ? "무료배송 · 오늘 자정 전 주문 시"
+                      : `배송비 3,000원 · ${FREE_SHIP_MIN.toLocaleString("ko-KR")}원 이상 구매 시 무료`}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div id="options" className="rounded-cardlg border border-neutral-border bg-white p-5 scroll-mt-24">
-              <OptionPicker product={product} colorIdx={colorIdx} size={size} onColor={pickColor} onSize={pickSize}
-                sizeAction={<a href="#fit-signal" onClick={(e) => { e.preventDefault(); document.getElementById("fit-signal")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="tap inline-flex items-center gap-1 text-[0.85rem] font-bold text-brand-accent hover:underline underline-offset-2"><Ruler size={14} />핏 추천{fit.ready && fit.size ? ` ${fit.size}` : ""}</a>} />
+            <div id="options" className="scroll-mt-24 rounded-cardlg border border-neutral-border bg-white p-5">
+              <OptionPicker
+                product={product}
+                colorIdx={colorIdx}
+                size={size}
+                onColor={pickColor}
+                onSize={pickSize}
+                sizeAction={
+                  <a
+                    href="#fit-signal"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById("fit-signal")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                    className="tap inline-flex items-center gap-1 text-[0.85rem] font-bold text-brand-accent underline-offset-2 hover:underline"
+                  >
+                    <Ruler size={14} />핏 추천{fit.ready && fit.size ? ` ${fit.size}` : ""}
+                  </a>
+                }
+              />
               {variant && (
-                <div className="mt-4 rounded-xl bg-brand-ivory px-4 py-3 flex items-center justify-between gap-3 text-[0.9rem]">
-                  <span className="min-w-0"><span className="font-semibold">{variant.color} · {variant.size}</span><span className="text-neutral-text2"> · 1개</span></span>
-                  <span className="font-bold tabular">{price.toLocaleString("ko-KR")}원</span>
+                <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-brand-ivory px-4 py-3 text-[0.9rem]">
+                  <span className="min-w-0">
+                    <span className="font-semibold">
+                      {variant.color} · {variant.size}
+                    </span>
+                    <span className="text-neutral-text2"> · 1개</span>
+                  </span>
+                  <span className="tabular font-bold">{price.toLocaleString("ko-KR")}원</span>
                 </div>
               )}
               {/* 휴대폰은 하단 구매 바가 같은 역할 → 여기서는 숨김. 태블릿(768)은 '구매하기'이 다음 줄로 내려가 전체 폭을 쓴다 */}
-              <div className="mt-4 hidden md:flex flex-wrap gap-2">
-                <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] !px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
-                {soldoutSelected ? <RestockCta tour="c-restock" /> : (
+              <div className="mt-4 hidden flex-wrap gap-2 md:flex">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={wish}
+                  aria-pressed={wished}
+                  aria-label={wished ? "찜 해제" : "찜하기"}
+                  className="w-[52px] shrink-0 !px-0"
+                  icon={
+                    <Heart
+                      size={20}
+                      fill={wished ? "currentColor" : "none"}
+                      className={wished ? "text-brand-accent" : undefined}
+                    />
+                  }
+                />
+                {soldoutSelected ? (
+                  <RestockCta tour="c-restock" />
+                ) : (
                   <>
-                    <Button variant="outline" size="lg" className="flex-1 basis-[7rem] min-w-0 !px-3 sm:!px-6 md:!px-3 xl:!px-6" onClick={addCart} icon={<ShoppingBag size={18} className="hidden sm:block md:hidden lg:block" />}>장바구니</Button>
-                    <Button variant="brand" size="lg" className="flex-1 basis-[7rem] min-w-0 !px-3 sm:!px-6 md:!px-3 xl:!px-6" onClick={buyNow} icon={<Zap size={18} className="hidden sm:block md:hidden lg:block" />}>구매하기</Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="min-w-0 flex-1 basis-[7rem] !px-3 sm:!px-6 md:!px-3 xl:!px-6"
+                      onClick={addCart}
+                      icon={<ShoppingBag size={18} className="hidden sm:block md:hidden lg:block" />}
+                    >
+                      장바구니
+                    </Button>
+                    <Button
+                      variant="brand"
+                      size="lg"
+                      className="min-w-0 flex-1 basis-[7rem] !px-3 sm:!px-6 md:!px-3 xl:!px-6"
+                      onClick={buyNow}
+                      icon={<Zap size={18} className="hidden sm:block md:hidden lg:block" />}
+                    >
+                      구매하기
+                    </Button>
                   </>
                 )}
               </div>
-              {added && <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-brand-accent/40 bg-brand-accent/5 px-4 py-2.5 text-[0.88rem] animate-fadeIn"><span className="font-semibold">장바구니에 담았습니다</span><Link href="/cart" className="inline-flex items-center gap-1 font-bold text-brand-accent hover:underline underline-offset-2">장바구니 보기<ArrowRight size={14} /></Link></div>}
+              {added && (
+                <div className="mt-3 flex animate-fadeIn items-center justify-between gap-2 rounded-xl border border-brand-accent/40 bg-brand-accent/5 px-4 py-2.5 text-[0.88rem]">
+                  <span className="font-semibold">장바구니에 담았습니다</span>
+                  <Link
+                    href="/cart"
+                    className="inline-flex items-center gap-1 font-bold text-brand-accent underline-offset-2 hover:underline"
+                  >
+                    장바구니 보기
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              )}
               {lowSelected && (
-                <div className="mt-3 rounded-xl border border-semantic-warning/30 bg-[#fff8f1] px-4 py-3 animate-fadeIn">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                    <p className="text-[0.85rem] leading-snug flex-1"><span className="font-bold text-semantic-warning">품절 임박 · 재고 {st?.stock}개.</span> <span className="text-neutral-text2">놓칠까 걱정되면 재입고 알림을 함께 신청해 두세요. 신청은 MD의 재입고 판단 신호가 됩니다.</span></p>
-                    {subscribed ? <Button variant="secondary" size="sm" onClick={() => router.push("/my/restock")} icon={<Bell size={14} />} data-tour="c-restock" aria-label="신청 완료 · 목록 (재입고 알림)">신청 완료 · 목록</Button> : <Button variant="outline" size="sm" onClick={restock} icon={<Bell size={14} />} data-tour="c-restock">재입고 알림 신청</Button>}
+                <div className="mt-3 animate-fadeIn rounded-xl border border-semantic-warning/30 bg-[#fff8f1] px-4 py-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                    <p className="flex-1 text-[0.85rem] leading-snug">
+                      <span className="font-bold text-semantic-warning">품절 임박 · 재고 {st?.stock}개.</span>{" "}
+                      <span className="text-neutral-text2">
+                        놓칠까 걱정되면 재입고 알림을 함께 신청해 두세요. 신청은 MD의 재입고 판단 신호가 됩니다.
+                      </span>
+                    </p>
+                    {subscribed ? (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => router.push("/my/restock")}
+                        icon={<Bell size={14} />}
+                        data-tour="c-restock"
+                        aria-label="신청 완료 · 목록 (재입고 알림)"
+                      >
+                        신청 완료 · 목록
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={restock}
+                        icon={<Bell size={14} />}
+                        data-tour="c-restock"
+                      >
+                        재입고 알림 신청
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
-              {soldoutSelected && <div className="mt-3 space-y-1"><p className="text-[0.85rem] text-neutral-text2">입고되면 알림으로 바로 알려드려요.</p><LoopHint href="/ax/inventory">신청은 AX 수요 레이더에 옵션별 수요로 반영됩니다</LoopHint></div>}
+              {soldoutSelected && (
+                <div className="mt-3 space-y-1">
+                  <p className="text-[0.85rem] text-neutral-text2">입고되면 알림으로 바로 알려드려요.</p>
+                  <LoopHint href="/ax/inventory">신청은 AX 수요 레이더에 옵션별 수요로 반영됩니다</LoopHint>
+                </div>
+              )}
             </div>
 
             <FitSignal product={product} selectedSize={size} onPickSize={pickSize} />
@@ -258,58 +680,192 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
       </Container>
 
-      <Container className="mt-10 md:mt-14 space-y-8 md:space-y-10">
+      <Container className="mt-10 space-y-8 md:mt-14 md:space-y-10">
         <section id="size-guide" className="space-y-4">
           <SectionHead title="사이즈·핏 정보" desc="실측표와 핏 특성을 함께 확인하세요." />
           <SizeGuide product={product} selectedSize={size} recommended={fit.ready ? fit.size : null} />
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="rounded-cardlg border border-neutral-border bg-white p-5">
-              <p className="font-bold flex items-center gap-2"><Shirt size={16} />핏 정보</p>
-              <div className="mt-3 flex flex-wrap gap-2"><Badge tone="dark">{FIT_LABEL[product.fit]}</Badge><Badge tone={product.sizing === "true" ? "success" : "warning"}>{SIZING_LABEL[product.sizing]}</Badge></div>
-              <p className="text-[0.85rem] text-neutral-text2 mt-2">{FIT_DESC[product.fit]}</p>
-              <div className="mt-3 grid grid-cols-3 text-[0.78rem] text-neutral-text2 text-center"><span>작음</span><span>정사이즈</span><span>큼</span></div>
-              <div className="relative h-2 rounded-full bg-brand-ivory mt-1"><span className={cn("absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-brand-black border-2 border-white shadow-card", product.sizing === "small" ? "left-[12%]" : product.sizing === "large" ? "left-[82%]" : "left-[47%]")} /></div>
-              <p className="text-[0.88rem] mt-3 leading-relaxed">{fitNote}</p>
+              <p className="flex items-center gap-2 font-bold">
+                <Shirt size={16} />핏 정보
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Badge tone="dark">{FIT_LABEL[product.fit]}</Badge>
+                <Badge tone={product.sizing === "true" ? "success" : "warning"}>{SIZING_LABEL[product.sizing]}</Badge>
+              </div>
+              <p className="mt-2 text-[0.85rem] text-neutral-text2">{FIT_DESC[product.fit]}</p>
+              <div className="mt-3 grid grid-cols-3 text-center text-[0.78rem] text-neutral-text2">
+                <span>작음</span>
+                <span>정사이즈</span>
+                <span>큼</span>
+              </div>
+              <div className="relative mt-1 h-2 rounded-full bg-brand-ivory">
+                <span
+                  className={cn(
+                    "absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white bg-brand-black shadow-card",
+                    product.sizing === "small"
+                      ? "left-[12%]"
+                      : product.sizing === "large"
+                        ? "left-[82%]"
+                        : "left-[47%]",
+                  )}
+                />
+              </div>
+              <p className="mt-3 text-[0.88rem] leading-relaxed">{fitNote}</p>
             </div>
             <div className="rounded-cardlg border border-neutral-border bg-white p-5">
-              <p className="font-bold flex items-center gap-2"><User size={16} />모델 정보</p>
-              <dl className="mt-3 space-y-1.5 text-[0.9rem]"><div className="flex justify-between"><dt className="text-neutral-text2">키</dt><dd className="tabular font-semibold">{product.model.height}cm</dd></div><div className="flex justify-between"><dt className="text-neutral-text2">몸무게</dt><dd className="tabular font-semibold">{product.model.weight}kg</dd></div><div className="flex justify-between"><dt className="text-neutral-text2">착용 사이즈</dt><dd className="font-semibold">{product.model.size}</dd></div></dl>
-              <p className="text-[0.82rem] text-neutral-text2 mt-3">모델 착용 사진은 준비 중입니다.</p>
+              <p className="flex items-center gap-2 font-bold">
+                <User size={16} />
+                모델 정보
+              </p>
+              <dl className="mt-3 space-y-1.5 text-[0.9rem]">
+                <div className="flex justify-between">
+                  <dt className="text-neutral-text2">키</dt>
+                  <dd className="tabular font-semibold">{product.model.height}cm</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-neutral-text2">몸무게</dt>
+                  <dd className="tabular font-semibold">{product.model.weight}kg</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-neutral-text2">착용 사이즈</dt>
+                  <dd className="font-semibold">{product.model.size}</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-[0.82rem] text-neutral-text2">모델 착용 사진은 준비 중입니다.</p>
             </div>
             <div className="rounded-cardlg border border-neutral-border bg-white p-5">
-              <p className="font-bold flex items-center gap-2"><Ruler size={16} />소재·세탁 정보</p>
-              <dl className="mt-3 space-y-2 text-[0.9rem]"><div><dt className="text-neutral-text2 text-[0.8rem]">소재</dt><dd className="font-semibold">{product.material}</dd></div><div><dt className="text-neutral-text2 text-[0.8rem]">세탁</dt><dd>{product.care}</dd></div><div><dt className="text-neutral-text2 text-[0.8rem]">상품 설명</dt><dd className="leading-relaxed">{product.description}</dd></div></dl>
+              <p className="flex items-center gap-2 font-bold">
+                <Ruler size={16} />
+                소재·세탁 정보
+              </p>
+              <dl className="mt-3 space-y-2 text-[0.9rem]">
+                <div>
+                  <dt className="text-[0.8rem] text-neutral-text2">소재</dt>
+                  <dd className="font-semibold">{product.material}</dd>
+                </div>
+                <div>
+                  <dt className="text-[0.8rem] text-neutral-text2">세탁</dt>
+                  <dd>{product.care}</dd>
+                </div>
+                <div>
+                  <dt className="text-[0.8rem] text-neutral-text2">상품 설명</dt>
+                  <dd className="leading-relaxed">{product.description}</dd>
+                </div>
+              </dl>
             </div>
           </div>
         </section>
 
-        <section id="reviews"><Reviews product={product} /></section>
+        <section id="reviews">
+          <Reviews product={product} />
+        </section>
 
-        {related.length > 0 && <section><SectionHead title={`${brand.name}의 다른 상품`} desc={brand.tagline} more={`/brands/${brand.slug}`} moreLabel="브랜드 보기" /><ProductGrid products={related} /></section>}
-        {alsoViewed.length > 0 && <section><SectionHead title="함께 본 상품" desc={`${CATEGORY_NAME[product.categoryId]} 카테고리에서 반응이 좋은 상품`} more={`/shop?category=${product.categoryId}`} /><ProductGrid products={alsoViewed} /></section>}
+        {related.length > 0 && (
+          <section>
+            <SectionHead
+              title={`${brand.name}의 다른 상품`}
+              desc={brand.tagline}
+              more={`/brands/${brand.slug}`}
+              moreLabel="브랜드 보기"
+            />
+            <ProductGrid products={related} />
+          </section>
+        )}
+        {alsoViewed.length > 0 && (
+          <section>
+            <SectionHead
+              title="함께 본 상품"
+              desc={`${CATEGORY_NAME[product.categoryId]} 카테고리에서 반응이 좋은 상품`}
+              more={`/shop?category=${product.categoryId}`}
+            />
+            <ProductGrid products={alsoViewed} />
+          </section>
+        )}
       </Container>
 
       {/* 모바일 하단 구매 바 — 상품 상세에서는 하단 탭 대신 이 바가 화면 맨 아래를 쓴다 (쇼핑앱 표준) */}
-      <div className="md:hidden fixed inset-x-0 bottom-0 z-40 bg-white/95 backdrop-blur border-t border-neutral-border px-4 pt-2.5 safe-bottom" data-buy-bar>
+      <div
+        className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-neutral-border bg-white/95 px-4 pt-2.5 backdrop-blur md:hidden"
+        data-buy-bar
+      >
         <div className="flex gap-2">
-          <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] !px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
-          {soldoutSelected ? <RestockCta /> : (
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={wish}
+            aria-pressed={wished}
+            aria-label={wished ? "찜 해제" : "찜하기"}
+            className="w-[52px] shrink-0 !px-0"
+            icon={
+              <Heart
+                size={20}
+                fill={wished ? "currentColor" : "none"}
+                className={wished ? "text-brand-accent" : undefined}
+              />
+            }
+          />
+          {soldoutSelected ? (
+            <RestockCta />
+          ) : (
             <>
-              <Button variant="outline" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={() => fromBar("cart")}>장바구니</Button>
-              <Button variant="brand" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={() => fromBar("buy")}>구매하기</Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="min-w-0 flex-1 !px-3 sm:!px-6"
+                onClick={() => fromBar("cart")}
+              >
+                장바구니
+              </Button>
+              <Button
+                variant="brand"
+                size="lg"
+                className="min-w-0 flex-1 !px-3 sm:!px-6"
+                onClick={() => fromBar("buy")}
+              >
+                구매하기
+              </Button>
             </>
           )}
         </div>
       </div>
 
-      <BottomSheet open={!!sheet} onClose={() => setSheet(null)} title="옵션 선택"
-        footer={soldoutSelected ? <RestockCta full /> : (
-          <Button variant="brand" size="lg" full disabled={!variant} onClick={() => { const m = sheet; setSheet(null); if (m === "cart") addCart(); else buyNow(); }}>
-            {!variant ? "색상과 사이즈를 선택해주세요" : sheet === "cart" ? `장바구니 담기 · ${price.toLocaleString("ko-KR")}원` : `구매하기 · ${price.toLocaleString("ko-KR")}원`}
-          </Button>
-        )}>
+      <BottomSheet
+        open={!!sheet}
+        onClose={() => setSheet(null)}
+        title="옵션 선택"
+        footer={
+          soldoutSelected ? (
+            <RestockCta full />
+          ) : (
+            <Button
+              variant="brand"
+              size="lg"
+              full
+              disabled={!variant}
+              onClick={() => {
+                const m = sheet;
+                setSheet(null);
+                if (m === "cart") addCart();
+                else buyNow();
+              }}
+            >
+              {!variant
+                ? "색상과 사이즈를 선택해주세요"
+                : sheet === "cart"
+                  ? `장바구니 담기 · ${price.toLocaleString("ko-KR")}원`
+                  : `구매하기 · ${price.toLocaleString("ko-KR")}원`}
+            </Button>
+          )
+        }
+      >
         <OptionPicker product={product} colorIdx={colorIdx} size={size} onColor={pickColor} onSize={pickSize} compact />
-        {fit.ready && fit.size && <p className="mt-4 text-[0.88rem] text-neutral-text2"><Ruler size={14} className="inline -mt-0.5 mr-1 text-brand-accent" />내 추천 사이즈 <b className="text-brand-accent">{fit.size}</b></p>}
+        {fit.ready && fit.size && (
+          <p className="mt-4 text-[0.88rem] text-neutral-text2">
+            <Ruler size={14} className="-mt-0.5 mr-1 inline text-brand-accent" />내 추천 사이즈{" "}
+            <b className="text-brand-accent">{fit.size}</b>
+          </p>
+        )}
       </BottomSheet>
     </div>
   );
@@ -318,9 +874,17 @@ export function ProductDetail({ product }: { product: Product }) {
 export function ProductDetailSkeleton() {
   return (
     <Container className="pt-4 md:pt-8">
-      <div className="grid md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-6 md:gap-10">
+      <div className="grid gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:gap-10">
         <div className="skeleton aspect-[3/4] w-full rounded-cardlg" />
-        <div className="space-y-4"><div className="skeleton h-4 w-24" /><div className="skeleton h-8 w-3/4" /><div className="skeleton h-5 w-1/2" /><div className="skeleton h-8 w-40" /><div className="skeleton h-40 w-full rounded-cardlg" /><div className="skeleton h-14 w-full rounded-xl" /><div className="skeleton h-64 w-full rounded-cardlg" /></div>
+        <div className="space-y-4">
+          <div className="skeleton h-4 w-24" />
+          <div className="skeleton h-8 w-3/4" />
+          <div className="skeleton h-5 w-1/2" />
+          <div className="skeleton h-8 w-40" />
+          <div className="skeleton h-40 w-full rounded-cardlg" />
+          <div className="skeleton h-14 w-full rounded-xl" />
+          <div className="skeleton h-64 w-full rounded-cardlg" />
+        </div>
       </div>
     </Container>
   );

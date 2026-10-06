@@ -18,13 +18,31 @@ import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { OptionSheet } from "@/components/customer/conversion/OptionSheet";
 import { PriceSummary } from "@/components/customer/conversion/OrderBits";
-import { AERNO_COUPON, COUPONS, FREE_SHIP_MIN, couponByCode, couponDiscount, etaLabel, parseVariant, shippingFeeFor, stockState } from "@/components/customer/conversion/shared";
+import {
+  AERNO_COUPON,
+  COUPONS,
+  FREE_SHIP_MIN,
+  couponByCode,
+  couponDiscount,
+  etaLabel,
+  parseVariant,
+  shippingFeeFor,
+  stockState,
+} from "@/components/customer/conversion/shared";
 
 function CartContent() {
   const store = useApp();
   const [coupon, setCoupon] = useState("");
   const [sheet, setSheet] = useState<{ product: Product; colorIdx: number } | null>(null);
-  const rows = store.cart.map((c) => { const parsed = parseVariant(c.variantId); if (!parsed) return null; const price = effPrice(parsed.product, store); const st = stockState(parsed.variant, store); return { c, ...parsed, price, st }; }).filter((r): r is NonNullable<typeof r> => !!r);
+  const rows = store.cart
+    .map((c) => {
+      const parsed = parseVariant(c.variantId);
+      if (!parsed) return null;
+      const price = effPrice(parsed.product, store);
+      const st = stockState(parsed.variant, store);
+      return { c, ...parsed, price, st };
+    })
+    .filter((r): r is NonNullable<typeof r> => !!r);
   const subtotal = rows.reduce((s, r) => s + r.price * r.c.qty, 0);
   const itemDiscount = rows.reduce((s, r) => s + (r.product.price - r.price) * r.c.qty, 0);
   const aernoRunning = campaignStatus("cp-06", store.campaignStatusOverride) === "running";
@@ -36,81 +54,261 @@ function CartContent() {
   const blocked = rows.filter((r) => !r.st.purchasable);
   const short = rows.filter((r) => r.st.purchasable && r.st.stock < r.c.qty);
   const canCheckout = rows.length > 0 && blocked.length === 0;
-  const wishCandidates = store.wishlist.map((w) => PRODUCT_BY_ID[w.productId]).filter((p): p is Product => !!p && !store.cart.some((c) => c.productId === p.id)).slice(0, 4);
+  const wishCandidates = store.wishlist
+    .map((w) => PRODUCT_BY_ID[w.productId])
+    .filter((p): p is Product => !!p && !store.cart.some((c) => c.productId === p.id))
+    .slice(0, 4);
   const checkoutHref = `/checkout${cp.code ? `?coupon=${cp.code}` : ""}`;
 
   if (rows.length === 0) {
     return (
       <>
-        <EmptyState icon={<ShoppingBag size={22} />} title="장바구니가 비어 있습니다" desc="상품을 담으면 예상 배송일과 결제 금액을 미리 보여드립니다." action={<div className="flex gap-2"><Button variant="brand" href="/ranking">상품 둘러보기</Button><Button variant="outline" href="/wishlist">찜한 상품</Button></div>} />
-        {wishCandidates.length > 0 && <WishQuick products={wishCandidates} onPick={(p) => setSheet({ product: p, colorIdx: 0 })} />}
-        <OptionSheet product={sheet?.product ?? null} open={!!sheet} onClose={() => setSheet(null)} initialColorIdx={sheet?.colorIdx ?? 0} />
+        <EmptyState
+          icon={<ShoppingBag size={22} />}
+          title="장바구니가 비어 있습니다"
+          desc="상품을 담으면 예상 배송일과 결제 금액을 미리 보여드립니다."
+          action={
+            <div className="flex gap-2">
+              <Button variant="brand" href="/ranking">
+                상품 둘러보기
+              </Button>
+              <Button variant="outline" href="/wishlist">
+                찜한 상품
+              </Button>
+            </div>
+          }
+        />
+        {wishCandidates.length > 0 && (
+          <WishQuick products={wishCandidates} onPick={(p) => setSheet({ product: p, colorIdx: 0 })} />
+        )}
+        <OptionSheet
+          product={sheet?.product ?? null}
+          open={!!sheet}
+          onClose={() => setSheet(null)}
+          initialColorIdx={sheet?.colorIdx ?? 0}
+        />
       </>
     );
   }
 
   return (
-    <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-6 lg:gap-8 items-start">
-      <div className="space-y-4 min-w-0">
-        <ul className="rounded-cardlg border border-neutral-border bg-white divide-y divide-neutral-border">
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
+      <div className="min-w-0 space-y-4">
+        <ul className="divide-y divide-neutral-border rounded-cardlg border border-neutral-border bg-white">
           {rows.map(({ c, product, variant, colorIdx, price, st }) => (
             <li key={c.variantId} className="p-4 md:p-5">
               <div className="flex gap-4">
-                <Link href={`/products/${product.id}`} className="shrink-0 w-20 md:w-24"><ProductImage colors={product.colors} variant={colorIdx} label={product.name} ratio="aspect-[3/4]" /></Link>
+                <Link href={`/products/${product.id}`} className="w-20 shrink-0 md:w-24">
+                  <ProductImage colors={product.colors} variant={colorIdx} label={product.name} ratio="aspect-[3/4]" />
+                </Link>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0"><p className="text-[0.78rem] font-bold text-neutral-text2">{BRAND_BY_ID[product.brandId].name}</p><Link href={`/products/${product.id}`} className="font-semibold leading-snug hover:underline underline-offset-2">{product.name}</Link><p className="text-[0.85rem] text-neutral-text2 mt-0.5">{variant.color} · {variant.size}</p></div>
-                    <button type="button" onClick={() => { store.removeFromCart(c.variantId); toast("장바구니에서 삭제했습니다", undefined, "info"); }} aria-label="삭제" className="h-10 w-10 -mr-2 -mt-1 shrink-0 inline-flex items-center justify-center rounded-full text-neutral-text2 hover:bg-brand-ivory hover:text-neutral-text"><Trash2 size={18} /></button>
+                    <div className="min-w-0">
+                      <p className="text-[0.78rem] font-bold text-neutral-text2">{BRAND_BY_ID[product.brandId].name}</p>
+                      <Link
+                        href={`/products/${product.id}`}
+                        className="font-semibold leading-snug underline-offset-2 hover:underline"
+                      >
+                        {product.name}
+                      </Link>
+                      <p className="mt-0.5 text-[0.85rem] text-neutral-text2">
+                        {variant.color} · {variant.size}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        store.removeFromCart(c.variantId);
+                        toast("장바구니에서 삭제했습니다", undefined, "info");
+                      }}
+                      aria-label="삭제"
+                      className="-mr-2 -mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-neutral-text2 hover:bg-brand-ivory hover:text-neutral-text"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                    <div className="inline-flex items-center rounded-xl border border-neutral-border" role="group" aria-label="수량">
-                      <button type="button" onClick={() => store.updateCartQty(c.variantId, c.qty - 1)} disabled={c.qty <= 1} aria-label="수량 줄이기" className="h-11 w-11 inline-flex items-center justify-center rounded-l-xl hover:bg-brand-ivory disabled:opacity-40 active:bg-brand-ivory"><Minus size={16} /></button>
-                      <span className="w-10 text-center font-bold tabular" aria-live="polite">{c.qty}</span>
-                      <button type="button" onClick={() => { if (c.qty >= 9) { toast("최대 9개까지 담을 수 있습니다", undefined, "warning"); return; } if (c.qty + 1 > st.stock) { toast(`재고가 ${st.stock}개 남았습니다`, undefined, "warning"); return; } store.updateCartQty(c.variantId, c.qty + 1); }} aria-label="수량 늘리기" className="h-11 w-11 inline-flex items-center justify-center rounded-r-xl hover:bg-brand-ivory active:bg-brand-ivory"><Plus size={16} /></button>
+                    <div
+                      className="inline-flex items-center rounded-xl border border-neutral-border"
+                      role="group"
+                      aria-label="수량"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => store.updateCartQty(c.variantId, c.qty - 1)}
+                        disabled={c.qty <= 1}
+                        aria-label="수량 줄이기"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-l-xl hover:bg-brand-ivory active:bg-brand-ivory disabled:opacity-40"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="tabular w-10 text-center font-bold" aria-live="polite">
+                        {c.qty}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (c.qty >= 9) {
+                            toast("최대 9개까지 담을 수 있습니다", undefined, "warning");
+                            return;
+                          }
+                          if (c.qty + 1 > st.stock) {
+                            toast(`재고가 ${st.stock}개 남았습니다`, undefined, "warning");
+                            return;
+                          }
+                          store.updateCartQty(c.variantId, c.qty + 1);
+                        }}
+                        aria-label="수량 늘리기"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-r-xl hover:bg-brand-ivory active:bg-brand-ivory"
+                      >
+                        <Plus size={16} />
+                      </button>
                     </div>
-                    <p className="font-bold tabular text-[1.05rem]">{krw(price * c.qty)}{price < product.price && <span className="ml-2 text-[0.8rem] font-normal text-neutral-text2 line-through">{krw(product.price * c.qty)}</span>}</p>
+                    <p className="tabular text-[1.05rem] font-bold">
+                      {krw(price * c.qty)}
+                      {price < product.price && (
+                        <span className="ml-2 text-[0.8rem] font-normal text-neutral-text2 line-through">
+                          {krw(product.price * c.qty)}
+                        </span>
+                      )}
+                    </p>
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2 text-[0.82rem]">
-                    <span className="inline-flex items-center gap-1 text-neutral-text2"><Truck size={14} />{etaLabel(subtotal >= FREE_SHIP_MIN)}</span>
-                    {st.key !== "normal" && st.key !== "rising" && <Badge tone={st.tone} size="sm">{st.label}</Badge>}
-                    {st.purchasable && st.stock < c.qty && <span className="text-semantic-error font-semibold">재고 {st.stock}개 · 수량을 줄여주세요</span>}
+                    <span className="inline-flex items-center gap-1 text-neutral-text2">
+                      <Truck size={14} />
+                      {etaLabel(subtotal >= FREE_SHIP_MIN)}
+                    </span>
+                    {st.key !== "normal" && st.key !== "rising" && (
+                      <Badge tone={st.tone} size="sm">
+                        {st.label}
+                      </Badge>
+                    )}
+                    {st.purchasable && st.stock < c.qty && (
+                      <span className="font-semibold text-semantic-error">재고 {st.stock}개 · 수량을 줄여주세요</span>
+                    )}
                   </div>
                 </div>
               </div>
             </li>
           ))}
         </ul>
-        {blocked.length > 0 && <p className="text-[0.88rem] text-semantic-error font-semibold">품절된 옵션이 있어 주문할 수 없습니다. 삭제하거나 상품 상세에서 재입고 알림을 신청해 주세요.</p>}
-        {short.length > 0 && <p className="text-[0.88rem] text-semantic-warning font-semibold">일부 상품의 재고가 수량보다 적습니다. 주문 시 재고만큼만 반영됩니다.</p>}
+        {blocked.length > 0 && (
+          <p className="text-[0.88rem] font-semibold text-semantic-error">
+            품절된 옵션이 있어 주문할 수 없습니다. 삭제하거나 상품 상세에서 재입고 알림을 신청해 주세요.
+          </p>
+        )}
+        {short.length > 0 && (
+          <p className="text-[0.88rem] font-semibold text-semantic-warning">
+            일부 상품의 재고가 수량보다 적습니다. 주문 시 재고만큼만 반영됩니다.
+          </p>
+        )}
 
         <div className="rounded-cardlg border border-neutral-border bg-white p-4 md:p-5">
-          <div className="flex items-center gap-2 mb-3"><Ticket size={18} /><p className="font-bold">쿠폰</p></div>
-          <Select name="coupon" aria-label="쿠폰 선택" value={coupon} onChange={(e) => { setCoupon(e.target.value); const sel = couponByCode(e.target.value); if (sel.code) toast(`${sel.code} 쿠폰을 적용했습니다`, `${sel.rate}% 할인 · ${sel.desc}`); }}>
-            {coupons.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
+          <div className="mb-3 flex items-center gap-2">
+            <Ticket size={18} />
+            <p className="font-bold">쿠폰</p>
+          </div>
+          <Select
+            name="coupon"
+            aria-label="쿠폰 선택"
+            value={coupon}
+            onChange={(e) => {
+              setCoupon(e.target.value);
+              const sel = couponByCode(e.target.value);
+              if (sel.code) toast(`${sel.code} 쿠폰을 적용했습니다`, `${sel.rate}% 할인 · ${sel.desc}`);
+            }}
+          >
+            {coupons.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.label}
+              </option>
+            ))}
           </Select>
-          {aernoRunning && <p className="text-[0.85rem] mt-2 font-semibold text-brand-accent">AERNO 재구매 혜택 진행 중 · AERNO7 쿠폰 사용 가능</p>}
+          {aernoRunning && (
+            <p className="mt-2 text-[0.85rem] font-semibold text-brand-accent">
+              AERNO 재구매 혜택 진행 중 · AERNO7 쿠폰 사용 가능
+            </p>
+          )}
         </div>
 
-        {wishCandidates.length > 0 && <WishQuick products={wishCandidates} onPick={(p) => setSheet({ product: p, colorIdx: 0 })} />}
+        {wishCandidates.length > 0 && (
+          <WishQuick products={wishCandidates} onPick={(p) => setSheet({ product: p, colorIdx: 0 })} />
+        )}
       </div>
 
-      <aside className="lg:sticky lg:top-[96px] rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 shadow-card min-w-0">
-        <p className="font-bold text-[1.05rem] mb-4">결제 예정 금액</p>
-        <PriceSummary subtotal={subtotal} itemDiscount={itemDiscount} coupon={cDisc} shipping={ship} total={total} couponLabel={cp.code || undefined} />
-        <p className="mt-3 text-[0.8rem] text-neutral-text2">{ship > 0 ? `${krw(FREE_SHIP_MIN - subtotal)} 더 담으면 무료배송` : "무료배송 적용"} · {etaLabel(ship === 0)}</p>
-        <Link href={canCheckout ? checkoutHref : "#"} aria-disabled={!canCheckout} onClick={(e) => { if (!canCheckout) { e.preventDefault(); toast("품절 옵션을 정리한 뒤 주문할 수 있습니다", undefined, "warning"); return; } store.track("begin_checkout", { items: rows.length, total, coupon: cp.code }); }}
-          className={cn("mt-5 h-[52px] w-full rounded-xl inline-flex items-center justify-center gap-2 font-bold text-[1rem] transition-all duration-fast active:scale-[0.98]", canCheckout ? "bg-brand-black text-white hover:bg-[#2a2a2a] hover:shadow-raised" : "bg-neutral-border text-neutral-text2 cursor-not-allowed")}>
-          주문하기<ArrowRight size={18} />
+      <aside className="min-w-0 rounded-cardlg border border-neutral-border bg-white p-5 shadow-card md:p-6 lg:sticky lg:top-[96px]">
+        <p className="mb-4 text-[1.05rem] font-bold">결제 예정 금액</p>
+        <PriceSummary
+          subtotal={subtotal}
+          itemDiscount={itemDiscount}
+          coupon={cDisc}
+          shipping={ship}
+          total={total}
+          couponLabel={cp.code || undefined}
+        />
+        <p className="mt-3 text-[0.8rem] text-neutral-text2">
+          {ship > 0 ? `${krw(FREE_SHIP_MIN - subtotal)} 더 담으면 무료배송` : "무료배송 적용"} · {etaLabel(ship === 0)}
+        </p>
+        <Link
+          href={canCheckout ? checkoutHref : "#"}
+          aria-disabled={!canCheckout}
+          onClick={(e) => {
+            if (!canCheckout) {
+              e.preventDefault();
+              toast("품절 옵션을 정리한 뒤 주문할 수 있습니다", undefined, "warning");
+              return;
+            }
+            store.track("begin_checkout", { items: rows.length, total, coupon: cp.code });
+          }}
+          className={cn(
+            "mt-5 inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-xl text-[1rem] font-bold transition-all duration-fast active:scale-[0.98]",
+            canCheckout
+              ? "bg-brand-black text-white hover:bg-[#2a2a2a] hover:shadow-raised"
+              : "cursor-not-allowed bg-neutral-border text-neutral-text2",
+          )}
+        >
+          주문하기
+          <ArrowRight size={18} />
         </Link>
       </aside>
-      <OptionSheet product={sheet?.product ?? null} open={!!sheet} onClose={() => setSheet(null)} initialColorIdx={sheet?.colorIdx ?? 0} />
+      <OptionSheet
+        product={sheet?.product ?? null}
+        open={!!sheet}
+        onClose={() => setSheet(null)}
+        initialColorIdx={sheet?.colorIdx ?? 0}
+      />
 
       {/* 휴대폰: 총액과 '주문하기'를 하단 탭 바로 위에 고정 — 아래 요약까지 스크롤하지 않아도 된다 */}
-      <div className="lg:hidden fixed inset-x-0 z-30 bottom-[var(--tabbar-h)] md:bottom-0 bg-white/95 backdrop-blur border-t border-neutral-border px-4 py-2.5" data-checkout-bar>
+      <div
+        className="fixed inset-x-0 bottom-[var(--tabbar-h)] z-30 border-t border-neutral-border bg-white/95 px-4 py-2.5 backdrop-blur md:bottom-0 lg:hidden"
+        data-checkout-bar
+      >
         <div className="flex items-center gap-3">
-          <div className="min-w-0 flex-1"><p className="text-[0.8rem] text-neutral-text2">결제 예정 · {num(rows.reduce((n, r) => n + r.c.qty, 0))}개</p><p className="font-black text-[1.15rem] tabular leading-tight">{krw(total)}</p></div>
-          <Link href={canCheckout ? checkoutHref : "#"} aria-disabled={!canCheckout} onClick={(e) => { if (!canCheckout) { e.preventDefault(); toast("품절 옵션을 정리한 뒤 주문할 수 있습니다", undefined, "warning"); return; } store.track("begin_checkout", { items: rows.length, total, coupon: cp.code }); }}
-            className={cn("h-12 px-6 rounded-xl inline-flex items-center justify-center gap-1.5 font-bold transition-all duration-fast active:scale-[0.98]", canCheckout ? "bg-brand-black text-white" : "bg-neutral-border text-neutral-text2")}>주문하기<ArrowRight size={17} /></Link>
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.8rem] text-neutral-text2">
+              결제 예정 · {num(rows.reduce((n, r) => n + r.c.qty, 0))}개
+            </p>
+            <p className="tabular text-[1.15rem] font-black leading-tight">{krw(total)}</p>
+          </div>
+          <Link
+            href={canCheckout ? checkoutHref : "#"}
+            aria-disabled={!canCheckout}
+            onClick={(e) => {
+              if (!canCheckout) {
+                e.preventDefault();
+                toast("품절 옵션을 정리한 뒤 주문할 수 있습니다", undefined, "warning");
+                return;
+              }
+              store.track("begin_checkout", { items: rows.length, total, coupon: cp.code });
+            }}
+            className={cn(
+              "inline-flex h-12 items-center justify-center gap-1.5 rounded-xl px-6 font-bold transition-all duration-fast active:scale-[0.98]",
+              canCheckout ? "bg-brand-black text-white" : "bg-neutral-border text-neutral-text2",
+            )}
+          >
+            주문하기
+            <ArrowRight size={17} />
+          </Link>
         </div>
       </div>
     </div>
@@ -121,14 +319,29 @@ function WishQuick({ products, onPick }: { products: Product[]; onPick: (p: Prod
   const store = useApp();
   return (
     <div className="mt-6 rounded-cardlg border border-neutral-border bg-white p-4 md:p-5">
-      <div className="flex items-center justify-between gap-2 mb-3"><p className="font-bold flex items-center gap-2"><Heart size={16} />찜한 상품 담기</p><Link href="/wishlist" className="tap inline-flex items-center text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text">전체 보기</Link></div>
-      <ul className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <p className="flex items-center gap-2 font-bold">
+          <Heart size={16} />
+          찜한 상품 담기
+        </p>
+        <Link
+          href="/wishlist"
+          className="tap inline-flex items-center text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text"
+        >
+          전체 보기
+        </Link>
+      </div>
+      <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {products.map((p) => (
           <li key={p.id} className="min-w-0">
-            <Link href={`/products/${p.id}`} className="block hover:opacity-90 transition-opacity"><ProductImage colors={p.colors} label={p.name} ratio="aspect-[3/4]" className="rounded-xl" /></Link>
-            <p className="mt-2 text-[0.85rem] font-semibold leading-snug line-clamp-2 min-h-[2.5em]">{p.name}</p>
-            <p className="text-[0.85rem] font-bold tabular">{krw(effPrice(p, store))}</p>
-            <Button size="sm" variant="outline" full className="mt-2" onClick={() => onPick(p)}>옵션 선택 후 담기</Button>
+            <Link href={`/products/${p.id}`} className="block transition-opacity hover:opacity-90">
+              <ProductImage colors={p.colors} label={p.name} ratio="aspect-[3/4]" className="rounded-xl" />
+            </Link>
+            <p className="mt-2 line-clamp-2 min-h-[2.5em] text-[0.85rem] font-semibold leading-snug">{p.name}</p>
+            <p className="tabular text-[0.85rem] font-bold">{krw(effPrice(p, store))}</p>
+            <Button size="sm" variant="outline" full className="mt-2" onClick={() => onPick(p)}>
+              옵션 선택 후 담기
+            </Button>
           </li>
         ))}
       </ul>
@@ -140,7 +353,16 @@ export default function CartPage() {
   return (
     <Container className="py-6 md:py-10">
       <PageTitle title="장바구니" desc="수량과 쿠폰을 확인하고 주문서로 이동하세요." />
-      <Hydrated fallback={<div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-6"><SkeletonCard lines={5} /><SkeletonCard lines={4} /></div>}><CartContent /></Hydrated>
+      <Hydrated
+        fallback={
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <SkeletonCard lines={5} />
+            <SkeletonCard lines={4} />
+          </div>
+        }
+      >
+        <CartContent />
+      </Hydrated>
     </Container>
   );
 }

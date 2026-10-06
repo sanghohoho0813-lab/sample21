@@ -16,7 +16,21 @@ export default function ProductPage() {
   if (!product) {
     return (
       <Container className="py-16">
-        <EmptyState icon={<Search size={22} />} title="상품을 찾을 수 없습니다" desc={`'${id}' 상품이 없거나 판매가 종료되었습니다. 다른 상품을 둘러보세요.`} action={<div className="flex gap-2"><Button variant="brand" href="/ranking">랭킹 보기</Button><Button variant="outline" href="/shop">전체 상품</Button></div>} />
+        <EmptyState
+          icon={<Search size={22} />}
+          title="상품을 찾을 수 없습니다"
+          desc={`'${id}' 상품이 없거나 판매가 종료되었습니다. 다른 상품을 둘러보세요.`}
+          action={
+            <div className="flex gap-2">
+              <Button variant="brand" href="/ranking">
+                랭킹 보기
+              </Button>
+              <Button variant="outline" href="/shop">
+                전체 상품
+              </Button>
+            </div>
+          }
+        />
       </Container>
     );
   }

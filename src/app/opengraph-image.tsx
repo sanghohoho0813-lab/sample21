@@ -7,18 +7,29 @@ export const contentType = "image/png";
 
 export default function OpengraphImage() {
   return new ImageResponse(
-    (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 80, background: "linear-gradient(135deg, #111111 0%, #1b2440 100%)", color: "#ffffff" }}>
-        <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, color: "rgba(255,255,255,0.6)" }}>FASHION AX + PLATFORM</div>
-        <div style={{ display: "flex", alignItems: "baseline", fontSize: 168, fontWeight: 900, letterSpacing: -6 }}>
-          MORFIT<span style={{ color: "#315CF5" }}>.</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 30, color: "rgba(255,255,255,0.75)" }}>
-          <span>Multi-brand fashion · size-aware shopping</span>
-          <span>Demo</span>
-        </div>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: 80,
+        background: "linear-gradient(135deg, #111111 0%, #1b2440 100%)",
+        color: "#ffffff",
+      }}
+    >
+      <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, color: "rgba(255,255,255,0.6)" }}>
+        FASHION AX + PLATFORM
       </div>
-    ),
+      <div style={{ display: "flex", alignItems: "baseline", fontSize: 168, fontWeight: 900, letterSpacing: -6 }}>
+        MORFIT<span style={{ color: "#315CF5" }}>.</span>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 30, color: "rgba(255,255,255,0.75)" }}>
+        <span>Multi-brand fashion · size-aware shopping</span>
+        <span>Demo</span>
+      </div>
+    </div>,
     size,
   );
 }

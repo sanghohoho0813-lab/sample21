@@ -36,101 +36,324 @@ function OrderDetail({ id }: { id: string }) {
   const [err, setErr] = useState("");
   const seen = useRef<string | null>(null);
   const track = store.track;
-  useEffect(() => { if (order && seen.current !== order.id) { seen.current = order.id; track("view_order", { orderId: order.id, status: order.status }); } }, [order, track]);
+  useEffect(() => {
+    if (order && seen.current !== order.id) {
+      seen.current = order.id;
+      track("view_order", { orderId: order.id, status: order.status });
+    }
+  }, [order, track]);
 
   if (!order) {
-    return <EmptyState icon={<PackageSearch size={22} />} title="주문을 찾을 수 없습니다" desc={`주문번호 '${id}'가 내 주문 목록에 없습니다.`} action={<div className="flex gap-2"><Button variant="brand" href="/my/orders">주문내역으로</Button><Button variant="outline" href="/ranking">쇼핑 계속</Button></div>} />;
+    return (
+      <EmptyState
+        icon={<PackageSearch size={22} />}
+        title="주문을 찾을 수 없습니다"
+        desc={`주문번호 '${id}'가 내 주문 목록에 없습니다.`}
+        action={
+          <div className="flex gap-2">
+            <Button variant="brand" href="/my/orders">
+              주문내역으로
+            </Button>
+            <Button variant="outline" href="/ranking">
+              쇼핑 계속
+            </Button>
+          </div>
+        }
+      />
+    );
   }
   const canCancel = order.status === "pending" || order.status === "preparing";
   const canAfter = order.status === "delivered";
   const myReturns = store.returns.filter((r) => r.orderId === order.id);
-  const openPicker = (setter: (v: boolean) => void) => { setPickVid(order.items[0]?.variantId ?? ""); setReason("size-small"); setNote(""); setErr(""); setter(true); };
+  const openPicker = (setter: (v: boolean) => void) => {
+    setPickVid(order.items[0]?.variantId ?? "");
+    setReason("size-small");
+    setNote("");
+    setErr("");
+    setter(true);
+  };
 
-  const doCancel = () => { store.updateOrderStatus(order.id, "cancelled", DEMO_CUSTOMER_NAME); setCancelOpen(false); toast("주문이 취소되었습니다", undefined, "info"); };
+  const doCancel = () => {
+    store.updateOrderStatus(order.id, "cancelled", DEMO_CUSTOMER_NAME);
+    setCancelOpen(false);
+    toast("주문이 취소되었습니다", undefined, "info");
+  };
   const doReturn = () => {
-    if (!pickVid) { setErr("반품할 상품을 선택해주세요."); return; }
-    if ((reason === "other" || reason === "fit") && note.trim().length < 2) { setErr("사유를 조금 더 자세히 적어주세요."); return; }
+    if (!pickVid) {
+      setErr("반품할 상품을 선택해주세요.");
+      return;
+    }
+    if ((reason === "other" || reason === "fit") && note.trim().length < 2) {
+      setErr("사유를 조금 더 자세히 적어주세요.");
+      return;
+    }
     store.requestReturn(order.id, pickVid, reason, note.trim() || undefined);
     setReturnOpen(false);
     toast("반품 요청이 접수되었습니다", `사유: ${RETURN_REASON_LABEL[reason]} · 확인 후 회수 안내를 드려요`);
   };
   const doExchange = () => {
-    if (!pickVid) { setErr("교환할 상품을 선택해주세요."); return; }
+    if (!pickVid) {
+      setErr("교환할 상품을 선택해주세요.");
+      return;
+    }
     store.updateOrderStatus(order.id, "exchange-requested", DEMO_CUSTOMER_NAME);
     setExchangeOpen(false);
     toast("교환 요청이 접수되었습니다", "확인 후 교환 상품을 보내드려요");
   };
   const ItemPicker = () => (
     <div className="space-y-2" role="radiogroup" aria-label="상품 선택">
-      {order.items.map((it) => { const p = PRODUCT_BY_ID[it.productId]; const v = VARIANT_BY_ID[it.variantId]; const on = pickVid === it.variantId; return (
-        <label key={it.variantId} className={cn("flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition-colors", on ? "border-brand-black bg-brand-ivory" : "border-neutral-border hover:bg-brand-ivory")}>
-          <input type="radio" name="item" value={it.variantId} checked={on} onChange={() => setPickVid(it.variantId)} className="h-5 w-5 accent-[#111111]" />
-          <span className="min-w-0 flex-1"><span className="block font-semibold text-[0.92rem] leading-snug">{p?.name}</span><span className="block text-[0.8rem] text-neutral-text2">{v ? `${v.color} · ${v.size}` : ""} · {it.qty}개</span></span>
-        </label>
-      ); })}
+      {order.items.map((it) => {
+        const p = PRODUCT_BY_ID[it.productId];
+        const v = VARIANT_BY_ID[it.variantId];
+        const on = pickVid === it.variantId;
+        return (
+          <label
+            key={it.variantId}
+            className={cn(
+              "flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors",
+              on ? "border-brand-black bg-brand-ivory" : "border-neutral-border hover:bg-brand-ivory",
+            )}
+          >
+            <input
+              type="radio"
+              name="item"
+              value={it.variantId}
+              checked={on}
+              onChange={() => setPickVid(it.variantId)}
+              className="h-5 w-5 accent-[#111111]"
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[0.92rem] font-semibold leading-snug">{p?.name}</span>
+              <span className="block text-[0.8rem] text-neutral-text2">
+                {v ? `${v.color} · ${v.size}` : ""} · {it.qty}개
+              </span>
+            </span>
+          </label>
+        );
+      })}
     </div>
   );
 
   return (
-    <div className="max-w-[880px] mx-auto space-y-5">
-      <div className="flex items-start gap-2"><Link href="/my/orders" className="hidden lg:inline-flex h-10 w-10 -ml-2 items-center justify-center rounded-full hover:bg-brand-ivory" aria-label="주문내역으로"><ChevronLeft size={22} /></Link><div className="min-w-0 flex-1"><p className="text-[0.85rem] text-neutral-text2 tabular">{fmtDate(order.createdAt, "datetime")} 주문</p><h1 className="mt-0.5 text-[1.3rem] md:text-[1.6rem] font-bold tracking-tight leading-tight tabular whitespace-nowrap">{order.id}</h1></div><span className="mt-1 shrink-0"><OrderStatusBadge status={order.status} size="md" /></span></div>
+    <div className="mx-auto max-w-[880px] space-y-5">
+      <div className="flex items-start gap-2">
+        <Link
+          href="/my/orders"
+          className="-ml-2 hidden h-10 w-10 items-center justify-center rounded-full hover:bg-brand-ivory lg:inline-flex"
+          aria-label="주문내역으로"
+        >
+          <ChevronLeft size={22} />
+        </Link>
+        <div className="min-w-0 flex-1">
+          <p className="tabular text-[0.85rem] text-neutral-text2">{fmtDate(order.createdAt, "datetime")} 주문</p>
+          <h1 className="tabular mt-0.5 whitespace-nowrap text-[1.3rem] font-bold leading-tight tracking-tight md:text-[1.6rem]">
+            {order.id}
+          </h1>
+        </div>
+        <span className="mt-1 shrink-0">
+          <OrderStatusBadge status={order.status} size="md" />
+        </span>
+      </div>
 
-      <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-5 items-start">
-        <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 min-w-0">
-          <p className="font-bold mb-4">배송 진행 상태</p>
+      <div className="grid items-start gap-5 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <section className="min-w-0 rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
+          <p className="mb-4 font-bold">배송 진행 상태</p>
           <OrderTimeline order={order} tour="c-order-status" />
-          <p className="mt-4 text-[0.85rem] text-neutral-text2 leading-relaxed">상태가 바뀌면 이 화면과 알림으로 바로 알려드려요.</p>
-          <LoopHint href="/ax/orders" className="mt-1">상태는 AX 주문·배송 화면에서 운영직원이 바꿉니다</LoopHint>
+          <p className="mt-4 text-[0.85rem] leading-relaxed text-neutral-text2">
+            상태가 바뀌면 이 화면과 알림으로 바로 알려드려요.
+          </p>
+          <LoopHint href="/ax/orders" className="mt-1">
+            상태는 AX 주문·배송 화면에서 운영직원이 바꿉니다
+          </LoopHint>
         </section>
 
-        <div className="space-y-5 min-w-0">
+        <div className="min-w-0 space-y-5">
           <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
-            <p className="font-bold mb-3">주문 상품 {order.items.length}종</p>
-            <ul className="divide-y divide-neutral-border">{order.items.map((it) => <li key={it.variantId} className="py-3 first:pt-0 last:pb-0"><OrderItemRow item={it} /></li>)}</ul>
-            {myReturns.length > 0 && <div className="mt-4 rounded-xl bg-brand-ivory px-4 py-3 text-[0.85rem]"><p className="font-bold">반품 요청 {myReturns.length}건</p>{myReturns.map((r) => <p key={r.id} className="text-neutral-text2">{PRODUCT_BY_ID[r.productId]?.name} · {RETURN_REASON_LABEL[r.reason]}{r.note ? ` · ${r.note}` : ""} · {fmtDate(r.createdAt)}</p>)}</div>}
+            <p className="mb-3 font-bold">주문 상품 {order.items.length}종</p>
+            <ul className="divide-y divide-neutral-border">
+              {order.items.map((it) => (
+                <li key={it.variantId} className="py-3 first:pt-0 last:pb-0">
+                  <OrderItemRow item={it} />
+                </li>
+              ))}
+            </ul>
+            {myReturns.length > 0 && (
+              <div className="mt-4 rounded-xl bg-brand-ivory px-4 py-3 text-[0.85rem]">
+                <p className="font-bold">반품 요청 {myReturns.length}건</p>
+                {myReturns.map((r) => (
+                  <p key={r.id} className="text-neutral-text2">
+                    {PRODUCT_BY_ID[r.productId]?.name} · {RETURN_REASON_LABEL[r.reason]}
+                    {r.note ? ` · ${r.note}` : ""} · {fmtDate(r.createdAt)}
+                  </p>
+                ))}
+              </div>
+            )}
           </section>
-          <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 space-y-3 text-[0.92rem]">
+          <section className="space-y-3 rounded-cardlg border border-neutral-border bg-white p-5 text-[0.92rem] md:p-6">
             <OrderInfoRows order={order} />
-            <dl className="pt-3 border-t border-neutral-border space-y-1.5">
-              <div className="flex justify-between"><dt className="text-neutral-text2">상품금액</dt><dd className="tabular">{krw(order.subtotal + order.items.reduce((s, i) => s + i.discount * i.qty, 0))}</dd></div>
-              <div className="flex justify-between"><dt className="text-neutral-text2">할인 합계</dt><dd className="tabular">{order.discount > 0 ? `−${krw(order.discount)}` : "0원"}</dd></div>
-              <div className="flex justify-between"><dt className="text-neutral-text2">배송비</dt><dd className="tabular">{order.shippingFee === 0 ? "무료" : krw(order.shippingFee)}</dd></div>
-              <div className="flex justify-between pt-2 border-t border-neutral-border"><dt className="font-bold">결제금액</dt><dd className="font-black text-[1.2rem] tabular">{krw(order.total)}</dd></div>
+            <dl className="space-y-1.5 border-t border-neutral-border pt-3">
+              <div className="flex justify-between">
+                <dt className="text-neutral-text2">상품금액</dt>
+                <dd className="tabular">
+                  {krw(order.subtotal + order.items.reduce((s, i) => s + i.discount * i.qty, 0))}
+                </dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-neutral-text2">할인 합계</dt>
+                <dd className="tabular">{order.discount > 0 ? `−${krw(order.discount)}` : "0원"}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-neutral-text2">배송비</dt>
+                <dd className="tabular">{order.shippingFee === 0 ? "무료" : krw(order.shippingFee)}</dd>
+              </div>
+              <div className="flex justify-between border-t border-neutral-border pt-2">
+                <dt className="font-bold">결제금액</dt>
+                <dd className="tabular text-[1.2rem] font-black">{krw(order.total)}</dd>
+              </div>
             </dl>
           </section>
           <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
-            <p className="font-bold mb-3">주문 관리</p>
+            <p className="mb-3 font-bold">주문 관리</p>
             <div className="flex flex-wrap gap-2">
-              {canCancel && <Button variant="outline" onClick={() => setCancelOpen(true)} icon={<XCircle size={16} />}>취소 요청</Button>}
-              {canAfter && <Button variant="outline" onClick={() => openPicker(setReturnOpen)} icon={<RotateCcw size={16} />}>반품 요청</Button>}
-              {canAfter && <Button variant="outline" onClick={() => openPicker(setExchangeOpen)} icon={<Repeat size={16} />}>교환 요청</Button>}
-              {!canCancel && !canAfter && <p className="text-[0.88rem] text-neutral-text2">{order.status === "cancelled" ? "취소된 주문입니다." : order.status === "return-requested" ? "반품 요청이 접수되어 운영팀이 확인 중입니다." : order.status === "exchange-requested" ? "교환 요청이 접수되어 운영팀이 확인 중입니다." : "출고 이후에는 취소할 수 없습니다. 배송 완료 후 반품·교환을 요청하세요."}</p>}
+              {canCancel && (
+                <Button variant="outline" onClick={() => setCancelOpen(true)} icon={<XCircle size={16} />}>
+                  취소 요청
+                </Button>
+              )}
+              {canAfter && (
+                <Button variant="outline" onClick={() => openPicker(setReturnOpen)} icon={<RotateCcw size={16} />}>
+                  반품 요청
+                </Button>
+              )}
+              {canAfter && (
+                <Button variant="outline" onClick={() => openPicker(setExchangeOpen)} icon={<Repeat size={16} />}>
+                  교환 요청
+                </Button>
+              )}
+              {!canCancel && !canAfter && (
+                <p className="text-[0.88rem] text-neutral-text2">
+                  {order.status === "cancelled"
+                    ? "취소된 주문입니다."
+                    : order.status === "return-requested"
+                      ? "반품 요청이 접수되어 운영팀이 확인 중입니다."
+                      : order.status === "exchange-requested"
+                        ? "교환 요청이 접수되어 운영팀이 확인 중입니다."
+                        : "출고 이후에는 취소할 수 없습니다. 배송 완료 후 반품·교환을 요청하세요."}
+                </p>
+              )}
             </div>
-            <LoopHint href="/ax/fit-returns" className="mt-3">반품 사유는 AX 핏·반품 분석에 바로 반영됩니다</LoopHint>
+            <LoopHint href="/ax/fit-returns" className="mt-3">
+              반품 사유는 AX 핏·반품 분석에 바로 반영됩니다
+            </LoopHint>
           </section>
         </div>
       </div>
 
-      <Modal open={cancelOpen} onClose={() => setCancelOpen(false)} title="주문을 취소할까요?" size="sm" footer={<div className="flex gap-2 justify-end"><Button variant="outline" onClick={() => setCancelOpen(false)}>돌아가기</Button><Button variant="danger" onClick={doCancel}>취소 요청</Button></div>}>
-        <p className="text-[0.95rem] leading-relaxed">주문번호 <span className="font-bold tabular">{order.id}</span>의 상품 {order.items.length}종을 취소합니다. 데모 주문이므로 환불 절차는 없으며, 취소 상태가 AX 운영화면에 바로 반영됩니다.</p>
+      <Modal
+        open={cancelOpen}
+        onClose={() => setCancelOpen(false)}
+        title="주문을 취소할까요?"
+        size="sm"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setCancelOpen(false)}>
+              돌아가기
+            </Button>
+            <Button variant="danger" onClick={doCancel}>
+              취소 요청
+            </Button>
+          </div>
+        }
+      >
+        <p className="text-[0.95rem] leading-relaxed">
+          주문번호 <span className="tabular font-bold">{order.id}</span>의 상품 {order.items.length}종을 취소합니다.
+          데모 주문이므로 환불 절차는 없으며, 취소 상태가 AX 운영화면에 바로 반영됩니다.
+        </p>
       </Modal>
 
-      <Responsive open={returnOpen} onClose={() => setReturnOpen(false)} title="반품 요청" footer={<div className="flex gap-2 justify-end"><Button variant="outline" onClick={() => setReturnOpen(false)}>닫기</Button><Button variant="brand" onClick={doReturn}>반품 요청 보내기</Button></div>}>
+      <Responsive
+        open={returnOpen}
+        onClose={() => setReturnOpen(false)}
+        title="반품 요청"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setReturnOpen(false)}>
+              닫기
+            </Button>
+            <Button variant="brand" onClick={doReturn}>
+              반품 요청 보내기
+            </Button>
+          </div>
+        }
+      >
         <div className="space-y-4">
-          <div><p className="font-semibold text-[0.9rem] mb-2">반품할 상품</p><ItemPicker /></div>
-          <Select label="반품 사유" name="reason" value={reason} onChange={(e) => setReason(e.target.value as ReturnReason)}>{REASONS.map((r) => <option key={r} value={r}>{RETURN_REASON_LABEL[r]}</option>)}</Select>
-          <Textarea label="상세 내용 (선택)" name="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="예: 허리가 타이트해서 한 치수 크게 입어야 할 것 같아요" maxLength={200} />
+          <div>
+            <p className="mb-2 text-[0.9rem] font-semibold">반품할 상품</p>
+            <ItemPicker />
+          </div>
+          <Select
+            label="반품 사유"
+            name="reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value as ReturnReason)}
+          >
+            {REASONS.map((r) => (
+              <option key={r} value={r}>
+                {RETURN_REASON_LABEL[r]}
+              </option>
+            ))}
+          </Select>
+          <Textarea
+            label="상세 내용 (선택)"
+            name="note"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="예: 허리가 타이트해서 한 치수 크게 입어야 할 것 같아요"
+            maxLength={200}
+          />
           {err && <p className="text-[0.85rem] text-semantic-error">{err}</p>}
-          <p className="text-[0.8rem] text-neutral-text2 leading-relaxed">사이즈 관련 사유는 해당 상품의 핏 안내 개선 과제(핏 엔진)의 근거가 됩니다.</p>
+          <p className="text-[0.8rem] leading-relaxed text-neutral-text2">
+            사이즈 관련 사유는 해당 상품의 핏 안내 개선 과제(핏 엔진)의 근거가 됩니다.
+          </p>
         </div>
       </Responsive>
 
-      <Responsive open={exchangeOpen} onClose={() => setExchangeOpen(false)} title="교환 요청" footer={<div className="flex gap-2 justify-end"><Button variant="outline" onClick={() => setExchangeOpen(false)}>닫기</Button><Button variant="brand" onClick={doExchange}>교환 요청 보내기</Button></div>}>
+      <Responsive
+        open={exchangeOpen}
+        onClose={() => setExchangeOpen(false)}
+        title="교환 요청"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setExchangeOpen(false)}>
+              닫기
+            </Button>
+            <Button variant="brand" onClick={doExchange}>
+              교환 요청 보내기
+            </Button>
+          </div>
+        }
+      >
         <div className="space-y-4">
-          <div><p className="font-semibold text-[0.9rem] mb-2">교환할 상품</p><ItemPicker /></div>
-          <Select label="교환 사유" name="exchangeReason" value={reason} onChange={(e) => setReason(e.target.value as ReturnReason)}>{REASONS.filter((r) => r !== "change-of-mind" && r !== "delivery").map((r) => <option key={r} value={r}>{RETURN_REASON_LABEL[r]}</option>)}</Select>
+          <div>
+            <p className="mb-2 text-[0.9rem] font-semibold">교환할 상품</p>
+            <ItemPicker />
+          </div>
+          <Select
+            label="교환 사유"
+            name="exchangeReason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value as ReturnReason)}
+          >
+            {REASONS.filter((r) => r !== "change-of-mind" && r !== "delivery").map((r) => (
+              <option key={r} value={r}>
+                {RETURN_REASON_LABEL[r]}
+              </option>
+            ))}
+          </Select>
           {err && <p className="text-[0.85rem] text-semantic-error">{err}</p>}
-          <p className="text-[0.8rem] text-neutral-text2 leading-relaxed">운영팀이 재고를 확인한 뒤 교환 상품을 발송합니다. 데모에서는 주문 상태만 ‘교환요청’으로 바뀝니다.</p>
+          <p className="text-[0.8rem] leading-relaxed text-neutral-text2">
+            운영팀이 재고를 확인한 뒤 교환 상품을 발송합니다. 데모에서는 주문 상태만 ‘교환요청’으로 바뀝니다.
+          </p>
         </div>
       </Responsive>
     </div>
@@ -142,7 +365,16 @@ export default function OrderDetailPage() {
   const id = decodeURIComponent(String(params?.id ?? ""));
   return (
     <Container className="py-6 md:py-10">
-      <Hydrated fallback={<div className="max-w-[880px] mx-auto grid md:grid-cols-2 gap-5"><SkeletonCard lines={6} /><SkeletonCard lines={6} /></div>}><OrderDetail id={id} /></Hydrated>
+      <Hydrated
+        fallback={
+          <div className="mx-auto grid max-w-[880px] gap-5 md:grid-cols-2">
+            <SkeletonCard lines={6} />
+            <SkeletonCard lines={6} />
+          </div>
+        }
+      >
+        <OrderDetail id={id} />
+      </Hydrated>
     </Container>
   );
 }

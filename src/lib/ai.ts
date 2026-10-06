@@ -22,7 +22,12 @@ export interface AIExplainResponse {
 /** 빌드 시점 기본값. 실제 연결 여부는 aiStatus()(서버 Route GET)로 확인한다. */
 export const AI_STATUS: AIStatus = "AI_READY";
 
-const RULE_RESPONSE = (fallback: string, note?: string): AIExplainResponse => ({ status: "AI_READY", text: fallback, model: "rule-based (LLM 연결 예정)", note });
+const RULE_RESPONSE = (fallback: string, note?: string): AIExplainResponse => ({
+  status: "AI_READY",
+  text: fallback,
+  model: "rule-based (LLM 연결 예정)",
+  note,
+});
 
 /** 서버 Route에 연결 상태를 묻는다. 실패하면 AI_READY. */
 export async function aiStatus(): Promise<{ status: AIStatus; model: string; configured: boolean }> {
@@ -39,10 +44,20 @@ export async function aiStatus(): Promise<{ status: AIStatus; model: string; con
 export async function explain(req: AIExplainRequest, fallback: string): Promise<AIExplainResponse> {
   if (typeof window === "undefined") return RULE_RESPONSE(fallback);
   try {
-    const r = await fetch("/api/ai/explain", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...req, fallback }) });
+    const r = await fetch("/api/ai/explain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...req, fallback }),
+    });
     if (!r.ok) return RULE_RESPONSE(fallback, `서버 응답 ${r.status} — 규칙 기반 텍스트를 표시합니다.`);
     const data = (await r.json()) as Partial<AIExplainResponse>;
-    return { status: data.status === "LIVE" ? "LIVE" : "AI_READY", text: data.text || fallback, model: data.model ?? "rule-based", note: data.note, usage: data.usage };
+    return {
+      status: data.status === "LIVE" ? "LIVE" : "AI_READY",
+      text: data.text || fallback,
+      model: data.model ?? "rule-based",
+      note: data.note,
+      usage: data.usage,
+    };
   } catch {
     return RULE_RESPONSE(fallback, "네트워크 오류 — 규칙 기반 텍스트를 표시합니다.");
   }

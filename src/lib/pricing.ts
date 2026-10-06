@@ -9,7 +9,8 @@ export const SHIP_FEE = 3_000;
 export const shippingFeeFor = (subtotal: number) => (subtotal >= FREE_SHIP_MIN ? 0 : SHIP_FEE);
 
 /** 정률 쿠폰 할인액 — ratePercent는 % 단위(5 = 5%), 결과는 100원 단위 반올림 */
-export const couponDiscount = (subtotal: number, ratePercent: number) => Math.round((subtotal * ratePercent) / 100 / 100) * 100;
+export const couponDiscount = (subtotal: number, ratePercent: number) =>
+  Math.round((subtotal * ratePercent) / 100 / 100) * 100;
 
 export interface PricedLine {
   /** 실제 판매가(할인 반영) */

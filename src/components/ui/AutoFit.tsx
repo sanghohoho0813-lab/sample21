@@ -5,7 +5,15 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-export function AutoFit({ children, className, min = 0.62 }: { children: ReactNode; className?: string; min?: number }) {
+export function AutoFit({
+  children,
+  className,
+  min = 0.62,
+}: {
+  children: ReactNode;
+  className?: string;
+  min?: number;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
     const el = ref.current;
@@ -15,16 +23,30 @@ export function AutoFit({ children, className, min = 0.62 }: { children: ReactNo
     const fit = () => {
       el.style.fontSize = "";
       const base = parseFloat(getComputedStyle(el).fontSize);
-      const need = el.scrollWidth, have = el.clientWidth;
+      const need = el.scrollWidth,
+        have = el.clientWidth;
       if (have > 0 && need > have + 1) {
         const next = Math.max(base * min, base * (have / need) - 0.3);
         el.style.fontSize = `${next.toFixed(2)}px`;
       }
     };
     fit();
-    const ro = new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); });
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(fit);
+    });
     ro.observe(parent);
-    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
   });
-  return <span ref={ref} className={cn("inline-block max-w-full whitespace-nowrap overflow-hidden text-ellipsis align-bottom", className)}>{children}</span>;
+  return (
+    <span
+      ref={ref}
+      className={cn("inline-block max-w-full overflow-hidden text-ellipsis whitespace-nowrap align-bottom", className)}
+    >
+      {children}
+    </span>
+  );
 }

@@ -24,7 +24,13 @@ function priceNote(p: Product, current: number, overridden: boolean) {
   return overridden && current < p.price ? "찜한 뒤 가격 인하" : null;
 }
 
-function WishRow({ item, onPick }: { item: WishItem; onPick: (p: Product, colorIdx: number, size: string | null) => void }) {
+function WishRow({
+  item,
+  onPick,
+}: {
+  item: WishItem;
+  onPick: (p: Product, colorIdx: number, size: string | null) => void;
+}) {
   const store = useApp();
   const p = PRODUCT_BY_ID[item.productId];
   if (!p) return null;
@@ -36,45 +42,104 @@ function WishRow({ item, onPick }: { item: WishItem; onPick: (p: Product, colorI
   const vState = variant ? stockState(variant, store) : null;
   const stock = vState ?? pState;
   const quiet = stock.key === "normal" || stock.key === "rising"; // 평소 상태는 배지 없이
-  const subscribed = variant ? store.restockSubs.some((s) => s.variantId === variant.id && s.status === "waiting") : false;
-  const remove = () => { store.removeWishlist(p.id); toast("찜 목록에서 삭제했습니다", undefined, "info"); };
+  const subscribed = variant
+    ? store.restockSubs.some((s) => s.variantId === variant.id && s.status === "waiting")
+    : false;
+  const remove = () => {
+    store.removeWishlist(p.id);
+    toast("찜 목록에서 삭제했습니다", undefined, "info");
+  };
   const toCart = () => {
-    if (variant && vState?.purchasable) { store.addToCart(variant.id); toast("장바구니에 담았습니다", `${p.name} · ${variant.color} · ${variant.size}`); return; }
+    if (variant && vState?.purchasable) {
+      store.addToCart(variant.id);
+      toast("장바구니에 담았습니다", `${p.name} · ${variant.color} · ${variant.size}`);
+      return;
+    }
     onPick(p, parsed?.colorIdx ?? 0, variant?.size ?? null);
   };
-  const restock = () => { if (!variant) return; store.subscribeRestock(variant.id); toast("재입고 알림을 신청했습니다", "입고되면 알림으로 알려드려요"); };
+  const restock = () => {
+    if (!variant) return;
+    store.subscribeRestock(variant.id);
+    toast("재입고 알림을 신청했습니다", "입고되면 알림으로 알려드려요");
+  };
   return (
-    <li className="rounded-cardlg border border-neutral-border bg-white p-4 md:p-5 transition-shadow hover:shadow-raised">
+    <li className="rounded-cardlg border border-neutral-border bg-white p-4 transition-shadow hover:shadow-raised md:p-5">
       <div className="flex gap-4">
-        <Link href={`/products/${p.id}`} className="shrink-0 w-24 md:w-28 hover:opacity-90 transition-opacity"><ProductImage colors={p.colors} variant={parsed?.colorIdx ?? 0} label={p.name} ratio="aspect-[3/4]" /></Link>
+        <Link href={`/products/${p.id}`} className="w-24 shrink-0 transition-opacity hover:opacity-90 md:w-28">
+          <ProductImage colors={p.colors} variant={parsed?.colorIdx ?? 0} label={p.name} ratio="aspect-[3/4]" />
+        </Link>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0"><p className="text-[0.78rem] font-bold text-neutral-text2">{BRAND_BY_ID[p.brandId].name}</p><Link href={`/products/${p.id}`} className="font-semibold leading-snug hover:underline underline-offset-2">{p.name}</Link></div>
-            <button type="button" onClick={remove} aria-label="찜 삭제" className="h-10 w-10 -mr-2 -mt-1 shrink-0 inline-flex items-center justify-center rounded-full text-neutral-text2 hover:bg-brand-ivory hover:text-neutral-text"><Trash2 size={18} /></button>
+            <div className="min-w-0">
+              <p className="text-[0.78rem] font-bold text-neutral-text2">{BRAND_BY_ID[p.brandId].name}</p>
+              <Link
+                href={`/products/${p.id}`}
+                className="font-semibold leading-snug underline-offset-2 hover:underline"
+              >
+                {p.name}
+              </Link>
+            </div>
+            <button
+              type="button"
+              onClick={remove}
+              aria-label="찜 삭제"
+              className="-mr-2 -mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-neutral-text2 hover:bg-brand-ivory hover:text-neutral-text"
+            >
+              <Trash2 size={18} />
+            </button>
           </div>
-          <p className="text-[0.82rem] text-neutral-text2 mt-0.5">{variant ? `선택 옵션 · ${variant.color} · ${variant.size}` : "옵션 미선택"} · {relTime(item.addedAt)} 찜</p>
+          <p className="mt-0.5 text-[0.82rem] text-neutral-text2">
+            {variant ? `선택 옵션 · ${variant.color} · ${variant.size}` : "옵션 미선택"} · {relTime(item.addedAt)} 찜
+          </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <Price price={price} original={p.price} size="sm" />
-            {note && <Badge tone="error" size="sm">{note}</Badge>}
-            {!quiet && <Badge tone={stock.tone} size="sm">{stock.label}</Badge>}
-          </div>
-          <div className="mt-3 hidden sm:flex gap-2">
-            {variant && vState && !vState.purchasable ? (
-              <Button size="sm" variant="brand" onClick={restock} disabled={subscribed} icon={<Bell size={14} />}>{subscribed ? "재입고 알림 신청 완료" : "재입고 알림"}</Button>
-            ) : (
-              <Button size="sm" variant="brand" onClick={toCart} icon={<ShoppingBag size={14} />}>{variant ? "장바구니 담기" : "옵션 선택 후 담기"}</Button>
+            {note && (
+              <Badge tone="error" size="sm">
+                {note}
+              </Badge>
             )}
-            <Button size="sm" variant="outline" href={`/products/${p.id}`}>상세 보기</Button>
+            {!quiet && (
+              <Badge tone={stock.tone} size="sm">
+                {stock.label}
+              </Badge>
+            )}
+          </div>
+          <div className="mt-3 hidden gap-2 sm:flex">
+            {variant && vState && !vState.purchasable ? (
+              <Button size="sm" variant="brand" onClick={restock} disabled={subscribed} icon={<Bell size={14} />}>
+                {subscribed ? "재입고 알림 신청 완료" : "재입고 알림"}
+              </Button>
+            ) : (
+              <Button size="sm" variant="brand" onClick={toCart} icon={<ShoppingBag size={14} />}>
+                {variant ? "장바구니 담기" : "옵션 선택 후 담기"}
+              </Button>
+            )}
+            <Button size="sm" variant="outline" href={`/products/${p.id}`}>
+              상세 보기
+            </Button>
           </div>
         </div>
       </div>
-      <div className="mt-3 flex sm:hidden gap-2">
+      <div className="mt-3 flex gap-2 sm:hidden">
         {variant && vState && !vState.purchasable ? (
-          <Button size="md" variant="brand" className="flex-1" onClick={restock} disabled={subscribed} icon={<Bell size={14} />}>{subscribed ? "재입고 알림 신청 완료" : "재입고 알림"}</Button>
+          <Button
+            size="md"
+            variant="brand"
+            className="flex-1"
+            onClick={restock}
+            disabled={subscribed}
+            icon={<Bell size={14} />}
+          >
+            {subscribed ? "재입고 알림 신청 완료" : "재입고 알림"}
+          </Button>
         ) : (
-          <Button size="md" variant="brand" className="flex-1" onClick={toCart} icon={<ShoppingBag size={14} />}>{variant ? "장바구니 담기" : "옵션 선택 후 담기"}</Button>
+          <Button size="md" variant="brand" className="flex-1" onClick={toCart} icon={<ShoppingBag size={14} />}>
+            {variant ? "장바구니 담기" : "옵션 선택 후 담기"}
+          </Button>
         )}
-        <Button size="md" variant="outline" href={`/products/${p.id}`}>상세</Button>
+        <Button size="md" variant="outline" href={`/products/${p.id}`}>
+          상세
+        </Button>
       </div>
     </li>
   );
@@ -88,27 +153,86 @@ function WishlistContent() {
     const cats = new Set(items.map((w) => PRODUCT_BY_ID[w.productId]?.categoryId));
     const brands = new Set(items.map((w) => PRODUCT_BY_ID[w.productId]?.brandId));
     const wished = new Set(items.map((w) => w.productId));
-    return PRODUCTS.filter((p) => !wished.has(p.id)).map((p) => ({ p, s: (cats.has(p.categoryId) ? 2 : 0) + (brands.has(p.brandId) ? 1.5 : 0) + (p.tags.includes("베스트") ? 1 : 0) + (p.salePrice ? 0.5 : 0) })).sort((a, b) => b.s - a.s).slice(0, 4).map((x) => x.p);
+    return PRODUCTS.filter((p) => !wished.has(p.id))
+      .map((p) => ({
+        p,
+        s:
+          (cats.has(p.categoryId) ? 2 : 0) +
+          (brands.has(p.brandId) ? 1.5 : 0) +
+          (p.tags.includes("베스트") ? 1 : 0) +
+          (p.salePrice ? 0.5 : 0),
+      }))
+      .sort((a, b) => b.s - a.s)
+      .slice(0, 4)
+      .map((x) => x.p);
   }, [items]);
   return (
     <>
       {items.length === 0 ? (
-        <EmptyState icon={<Heart size={22} />} title="아직 찜한 상품이 없습니다" desc="마음에 드는 상품의 하트를 누르면 재고와 가격 변화를 알려드립니다." action={<div className="flex gap-2"><Button variant="brand" href="/ranking">상품 둘러보기</Button><Button variant="outline" href="/new">신상품</Button></div>} />
+        <EmptyState
+          icon={<Heart size={22} />}
+          title="아직 찜한 상품이 없습니다"
+          desc="마음에 드는 상품의 하트를 누르면 재고와 가격 변화를 알려드립니다."
+          action={
+            <div className="flex gap-2">
+              <Button variant="brand" href="/ranking">
+                상품 둘러보기
+              </Button>
+              <Button variant="outline" href="/new">
+                신상품
+              </Button>
+            </div>
+          }
+        />
       ) : (
-        <ul className="space-y-3">{items.map((w) => <WishRow key={w.productId} item={w} onPick={(product, colorIdx, size) => setSheet({ product, colorIdx, size })} />)}</ul>
+        <ul className="space-y-3">
+          {items.map((w) => (
+            <WishRow
+              key={w.productId}
+              item={w}
+              onPick={(product, colorIdx, size) => setSheet({ product, colorIdx, size })}
+            />
+          ))}
+        </ul>
       )}
-      <LoopHint href="/ax/inventory" className="mt-6">찜은 AX 수요 레이더의 관심 신호로 집계됩니다</LoopHint>
-      {similar.length > 0 && <section className="mt-12"><SectionHead title="비슷한 상품 추천" desc={items.length ? "찜한 상품의 카테고리·브랜드를 기준으로 골랐습니다." : "지금 반응이 좋은 상품"} more="/ranking" /><ProductGrid products={similar} /></section>}
-      <OptionSheet product={sheet?.product ?? null} open={!!sheet} onClose={() => setSheet(null)} initialColorIdx={sheet?.colorIdx ?? 0} initialSize={sheet?.size ?? null} />
+      <LoopHint href="/ax/inventory" className="mt-6">
+        찜은 AX 수요 레이더의 관심 신호로 집계됩니다
+      </LoopHint>
+      {similar.length > 0 && (
+        <section className="mt-12">
+          <SectionHead
+            title="비슷한 상품 추천"
+            desc={items.length ? "찜한 상품의 카테고리·브랜드를 기준으로 골랐습니다." : "지금 반응이 좋은 상품"}
+            more="/ranking"
+          />
+          <ProductGrid products={similar} />
+        </section>
+      )}
+      <OptionSheet
+        product={sheet?.product ?? null}
+        open={!!sheet}
+        onClose={() => setSheet(null)}
+        initialColorIdx={sheet?.colorIdx ?? 0}
+        initialSize={sheet?.size ?? null}
+      />
     </>
   );
 }
 
 export default function WishlistPage() {
   return (
-    <Container className="py-6 md:py-10 max-w-[960px]">
+    <Container className="max-w-[960px] py-6 md:py-10">
       <PageTitle title="찜한 상품" desc="선택한 옵션의 재고·가격 변화를 함께 보여드립니다." />
-      <Hydrated fallback={<div className="space-y-3"><SkeletonCard lines={3} /><SkeletonCard lines={3} /></div>}><WishlistContent /></Hydrated>
+      <Hydrated
+        fallback={
+          <div className="space-y-3">
+            <SkeletonCard lines={3} />
+            <SkeletonCard lines={3} />
+          </div>
+        }
+      >
+        <WishlistContent />
+      </Hydrated>
     </Container>
   );
 }

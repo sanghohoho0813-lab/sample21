@@ -5,5 +5,9 @@ import { CustomersPage } from "@/components/ax/ops/CustomersPage";
 export const metadata = axMeta("customers");
 
 export default function Page() {
-  return <Suspense fallback={null}><CustomersPage /></Suspense>;
+  return (
+    <Suspense fallback={null}>
+      <CustomersPage />
+    </Suspense>
+  );
 }

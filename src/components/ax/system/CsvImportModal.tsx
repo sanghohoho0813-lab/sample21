@@ -12,10 +12,16 @@ import { cn } from "@/lib/cn";
 type Tab = "sample" | "fields" | "upload";
 type FileKey = "products" | "variants" | "orders";
 
-interface FieldDef { name: string; required: boolean; desc: string; example: string }
+interface FieldDef {
+  name: string;
+  required: boolean;
+  desc: string;
+  example: string;
+}
 const FILES: Record<FileKey, { file: string; title: string; fields: FieldDef[]; rows: string[][] }> = {
   products: {
-    file: "products.csv", title: "상품",
+    file: "products.csv",
+    title: "상품",
     fields: [
       { name: "product_id", required: true, desc: "상품 고유 ID (브랜드 내 중복 불가)", example: "p-nove-oxford" },
       { name: "brand_id", required: true, desc: "브랜드 ID", example: "b-nove" },
@@ -34,7 +40,8 @@ const FILES: Record<FileKey, { file: string; title: string; fields: FieldDef[]; 
     ],
   },
   variants: {
-    file: "variants.csv", title: "옵션(색상×사이즈)",
+    file: "variants.csv",
+    title: "옵션(색상×사이즈)",
     fields: [
       { name: "variant_id", required: true, desc: "옵션 고유 ID (SKU)", example: "p-nove-oxford-c0-M" },
       { name: "product_id", required: true, desc: "상품 ID (products.csv 참조)", example: "p-nove-oxford" },
@@ -50,7 +57,8 @@ const FILES: Record<FileKey, { file: string; title: string; fields: FieldDef[]; 
     ],
   },
   orders: {
-    file: "orders.csv", title: "주문 (행 = 주문 항목)",
+    file: "orders.csv",
+    title: "주문 (행 = 주문 항목)",
     fields: [
       { name: "order_id", required: true, desc: "주문번호 — 같은 주문의 항목은 같은 번호", example: "MF0908-0121" },
       { name: "customer_id", required: true, desc: "고객 ID (개인정보 아님, 익명 키)", example: "c-0042" },
@@ -58,12 +66,31 @@ const FILES: Record<FileKey, { file: string; title: string; fields: FieldDef[]; 
       { name: "variant_id", required: true, desc: "옵션 ID (variants.csv 참조)", example: "p-nove-oxford-c0-M" },
       { name: "qty", required: true, desc: "수량", example: "1" },
       { name: "unit_price", required: true, desc: "실제 판매 단가 (원)", example: "79000" },
-      { name: "status", required: true, desc: "pending/preparing/shipped/in-transit/delivered/cancelled/return-requested", example: "delivered" },
-      { name: "return_reason", required: false, desc: "반품 사유 (size-small/size-large/fit/color/material/delivery/change-of-mind/other)", example: "" },
+      {
+        name: "status",
+        required: true,
+        desc: "pending/preparing/shipped/in-transit/delivered/cancelled/return-requested",
+        example: "delivered",
+      },
+      {
+        name: "return_reason",
+        required: false,
+        desc: "반품 사유 (size-small/size-large/fit/color/material/delivery/change-of-mind/other)",
+        example: "",
+      },
     ],
     rows: [
       ["MF0908-0121", "c-0042", "2026-09-08T10:20:00+09:00", "p-nove-oxford-c0-M", "1", "79000", "delivered", ""],
-      ["MF0907-0088", "c-0110", "2026-09-07T18:02:00+09:00", "p-plane-wide-c0-M", "1", "138000", "return-requested", "size-small"],
+      [
+        "MF0907-0088",
+        "c-0110",
+        "2026-09-07T18:02:00+09:00",
+        "p-plane-wide-c0-M",
+        "1",
+        "138000",
+        "return-requested",
+        "size-small",
+      ],
       ["MF0907-0088", "c-0110", "2026-09-07T18:02:00+09:00", "p-unit-tee-c0-M", "2", "29000", "delivered", ""],
     ],
   },
@@ -73,18 +100,34 @@ const FILE_KEYS: FileKey[] = ["products", "variants", "orders"];
 /** 작은 CSV 파서 — 따옴표·콤마·줄바꿈 처리 */
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
-  let row: string[] = [], cell = "", q = false;
+  let row: string[] = [],
+    cell = "",
+    q = false;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
     if (q) {
-      if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
-      else cell += ch;
+      if (ch === '"') {
+        if (text[i + 1] === '"') {
+          cell += '"';
+          i++;
+        } else q = false;
+      } else cell += ch;
     } else if (ch === '"') q = true;
-    else if (ch === ",") { row.push(cell); cell = ""; }
-    else if (ch === "\n" || ch === "\r") { if (ch === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; }
-    else cell += ch;
+    else if (ch === ",") {
+      row.push(cell);
+      cell = "";
+    } else if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = "";
+    } else cell += ch;
   }
-  if (cell.length || row.length) { row.push(cell); rows.push(row); }
+  if (cell.length || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
   return rows.filter((r) => r.some((c) => c.trim().length));
 }
 
@@ -92,11 +135,24 @@ function MiniTable({ header, rows, className }: { header: string[]; rows: string
   return (
     <div className={cn("overflow-x-auto rounded-xl border border-neutral-border bg-white", className)}>
       <table className="min-w-full text-[0.82rem]">
-        <thead><tr className="bg-neutral-canvas text-neutral-text2">{header.map((h, i) => <th key={`${h}-${i}`} className="px-3 py-2 text-left font-semibold whitespace-nowrap">{h}</th>)}</tr></thead>
+        <thead>
+          <tr className="bg-neutral-canvas text-neutral-text2">
+            {header.map((h, i) => (
+              <th key={`${h}-${i}`} className="whitespace-nowrap px-3 py-2 text-left font-semibold">
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
         <tbody>
           {rows.map((r, ri) => (
             <tr key={ri} className="border-t border-neutral-border">
-              {header.map((_, ci) => <td key={ci} className="px-3 py-2 whitespace-nowrap tabular">{r[ci] ?? ""}{r[ci] === "" && <span className="text-neutral-text2/60">—</span>}</td>)}
+              {header.map((_, ci) => (
+                <td key={ci} className="tabular whitespace-nowrap px-3 py-2">
+                  {r[ci] ?? ""}
+                  {r[ci] === "" && <span className="text-neutral-text2/60">—</span>}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -108,14 +164,25 @@ function MiniTable({ header, rows, className }: { header: string[]; rows: string
 export function CsvImportModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [tab, setTab] = useState<Tab>("sample");
   const [fileKey, setFileKey] = useState<FileKey>("products");
-  const [parsed, setParsed] = useState<{ name: string; size: number; header: string[]; rows: string[][]; total: number; truncated: boolean } | null>(null);
+  const [parsed, setParsed] = useState<{
+    name: string;
+    size: number;
+    header: string[];
+    rows: string[][];
+    total: number;
+    truncated: boolean;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onFile = useCallback((f: File | undefined) => {
-    setError(null); setParsed(null);
+    setError(null);
+    setParsed(null);
     if (!f) return;
-    if (!/\.csv$/i.test(f.name) && f.type !== "text/csv") { setError("CSV 파일(.csv)만 읽을 수 있습니다."); return; }
+    if (!/\.csv$/i.test(f.name) && f.type !== "text/csv") {
+      setError("CSV 파일(.csv)만 읽을 수 있습니다.");
+      return;
+    }
     const LIMIT = 512 * 1024;
     const blob = f.size > LIMIT ? f.slice(0, LIMIT) : f;
     const reader = new FileReader();
@@ -123,45 +190,117 @@ export function CsvImportModal({ open, onClose }: { open: boolean; onClose: () =
     reader.onload = () => {
       const text = String(reader.result ?? "").replace(/^﻿/, "");
       const rows = parseCsv(text);
-      if (rows.length < 1) { setError("비어 있는 파일입니다. 첫 줄에 열 이름이 필요합니다."); return; }
+      if (rows.length < 1) {
+        setError("비어 있는 파일입니다. 첫 줄에 열 이름이 필요합니다.");
+        return;
+      }
       const [header, ...body] = rows;
-      setParsed({ name: f.name, size: f.size, header, rows: body.slice(0, 5), total: body.length, truncated: f.size > LIMIT });
+      setParsed({
+        name: f.name,
+        size: f.size,
+        header,
+        rows: body.slice(0, 5),
+        total: body.length,
+        truncated: f.size > LIMIT,
+      });
     };
     reader.readAsText(blob, "utf-8");
   }, []);
 
-  const close = useCallback(() => { onClose(); }, [onClose]);
+  const close = useCallback(() => {
+    onClose();
+  }, [onClose]);
   const cur = FILES[fileKey];
   // 올린 파일의 첫 줄(열 이름)에 필수 열이 다 있는지 — 반영 전에 사람이 바로 고칠 수 있게
-  const missing = parsed ? cur.fields.filter((f) => f.required && !parsed.header.some((h) => h.trim().toLowerCase() === f.name)).map((f) => f.name) : [];
+  const missing = parsed
+    ? cur.fields
+        .filter((f) => f.required && !parsed.header.some((h) => h.trim().toLowerCase() === f.name))
+        .map((f) => f.name)
+    : [];
 
   return (
-    <Modal open={open} onClose={close} title={<span className="inline-flex items-center gap-2">CSV 가져오기 <Badge tone="ready" size="sm">연결 준비</Badge></span>} size="lg"
-      footer={<div className="flex flex-col sm:flex-row sm:items-center gap-2"><p className="text-[0.82rem] text-neutral-text2 sm:mr-auto">실제 반영은 Supabase 연결 후 가능 (연결 준비). 지금은 미리보기만 하며 데모 데이터는 바뀌지 않습니다.</p><Button variant="outline" onClick={close}>닫기</Button></div>}>
+    <Modal
+      open={open}
+      onClose={close}
+      title={
+        <span className="inline-flex items-center gap-2">
+          CSV 가져오기{" "}
+          <Badge tone="ready" size="sm">
+            연결 준비
+          </Badge>
+        </span>
+      }
+      size="lg"
+      footer={
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <p className="text-[0.82rem] text-neutral-text2 sm:mr-auto">
+            실제 반영은 Supabase 연결 후 가능 (연결 준비). 지금은 미리보기만 하며 데모 데이터는 바뀌지 않습니다.
+          </p>
+          <Button variant="outline" onClick={close}>
+            닫기
+          </Button>
+        </div>
+      }
+    >
       <div className="space-y-4">
-        <Segmented value={tab} onChange={setTab} options={[{ value: "sample", label: "샘플 파일 보기" }, { value: "fields", label: "필드 구조 보기" }, { value: "upload", label: "업로드" }]} />
+        <Segmented
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: "sample", label: "샘플 파일 보기" },
+            { value: "fields", label: "필드 구조 보기" },
+            { value: "upload", label: "업로드" },
+          ]}
+        />
 
         {tab !== "upload" && (
           <div className="flex flex-wrap gap-2">
-            {FILE_KEYS.map((k) => <Chip key={k} active={fileKey === k} onClick={() => setFileKey(k)} className="h-9 px-3 text-[0.85rem]">{FILES[k].file}</Chip>)}
+            {FILE_KEYS.map((k) => (
+              <Chip key={k} active={fileKey === k} onClick={() => setFileKey(k)} className="h-9 px-3 text-[0.85rem]">
+                {FILES[k].file}
+              </Chip>
+            ))}
           </div>
         )}
 
         {tab === "sample" && (
           <div className="space-y-2">
-            <p className="text-[0.88rem] text-neutral-text2"><span className="font-semibold text-neutral-text">{cur.file}</span> · {cur.title} — 첫 줄은 열 이름, 이후 한 줄이 한 건입니다. (샘플 값은 데모 시나리오)</p>
+            <p className="text-[0.88rem] text-neutral-text2">
+              <span className="font-semibold text-neutral-text">{cur.file}</span> · {cur.title} — 첫 줄은 열 이름, 이후
+              한 줄이 한 건입니다. (샘플 값은 데모 시나리오)
+            </p>
             <MiniTable header={cur.fields.map((f) => f.name)} rows={cur.rows} />
           </div>
         )}
 
         {tab === "fields" && (
           <div className="space-y-2">
-            <p className="text-[0.88rem] text-neutral-text2"><span className="font-semibold text-neutral-text">{cur.file}</span> 필드 — <Badge tone="error" size="sm">필수</Badge> 표시는 반드시 있어야 합니다.</p>
+            <p className="text-[0.88rem] text-neutral-text2">
+              <span className="font-semibold text-neutral-text">{cur.file}</span> 필드 —{" "}
+              <Badge tone="error" size="sm">
+                필수
+              </Badge>{" "}
+              표시는 반드시 있어야 합니다.
+            </p>
             <ul className="divide-y divide-neutral-border rounded-xl border border-neutral-border bg-white">
               {cur.fields.map((f) => (
-                <li key={f.name} className="px-4 py-2.5 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
-                  <div className="sm:w-48 shrink-0 flex items-center gap-2"><code className="text-[0.85rem] font-bold">{f.name}</code>{f.required && <Badge tone="error" size="sm">필수</Badge>}</div>
-                  <div className="min-w-0 text-[0.85rem]"><p>{f.desc}</p>{f.example && <p className="text-neutral-text2">예: <code>{f.example}</code></p>}</div>
+                <li key={f.name} className="flex flex-col gap-1 px-4 py-2.5 sm:flex-row sm:items-start sm:gap-3">
+                  <div className="flex shrink-0 items-center gap-2 sm:w-48">
+                    <code className="text-[0.85rem] font-bold">{f.name}</code>
+                    {f.required && (
+                      <Badge tone="error" size="sm">
+                        필수
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="min-w-0 text-[0.85rem]">
+                    <p>{f.desc}</p>
+                    {f.example && (
+                      <p className="text-neutral-text2">
+                        예: <code>{f.example}</code>
+                      </p>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -170,30 +309,79 @@ export function CsvImportModal({ open, onClose }: { open: boolean; onClose: () =
 
         {tab === "upload" && (
           <div className="space-y-3">
-            <label className="block rounded-2xl border-2 border-dashed border-neutral-border bg-neutral-canvas px-4 py-8 text-center cursor-pointer hover:border-theme-primary hover:bg-theme-soft/40 transition-colors duration-fast active:scale-[0.995]"
-              onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); onFile(e.dataTransfer.files?.[0]); }}>
-              <input ref={inputRef} type="file" accept=".csv,text/csv" className="sr-only" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ""; }} />
+            <label
+              className="block cursor-pointer rounded-2xl border-2 border-dashed border-neutral-border bg-neutral-canvas px-4 py-8 text-center transition-colors duration-fast hover:border-theme-primary hover:bg-theme-soft/40 active:scale-[0.995]"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                onFile(e.dataTransfer.files?.[0]);
+              }}
+            >
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="sr-only"
+                onChange={(e) => {
+                  onFile(e.target.files?.[0]);
+                  e.target.value = "";
+                }}
+              />
               <FileUp size={26} className="mx-auto text-theme-primary" />
               <p className="mt-2 font-bold">CSV 파일 선택 또는 끌어다 놓기</p>
-              <p className="mt-1 text-[0.82rem] text-neutral-text2">브라우저 안에서만 읽습니다 · 서버 전송 없음 · 미리보기는 처음 512KB</p>
+              <p className="mt-1 text-[0.82rem] text-neutral-text2">
+                브라우저 안에서만 읽습니다 · 서버 전송 없음 · 미리보기는 처음 512KB
+              </p>
             </label>
-            {error && <p role="alert" className="rounded-xl bg-[#fdecec] px-4 py-3 text-[0.88rem] text-semantic-error font-semibold">{error}</p>}
+            {error && (
+              <p
+                role="alert"
+                className="rounded-xl bg-[#fdecec] px-4 py-3 text-[0.88rem] font-semibold text-semantic-error"
+              >
+                {error}
+              </p>
+            )}
             {parsed ? (
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-2 text-[0.85rem]">
                   <Table2 size={16} className="text-theme-primary" />
-                  <span className="font-bold break-anywhere">{parsed.name}</span>
-                  <span className="text-neutral-text2 tabular">{(parsed.size / 1024).toFixed(1)}KB · 열 {parsed.header.length}개 · 행 {parsed.total.toLocaleString("ko-KR")}{parsed.truncated ? "+" : ""}개</span>
-                  <Badge tone="demo" size="sm" className="ml-auto">미리보기만</Badge>
+                  <span className="break-anywhere font-bold">{parsed.name}</span>
+                  <span className="tabular text-neutral-text2">
+                    {(parsed.size / 1024).toFixed(1)}KB · 열 {parsed.header.length}개 · 행{" "}
+                    {parsed.total.toLocaleString("ko-KR")}
+                    {parsed.truncated ? "+" : ""}개
+                  </span>
+                  <Badge tone="demo" size="sm" className="ml-auto">
+                    미리보기만
+                  </Badge>
                 </div>
-                {missing.length > 0
-                  ? <p role="alert" className="rounded-xl bg-[#fff1e6] px-4 py-3 text-[0.88rem] text-[#b45309] font-semibold">{cur.file} 형식의 필수 열이 없습니다: {missing.join(", ")} — 첫 줄 열 이름을 확인하거나 위에서 파일 종류를 바꿔주세요.</p>
-                  : <p className="rounded-xl bg-[#e6f6ec] px-4 py-3 text-[0.88rem] text-[#15803d] font-semibold">{cur.file} 필수 열 {cur.fields.filter((f) => f.required).length}개가 모두 있습니다.</p>}
+                {missing.length > 0 ? (
+                  <p
+                    role="alert"
+                    className="rounded-xl bg-[#fff1e6] px-4 py-3 text-[0.88rem] font-semibold text-[#b45309]"
+                  >
+                    {cur.file} 형식의 필수 열이 없습니다: {missing.join(", ")} — 첫 줄 열 이름을 확인하거나 위에서 파일
+                    종류를 바꿔주세요.
+                  </p>
+                ) : (
+                  <p className="rounded-xl bg-[#e6f6ec] px-4 py-3 text-[0.88rem] font-semibold text-[#15803d]">
+                    {cur.file} 필수 열 {cur.fields.filter((f) => f.required).length}개가 모두 있습니다.
+                  </p>
+                )}
                 <MiniTable header={parsed.header} rows={parsed.rows} />
-                <p className="text-[0.82rem] text-neutral-text2">처음 5행만 표시합니다. 실제 반영은 Supabase 연결 후 가능 (연결 준비) — 데모 스토어는 변경되지 않았습니다.</p>
+                <p className="text-[0.82rem] text-neutral-text2">
+                  처음 5행만 표시합니다. 실제 반영은 Supabase 연결 후 가능 (연결 준비) — 데모 스토어는 변경되지
+                  않았습니다.
+                </p>
               </div>
-            ) : !error && (
-              <EmptyState title="아직 선택한 파일이 없습니다" desc="샘플 파일 형식에 맞춘 CSV를 올리면 열 이름과 처음 5행을 확인할 수 있습니다." className="py-8" />
+            ) : (
+              !error && (
+                <EmptyState
+                  title="아직 선택한 파일이 없습니다"
+                  desc="샘플 파일 형식에 맞춘 CSV를 올리면 열 이름과 처음 5행을 확인할 수 있습니다."
+                  className="py-8"
+                />
+              )
             )}
           </div>
         )}

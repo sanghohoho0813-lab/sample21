@@ -15,21 +15,62 @@ function BrandsBody() {
   const [mood, setMood] = useState<BrandMood | "all">("all");
   const [onlyFollowing, setOnlyFollowing] = useState(false);
   const { following, isFollowing, toggle, ready } = useBrandFollow();
-  const list = useMemo(() => BRANDS.filter((b) => (mood === "all" || (BRAND_MOOD[b.id] ?? []).includes(mood)) && (!onlyFollowing || following.includes(b.id))), [mood, onlyFollowing, following]);
+  const list = useMemo(
+    () =>
+      BRANDS.filter(
+        (b) =>
+          (mood === "all" || (BRAND_MOOD[b.id] ?? []).includes(mood)) && (!onlyFollowing || following.includes(b.id)),
+      ),
+    [mood, onlyFollowing, following],
+  );
 
-  if (!ready) return <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4">{Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="aspect-[4/5] md:aspect-[3/4] rounded-cardlg" />)}</div>;
+  if (!ready)
+    return (
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-5">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <Skeleton key={i} className="aspect-[4/5] rounded-cardlg md:aspect-[3/4]" />
+        ))}
+      </div>
+    );
   return (
     <>
-      <div className="flex flex-wrap items-center gap-2 mb-6" role="group" aria-label="브랜드 성격 필터">
-        {MOOD_OPTIONS.map((m) => <FilterChip key={m.value} size="sm" active={mood === m.value} onClick={() => setMood(m.value)}>{m.label}</FilterChip>)}
-        <span className="hidden sm:block h-6 w-px bg-neutral-border mx-1" aria-hidden />
-        <FilterChip size="sm" active={onlyFollowing} onClick={() => setOnlyFollowing((v) => !v)}><Heart size={14} fill={onlyFollowing ? "currentColor" : "none"} />팔로잉만 {following.length > 0 && <span className="tabular">({following.length})</span>}</FilterChip>
+      <div className="mb-6 flex flex-wrap items-center gap-2" role="group" aria-label="브랜드 성격 필터">
+        {MOOD_OPTIONS.map((m) => (
+          <FilterChip key={m.value} size="sm" active={mood === m.value} onClick={() => setMood(m.value)}>
+            {m.label}
+          </FilterChip>
+        ))}
+        <span className="mx-1 hidden h-6 w-px bg-neutral-border sm:block" aria-hidden />
+        <FilterChip size="sm" active={onlyFollowing} onClick={() => setOnlyFollowing((v) => !v)}>
+          <Heart size={14} fill={onlyFollowing ? "currentColor" : "none"} />
+          팔로잉만 {following.length > 0 && <span className="tabular">({following.length})</span>}
+        </FilterChip>
       </div>
       {list.length === 0 ? (
-        <EmptyState title={onlyFollowing ? "아직 팔로우한 브랜드가 없어요" : "해당 성격의 브랜드가 없습니다"} desc={onlyFollowing ? "마음에 드는 브랜드의 팔로우 버튼을 눌러보세요. 신상품·세일 소식을 먼저 알려드려요." : "다른 성격을 선택해보세요."} action={<Button variant="brand" onClick={() => { setOnlyFollowing(false); setMood("all"); }}>전체 브랜드 보기</Button>} />
+        <EmptyState
+          title={onlyFollowing ? "아직 팔로우한 브랜드가 없어요" : "해당 성격의 브랜드가 없습니다"}
+          desc={
+            onlyFollowing
+              ? "마음에 드는 브랜드의 팔로우 버튼을 눌러보세요. 신상품·세일 소식을 먼저 알려드려요."
+              : "다른 성격을 선택해보세요."
+          }
+          action={
+            <Button
+              variant="brand"
+              onClick={() => {
+                setOnlyFollowing(false);
+                setMood("all");
+              }}
+            >
+              전체 브랜드 보기
+            </Button>
+          }
+        />
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4">
-          {list.map((b) => <BrandCard key={b.id} brand={b} following={isFollowing(b.id)} onToggle={toggle} />)}
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-5">
+          {list.map((b) => (
+            <BrandCard key={b.id} brand={b} following={isFollowing(b.id)} onToggle={toggle} />
+          ))}
         </div>
       )}
     </>
@@ -38,9 +79,20 @@ function BrandsBody() {
 
 export default function BrandsPage() {
   return (
-    <Container className="py-6 md:py-10 animate-fadeIn">
-      <PageTitle title="브랜드" desc={`${BRANDS.length}개 브랜드, 네 가지 무드. 팔로우하면 신상품과 세일 소식을 먼저 받아요.`} />
-      <Hydrated fallback={<div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4">{Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="aspect-[4/5] md:aspect-[3/4] rounded-cardlg" />)}</div>}>
+    <Container className="animate-fadeIn py-6 md:py-10">
+      <PageTitle
+        title="브랜드"
+        desc={`${BRANDS.length}개 브랜드, 네 가지 무드. 팔로우하면 신상품과 세일 소식을 먼저 받아요.`}
+      />
+      <Hydrated
+        fallback={
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-5">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-[4/5] rounded-cardlg md:aspect-[3/4]" />
+            ))}
+          </div>
+        }
+      >
         <BrandsBody />
       </Hydrated>
     </Container>

@@ -4,7 +4,9 @@ import { chromium } from "playwright";
 import fs from "node:fs";
 
 const BASE = process.env.QA_BASE ?? "http://localhost:3000";
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH ?? "/opt/pw-browsers/chromium-1194/chrome-linux/chrome" });
+const browser = await chromium.launch({
+  executablePath: process.env.CHROMIUM_PATH ?? "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+});
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: "ko-KR" });
 const page = await ctx.newPage();
 // Sandbox: block external hosts (CDN fonts etc.) so page load never waits on the egress proxy
@@ -12,42 +14,180 @@ await page.route("**/*", (route) => (route.request().url().startsWith(BASE) ? ro
 const errors = [];
 page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
 const results = [];
-const step = async (name, fn) => { try { await fn(); results.push({ name, ok: true }); console.log("✓", name); } catch (e) { results.push({ name, ok: false, err: String(e.message).slice(0, 200) }); console.log("✗", name, "—", String(e.message).slice(0, 200)); } };
-const go = async (path) => { await page.goto(BASE + path, { waitUntil: "load", timeout: 90000 }); await page.waitForTimeout(700); const skip = page.getByText("건너뛰기"); if (await skip.count()) { await skip.first().click().catch(() => {}); await page.waitForTimeout(250); } };
+const step = async (name, fn) => {
+  try {
+    await fn();
+    results.push({ name, ok: true });
+    console.log("✓", name);
+  } catch (e) {
+    results.push({ name, ok: false, err: String(e.message).slice(0, 200) });
+    console.log("✗", name, "—", String(e.message).slice(0, 200));
+  }
+};
+const go = async (path) => {
+  await page.goto(BASE + path, { waitUntil: "load", timeout: 90000 });
+  await page.waitForTimeout(700);
+  const skip = page.getByText("건너뛰기");
+  if (await skip.count()) {
+    await skip
+      .first()
+      .click()
+      .catch(() => {});
+    await page.waitForTimeout(250);
+  }
+};
 // pre-warm dev compilation so timing does not fail the journey
-for (const r of ["/", "/ranking", "/products/p-nove-oxford", "/products/p-aerno-sweat", "/cart", "/checkout", "/my", "/my/orders", "/my/restock", "/ax", "/ax/actions", "/ax/inventory", "/ax/orders", "/ax/evidence", "/ax/why", "/ax/present", "/ax/settings"]) { await fetch(BASE + r).catch(() => {}); }
-const text = async () => (await page.locator("body").innerText());
+for (const r of [
+  "/",
+  "/ranking",
+  "/products/p-nove-oxford",
+  "/products/p-aerno-sweat",
+  "/cart",
+  "/checkout",
+  "/my",
+  "/my/orders",
+  "/my/restock",
+  "/ax",
+  "/ax/actions",
+  "/ax/inventory",
+  "/ax/orders",
+  "/ax/evidence",
+  "/ax/why",
+  "/ax/present",
+  "/ax/settings",
+]) {
+  await fetch(BASE + r).catch(() => {});
+}
+const text = async () => await page.locator("body").innerText();
 
-await step("Fresh load + Demo Reset", async () => { await go("/ax/settings"); await page.evaluate(() => localStorage.clear()); await go("/"); });
-await step("Customer Home 5초 테스트 (MORFIT/멀티브랜드/CTA)", async () => { const t = await text(); if (!/멀티브랜드|브랜드/.test(t)) throw new Error("no multibrand copy"); await page.locator('[data-tour="c-hero"]').first().waitFor({ timeout: 5000 }); });
-await step("Tutorial 닫기 (overlay cleanup)", async () => { const skip = page.getByText("건너뛰기"); if (await skip.count()) { await skip.first().click(); await page.waitForTimeout(300); } const blocked = await page.evaluate(() => !!document.querySelector('[role="dialog"][aria-label="튜토리얼"]')); if (blocked) throw new Error("tutorial overlay remains"); });
-await step("Ranking", async () => { await go("/ranking"); await page.locator('[data-tour="c-ranking"]').waitFor({ timeout: 5000 }); });
-await step("Product detail (Scenario A)", async () => { await go("/products/p-nove-oxford?color=블랙&size=M"); await page.locator('[data-tour="c-fit-signal"]').waitFor({ timeout: 8000 }); });
-await step("Fit profile → recommendation", async () => { const h = page.locator('input[name="height"]'); if (await h.count()) { await h.fill("168"); await page.locator('input[name="weight"]').fill("55"); }  });
-await step("Restock subscribe (Loop 1 start)", async () => { const btn = page.locator('[data-tour="c-restock"]'); await btn.first().waitFor({ timeout: 5000 }); await btn.first().click(); await page.waitForTimeout(500); const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state); if (!st || !(st.restockSubs || []).length) throw new Error("restockSubs not persisted"); });
-await step("Business AX 전환 + KPI", async () => { await go("/ax"); await page.locator('[data-tour="kpi-row"]').waitFor({ timeout: 15000 }); await page.waitForTimeout(900); const skip = page.getByText("건너뛰기"); if (await skip.count()) { await skip.first().click(); await page.waitForTimeout(300); } });
-await step("Role switch (MD) changes UI", async () => { const before = await text(); await page.getByRole("radio", { name: "MD" }).first().click(); await page.waitForTimeout(400); const after = await text(); if (before === after) throw new Error("role switch no change"); await page.getByRole("radio", { name: "대표" }).first().click(); });
-await step("Demand Radar shows restock request reflected", async () => { await go("/ax/inventory"); await page.locator('[data-tour="demand-radar"]').waitFor({ timeout: 8000 }); const row = page.locator('[data-tour="radar-scenario-a"]'); await row.first().waitFor({ timeout: 5000 }); const t = await row.first().innerText(); if (!/19/.test(t)) throw new Error("expected restockRequests 18+1=19 in scenario row: " + t.replace(/\s+/g, " ").slice(0, 200)); });
+await step("Fresh load + Demo Reset", async () => {
+  await go("/ax/settings");
+  await page.evaluate(() => localStorage.clear());
+  await go("/");
+});
+await step("Customer Home 5초 테스트 (MORFIT/멀티브랜드/CTA)", async () => {
+  const t = await text();
+  if (!/멀티브랜드|브랜드/.test(t)) throw new Error("no multibrand copy");
+  await page.locator('[data-tour="c-hero"]').first().waitFor({ timeout: 5000 });
+});
+await step("Tutorial 닫기 (overlay cleanup)", async () => {
+  const skip = page.getByText("건너뛰기");
+  if (await skip.count()) {
+    await skip.first().click();
+    await page.waitForTimeout(300);
+  }
+  const blocked = await page.evaluate(() => !!document.querySelector('[role="dialog"][aria-label="튜토리얼"]'));
+  if (blocked) throw new Error("tutorial overlay remains");
+});
+await step("Ranking", async () => {
+  await go("/ranking");
+  await page.locator('[data-tour="c-ranking"]').waitFor({ timeout: 5000 });
+});
+await step("Product detail (Scenario A)", async () => {
+  await go("/products/p-nove-oxford?color=블랙&size=M");
+  await page.locator('[data-tour="c-fit-signal"]').waitFor({ timeout: 8000 });
+});
+await step("Fit profile → recommendation", async () => {
+  const h = page.locator('input[name="height"]');
+  if (await h.count()) {
+    await h.fill("168");
+    await page.locator('input[name="weight"]').fill("55");
+  }
+});
+await step("Restock subscribe (Loop 1 start)", async () => {
+  const btn = page.locator('[data-tour="c-restock"]');
+  await btn.first().waitFor({ timeout: 5000 });
+  await btn.first().click();
+  await page.waitForTimeout(500);
+  const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state);
+  if (!st || !(st.restockSubs || []).length) throw new Error("restockSubs not persisted");
+});
+await step("Business AX 전환 + KPI", async () => {
+  await go("/ax");
+  await page.locator('[data-tour="kpi-row"]').waitFor({ timeout: 15000 });
+  await page.waitForTimeout(900);
+  const skip = page.getByText("건너뛰기");
+  if (await skip.count()) {
+    await skip.first().click();
+    await page.waitForTimeout(300);
+  }
+});
+await step("Role switch (MD) changes UI", async () => {
+  const before = await text();
+  await page.getByRole("radio", { name: "MD" }).first().click();
+  await page.waitForTimeout(400);
+  const after = await text();
+  if (before === after) throw new Error("role switch no change");
+  await page.getByRole("radio", { name: "대표" }).first().click();
+});
+await step("Demand Radar shows restock request reflected", async () => {
+  await go("/ax/inventory");
+  await page.locator('[data-tour="demand-radar"]').waitFor({ timeout: 8000 });
+  const row = page.locator('[data-tour="radar-scenario-a"]');
+  await row.first().waitFor({ timeout: 5000 });
+  const t = await row.first().innerText();
+  if (!/19/.test(t))
+    throw new Error("expected restockRequests 18+1=19 in scenario row: " + t.replace(/\s+/g, " ").slice(0, 200));
+});
 await step("Action approve → execute → done (Loop 1 close)", async () => {
   await go("/ax/actions?open=act-001");
   await page.locator('[data-tour="action-first"]').first().waitFor({ timeout: 8000 });
-  for (const label of ["확인", "실행 시작", "완료"]) { const b = page.getByRole("button", { name: new RegExp(`^${label}`) }); await b.first().waitFor({ timeout: 5000 }); await b.first().click(); await page.waitForTimeout(400); const confirm = page.getByRole("button", { name: /완료 처리|저장|확인$/ }); if (label === "완료" && (await confirm.count())) { await confirm.last().click(); } await page.waitForTimeout(400); }
+  for (const label of ["확인", "실행 시작", "완료"]) {
+    const b = page.getByRole("button", { name: new RegExp(`^${label}`) });
+    await b.first().waitFor({ timeout: 5000 });
+    await b.first().click();
+    await page.waitForTimeout(400);
+    const confirm = page.getByRole("button", { name: /완료 처리|저장|확인$/ });
+    if (label === "완료" && (await confirm.count())) {
+      await confirm.last().click();
+    }
+    await page.waitForTimeout(400);
+  }
   const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state);
-  const a = st.actions.find((x) => x.id === "act-001"); if (a.status !== "done") throw new Error("act-001 status " + a.status);
+  const a = st.actions.find((x) => x.id === "act-001");
+  if (a.status !== "done") throw new Error("act-001 status " + a.status);
   if (!(st.inventoryDelta["p-nove-oxford-c0-M"] > 0)) throw new Error("inventory not increased");
   if (!st.notifications.some((n) => n.kind === "restock")) throw new Error("no restock notification");
 });
-await step("Customer sees restock notification / status", async () => { await go("/my/restock"); const t = await text(); if (!/재입고/.test(t)) throw new Error("no restock text"); });
+await step("Customer sees restock notification / status", async () => {
+  await go("/my/restock");
+  const t = await text();
+  if (!/재입고/.test(t)) throw new Error("no restock text");
+});
 await step("Cart → Checkout → DEMO order (Loop 2 start)", async () => {
   // 재입고 알림을 받은 옵션(Scenario A)을 먼저 담는다 → 주문 시 Loop 1이 '구매 전환'으로 닫힌다
-  await go("/products/p-nove-oxford?color=블랙&size=M"); const addA = page.getByRole("button", { name: /장바구니/ }).first(); await addA.waitFor({ timeout: 10000 }); await addA.click(); await page.waitForTimeout(300);
-  await go("/products/p-aerno-sweat"); const size = page.getByRole("button", { name: /^사이즈 (S|M)\b/ }).first(); await size.waitFor({ timeout: 10000 }); await size.click(); await page.getByRole("button", { name: /장바구니/ }).first().click(); await page.waitForTimeout(300);
-  await go("/cart"); await page.getByRole("link", { name: /주문하기/ }).first().click(); await page.waitForLoadState("networkidle");
-  const agree = page.locator('input[name="agree"]'); await agree.waitFor({ timeout: 8000 });
+  await go("/products/p-nove-oxford?color=블랙&size=M");
+  const addA = page.getByRole("button", { name: /장바구니/ }).first();
+  await addA.waitFor({ timeout: 10000 });
+  await addA.click();
+  await page.waitForTimeout(300);
+  await go("/products/p-aerno-sweat");
+  const size = page.getByRole("button", { name: /^사이즈 (S|M)\b/ }).first();
+  await size.waitFor({ timeout: 10000 });
+  await size.click();
+  await page
+    .getByRole("button", { name: /장바구니/ })
+    .first()
+    .click();
+  await page.waitForTimeout(300);
+  await go("/cart");
+  await page
+    .getByRole("link", { name: /주문하기/ })
+    .first()
+    .click();
+  await page.waitForLoadState("networkidle");
+  const agree = page.locator('input[name="agree"]');
+  await agree.waitFor({ timeout: 8000 });
   for (let attempt = 0; attempt < 3 && !/checkout\/complete/.test(page.url()); attempt++) {
-    if (!(await agree.isChecked())) { await agree.check(); await page.waitForTimeout(150); }
+    if (!(await agree.isChecked())) {
+      await agree.check();
+      await page.waitForTimeout(150);
+    }
     if (!(await agree.isChecked())) throw new Error("agree checkbox did not stay checked (controlled input reset?)");
-    await page.getByRole("button", { name: /DEMO 주문 완료|주문 완료/ }).first().click();
+    await page
+      .getByRole("button", { name: /DEMO 주문 완료|주문 완료/ })
+      .first()
+      .click();
     await page.waitForURL(/checkout\/complete/, { timeout: 6000 }).catch(() => {});
   }
   if (!/checkout\/complete/.test(page.url())) throw new Error("not on completion page: " + page.url());
@@ -55,67 +195,204 @@ await step("Cart → Checkout → DEMO order (Loop 2 start)", async () => {
 await step("Restock notified → purchased (Loop 1 complete)", async () => {
   const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state);
   const sub = (st.restockSubs || []).find((r) => r.variantId === "p-nove-oxford-c0-M");
-  if (!sub || sub.status !== "purchased" || !sub.notifiedAt || !sub.purchaseOrderId) throw new Error("restock sub not closed: " + JSON.stringify(sub));
-  if (!st.evidence.some((e) => e.type === "RESULT" && /구매 전환/.test(e.title))) throw new Error("no purchase-conversion evidence");
-  await go("/my/restock"); const t = await text(); if (!/구매 완료 1/.test(t)) throw new Error("restock page does not show purchased count");
+  if (!sub || sub.status !== "purchased" || !sub.notifiedAt || !sub.purchaseOrderId)
+    throw new Error("restock sub not closed: " + JSON.stringify(sub));
+  if (!st.evidence.some((e) => e.type === "RESULT" && /구매 전환/.test(e.title)))
+    throw new Error("no purchase-conversion evidence");
+  await go("/my/restock");
+  const t = await text();
+  if (!/구매 완료 1/.test(t)) throw new Error("restock page does not show purchased count");
 });
 await step("AX orders shows customer order → status change (Loop 2 close)", async () => {
-  await go("/ax/orders"); const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state); const oid = st.orders[0].id; const t = await text(); if (!t.includes(oid)) throw new Error("order not listed");
-  const btn = page.getByRole("button", { name: /상품준비/ }).first(); await btn.waitFor({ timeout: 5000 }); await btn.click(); await page.waitForTimeout(400);
-  const st2 = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state); if (st2.orders[0].status !== "preparing") throw new Error("status not changed: " + st2.orders[0].status);
+  await go("/ax/orders");
+  const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state);
+  const oid = st.orders[0].id;
+  const t = await text();
+  if (!t.includes(oid)) throw new Error("order not listed");
+  const btn = page.getByRole("button", { name: /상품준비/ }).first();
+  await btn.waitFor({ timeout: 5000 });
+  await btn.click();
+  await page.waitForTimeout(400);
+  const st2 = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state);
+  if (st2.orders[0].status !== "preparing") throw new Error("status not changed: " + st2.orders[0].status);
 });
-await step("Customer My Page reflects order status", async () => { const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state); await go(`/my/orders/${st.orders[0].id}`); const t = await text(); if (!/상품준비/.test(t)) throw new Error("status not reflected"); });
-await step("Evidence lists loop", async () => { await go("/ax/evidence"); await page.locator('[data-tour="evidence-list"]').waitFor({ timeout: 8000 }); const t = await text(); if (!/재고 \+/.test(t)) throw new Error("restock result evidence missing"); });
+await step("Customer My Page reflects order status", async () => {
+  const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state);
+  await go(`/my/orders/${st.orders[0].id}`);
+  const t = await text();
+  if (!/상품준비/.test(t)) throw new Error("status not reflected");
+});
+await step("Evidence lists loop", async () => {
+  await go("/ax/evidence");
+  await page.locator('[data-tour="evidence-list"]').waitFor({ timeout: 8000 });
+  const t = await text();
+  if (!/재고 \+/.test(t)) throw new Error("restock result evidence missing");
+});
 await step("Evidence Pack preview + JSON export", async () => {
-  await go("/ax/evidence/pack"); await page.locator("#pack-log").waitFor({ timeout: 10000 }); const t = await text();
+  await go("/ax/evidence/pack");
+  await page.locator("#pack-log").waitFor({ timeout: 10000 });
+  const t = await text();
   if (!/미측정 · 실증 필요/.test(t) || !/실증 후 확인/.test(t)) throw new Error("pack lacks baseline honesty markers");
   if (!/구매 전환/.test(t)) throw new Error("pack does not include Loop 1 purchase conversion");
-  const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 8000 }), page.getByRole("button", { name: /JSON 내보내기/ }).first().click()]);
-  const file = await dl.path(); const json = JSON.parse(fs.readFileSync(file, "utf8"));
-  if (json.meta?.stage !== "DEMO" || json.meta?.baseline !== "UNKNOWN / REQUIRED" || !Array.isArray(json.baseline) || json.baseline.length < 8 || !Array.isArray(json.actions) || !Array.isArray(json.evidence)) throw new Error("pack json shape invalid");
+  const [dl] = await Promise.all([
+    page.waitForEvent("download", { timeout: 8000 }),
+    page
+      .getByRole("button", { name: /JSON 내보내기/ })
+      .first()
+      .click(),
+  ]);
+  const file = await dl.path();
+  const json = JSON.parse(fs.readFileSync(file, "utf8"));
+  if (
+    json.meta?.stage !== "DEMO" ||
+    json.meta?.baseline !== "UNKNOWN / REQUIRED" ||
+    !Array.isArray(json.baseline) ||
+    json.baseline.length < 8 ||
+    !Array.isArray(json.actions) ||
+    !Array.isArray(json.evidence)
+  )
+    throw new Error("pack json shape invalid");
   if (json.kpiDelta.some((r) => r.delta !== "VALIDATE LATER")) throw new Error("pack json claims a delta");
 });
-await step("Why AX discoverable (2단계 메뉴)", async () => { await go("/ax"); const why = page.locator('[data-tour="nav-why"]'); if (!(await why.first().isVisible().catch(() => false))) { await page.locator('[data-tour="nav-group-story"]').first().click(); await page.waitForTimeout(250); } await why.first().click(); await page.waitForLoadState("networkidle"); await page.locator('[data-tour="why-top"]').waitFor({ timeout: 20000 }); });
+await step("Why AX discoverable (2단계 메뉴)", async () => {
+  await go("/ax");
+  const why = page.locator('[data-tour="nav-why"]');
+  if (
+    !(await why
+      .first()
+      .isVisible()
+      .catch(() => false))
+  ) {
+    await page.locator('[data-tour="nav-group-story"]').first().click();
+    await page.waitForTimeout(250);
+  }
+  await why.first().click();
+  await page.waitForLoadState("networkidle");
+  await page.locator('[data-tour="why-top"]').waitFor({ timeout: 20000 });
+});
 await step("AX → 고객 플랫폼 보기 / 고객 → AX 운영화면 보기", async () => {
-  await go("/ax"); const cp = page.locator('[data-tour="surface-switch"]').first(); if (!/고객 플랫폼 보기/.test(await cp.innerText())) throw new Error("AX header CTA label"); await cp.click(); await page.waitForURL((u) => new URL(u).pathname === "/", { timeout: 15000 });
-  const back = page.locator('[data-tour="c-surface-switch"]').first(); await back.waitFor({ timeout: 8000 }); if (!/AX 운영화면 보기/.test(await back.innerText())) throw new Error("customer demo bar label"); await back.click(); await page.waitForURL(/\/ax$/, { timeout: 15000 });
+  await go("/ax");
+  const cp = page.locator('[data-tour="surface-switch"]').first();
+  if (!/고객 플랫폼 보기/.test(await cp.innerText())) throw new Error("AX header CTA label");
+  await cp.click();
+  await page.waitForURL((u) => new URL(u).pathname === "/", { timeout: 15000 });
+  const back = page.locator('[data-tour="c-surface-switch"]').first();
+  await back.waitFor({ timeout: 8000 });
+  if (!/AX 운영화면 보기/.test(await back.innerText())) throw new Error("customer demo bar label");
+  await back.click();
+  await page.waitForURL(/\/ax$/, { timeout: 15000 });
 });
 await step("모바일 햄버거: 왼쪽 · 1차 메뉴 수 · 스크롤 잠금 · 하단 CTA", async () => {
   const m = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: "ko-KR", hasTouch: true });
-  const mp = await m.newPage(); await mp.route("**/*", (r) => (r.request().url().startsWith(BASE) ? r.continue() : r.abort()));
-  await mp.addInitScript(() => { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 5; localStorage.setItem(k, JSON.stringify(s)); });
-  for (const [route, btnName, expectMax, ctaSel] of [["/ax", "메뉴 열기", 8, '[data-tour="drawer-customer-cta"]'], ["/", "전체 메뉴", 7, '[data-tour="c-drawer-ax-cta"]']]) {
-    await mp.goto(BASE + route, { waitUntil: "networkidle" }); await mp.waitForTimeout(900);
-    const btn = mp.getByRole("button", { name: btnName }).first(); const box = await btn.boundingBox(); if (!box || box.x > 60) throw new Error(`${route} hamburger not on the left (x=${box?.x})`);
-    await btn.click(); await mp.waitForTimeout(400);
-    const dlg = mp.locator('[role="dialog"]').last(); await dlg.waitFor({ timeout: 5000 });
-    const top = await dlg.evaluate((d) => { const nav = d.querySelector("nav"); return nav ? nav.querySelectorAll(":scope > a, :scope > div > button, :scope > div > a").length : -1; });
+  const mp = await m.newPage();
+  await mp.route("**/*", (r) => (r.request().url().startsWith(BASE) ? r.continue() : r.abort()));
+  await mp.addInitScript(() => {
+    const k = "morfit-demo-v1";
+    const s = JSON.parse(localStorage.getItem(k) || "{}");
+    s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true };
+    s.version = 5;
+    localStorage.setItem(k, JSON.stringify(s));
+  });
+  for (const [route, btnName, expectMax, ctaSel] of [
+    ["/ax", "메뉴 열기", 8, '[data-tour="drawer-customer-cta"]'],
+    ["/", "전체 메뉴", 7, '[data-tour="c-drawer-ax-cta"]'],
+  ]) {
+    await mp.goto(BASE + route, { waitUntil: "networkidle" });
+    await mp.waitForTimeout(900);
+    const btn = mp.getByRole("button", { name: btnName }).first();
+    const box = await btn.boundingBox();
+    if (!box || box.x > 60) throw new Error(`${route} hamburger not on the left (x=${box?.x})`);
+    await btn.click();
+    await mp.waitForTimeout(400);
+    const dlg = mp.locator('[role="dialog"]').last();
+    await dlg.waitFor({ timeout: 5000 });
+    const top = await dlg.evaluate((d) => {
+      const nav = d.querySelector("nav");
+      return nav ? nav.querySelectorAll(":scope > a, :scope > div > button, :scope > div > a").length : -1;
+    });
     if (top < 5 || top > expectMax) throw new Error(`${route} first-level menu count ${top} (expected 5~${expectMax})`);
-    if ((await mp.evaluate(() => getComputedStyle(document.body).overflow)) !== "hidden") throw new Error(`${route} background scroll not locked`);
-    if (!(await mp.locator(ctaSel).first().isVisible().catch(() => false))) throw new Error(`${route} drawer bottom CTA missing`);
-    await mp.getByRole("button", { name: "닫기" }).last().click(); await mp.waitForTimeout(350);
+    if ((await mp.evaluate(() => getComputedStyle(document.body).overflow)) !== "hidden")
+      throw new Error(`${route} background scroll not locked`);
+    if (
+      !(await mp
+        .locator(ctaSel)
+        .first()
+        .isVisible()
+        .catch(() => false))
+    )
+      throw new Error(`${route} drawer bottom CTA missing`);
+    await mp.getByRole("button", { name: "닫기" }).last().click();
+    await mp.waitForTimeout(350);
     if (await mp.locator('[role="dialog"]').count()) throw new Error(`${route} drawer did not close`);
-    if ((await mp.evaluate(() => getComputedStyle(document.body).overflow)) === "hidden") throw new Error(`${route} scroll lock not restored`);
+    if ((await mp.evaluate(() => getComputedStyle(document.body).overflow)) === "hidden")
+      throw new Error(`${route} scroll lock not restored`);
   }
   await m.close();
 });
-await step("Presentation mode starts", async () => { await go("/ax/present"); await page.getByRole("button", { name: /시연 시작/ }).first().click(); await page.waitForTimeout(600); const t = await text(); if (!/시연 모드 · 1/.test(t)) throw new Error("controller missing"); await page.keyboard.press("Escape"); });
+await step("Presentation mode starts", async () => {
+  await go("/ax/present");
+  await page
+    .getByRole("button", { name: /시연 시작/ })
+    .first()
+    .click();
+  await page.waitForTimeout(600);
+  const t = await text();
+  if (!/시연 모드 · 1/.test(t)) throw new Error("controller missing");
+  await page.keyboard.press("Escape");
+});
 await step("Theme 9 switch + no residual", async () => {
-  await go("/ax/settings"); await page.locator('[data-tour="settings-theme"]').waitFor({ timeout: 8000 });
-  const ids = ["deep-navy", "navy-gold", "emerald-gold", "forest-sage", "deep-teal", "onyx-gold", "burgundy-slate", "plum-indigo", "steel-platinum"];
-  for (const id of ids) { const b = page.locator(`[data-theme-id="${id}"]`); await b.first().click(); await page.waitForTimeout(150); const applied = await page.evaluate(() => document.documentElement.getAttribute("data-theme")); if (applied !== id) throw new Error(`theme ${id} not applied (${applied})`); }
+  await go("/ax/settings");
+  await page.locator('[data-tour="settings-theme"]').waitFor({ timeout: 8000 });
+  const ids = [
+    "deep-navy",
+    "navy-gold",
+    "emerald-gold",
+    "forest-sage",
+    "deep-teal",
+    "onyx-gold",
+    "burgundy-slate",
+    "plum-indigo",
+    "steel-platinum",
+  ];
+  for (const id of ids) {
+    const b = page.locator(`[data-theme-id="${id}"]`);
+    await b.first().click();
+    await page.waitForTimeout(150);
+    const applied = await page.evaluate(() => document.documentElement.getAttribute("data-theme"));
+    if (applied !== id) throw new Error(`theme ${id} not applied (${applied})`);
+  }
   await page.locator('[data-theme-id="deep-navy"]').first().click();
 });
 await step("Font scale + role + device preview (no recursion)", async () => {
-  await page.getByRole("tab", { name: "크게" }).first().click(); const f = await page.evaluate(() => document.documentElement.getAttribute("data-font")); if (f !== "large") throw new Error("font not applied");
+  await page.getByRole("tab", { name: "크게" }).first().click();
+  const f = await page.evaluate(() => document.documentElement.getAttribute("data-font"));
+  if (f !== "large") throw new Error("font not applied");
   await page.getByRole("tab", { name: "기본" }).first().click();
-  await page.locator('[data-tour="device-preview"]').first().click(); await page.waitForTimeout(2500);
-  const frame = page.frames().find((fr) => fr.url().includes("preview=1")); if (!frame) throw new Error("preview iframe missing");
+  await page.locator('[data-tour="device-preview"]').first().click();
+  await page.waitForTimeout(2500);
+  const frame = page.frames().find((fr) => fr.url().includes("preview=1"));
+  if (!frame) throw new Error("preview iframe missing");
   await frame.waitForLoadState("load").catch(() => {});
-  const innerVisible = await frame.locator('[data-tour="device-preview"]:visible').count(); if (innerVisible > 0) throw new Error("recursive preview button visible inside frame");
-  await page.keyboard.press("Escape"); await page.waitForTimeout(300); const overflow = await page.evaluate(() => document.body.style.overflow); if (overflow === "hidden") throw new Error("scroll lock not restored");
+  const innerVisible = await frame.locator('[data-tour="device-preview"]:visible').count();
+  if (innerVisible > 0) throw new Error("recursive preview button visible inside frame");
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(300);
+  const overflow = await page.evaluate(() => document.body.style.overflow);
+  if (overflow === "hidden") throw new Error("scroll lock not restored");
 });
-await step("Demo Reset restores initial state", async () => { await go("/ax/settings"); await page.getByRole("button", { name: /데모 초기화/ }).first().click(); await page.waitForTimeout(300); const c = page.getByRole("button", { name: /초기화 실행|초기화$/ }); await c.last().click(); await page.waitForTimeout(600); const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state); if ((st.orders || []).length) throw new Error("orders not cleared"); });
+await step("Demo Reset restores initial state", async () => {
+  await go("/ax/settings");
+  await page
+    .getByRole("button", { name: /데모 초기화/ })
+    .first()
+    .click();
+  await page.waitForTimeout(300);
+  const c = page.getByRole("button", { name: /초기화 실행|초기화$/ });
+  await c.last().click();
+  await page.waitForTimeout(600);
+  const st = await page.evaluate(() => JSON.parse(localStorage.getItem("morfit-demo-v1") || "{}").state);
+  if ((st.orders || []).length) throw new Error("orders not cleared");
+});
 
 await browser.close();
 const failed = results.filter((r) => !r.ok);

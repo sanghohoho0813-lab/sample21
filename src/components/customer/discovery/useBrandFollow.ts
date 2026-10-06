@@ -10,7 +10,9 @@ function read(): string[] {
     const raw = window.localStorage.getItem(BRAND_FOLLOW_KEY);
     const arr = raw ? (JSON.parse(raw) as unknown) : [];
     return Array.isArray(arr) ? arr.filter((x): x is string => typeof x === "string") : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 export function useBrandFollow() {
@@ -18,18 +20,26 @@ export function useBrandFollow() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setIds(read()); setReady(true);
+    setIds(read());
+    setReady(true);
     const sync = () => setIds(read());
     window.addEventListener(EVT, sync);
     window.addEventListener("storage", sync);
-    return () => { window.removeEventListener(EVT, sync); window.removeEventListener("storage", sync); };
+    return () => {
+      window.removeEventListener(EVT, sync);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   const toggle = useCallback((brandId: string) => {
     const cur = read();
     const on = !cur.includes(brandId);
     const next = on ? [...cur, brandId] : cur.filter((x) => x !== brandId);
-    try { window.localStorage.setItem(BRAND_FOLLOW_KEY, JSON.stringify(next)); } catch { /* private mode etc. */ }
+    try {
+      window.localStorage.setItem(BRAND_FOLLOW_KEY, JSON.stringify(next));
+    } catch {
+      /* private mode etc. */
+    }
     setIds(next);
     window.dispatchEvent(new Event(EVT));
     return on;

@@ -7,5 +7,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!product) return { title: "상품을 찾을 수 없음" };
   const brand = BRAND_BY_ID[product.brandId]?.name;
   const title = brand ? `${product.name} · ${brand}` : product.name;
-  return { title, description: product.subtitle, openGraph: { title, description: product.subtitle, images: ["/opengraph-image"] } };
+  return {
+    title,
+    description: product.subtitle,
+    openGraph: { title, description: product.subtitle, images: ["/opengraph-image"] },
+  };
 }

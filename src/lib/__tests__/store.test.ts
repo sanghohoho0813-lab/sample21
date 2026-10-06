@@ -16,7 +16,12 @@ describe("주문 (Loop 2: 고객 주문 → AX 주문·재고)", () => {
     const unit = effPrice(PRODUCT_BY_ID["p-nove-oxford"], store());
     const expected = orderAmounts([{ unitPrice: unit, listPrice: PRODUCT_BY_ID["p-nove-oxford"].price, qty: 2 }], 5);
 
-    const order = store().placeOrder({ address: "서울 마포구 성산로 12", memo: "문 앞", couponRate: 5, payment: "카드" });
+    const order = store().placeOrder({
+      address: "서울 마포구 성산로 12",
+      memo: "문 앞",
+      couponRate: 5,
+      payment: "카드",
+    });
 
     expect(order.subtotal).toBe(expected.subtotal);
     expect(order.total).toBe(expected.total);
@@ -76,7 +81,11 @@ describe("저장 데이터 마이그레이션 v4 → v5", () => {
     expect(repairCouponOrder(ok)).toBe(ok);
 
     // 예전 식으로 저장된 주문: 쿠폰액 = round(79,000 × 5 / 100) × 100 = 395,000
-    const broken = { ...ok, discount: ok.discount - (ok.subtotal - ok.total + ok.shippingFee) + 395_000, total: ok.subtotal - 395_000 + ok.shippingFee };
+    const broken = {
+      ...ok,
+      discount: ok.discount - (ok.subtotal - ok.total + ok.shippingFee) + 395_000,
+      total: ok.subtotal - 395_000 + ok.shippingFee,
+    };
     const fixed = repairCouponOrder(broken);
     expect(fixed.total).toBe(ok.total);
     expect(fixed.discount).toBe(ok.discount);

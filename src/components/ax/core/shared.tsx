@@ -30,7 +30,16 @@ export const CHART = {
 };
 /** Categorical palette — 아이콘 톤 사다리와 분리한다: 차트는 '구분'이 목적이라
  *  같은 색의 톤 차이만으로는 계열을 읽을 수 없다. 테마 4색 + 각 색의 변형 4개. */
-export const CHART_SERIES = [CHART.primary, CHART.secondary, CHART.accent, CHART.highlight, "var(--chart-5)", "var(--chart-6)", "var(--chart-7)", "var(--chart-8)"];
+export const CHART_SERIES = [
+  CHART.primary,
+  CHART.secondary,
+  CHART.accent,
+  CHART.highlight,
+  "var(--chart-5)",
+  "var(--chart-6)",
+  "var(--chart-7)",
+  "var(--chart-8)",
+];
 
 export const axisKrw = (n: number) => {
   const abs = Math.abs(n);
@@ -41,20 +50,37 @@ export const axisKrw = (n: number) => {
 export const dayLabel = (key: string) => key.slice(5).replace("-", ".");
 
 /** Custom recharts tooltip — tokens only. */
-export function ChartTip({ active, payload, label, formatter }: {
-  active?: boolean; payload?: Array<{ name?: string; value?: number | string; color?: string; dataKey?: string | number; fill?: string; stroke?: string }>; label?: string | number;
+export function ChartTip({
+  active,
+  payload,
+  label,
+  formatter,
+}: {
+  active?: boolean;
+  payload?: Array<{
+    name?: string;
+    value?: number | string;
+    color?: string;
+    dataKey?: string | number;
+    fill?: string;
+    stroke?: string;
+  }>;
+  label?: string | number;
   formatter?: (key: string, value: number) => string;
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl bg-brand-black text-white px-3 py-2 shadow-lift text-[0.82rem] min-w-[140px]">
-      {label !== undefined && <p className="font-bold mb-1">{label}</p>}
+    <div className="min-w-[140px] rounded-xl bg-brand-black px-3 py-2 text-[0.82rem] text-white shadow-lift">
+      {label !== undefined && <p className="mb-1 font-bold">{label}</p>}
       {payload.map((p, i) => {
         const key = String(p.dataKey ?? p.name ?? i);
         const v = typeof p.value === "number" ? p.value : Number(p.value ?? 0);
         return (
           <p key={key + i} className="flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: p.color ?? p.fill ?? p.stroke ?? "#fff" }} />{p.name ?? key}</span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full" style={{ background: p.color ?? p.fill ?? p.stroke ?? "#fff" }} />
+              {p.name ?? key}
+            </span>
             <span className="tabular font-semibold">{formatter ? formatter(key, v) : v.toLocaleString("ko-KR")}</span>
           </p>
         );
@@ -64,11 +90,39 @@ export function ChartTip({ active, payload, label, formatter }: {
 }
 
 /* ------------------------------ Action labels ------------------------------ */
-export const ACTION_TYPE_LABEL: Record<ActionType, string> = { restock: "재입고", rebalance: "재배분", markdown: "할인", "fit-guide": "핏 안내", "segment-campaign": "세그먼트 캠페인", "cart-reminder": "장바구니 리마인드" };
-export const ACTION_TYPES: ActionType[] = ["restock", "rebalance", "markdown", "fit-guide", "segment-campaign", "cart-reminder"];
-export const ENGINE_LABEL: Record<AXAction["engine"], string> = { demand: "수요·재입고 엔진", fit: "핏 엔진", markdown: "할인 엔진", repeat: "재구매 엔진" };
-export const ENGINE_SHORT: Record<AXAction["engine"], string> = { demand: "수요", fit: "핏", markdown: "할인", repeat: "재구매" };
-export const ERROR_COST_LABEL: Record<AXAction["errorCost"], string> = { LOW: "오류 비용 낮음", MID: "오류 비용 중간", HIGH: "오류 비용 높음" };
+export const ACTION_TYPE_LABEL: Record<ActionType, string> = {
+  restock: "재입고",
+  rebalance: "재배분",
+  markdown: "할인",
+  "fit-guide": "핏 안내",
+  "segment-campaign": "세그먼트 캠페인",
+  "cart-reminder": "장바구니 리마인드",
+};
+export const ACTION_TYPES: ActionType[] = [
+  "restock",
+  "rebalance",
+  "markdown",
+  "fit-guide",
+  "segment-campaign",
+  "cart-reminder",
+];
+export const ENGINE_LABEL: Record<AXAction["engine"], string> = {
+  demand: "수요·재입고 엔진",
+  fit: "핏 엔진",
+  markdown: "할인 엔진",
+  repeat: "재구매 엔진",
+};
+export const ENGINE_SHORT: Record<AXAction["engine"], string> = {
+  demand: "수요",
+  fit: "핏",
+  markdown: "할인",
+  repeat: "재구매",
+};
+export const ERROR_COST_LABEL: Record<AXAction["errorCost"], string> = {
+  LOW: "오류 비용 낮음",
+  MID: "오류 비용 중간",
+  HIGH: "오류 비용 높음",
+};
 export const URGENCY_ORDER: Record<Urgency, number> = { high: 0, mid: 1, low: 2 };
 export const OPEN_STATUSES = new Set(["recommended", "confirmed", "in-progress"]);
 
@@ -78,7 +132,9 @@ export function visibleActions(role: Role, actions: AXAction[]) {
   return actions;
 }
 export function sortByUrgency(actions: AXAction[]) {
-  return [...actions].sort((a, b) => URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency] || (a.recommendedAt < b.recommendedAt ? 1 : -1));
+  return [...actions].sort(
+    (a, b) => URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency] || (a.recommendedAt < b.recommendedAt ? 1 : -1),
+  );
 }
 export const variantLabel = (variantId: string) => {
   const v = VARIANT_BY_ID[variantId];
@@ -87,21 +143,62 @@ export const variantLabel = (variantId: string) => {
 };
 
 /* ------------------------------ Small presentational parts ------------------------------ */
-export function SectionCard({ title, desc, right, children, tour, className, pad, as }: { title?: ReactNode; desc?: ReactNode; right?: ReactNode; children: ReactNode; tour?: string; className?: string; pad?: "none" | "sm" | "md" | "lg"; as?: "h2" | "h3" }) {
+export function SectionCard({
+  title,
+  desc,
+  right,
+  children,
+  tour,
+  className,
+  pad,
+  as,
+}: {
+  title?: ReactNode;
+  desc?: ReactNode;
+  right?: ReactNode;
+  children: ReactNode;
+  tour?: string;
+  className?: string;
+  pad?: "none" | "sm" | "md" | "lg";
+  as?: "h2" | "h3";
+}) {
   return (
-    <Card className={cn("bg-white transition-colors duration-200 hover:border-neutral-text2/25", className)} data-tour={tour} pad={pad}>
+    <Card
+      className={cn("bg-white transition-colors duration-200 hover:border-neutral-text2/25", className)}
+      data-tour={tour}
+      pad={pad}
+    >
       {title && <SectionTitle title={title} desc={desc} right={right} as={as ?? "h2"} className="mb-4" />}
       {children}
     </Card>
   );
 }
 
-export function DeltaText({ value, invert, label = "직전 대비", className, digits = 1 }: { value: number; invert?: boolean; label?: string; className?: string; digits?: number }) {
+export function DeltaText({
+  value,
+  invert,
+  label = "직전 대비",
+  className,
+  digits = 1,
+}: {
+  value: number;
+  invert?: boolean;
+  label?: string;
+  className?: string;
+  digits?: number;
+}) {
   const good = invert ? value <= 0 : value >= 0;
   return (
-    <span className={cn("inline-flex items-center gap-0.5 text-[0.82rem] font-semibold tabular", good ? "text-semantic-success" : "text-semantic-error", className)}>
-      {value >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}{Math.abs(value * 100).toFixed(digits)}%
-      {label && <span className="text-neutral-text2 font-normal ml-1">{label}</span>}
+    <span
+      className={cn(
+        "tabular inline-flex items-center gap-0.5 text-[0.82rem] font-semibold",
+        good ? "text-semantic-success" : "text-semantic-error",
+        className,
+      )}
+    >
+      {value >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+      {Math.abs(value * 100).toFixed(digits)}%
+      {label && <span className="ml-1 font-normal text-neutral-text2">{label}</span>}
     </span>
   );
 }
@@ -109,27 +206,85 @@ export function DeltaText({ value, invert, label = "직전 대비", className, d
 /** Signed unit delta e.g. "+8" / "−3" (for 판매/찜 대비). */
 export function UnitDelta({ cur, prev, className }: { cur: number; prev: number; className?: string }) {
   const d = cur - prev;
-  return <span className={cn("tabular text-[0.8rem] font-semibold", d > 0 ? "text-semantic-success" : d < 0 ? "text-semantic-error" : "text-neutral-text2", className)}>{d > 0 ? "+" : ""}{d}</span>;
-}
-
-export function MiniBar({ value, tone = "primary", className, showValue = true }: { value: number; tone?: "primary" | "warning" | "error" | "success" | "accent"; className?: string; showValue?: boolean }) {
-  const colors = { primary: "bg-theme-primary", warning: "bg-semantic-warning", error: "bg-semantic-error", success: "bg-semantic-success", accent: "bg-theme-accent" };
-  const v = Math.max(0, Math.min(100, value));
   return (
-    <span className={cn("inline-flex items-center gap-2 min-w-[96px]", className)}>
-      <span className="h-2 flex-1 rounded-full bg-neutral-canvas overflow-hidden border border-neutral-border/60"><span className={cn("block h-full rounded-full transition-[width] duration-500 ease-out", colors[tone])} style={{ width: `${Math.max(3, v)}%` }} /></span>
-      {showValue && <span className="tabular font-bold text-[0.9rem] w-7 text-right">{Math.round(v)}</span>}
+    <span
+      className={cn(
+        "tabular text-[0.8rem] font-semibold",
+        d > 0 ? "text-semantic-success" : d < 0 ? "text-semantic-error" : "text-neutral-text2",
+        className,
+      )}
+    >
+      {d > 0 ? "+" : ""}
+      {d}
     </span>
   );
 }
-export const demandTone = (score: number): "error" | "warning" | "primary" | "success" => (score >= 70 ? "error" : score >= 45 ? "warning" : score >= 25 ? "primary" : "success");
 
-export function EntityChip({ href, children, tone = "neutral" }: { href?: string; children: ReactNode; tone?: "neutral" | "accent" | "info" }) {
-  const cls = cn("inline-flex items-center gap-1 rounded-full px-2.5 h-10 md:h-7 text-[0.78rem] font-semibold border transition-colors duration-fast whitespace-nowrap max-w-full min-w-0", tone === "accent" ? "bg-theme-soft border-transparent text-theme-primary hover:brightness-95" : tone === "info" ? "bg-[#e8f0fe] border-transparent text-[#1d4ed8]" : "bg-neutral-canvas border-neutral-border text-neutral-text hover:border-neutral-text2");
+export function MiniBar({
+  value,
+  tone = "primary",
+  className,
+  showValue = true,
+}: {
+  value: number;
+  tone?: "primary" | "warning" | "error" | "success" | "accent";
+  className?: string;
+  showValue?: boolean;
+}) {
+  const colors = {
+    primary: "bg-theme-primary",
+    warning: "bg-semantic-warning",
+    error: "bg-semantic-error",
+    success: "bg-semantic-success",
+    accent: "bg-theme-accent",
+  };
+  const v = Math.max(0, Math.min(100, value));
+  return (
+    <span className={cn("inline-flex min-w-[96px] items-center gap-2", className)}>
+      <span className="h-2 flex-1 overflow-hidden rounded-full border border-neutral-border/60 bg-neutral-canvas">
+        <span
+          className={cn("block h-full rounded-full transition-[width] duration-500 ease-out", colors[tone])}
+          style={{ width: `${Math.max(3, v)}%` }}
+        />
+      </span>
+      {showValue && <span className="tabular w-7 text-right text-[0.9rem] font-bold">{Math.round(v)}</span>}
+    </span>
+  );
+}
+export const demandTone = (score: number): "error" | "warning" | "primary" | "success" =>
+  score >= 70 ? "error" : score >= 45 ? "warning" : score >= 25 ? "primary" : "success";
+
+export function EntityChip({
+  href,
+  children,
+  tone = "neutral",
+}: {
+  href?: string;
+  children: ReactNode;
+  tone?: "neutral" | "accent" | "info";
+}) {
+  const cls = cn(
+    "inline-flex h-10 min-w-0 max-w-full items-center gap-1 whitespace-nowrap rounded-full border px-2.5 text-[0.78rem] font-semibold transition-colors duration-fast md:h-7",
+    tone === "accent"
+      ? "border-transparent bg-theme-soft text-theme-primary hover:brightness-95"
+      : tone === "info"
+        ? "border-transparent bg-[#e8f0fe] text-[#1d4ed8]"
+        : "border-neutral-border bg-neutral-canvas text-neutral-text hover:border-neutral-text2",
+  );
   const label = <span className="min-w-0 truncate">{children}</span>;
   const title = typeof children === "string" ? children : undefined;
-  if (href) return <Link href={href} title={title} className={cn(cls, "press group")} onClick={(e) => e.stopPropagation()}>{label}<ChevronRight size={12} className="shrink-0 opacity-60 nudge-x" /></Link>;
-  return <span className={cls} title={title}>{label}</span>;
+  if (href)
+    return (
+      <Link href={href} title={title} className={cn(cls, "press group")} onClick={(e) => e.stopPropagation()}>
+        {label}
+        <ChevronRight size={12} className="nudge-x shrink-0 opacity-60" />
+      </Link>
+    );
+  return (
+    <span className={cls} title={title}>
+      {label}
+    </span>
+  );
 }
 
 /** Related product / option / brand / segment chips for an Action. */
@@ -139,36 +294,106 @@ export function ActionEntityChips({ action }: { action: AXAction }) {
   const b = action.brandId ? BRAND_BY_ID[action.brandId] : null;
   return (
     <div className="flex flex-wrap gap-1.5">
-      {p && <EntityChip href={`/ax/products/${p.id}`} tone="accent">{p.name}</EntityChip>}
-      {v && <EntityChip href={`/ax/products/${v.productId}?tab=options`}>옵션 {v.color} · {v.size}</EntityChip>}
+      {p && (
+        <EntityChip href={`/ax/products/${p.id}`} tone="accent">
+          {p.name}
+        </EntityChip>
+      )}
+      {v && (
+        <EntityChip href={`/ax/products/${v.productId}?tab=options`}>
+          옵션 {v.color} · {v.size}
+        </EntityChip>
+      )}
       {b && <EntityChip href={`/ax/brands`}>{b.name}</EntityChip>}
-      {action.segment && <EntityChip href={`/ax/customers?segment=${action.segment}`} tone="info">세그먼트 · {SEGMENT_LABEL[action.segment]}</EntityChip>}
+      {action.segment && (
+        <EntityChip href={`/ax/customers?segment=${action.segment}`} tone="info">
+          세그먼트 · {SEGMENT_LABEL[action.segment]}
+        </EntityChip>
+      )}
     </div>
   );
 }
 
 export function AxLink({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
-  return <Link href={href} className={cn("tap group inline-flex items-center gap-0.5 text-[0.9rem] font-semibold text-theme-primary", className)}><span className="link-line">{children}</span><ChevronRight size={16} className="nudge-x" /></Link>;
-}
-
-export function InfoNote({ children, tone = "neutral", className }: { children: ReactNode; tone?: "neutral" | "accent" | "warning"; className?: string }) {
   return (
-    <div className={cn("rounded-xl px-4 py-3 text-[0.88rem] leading-relaxed", tone === "accent" ? "bg-theme-soft text-neutral-text" : tone === "warning" ? "bg-[#fff1e6] text-[#b45309]" : "bg-neutral-canvas text-neutral-text2", className)}>{children}</div>
+    <Link
+      href={href}
+      className={cn(
+        "tap group inline-flex items-center gap-0.5 text-[0.9rem] font-semibold text-theme-primary",
+        className,
+      )}
+    >
+      <span className="link-line">{children}</span>
+      <ChevronRight size={16} className="nudge-x" />
+    </Link>
   );
 }
 
-export function StatPill({ label, value, sub, tone }: { label: string; value: ReactNode; sub?: ReactNode; tone?: "neutral" | "warning" | "error" | "success" | "accent" }) {
+export function InfoNote({
+  children,
+  tone = "neutral",
+  className,
+}: {
+  children: ReactNode;
+  tone?: "neutral" | "accent" | "warning";
+  className?: string;
+}) {
   return (
-    <div className="rounded-xl bg-neutral-canvas px-3.5 py-2.5 min-w-0">
-      <p className="text-[0.78rem] font-semibold text-neutral-text2 break-keep leading-snug">{label}</p>
-      <p className={cn("text-[1.1rem] font-bold tabular leading-tight mt-0.5", tone === "warning" && "text-semantic-warning", tone === "error" && "text-semantic-error", tone === "success" && "text-semantic-success", tone === "accent" && "text-theme-primary")}><AutoFit>{value}</AutoFit></p>
-      {sub && <p className="text-[0.78rem] text-neutral-text2 mt-0.5 break-keep leading-snug">{sub}</p>}
+    <div
+      className={cn(
+        "rounded-xl px-4 py-3 text-[0.88rem] leading-relaxed",
+        tone === "accent"
+          ? "bg-theme-soft text-neutral-text"
+          : tone === "warning"
+            ? "bg-[#fff1e6] text-[#b45309]"
+            : "bg-neutral-canvas text-neutral-text2",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function StatPill({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: ReactNode;
+  sub?: ReactNode;
+  tone?: "neutral" | "warning" | "error" | "success" | "accent";
+}) {
+  return (
+    <div className="min-w-0 rounded-xl bg-neutral-canvas px-3.5 py-2.5">
+      <p className="break-keep text-[0.78rem] font-semibold leading-snug text-neutral-text2">{label}</p>
+      <p
+        className={cn(
+          "tabular mt-0.5 text-[1.1rem] font-bold leading-tight",
+          tone === "warning" && "text-semantic-warning",
+          tone === "error" && "text-semantic-error",
+          tone === "success" && "text-semantic-success",
+          tone === "accent" && "text-theme-primary",
+        )}
+      >
+        <AutoFit>{value}</AutoFit>
+      </p>
+      {sub && <p className="mt-0.5 break-keep text-[0.78rem] leading-snug text-neutral-text2">{sub}</p>}
     </div>
   );
 }
 
 export function RoleNote({ children }: { children: ReactNode }) {
-  return <div className="inline-flex items-center gap-2 text-[0.82rem] text-neutral-text2"><Badge tone="neutral" size="sm">역할별 화면</Badge>{children}</div>;
+  return (
+    <div className="inline-flex items-center gap-2 text-[0.82rem] text-neutral-text2">
+      <Badge tone="neutral" size="sm">
+        역할별 화면
+      </Badge>
+      {children}
+    </div>
+  );
 }
 
 /* ------------------------------ Skeletons ------------------------------ */
@@ -176,17 +401,32 @@ export function KpiSkeleton({ n = 4, lg }: { n?: number; lg?: boolean }) {
   return (
     <div className={cn("grid gap-4", n >= 4 ? "grid-cols-2 xl:grid-cols-4" : "grid-cols-1 md:grid-cols-3")}>
       {Array.from({ length: n }).map((_, i) => (
-        <div key={i} className="rounded-cardlg bg-white border border-neutral-border p-5 space-y-3"><Skeleton className="h-4 w-1/2" /><Skeleton className={lg ? "h-10 w-3/4" : "h-8 w-2/3"} /><Skeleton className="h-4 w-1/3" /></div>
+        <div key={i} className="space-y-3 rounded-cardlg border border-neutral-border bg-white p-5">
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className={lg ? "h-10 w-3/4" : "h-8 w-2/3"} />
+          <Skeleton className="h-4 w-1/3" />
+        </div>
       ))}
     </div>
   );
 }
 export function PageSkeleton({ rows = 2 }: { rows?: number }) {
   return (
-    <div className="space-y-5 animate-fadeIn">
-      <div className="flex items-end justify-between gap-3"><div className="space-y-2"><Skeleton className="h-8 w-56" /><Skeleton className="h-4 w-80 max-w-full" /></div><Skeleton className="h-10 w-64 max-w-[40%]" /></div>
+    <div className="animate-fadeIn space-y-5">
+      <div className="flex items-end justify-between gap-3">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-56" />
+          <Skeleton className="h-4 w-80 max-w-full" />
+        </div>
+        <Skeleton className="h-10 w-64 max-w-[40%]" />
+      </div>
       <KpiSkeleton n={4} lg />
-      {Array.from({ length: rows }).map((_, i) => <div key={i} className="rounded-cardlg bg-white border border-neutral-border p-5 space-y-3"><Skeleton className="h-5 w-40" /><Skeleton className="h-40 w-full" /></div>)}
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="space-y-3 rounded-cardlg border border-neutral-border bg-white p-5">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-40 w-full" />
+        </div>
+      ))}
     </div>
   );
 }

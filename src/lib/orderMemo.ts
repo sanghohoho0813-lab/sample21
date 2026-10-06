@@ -11,16 +11,32 @@ export interface OrderMemoParts {
 }
 
 /** 주문서 입력값 → 저장용 메모 (결제수단은 store.placeOrder가 붙인다) */
-export function buildOrderMemo({ request, name, phone, coupon }: { request: string; name: string; phone: string; coupon?: string }) {
-  return [request.trim(), `주문자 ${name.trim()} ${phone.trim()}`, coupon ? `쿠폰 ${coupon}` : ""].filter(Boolean).join(SEP);
+export function buildOrderMemo({
+  request,
+  name,
+  phone,
+  coupon,
+}: {
+  request: string;
+  name: string;
+  phone: string;
+  coupon?: string;
+}) {
+  return [request.trim(), `주문자 ${name.trim()} ${phone.trim()}`, coupon ? `쿠폰 ${coupon}` : ""]
+    .filter(Boolean)
+    .join(SEP);
 }
 
-export const withPayment = (memo: string | undefined, payment: string) => (memo ? `${memo}${SEP}결제수단(데모): ${payment}` : `결제수단(데모): ${payment}`);
+export const withPayment = (memo: string | undefined, payment: string) =>
+  memo ? `${memo}${SEP}결제수단(데모): ${payment}` : `결제수단(데모): ${payment}`;
 
 /** 저장된 메모 → 항목. 알 수 없는 조각은 배송 요청으로 모은다(요청 문구 안의 ' · '도 보존). */
 export function parseOrderMemo(memo?: string): OrderMemoParts {
   const out: OrderMemoParts = { request: "", orderer: "", coupon: "", payment: "" };
-  for (const part of (memo ?? "").split(SEP).map((x) => x.trim()).filter(Boolean)) {
+  for (const part of (memo ?? "")
+    .split(SEP)
+    .map((x) => x.trim())
+    .filter(Boolean)) {
     if (part.startsWith("주문자 ")) out.orderer = part.slice(4);
     else if (part.startsWith("쿠폰 ")) out.coupon = part.slice(3);
     else if (part.startsWith("결제수단")) out.payment = part.replace(/^결제수단(\(데모\))?:\s*/, "");

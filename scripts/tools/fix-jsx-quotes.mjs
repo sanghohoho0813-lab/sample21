@@ -2,7 +2,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import ts from "typescript";
-function* walk(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) yield* walk(f); else if (f.endsWith(".tsx")) yield f; } }
+function* walk(d) {
+  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+    const f = path.join(d, e.name);
+    if (e.isDirectory()) yield* walk(f);
+    else if (f.endsWith(".tsx")) yield f;
+  }
+}
 let n = 0;
 for (const file of walk("src")) {
   const src = fs.readFileSync(file, "utf8");
@@ -12,8 +18,11 @@ for (const file of walk("src")) {
     if (ts.isJsxText(node)) {
       const t = node.getText(sf);
       if (/["']/.test(t)) {
-        let dq = 0, sq = 0;
-        const out = t.replace(/"/g, () => (dq++ % 2 === 0 ? "“" : "”")).replace(/'/g, () => (sq++ % 2 === 0 ? "‘" : "’"));
+        let dq = 0,
+          sq = 0;
+        const out = t
+          .replace(/"/g, () => (dq++ % 2 === 0 ? "“" : "”"))
+          .replace(/'/g, () => (sq++ % 2 === 0 ? "‘" : "’"));
         edits.push([node.getStart(sf), node.getEnd(), out]);
       }
     }
@@ -21,7 +30,9 @@ for (const file of walk("src")) {
   };
   visit(sf);
   if (!edits.length) continue;
-  let out = src; for (const [s, e, t] of edits.sort((a, b) => b[0] - a[0])) out = out.slice(0, s) + t + out.slice(e);
-  fs.writeFileSync(file, out); n += edits.length;
+  let out = src;
+  for (const [s, e, t] of edits.sort((a, b) => b[0] - a[0])) out = out.slice(0, s) + t + out.slice(e);
+  fs.writeFileSync(file, out);
+  n += edits.length;
 }
 console.log("JSX text nodes with quotes fixed:", n);

@@ -8,13 +8,13 @@ import type { Config } from "tailwindcss";
 ------------------------------------------------------------------- */
 const token = (name: string) =>
   // Tailwind는 런타임에 함수를 호출하지만 타입 정의는 문자열만 허용한다.
-  ((({ opacityValue }: { opacityValue?: string }) => {
+  (({ opacityValue }: { opacityValue?: string }) => {
     const v = `var(${name})`;
     if (opacityValue === undefined) return v;
     const n = Number(opacityValue);
     if (!Number.isFinite(n)) return v; // bg-opacity-* 같은 레거시 경로는 원색 유지
     return `color-mix(in srgb, ${v} ${n * 100}%, transparent)`;
-  }) as unknown) as string;
+  }) as unknown as string;
 
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
@@ -55,8 +55,16 @@ const config: Config = {
           label: token("--sidebar-label"),
         },
         icon: {
-          t1: token("--icon-t1"), t2: token("--icon-t2"), t3: token("--icon-t3"), t4: token("--icon-t4"), t5: token("--icon-t5"),
-          t6: token("--icon-t6"), t7: token("--icon-t7"), t8: token("--icon-t8"), t9: token("--icon-t9"), t10: token("--icon-t10"),
+          t1: token("--icon-t1"),
+          t2: token("--icon-t2"),
+          t3: token("--icon-t3"),
+          t4: token("--icon-t4"),
+          t5: token("--icon-t5"),
+          t6: token("--icon-t6"),
+          t7: token("--icon-t7"),
+          t8: token("--icon-t8"),
+          t9: token("--icon-t9"),
+          t10: token("--icon-t10"),
         },
       },
       fontFamily: {

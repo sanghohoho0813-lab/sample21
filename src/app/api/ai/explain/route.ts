@@ -27,19 +27,32 @@ const configured = () => !!process.env.ANTHROPIC_API_KEY;
 
 /** GET — 연결 상태만 알려준다 (LLM 호출 없음). */
 export async function GET() {
-  return NextResponse.json({ status: configured() ? "LIVE" : "AI_READY", model: configured() ? MODEL : "rule-based", configured: configured() });
+  return NextResponse.json({
+    status: configured() ? "LIVE" : "AI_READY",
+    model: configured() ? MODEL : "rule-based",
+    configured: configured(),
+  });
 }
 
 /** POST — { kind, structured, fallback } → { status, text, model, note? } */
 export async function POST(req: Request) {
   let body: { kind?: string; structured?: Record<string, unknown>; fallback?: string } = {};
-  try { body = await req.json(); } catch { /* empty body */ }
+  try {
+    body = await req.json();
+  } catch {
+    /* empty body */
+  }
   const kind = typeof body.kind === "string" && ALLOWED_KINDS.has(body.kind) ? body.kind : "briefing";
   const fallback = typeof body.fallback === "string" ? body.fallback.slice(0, 4000) : "";
   const structured = body.structured && typeof body.structured === "object" ? body.structured : {};
 
   if (!configured()) {
-    return NextResponse.json({ status: "AI_READY", text: fallback, model: "rule-based (LLM 연결 예정)", note: "ANTHROPIC_API_KEY 미설정 — 규칙 기반 텍스트를 그대로 표시합니다." });
+    return NextResponse.json({
+      status: "AI_READY",
+      text: fallback,
+      model: "rule-based (LLM 연결 예정)",
+      note: "ANTHROPIC_API_KEY 미설정 — 규칙 기반 텍스트를 그대로 표시합니다.",
+    });
   }
 
   // 구조화된 숫자만 전달 (이름·연락처 등 개인정보 없음)
@@ -52,17 +65,39 @@ export async function POST(req: Request) {
       thinking: { type: "adaptive" },
       output_config: { effort: "low" },
       system: SYSTEM,
-      messages: [{ role: "user", content: `다음 KPI를 바탕으로 ${kind === "briefing" ? "경영 브리핑" : kind === "action-reason" ? "과제 추천 근거 설명" : "핏 추천 설명"}을 작성해 주세요.\n${payload}` }],
+      messages: [
+        {
+          role: "user",
+          content: `다음 KPI를 바탕으로 ${kind === "briefing" ? "경영 브리핑" : kind === "action-reason" ? "과제 추천 근거 설명" : "핏 추천 설명"}을 작성해 주세요.\n${payload}`,
+        },
+      ],
     });
-    const text = res.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map((b) => b.text).join("\n").trim();
-    if (!text) return NextResponse.json({ status: "AI_READY", text: fallback, model: MODEL, note: "LLM 응답이 비어 있어 규칙 기반 텍스트를 표시합니다." });
-    return NextResponse.json({ status: "LIVE", text, model: res.model ?? MODEL, usage: { input: res.usage.input_tokens, output: res.usage.output_tokens } });
+    const text = res.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .map((b) => b.text)
+      .join("\n")
+      .trim();
+    if (!text)
+      return NextResponse.json({
+        status: "AI_READY",
+        text: fallback,
+        model: MODEL,
+        note: "LLM 응답이 비어 있어 규칙 기반 텍스트를 표시합니다.",
+      });
+    return NextResponse.json({
+      status: "LIVE",
+      text,
+      model: res.model ?? MODEL,
+      usage: { input: res.usage.input_tokens, output: res.usage.output_tokens },
+    });
   } catch (error) {
     // 실패해도 화면은 절대 비지 않는다 — 규칙 기반 텍스트로 폴백
     let note = "LLM 호출 실패 — 규칙 기반 텍스트를 표시합니다.";
-    if (error instanceof Anthropic.AuthenticationError) note = "API 키가 유효하지 않습니다 (401). 규칙 기반 텍스트를 표시합니다.";
+    if (error instanceof Anthropic.AuthenticationError)
+      note = "API 키가 유효하지 않습니다 (401). 규칙 기반 텍스트를 표시합니다.";
     else if (error instanceof Anthropic.RateLimitError) note = "요청 한도 초과 (429). 잠시 후 다시 시도하세요.";
-    else if (error instanceof Anthropic.APIError) note = `API 오류 ${error.status ?? ""}: 규칙 기반 텍스트를 표시합니다.`;
+    else if (error instanceof Anthropic.APIError)
+      note = `API 오류 ${error.status ?? ""}: 규칙 기반 텍스트를 표시합니다.`;
     return NextResponse.json({ status: "AI_READY", text: fallback, model: "rule-based (fallback)", note });
   }
 }

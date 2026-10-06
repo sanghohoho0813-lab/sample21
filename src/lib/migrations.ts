@@ -11,6 +11,9 @@ export function repairCouponOrder(o: Order): Order {
   const storedCoupon = o.discount - itemDiscount;
   if (o.subtotal <= 0 || storedCoupon <= o.subtotal) return o;
   const rate = Math.round(storedCoupon / o.subtotal);
-  const a = orderAmounts(o.items.map((i) => ({ unitPrice: i.unitPrice, listPrice: i.unitPrice + i.discount, qty: i.qty })), rate);
+  const a = orderAmounts(
+    o.items.map((i) => ({ unitPrice: i.unitPrice, listPrice: i.unitPrice + i.discount, qty: i.qty })),
+    rate,
+  );
   return { ...o, subtotal: a.subtotal, discount: a.coupon + itemDiscount, shippingFee: a.shippingFee, total: a.total };
 }

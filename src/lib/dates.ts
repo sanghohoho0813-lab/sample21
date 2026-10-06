@@ -26,9 +26,14 @@ export function daysBetween(a: string | Date, b: string | Date) {
 export function fmtDate(iso: string | Date, opts: "short" | "long" | "time" | "datetime" = "short"): string {
   const d = typeof iso === "string" ? new Date(iso) : iso;
   if (Number.isNaN(d.getTime())) return "-";
-  if (opts === "short") return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
-  if (opts === "long") return new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(d);
-  if (opts === "time") return new Intl.DateTimeFormat("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
+  if (opts === "short")
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+  if (opts === "long")
+    return new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(
+      d,
+    );
+  if (opts === "time")
+    return new Intl.DateTimeFormat("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
   // 날짜와 시각 사이는 줄바꿈 금지 공백(NBSP) — "2026.09.29 / 14:50"처럼 두 줄로 깨지지 않게
   return `${fmtDate(d, "short")}\u00a0${fmtDate(d, "time")}`;
 }

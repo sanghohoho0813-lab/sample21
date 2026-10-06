@@ -4,8 +4,18 @@ import { create } from "zustand";
 import { CheckCircle2, Info, AlertTriangle, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-interface ToastItem { id: string; title: string; body?: string; tone?: "success" | "info" | "warning"; href?: string }
-interface ToastState { items: ToastItem[]; push: (t: Omit<ToastItem, "id">) => void; dismiss: (id: string) => void }
+interface ToastItem {
+  id: string;
+  title: string;
+  body?: string;
+  tone?: "success" | "info" | "warning";
+  href?: string;
+}
+interface ToastState {
+  items: ToastItem[];
+  push: (t: Omit<ToastItem, "id">) => void;
+  dismiss: (id: string) => void;
+}
 
 export const useToast = create<ToastState>((set) => ({
   items: [],
@@ -18,7 +28,8 @@ export const useToast = create<ToastState>((set) => ({
   dismiss: (id) => set((s) => ({ items: s.items.filter((i) => i.id !== id) })),
 }));
 
-export const toast = (title: string, body?: string, tone: ToastItem["tone"] = "success") => useToast.getState().push({ title, body, tone });
+export const toast = (title: string, body?: string, tone: ToastItem["tone"] = "success") =>
+  useToast.getState().push({ title, body, tone });
 
 /* 위치: 창(모달·시트)이 열려 있으면 화면 위쪽, 하단 고정 버튼(구매·주문 바)이 있으면 그 바로 위 — 버튼을 가리지 않게 */
 function useToastPosition(lastId: string | undefined): CSSProperties | undefined {
@@ -27,8 +38,14 @@ function useToastPosition(lastId: string | undefined): CSSProperties | undefined
     if (!lastId) return;
     // 한 프레임 뒤에 잰다 — '담기'처럼 토스트와 동시에 시트가 닫히는 경우, 닫힌 뒤의 화면 기준으로 자리 잡게
     const id = requestAnimationFrame(() => {
-      if (document.documentElement.hasAttribute("data-overlay-open")) { setPos({ top: "calc(env(safe-area-inset-top) + 16px)", bottom: "auto" }); return; }
-      const tops = Array.from(document.querySelectorAll<HTMLElement>("[data-buy-bar],[data-checkout-bar]")).map((el) => el.getBoundingClientRect()).filter((r) => r.height > 0 && r.top < window.innerHeight).map((r) => r.top);
+      if (document.documentElement.hasAttribute("data-overlay-open")) {
+        setPos({ top: "calc(env(safe-area-inset-top) + 16px)", bottom: "auto" });
+        return;
+      }
+      const tops = Array.from(document.querySelectorAll<HTMLElement>("[data-buy-bar],[data-checkout-bar]"))
+        .map((el) => el.getBoundingClientRect())
+        .filter((r) => r.height > 0 && r.top < window.innerHeight)
+        .map((r) => r.top);
       setPos(tops.length ? { bottom: window.innerHeight - Math.min(...tops) + 8 } : undefined);
     });
     return () => cancelAnimationFrame(id);
@@ -40,15 +57,36 @@ export function Toaster() {
   const { items, dismiss } = useToast();
   const pos = useToastPosition(items[items.length - 1]?.id);
   return (
-    <div data-toaster role="status" aria-live="polite" style={pos} className="fixed left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-[calc(100%-32px)] max-w-md pointer-events-none max-md:[&>*:not(:last-child)]:hidden">
+    <div
+      data-toaster
+      role="status"
+      aria-live="polite"
+      style={pos}
+      className="pointer-events-none fixed left-1/2 z-[100] flex w-[calc(100%-32px)] max-w-md -translate-x-1/2 flex-col gap-2 max-md:[&>*:not(:last-child)]:hidden"
+    >
       {items.map((t) => (
-        <div key={t.id} className="pointer-events-auto rounded-2xl bg-brand-black text-white shadow-lift px-4 py-3 flex items-start gap-3 animate-fadeUp">
-          {t.tone === "warning" ? <AlertTriangle size={20} className="text-[#f5c451] mt-0.5 shrink-0" /> : t.tone === "info" ? <Info size={20} className="text-[#8fb4ff] mt-0.5 shrink-0" /> : <CheckCircle2 size={20} className="text-[#6ee7a2] mt-0.5 shrink-0" />}
+        <div
+          key={t.id}
+          className="pointer-events-auto flex animate-fadeUp items-start gap-3 rounded-2xl bg-brand-black px-4 py-3 text-white shadow-lift"
+        >
+          {t.tone === "warning" ? (
+            <AlertTriangle size={20} className="mt-0.5 shrink-0 text-[#f5c451]" />
+          ) : t.tone === "info" ? (
+            <Info size={20} className="mt-0.5 shrink-0 text-[#8fb4ff]" />
+          ) : (
+            <CheckCircle2 size={20} className="mt-0.5 shrink-0 text-[#6ee7a2]" />
+          )}
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-[0.95rem] leading-snug">{t.title}</p>
-            {t.body && <p className={cn("text-[0.85rem] text-white/75 mt-0.5 leading-snug")}>{t.body}</p>}
+            <p className="text-[0.95rem] font-semibold leading-snug">{t.title}</p>
+            {t.body && <p className={cn("mt-0.5 text-[0.85rem] leading-snug text-white/75")}>{t.body}</p>}
           </div>
-          <button onClick={() => dismiss(t.id)} aria-label="알림 닫기" className="-my-2 -mr-2 h-10 w-10 shrink-0 inline-flex items-center justify-center rounded-full text-white/60 hover:text-white"><X size={16} /></button>
+          <button
+            onClick={() => dismiss(t.id)}
+            aria-label="알림 닫기"
+            className="-my-2 -mr-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/60 hover:text-white"
+          >
+            <X size={16} />
+          </button>
         </div>
       ))}
     </div>

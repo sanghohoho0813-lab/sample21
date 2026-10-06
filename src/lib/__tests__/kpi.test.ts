@@ -1,11 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { PRODUCTS, PRODUCT_BY_ID, VARIANTS } from "@/lib/demo/seed";
-import { daysOfStock, demandScore, effPrice, inventoryStatus, markdownReview, restockFunnel, restockPriority } from "@/lib/kpi";
+import {
+  daysOfStock,
+  demandScore,
+  effPrice,
+  inventoryStatus,
+  markdownReview,
+  restockFunnel,
+  restockPriority,
+} from "@/lib/kpi";
 import type { Variant } from "@/lib/types";
 
 const emptyDelta = {
-  viewDelta: {}, wishlistDelta: {}, cartDelta: {}, restockDelta: {}, inventoryDelta: {}, returnDelta: {},
-  salePriceOverride: {}, fitNoteOverride: {}, variantRestockState: {}, orderStatusOverride: {}, orders: [], returns: [],
+  viewDelta: {},
+  wishlistDelta: {},
+  cartDelta: {},
+  restockDelta: {},
+  inventoryDelta: {},
+  returnDelta: {},
+  salePriceOverride: {},
+  fitNoteOverride: {},
+  variantRestockState: {},
+  orderStatusOverride: {},
+  orders: [],
+  returns: [],
 };
 const base = VARIANTS[0];
 const variant = (patch: Partial<Variant>): Variant => ({ ...base, ...patch });

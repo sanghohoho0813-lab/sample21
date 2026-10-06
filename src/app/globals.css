@@ -43,15 +43,87 @@
   --font-scale: 1;
 }
 
-[data-theme="deep-navy"]      { --theme-shell:#0B1830; --theme-primary:#2457D6; --theme-secondary:#1687A7; --theme-accent:#17A889; --theme-highlight:#E7C873; --theme-soft:#DCE8F7; --brand-accent:#315CF5; }
-[data-theme="navy-gold"]      { --theme-shell:#111A2D; --theme-primary:#2847A7; --theme-secondary:#A37A28; --theme-accent:#D0A84B; --theme-highlight:#F0D995; --theme-soft:#EFE8D7; --brand-accent:#2847A7; }
-[data-theme="emerald-gold"]   { --theme-shell:#11332B; --theme-primary:#0E7663; --theme-secondary:#2C9277; --theme-accent:#B4862A; --theme-highlight:#E8CE88; --theme-soft:#E2F0EA; --brand-accent:#0E7663; }
-[data-theme="forest-sage"]    { --theme-shell:#17352C; --theme-primary:#356E58; --theme-secondary:#73977E; --theme-accent:#A58E4D; --theme-highlight:#D9D2AA; --theme-soft:#E5ECE5; --brand-accent:#356E58; }
-[data-theme="deep-teal"]      { --theme-shell:#08323A; --theme-primary:#087A83; --theme-secondary:#1597A3; --theme-accent:#D2704C; --theme-highlight:#E9B59B; --theme-soft:#DDEDEF; --brand-accent:#087A83; }
-[data-theme="onyx-gold"]      { --theme-shell:#15171C; --theme-primary:#343942; --theme-secondary:#6A717C; --theme-accent:#B89032; --theme-highlight:#E0C76F; --theme-soft:#E6E8EC; --brand-accent:#B89032; }
-[data-theme="burgundy-slate"] { --theme-shell:#3A1724; --theme-primary:#7A2C49; --theme-secondary:#667085; --theme-accent:#A85C72; --theme-highlight:#E6B6A5; --theme-soft:#EEE4E8; --brand-accent:#7A2C49; }
-[data-theme="plum-indigo"]    { --theme-shell:#291A3D; --theme-primary:#573F91; --theme-secondary:#4E63A8; --theme-accent:#8B5AA6; --theme-highlight:#C4B0E6; --theme-soft:#E9E5F3; --brand-accent:#573F91; }
-[data-theme="steel-platinum"] { --theme-shell:#24303B; --theme-primary:#44647A; --theme-secondary:#6D8899; --theme-accent:#4C9AAA; --theme-highlight:#C9D6DE; --theme-soft:#E7EDF1; --brand-accent:#44647A; }
+[data-theme="deep-navy"] {
+  --theme-shell: #0b1830;
+  --theme-primary: #2457d6;
+  --theme-secondary: #1687a7;
+  --theme-accent: #17a889;
+  --theme-highlight: #e7c873;
+  --theme-soft: #dce8f7;
+  --brand-accent: #315cf5;
+}
+[data-theme="navy-gold"] {
+  --theme-shell: #111a2d;
+  --theme-primary: #2847a7;
+  --theme-secondary: #a37a28;
+  --theme-accent: #d0a84b;
+  --theme-highlight: #f0d995;
+  --theme-soft: #efe8d7;
+  --brand-accent: #2847a7;
+}
+[data-theme="emerald-gold"] {
+  --theme-shell: #11332b;
+  --theme-primary: #0e7663;
+  --theme-secondary: #2c9277;
+  --theme-accent: #b4862a;
+  --theme-highlight: #e8ce88;
+  --theme-soft: #e2f0ea;
+  --brand-accent: #0e7663;
+}
+[data-theme="forest-sage"] {
+  --theme-shell: #17352c;
+  --theme-primary: #356e58;
+  --theme-secondary: #73977e;
+  --theme-accent: #a58e4d;
+  --theme-highlight: #d9d2aa;
+  --theme-soft: #e5ece5;
+  --brand-accent: #356e58;
+}
+[data-theme="deep-teal"] {
+  --theme-shell: #08323a;
+  --theme-primary: #087a83;
+  --theme-secondary: #1597a3;
+  --theme-accent: #d2704c;
+  --theme-highlight: #e9b59b;
+  --theme-soft: #ddedef;
+  --brand-accent: #087a83;
+}
+[data-theme="onyx-gold"] {
+  --theme-shell: #15171c;
+  --theme-primary: #343942;
+  --theme-secondary: #6a717c;
+  --theme-accent: #b89032;
+  --theme-highlight: #e0c76f;
+  --theme-soft: #e6e8ec;
+  --brand-accent: #b89032;
+}
+[data-theme="burgundy-slate"] {
+  --theme-shell: #3a1724;
+  --theme-primary: #7a2c49;
+  --theme-secondary: #667085;
+  --theme-accent: #a85c72;
+  --theme-highlight: #e6b6a5;
+  --theme-soft: #eee4e8;
+  --brand-accent: #7a2c49;
+}
+[data-theme="plum-indigo"] {
+  --theme-shell: #291a3d;
+  --theme-primary: #573f91;
+  --theme-secondary: #4e63a8;
+  --theme-accent: #8b5aa6;
+  --theme-highlight: #c4b0e6;
+  --theme-soft: #e9e5f3;
+  --brand-accent: #573f91;
+}
+[data-theme="steel-platinum"] {
+  --theme-shell: #24303b;
+  --theme-primary: #44647a;
+  --theme-secondary: #6d8899;
+  --theme-accent: #4c9aaa;
+  --theme-highlight: #c9d6de;
+  --theme-soft: #e7edf1;
+  --brand-accent: #44647a;
+}
 
 /* ------------------------------------------------------------------
    ICON TONE LADDER — 아이콘은 '다른 색'이 아니라 '같은 색의 다른 톤'.
@@ -60,22 +132,33 @@
    t1(가장 진함) → t9(가장 옅음) → t10(무채 계열 · 중요도 최하)
 ------------------------------------------------------------------- */
 :root {
-  --icon-t1: #1b429f; --icon-t2: #1f4cb8; --icon-t3: #2252cb; --icon-t4: #2457d6; --icon-t5: #3766db;
-  --icon-t6: #4d79e0; --icon-t7: #648be5; --icon-t8: #7b9dea; --icon-t9: #92afef; --icon-t10: #5f6b82;
+  --icon-t1: #1b429f;
+  --icon-t2: #1f4cb8;
+  --icon-t3: #2252cb;
+  --icon-t4: #2457d6;
+  --icon-t5: #3766db;
+  --icon-t6: #4d79e0;
+  --icon-t7: #648be5;
+  --icon-t8: #7b9dea;
+  --icon-t9: #92afef;
+  --icon-t10: #5f6b82;
   /* 차트 계열색은 '구분'이 목적이라 톤 사다리와 분리한다 (테마 4색 + 각 색의 밝은/어두운 변형) */
-  --chart-5: #7d9ce8; --chart-6: #6fb9cc; --chart-7: #6cc9b4; --chart-8: #b99331;
+  --chart-5: #7d9ce8;
+  --chart-6: #6fb9cc;
+  --chart-7: #6cc9b4;
+  --chart-8: #b99331;
 }
 @supports (color: color-mix(in oklab, red, blue)) {
   :root {
-    --icon-t1:  color-mix(in oklab, var(--theme-primary) 82%, #000);
-    --icon-t2:  color-mix(in oklab, var(--theme-primary) 88%, #000);
-    --icon-t3:  color-mix(in oklab, var(--theme-primary) 94%, #000);
-    --icon-t4:  var(--theme-primary);
-    --icon-t5:  color-mix(in oklab, var(--theme-primary) 95%, #fff);
-    --icon-t6:  color-mix(in oklab, var(--theme-primary) 90%, #fff);
-    --icon-t7:  color-mix(in oklab, var(--theme-primary) 85%, #fff);
-    --icon-t8:  color-mix(in oklab, var(--theme-primary) 80%, #fff);
-    --icon-t9:  color-mix(in oklab, var(--theme-primary) 75%, #fff);
+    --icon-t1: color-mix(in oklab, var(--theme-primary) 82%, #000);
+    --icon-t2: color-mix(in oklab, var(--theme-primary) 88%, #000);
+    --icon-t3: color-mix(in oklab, var(--theme-primary) 94%, #000);
+    --icon-t4: var(--theme-primary);
+    --icon-t5: color-mix(in oklab, var(--theme-primary) 95%, #fff);
+    --icon-t6: color-mix(in oklab, var(--theme-primary) 90%, #fff);
+    --icon-t7: color-mix(in oklab, var(--theme-primary) 85%, #fff);
+    --icon-t8: color-mix(in oklab, var(--theme-primary) 80%, #fff);
+    --icon-t9: color-mix(in oklab, var(--theme-primary) 75%, #fff);
     --icon-t10: color-mix(in oklab, var(--theme-primary) 58%, var(--neutral-text-secondary));
     --chart-5: color-mix(in oklab, var(--theme-primary) 70%, #fff);
     --chart-6: color-mix(in oklab, var(--theme-secondary) 70%, #fff);
@@ -84,21 +167,35 @@
   }
 }
 
-html[data-font="small"]   { --font-scale: 0.9; }
-html[data-font="default"] { --font-scale: 1; }
-html[data-font="large"]   { --font-scale: 1.12; }
+html[data-font="small"] {
+  --font-scale: 0.9;
+}
+html[data-font="default"] {
+  --font-scale: 1;
+}
+html[data-font="large"] {
+  --font-scale: 1.12;
+}
 
 html {
   font-size: calc(18px * var(--font-scale));
   -webkit-text-size-adjust: 100%;
 }
-html[data-surface="ax"] { font-size: calc(19px * var(--font-scale)); }
+html[data-surface="ax"] {
+  font-size: calc(19px * var(--font-scale));
+}
 @media (max-width: 767px) {
-  html { font-size: calc(16.5px * var(--font-scale)); }
-  html[data-surface="ax"] { font-size: calc(17px * var(--font-scale)); }
+  html {
+    font-size: calc(16.5px * var(--font-scale));
+  }
+  html[data-surface="ax"] {
+    font-size: calc(17px * var(--font-scale));
+  }
 }
 
-html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after {
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
   animation-duration: 1ms !important;
   animation-delay: 0ms !important;
   animation-iteration-count: 1 !important; /* 무한 반복을 1ms로 돌리면 고속 점멸이 된다 */
@@ -106,35 +203,67 @@ html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-
 }
 /* 순수 장식용 반복 모션은 아예 끈다 */
 html[data-motion="reduced"] .animate-breathe,
-html[data-motion="reduced"] .sheen-idle::after { animation: none !important; }
+html[data-motion="reduced"] .sheen-idle::after {
+  animation: none !important;
+}
 /* OS 설정도 존중한다 (설정 토글과 별개) */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 60ms !important;
   }
-  .animate-breathe, .sheen-idle::after { animation: none !important; }
+  .animate-breathe,
+  .sheen-idle::after {
+    animation: none !important;
+  }
 }
 
 body {
-  @apply bg-neutral-canvas text-neutral-text font-sans antialiased;
+  @apply bg-neutral-canvas font-sans text-neutral-text antialiased;
   word-break: keep-all;
   overflow-x: hidden;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 /* Grid/flex children default to min-width:auto which lets tables/chips push the page wider than the viewport */
-[class*="grid-cols-"] > * { min-width: 0; }
-button, [role="button"] { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--theme-primary); outline-offset: 2px; border-radius: 6px; }
-.tabular { font-variant-numeric: tabular-nums; }
-.break-anywhere { overflow-wrap: anywhere; }
+[class*="grid-cols-"] > * {
+  min-width: 0;
+}
+button,
+[role="button"] {
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 2px solid var(--theme-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+.break-anywhere {
+  overflow-wrap: anywhere;
+}
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: #cfd4da; border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cfd4da;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 /* Skeleton */
 .skeleton {
@@ -151,26 +280,57 @@ button, [role="button"] { cursor: pointer; }
   background: linear-gradient(135deg, var(--ph-a, #e9e7e1), var(--ph-b, #cfcbc2));
 }
 /* 플레이스홀더 캡션: 좁은 썸네일(7rem 미만)에서는 글자가 세로로 쪼개지므로 숨김, 넓어도 한 줄 말줄임 */
-.ph-cap { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@container (max-width: 7rem) { .ph-cap { display: none; } }
+.ph-cap {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@container (max-width: 7rem) {
+  .ph-cap {
+    display: none;
+  }
+}
 .ph-img::after {
   content: "";
-  position: absolute; inset: 0;
+  position: absolute;
+  inset: 0;
   background:
-    radial-gradient(120% 80% at 80% 0%, rgba(255,255,255,0.35), transparent 60%),
-    linear-gradient(180deg, transparent 55%, rgba(17,17,17,0.10));
+    radial-gradient(120% 80% at 80% 0%, rgba(255, 255, 255, 0.35), transparent 60%),
+    linear-gradient(180deg, transparent 55%, rgba(17, 17, 17, 0.1));
 }
 
-.hide-scrollbar { scrollbar-width: none; }
-.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 
-.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem); }
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+}
 /* 고객 하단 탭 실제 높이(64px 칸 + 테두리 1px + 안전영역 여백) — 탭 위에 붙는 결제 바·토스트·본문 여백이 같은 값을 쓴다 */
-:root { --tabbar-h: calc(65px + max(env(safe-area-inset-bottom, 0px), 1rem)); }
-[data-toaster] { bottom: calc(var(--tabbar-h) + 12px); }
-@media (min-width: 768px) { html:not([data-surface="ax"]) [data-toaster] { bottom: 24px; } }
-@media (min-width: 1280px) { [data-toaster] { bottom: 24px; } }
-.safe-top { padding-top: max(env(safe-area-inset-top, 0px), 1rem); }
+:root {
+  --tabbar-h: calc(65px + max(env(safe-area-inset-bottom, 0px), 1rem));
+}
+[data-toaster] {
+  bottom: calc(var(--tabbar-h) + 12px);
+}
+@media (min-width: 768px) {
+  html:not([data-surface="ax"]) [data-toaster] {
+    bottom: 24px;
+  }
+}
+@media (min-width: 1280px) {
+  [data-toaster] {
+    bottom: 24px;
+  }
+}
+.safe-top {
+  padding-top: max(env(safe-area-inset-top, 0px), 1rem);
+}
 
 /* Customer surface */
 [data-surface="customer"] {
@@ -178,98 +338,283 @@ button, [role="button"] { cursor: pointer; }
 }
 
 /* AX sidebar */
-.ax-sidebar { background: var(--theme-shell); color: var(--sidebar-text); }
+.ax-sidebar {
+  background: var(--theme-shell);
+  color: var(--sidebar-text);
+}
 
 /* ------------------------------------------------------------------
    MOTION PRIMITIVES — 정보 전달을 돕는 모션만. 전부 data-motion="reduced",
    OS의 prefers-reduced-motion, 인쇄에서 자동으로 꺼진다.
    (차트 애니메이션은 D-14대로 계속 비활성: 시연·스크린샷·인쇄 안정성 우선)
 ------------------------------------------------------------------- */
-@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-@keyframes riseSm { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes popIn { 0% { opacity: 0; transform: scale(0.94); } 60% { transform: scale(1.02); } 100% { opacity: 1; transform: none; } }
-@keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes riseSm {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
 
-.animate-rise { animation: rise 300ms cubic-bezier(0.22, 0.72, 0.28, 1) both; }
-.animate-pop { animation: popIn 260ms cubic-bezier(0.22, 0.72, 0.28, 1) both; }
-.animate-breathe { animation: breathe 2.2s ease-in-out infinite; }
+.animate-rise {
+  animation: rise 300ms cubic-bezier(0.22, 0.72, 0.28, 1) both;
+}
+.animate-pop {
+  animation: popIn 260ms cubic-bezier(0.22, 0.72, 0.28, 1) both;
+}
+.animate-breathe {
+  animation: breathe 2.2s ease-in-out infinite;
+}
 
 /* 순차 진입 — 목록·KPI 행이 한 번에 튀어나오지 않고 읽는 순서대로 들어온다 */
-.stagger > * { animation: rise 320ms cubic-bezier(0.22, 0.72, 0.28, 1) both; }
-.stagger.stagger-sm > * { animation-name: riseSm; animation-duration: 260ms; }
-.stagger > *:nth-child(1)  { animation-delay: 0ms; }
-.stagger > *:nth-child(2)  { animation-delay: 45ms; }
-.stagger > *:nth-child(3)  { animation-delay: 90ms; }
-.stagger > *:nth-child(4)  { animation-delay: 135ms; }
-.stagger > *:nth-child(5)  { animation-delay: 175ms; }
-.stagger > *:nth-child(6)  { animation-delay: 210ms; }
-.stagger > *:nth-child(7)  { animation-delay: 240ms; }
-.stagger > *:nth-child(8)  { animation-delay: 265ms; }
-.stagger > *:nth-child(9)  { animation-delay: 285ms; }
-.stagger > *:nth-child(n+10) { animation-delay: 300ms; }
+.stagger > * {
+  animation: rise 320ms cubic-bezier(0.22, 0.72, 0.28, 1) both;
+}
+.stagger.stagger-sm > * {
+  animation-name: riseSm;
+  animation-duration: 260ms;
+}
+.stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 45ms;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 90ms;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 135ms;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 175ms;
+}
+.stagger > *:nth-child(6) {
+  animation-delay: 210ms;
+}
+.stagger > *:nth-child(7) {
+  animation-delay: 240ms;
+}
+.stagger > *:nth-child(8) {
+  animation-delay: 265ms;
+}
+.stagger > *:nth-child(9) {
+  animation-delay: 285ms;
+}
+.stagger > *:nth-child(n + 10) {
+  animation-delay: 300ms;
+}
 
 /* ------------------------------------------------------------------
    HOVER PRIMITIVES — "지금 이걸 누르면 무엇이 열리는가"를 미리 보여준다.
 ------------------------------------------------------------------- */
-.hover-lift { transition: transform 200ms cubic-bezier(0.22,0.72,0.28,1), box-shadow 200ms ease-out, border-color 200ms ease-out, background-color 200ms ease-out; }
-.hover-lift:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(17,24,39,0.13); }
-.hover-lift:active { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(17,24,39,0.10); }
+.hover-lift {
+  transition:
+    transform 200ms cubic-bezier(0.22, 0.72, 0.28, 1),
+    box-shadow 200ms ease-out,
+    border-color 200ms ease-out,
+    background-color 200ms ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.13);
+}
+.hover-lift:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.1);
+}
 
 /* 표 행: 배경 + 왼쪽 강조바 */
-.hover-row { transition: background-color 150ms ease-out, box-shadow 150ms ease-out; }
-.hover-row:hover { background-color: #f6f8fb; box-shadow: inset 3px 0 0 var(--theme-primary); }
+.hover-row {
+  transition:
+    background-color 150ms ease-out,
+    box-shadow 150ms ease-out;
+}
+.hover-row:hover {
+  background-color: #f6f8fb;
+  box-shadow: inset 3px 0 0 var(--theme-primary);
+}
 
 /* 아이콘 타일: 부모(.group) hover에 반응 */
-.tile { transition: transform 220ms cubic-bezier(0.22,0.72,0.28,1), background-color 220ms ease-out, color 220ms ease-out, box-shadow 220ms ease-out; }
-.group:hover .tile { transform: translateY(-1px) scale(1.08); }
-.group:active .tile { transform: translateY(0) scale(1.02); }
+.tile {
+  transition:
+    transform 220ms cubic-bezier(0.22, 0.72, 0.28, 1),
+    background-color 220ms ease-out,
+    color 220ms ease-out,
+    box-shadow 220ms ease-out;
+}
+.group:hover .tile {
+  transform: translateY(-1px) scale(1.08);
+}
+.group:active .tile {
+  transform: translateY(0) scale(1.02);
+}
 
 /* 누름 반응 */
-.press { transition: transform 130ms ease-out, background-color 160ms ease-out, color 160ms ease-out; }
-.press:active { transform: scale(0.97); }
+.press {
+  transition:
+    transform 130ms ease-out,
+    background-color 160ms ease-out,
+    color 160ms ease-out;
+}
+.press:active {
+  transform: scale(0.97);
+}
 
 /* 텍스트 링크: 밑줄이 좌→우로 그려진다 */
-.link-line { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1.5px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size 240ms cubic-bezier(0.22,0.72,0.28,1); }
-.link-line:hover, .link-line:focus-visible { background-size: 100% 1.5px; }
+.link-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1.5px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 240ms cubic-bezier(0.22, 0.72, 0.28, 1);
+}
+.link-line:hover,
+.link-line:focus-visible {
+  background-size: 100% 1.5px;
+}
 
 /* 은은한 자동 광택 — 미래AI랩 메인 CTA 전용. 6초에 한 번, 1초 동안만 지나간다.
    (깜빡임·네온 금지 원칙: 밝기 22%, 이동만, 색 변화 없음) */
-@keyframes sweepIdle { 0%, 84% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
-.sheen-idle { position: relative; overflow: hidden; }
+@keyframes sweepIdle {
+  0%,
+  84% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+.sheen-idle {
+  position: relative;
+  overflow: hidden;
+}
 .sheen-idle::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.22) 50%, transparent 62%);
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.22) 50%, transparent 62%);
   transform: translateX(-130%);
   animation: sweepIdle 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
-.sheen-idle:hover::after { animation-play-state: paused; }
+.sheen-idle:hover::after {
+  animation-play-state: paused;
+}
 
 /* 광택 스윕 — 주요 CTA에만 (한 화면에 2~3개 이하) */
-.sheen { position: relative; overflow: hidden; }
-.sheen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,0.26) 47%, transparent 62%); transform: translateX(-130%); transition: transform 680ms cubic-bezier(0.22,0.72,0.28,1); }
-.sheen:hover::after { transform: translateX(130%); }
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.26) 47%, transparent 62%);
+  transform: translateX(-130%);
+  transition: transform 680ms cubic-bezier(0.22, 0.72, 0.28, 1);
+}
+.sheen:hover::after {
+  transform: translateX(130%);
+}
 
 /* 화살표가 hover에서 가리키는 방향으로 밀린다 */
-.group:hover .nudge-x { transform: translateX(3px); }
-.nudge-x { transition: transform 200ms cubic-bezier(0.22,0.72,0.28,1), color 200ms ease-out; }
+.group:hover .nudge-x {
+  transform: translateX(3px);
+}
+.nudge-x {
+  transition:
+    transform 200ms cubic-bezier(0.22, 0.72, 0.28, 1),
+    color 200ms ease-out;
+}
 
 /* Touch-target expander for inline text links on touch widths — bigger hit area, no layout shift */
-@media (max-width: 767px) { .tap { padding-top: 0.6rem; padding-bottom: 0.6rem; margin-top: -0.6rem; margin-bottom: -0.6rem; } }
+@media (max-width: 767px) {
+  .tap {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    margin-top: -0.6rem;
+    margin-bottom: -0.6rem;
+  }
+}
 
 /* Device preview frame: never show a preview trigger inside a preview (P0 recursion guard) */
-html[data-preview="1"] [data-tour="device-preview"] { display: none !important; }
+html[data-preview="1"] [data-tour="device-preview"] {
+  display: none !important;
+}
 
 /* Tour spotlight */
-.tour-target { position: relative; z-index: 80 !important; box-shadow: 0 0 0 4px var(--theme-highlight), 0 0 0 9999px rgba(11,24,48,0.62); border-radius: 12px; }
+.tour-target {
+  position: relative;
+  z-index: 80 !important;
+  box-shadow:
+    0 0 0 4px var(--theme-highlight),
+    0 0 0 9999px rgba(11, 24, 48, 0.62);
+  border-radius: 12px;
+}
 
 @media print {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-  .no-print { display: none !important; }
-  body { background: #fff !important; }
-  .print-avoid { break-inside: avoid; }
-  .print-break { break-before: page; }
-  a { text-decoration: none; }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+  .print-avoid {
+    break-inside: avoid;
+  }
+  .print-break {
+    break-before: page;
+  }
+  a {
+    text-decoration: none;
+  }
 }
 
 /* 모달·시트·드로어가 열려 있는 동안에는 화면 위에 떠 있는 공용 이동 버튼을 숨긴다(시트 하단 버튼을 가리지 않게) */
-html[data-overlay-open] [data-mirae-history-nav] { display: none !important; }
+html[data-overlay-open] [data-mirae-history-nav] {
+  display: none !important;
+}

@@ -11,7 +11,15 @@ export function RankChange({ velocity, className }: { velocity: number; classNam
   const c = rankChange(velocity);
   return (
     <span
-      className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-[0.78rem] font-bold tabular whitespace-nowrap", c.dir === "up" ? "bg-theme-soft text-theme-primary" : c.dir === "down" ? "bg-neutral-canvas text-neutral-text2" : "bg-neutral-canvas text-neutral-text2", className)}
+      className={cn(
+        "tabular inline-flex items-center whitespace-nowrap rounded-md px-1.5 py-0.5 text-[0.78rem] font-bold",
+        c.dir === "up"
+          ? "bg-theme-soft text-theme-primary"
+          : c.dir === "down"
+            ? "bg-neutral-canvas text-neutral-text2"
+            : "bg-neutral-canvas text-neutral-text2",
+        className,
+      )}
       aria-label={c.dir === "up" ? "순위 상승" : c.dir === "down" ? "순위 하락" : "순위 유지"}
       title="직전 7일 대비 판매 변화"
     >

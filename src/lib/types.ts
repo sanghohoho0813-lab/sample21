@@ -81,15 +81,7 @@ export interface Variant {
 }
 
 export type InventoryStatus =
-  | "normal"
-  | "rising"
-  | "low"
-  | "soldout"
-  | "overstock"
-  | "slow"
-  | "restock-review"
-  | "restock-progress"
-  | "restocked";
+  "normal" | "rising" | "low" | "soldout" | "overstock" | "slow" | "restock-review" | "restock-progress" | "restocked";
 
 export interface DailyPoint {
   date: string; // YYYY-MM-DD
@@ -131,13 +123,7 @@ export interface Customer {
 }
 
 export type SegmentId =
-  | "first-purchase"
-  | "wish-no-buy"
-  | "restock-waiting"
-  | "cycle-due"
-  | "brand-loyal"
-  | "post-return-drop"
-  | "vip";
+  "first-purchase" | "wish-no-buy" | "restock-waiting" | "cycle-due" | "brand-loyal" | "post-return-drop" | "vip";
 
 export type OrderStatus =
   | "pending" // 결제대기 Demo
@@ -176,14 +162,7 @@ export interface Order {
 }
 
 export type ReturnReason =
-  | "size-small"
-  | "size-large"
-  | "fit"
-  | "color"
-  | "material"
-  | "delivery"
-  | "change-of-mind"
-  | "other";
+  "size-small" | "size-large" | "fit" | "color" | "material" | "delivery" | "change-of-mind" | "other";
 
 export interface ReturnRequest {
   id: string;
@@ -250,8 +229,16 @@ export interface AXAction {
 }
 
 export type EvidenceType =
-  | "BASELINE" | "ACTION" | "RESULT" | "ADOPTION" | "CUSTOMER"
-  | "EFFICIENCY" | "REVENUE" | "SCALE" | "RISK" | "EXCEPTION";
+  | "BASELINE"
+  | "ACTION"
+  | "RESULT"
+  | "ADOPTION"
+  | "CUSTOMER"
+  | "EFFICIENCY"
+  | "REVENUE"
+  | "SCALE"
+  | "RISK"
+  | "EXCEPTION";
 
 export interface EvidenceLog {
   id: string;
@@ -297,11 +284,25 @@ export interface FitProfile {
 }
 
 export type EventName =
-  | "view_home" | "search_product" | "select_category" | "view_product" | "select_color"
-  | "select_size" | "complete_fit_profile" | "view_fit_recommendation" | "add_wishlist"
-  | "remove_wishlist" | "subscribe_restock" | "add_to_cart" | "begin_checkout"
-  | "complete_demo_order" | "view_order" | "request_return" | "view_recommendation"
-  | "click_recommendation" | "return_visit";
+  | "view_home"
+  | "search_product"
+  | "select_category"
+  | "view_product"
+  | "select_color"
+  | "select_size"
+  | "complete_fit_profile"
+  | "view_fit_recommendation"
+  | "add_wishlist"
+  | "remove_wishlist"
+  | "subscribe_restock"
+  | "add_to_cart"
+  | "begin_checkout"
+  | "complete_demo_order"
+  | "view_order"
+  | "request_return"
+  | "view_recommendation"
+  | "click_recommendation"
+  | "return_visit";
 
 export interface TrackedEvent {
   id: string;

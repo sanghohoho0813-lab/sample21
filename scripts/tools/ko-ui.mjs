@@ -135,25 +135,140 @@ const DICT = [
   ["Log", "기록"],
 ];
 
-const UI_ATTRS = new Set(["title", "label", "placeholder", "alt", "aria-label", "desc", "description", "badge", "text", "caption", "headline", "sub", "deltaLabel", "moreLabel", "emptyText"]);
-const UI_KEYS = new Set(["method", "title", "label", "desc", "description", "body", "sub", "detail", "text", "headline", "caption", "note", "trigger", "expectedImpact", "caution", "resultNote", "kpiDelta", "meaning", "reads", "does", "why", "cta", "items", "reasons", "point", "metric", "formula", "now", "needs", "item", "tagline", "summary", "reason", "hint", "empty", "placeholder", "t", "b", "tag"]);
-const CODE_KEYS = new Set(["className", "href", "key", "tone", "size", "variant", "id", "name", "type", "value", "role", "htmlFor", "src", "target", "rel", "status", "source", "slug", "icon", "engine", "automation", "errorCost", "kind", "segment", "owner", "mode", "route", "tour", "group", "placement", "accent", "gradient", "data-tour", "inputMode", "autoComplete", "method", "sizing", "fit", "sourcing"]);
+const UI_ATTRS = new Set([
+  "title",
+  "label",
+  "placeholder",
+  "alt",
+  "aria-label",
+  "desc",
+  "description",
+  "badge",
+  "text",
+  "caption",
+  "headline",
+  "sub",
+  "deltaLabel",
+  "moreLabel",
+  "emptyText",
+]);
+const UI_KEYS = new Set([
+  "method",
+  "title",
+  "label",
+  "desc",
+  "description",
+  "body",
+  "sub",
+  "detail",
+  "text",
+  "headline",
+  "caption",
+  "note",
+  "trigger",
+  "expectedImpact",
+  "caution",
+  "resultNote",
+  "kpiDelta",
+  "meaning",
+  "reads",
+  "does",
+  "why",
+  "cta",
+  "items",
+  "reasons",
+  "point",
+  "metric",
+  "formula",
+  "now",
+  "needs",
+  "item",
+  "tagline",
+  "summary",
+  "reason",
+  "hint",
+  "empty",
+  "placeholder",
+  "t",
+  "b",
+  "tag",
+]);
+const CODE_KEYS = new Set([
+  "className",
+  "href",
+  "key",
+  "tone",
+  "size",
+  "variant",
+  "id",
+  "name",
+  "type",
+  "value",
+  "role",
+  "htmlFor",
+  "src",
+  "target",
+  "rel",
+  "status",
+  "source",
+  "slug",
+  "icon",
+  "engine",
+  "automation",
+  "errorCost",
+  "kind",
+  "segment",
+  "owner",
+  "mode",
+  "route",
+  "tour",
+  "group",
+  "placement",
+  "accent",
+  "gradient",
+  "data-tour",
+  "inputMode",
+  "autoComplete",
+  "method",
+  "sizing",
+  "fit",
+  "sourcing",
+]);
 
 const hangul = /[가-힣]/;
-const batchim = (ch) => { const c = ch.charCodeAt(0); if (c < 0xac00 || c > 0xd7a3) return null; return (c - 0xac00) % 28; };
+const batchim = (ch) => {
+  const c = ch.charCodeAt(0);
+  if (c < 0xac00 || c > 0xd7a3) return null;
+  return (c - 0xac00) % 28;
+};
 function fixParticle(word, particle) {
   const last = [...word].reverse().find((c) => /[가-힣]/.test(c));
   if (!last || !particle) return particle ?? "";
-  const b = batchim(last); const has = b !== null && b !== 0; const rieul = b === 8;
-  const pairs = { "을": ["을", "를"], "를": ["을", "를"], "이": ["이", "가"], "가": ["이", "가"], "은": ["은", "는"], "는": ["은", "는"], "과": ["과", "와"], "와": ["과", "와"] };
+  const b = batchim(last);
+  const has = b !== null && b !== 0;
+  const rieul = b === 8;
+  const pairs = {
+    을: ["을", "를"],
+    를: ["을", "를"],
+    이: ["이", "가"],
+    가: ["이", "가"],
+    은: ["은", "는"],
+    는: ["은", "는"],
+    과: ["과", "와"],
+    와: ["과", "와"],
+  };
   if (particle === "으로" || particle === "로") return has && !rieul ? "으로" : "로";
-  const p = pairs[particle]; return p ? (has ? p[0] : p[1]) : particle;
+  const p = pairs[particle];
+  return p ? (has ? p[0] : p[1]) : particle;
 }
 const PART = "(으로|로|을|를|이|가|은|는|과|와)?";
 function translate(text) {
   let out = text;
   for (const [from, to] of DICT) {
-    if (from instanceof RegExp) { out = out.replace(from, to); continue; }
+    if (from instanceof RegExp) {
+      out = out.replace(from, to);
+      continue;
+    }
     const esc = from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const re = new RegExp(`(?<![A-Za-z0-9_\\-])${esc}(?![A-Za-z0-9_])${PART}`, "g");
     out = out.replace(re, (m, part, offset, whole) => {
@@ -175,49 +290,133 @@ function isCodeContext(node) {
   if (ts.isCaseClause(p)) return true;
   if (ts.isElementAccessExpression(p) && p.argumentExpression === node) return true;
   if (ts.isPropertyAssignment(p) && p.name === node) return true;
-  if (ts.isBinaryExpression(p) && [ts.SyntaxKind.EqualsEqualsEqualsToken, ts.SyntaxKind.ExclamationEqualsEqualsToken, ts.SyntaxKind.EqualsEqualsToken, ts.SyntaxKind.ExclamationEqualsToken].includes(p.operatorToken.kind)) return true;
-  if (ts.isCallExpression(p)) { const callee = p.expression.getText(); if (/^(require|import|cn|clsx|localStorage\.\w+|JSON\.\w+|new Date|Date|searchParams\.get|params\.get|sp\.get|router\.push|router\.replace|getByRole|querySelector)/.test(callee)) return true; }
+  if (
+    ts.isBinaryExpression(p) &&
+    [
+      ts.SyntaxKind.EqualsEqualsEqualsToken,
+      ts.SyntaxKind.ExclamationEqualsEqualsToken,
+      ts.SyntaxKind.EqualsEqualsToken,
+      ts.SyntaxKind.ExclamationEqualsToken,
+    ].includes(p.operatorToken.kind)
+  )
+    return true;
+  if (ts.isCallExpression(p)) {
+    const callee = p.expression.getText();
+    if (
+      /^(require|import|cn|clsx|localStorage\.\w+|JSON\.\w+|new Date|Date|searchParams\.get|params\.get|sp\.get|router\.push|router\.replace|getByRole|querySelector)/.test(
+        callee,
+      )
+    )
+      return true;
+  }
   return false;
 }
 function uiByPlacement(node) {
-  // JSX 속성: <X title="…"> 
+  // JSX 속성: <X title="…">
   let p = node.parent;
-  if (p && ts.isJsxAttribute(p)) { const n = p.name.getText(); return UI_ATTRS.has(n) ? "ui" : (CODE_KEYS.has(n) || n.startsWith("data-") || n.startsWith("on")) ? "code" : "unknown"; }
-  if (p && ts.isJsxExpression(p) && p.parent && ts.isJsxAttribute(p.parent)) { const n = p.parent.name.getText(); return UI_ATTRS.has(n) ? "ui" : "code"; }
+  if (p && ts.isJsxAttribute(p)) {
+    const n = p.name.getText();
+    return UI_ATTRS.has(n)
+      ? "ui"
+      : CODE_KEYS.has(n) || n.startsWith("data-") || n.startsWith("on")
+        ? "code"
+        : "unknown";
+  }
+  if (p && ts.isJsxExpression(p) && p.parent && ts.isJsxAttribute(p.parent)) {
+    const n = p.parent.name.getText();
+    return UI_ATTRS.has(n) ? "ui" : "code";
+  }
   // 객체 속성: { title: "…" } / 배열 요소 { items: ["…"] }
-  let q = node; let hops = 0;
+  let q = node;
+  let hops = 0;
   while (q.parent && hops < 4) {
     const par = q.parent;
-    if (ts.isPropertyAssignment(par) && par.initializer === q) { const k = par.name.getText().replace(/["']/g, ""); return UI_KEYS.has(k) ? "ui" : CODE_KEYS.has(k) ? "code" : "unknown"; }
-    if (ts.isArrayLiteralExpression(par) || ts.isParenthesizedExpression(par) || ts.isConditionalExpression(par) || (ts.isBinaryExpression(par) && par.operatorToken.kind === ts.SyntaxKind.BarBarToken) || (ts.isBinaryExpression(par) && par.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken)) { q = par; hops++; continue; }
+    if (ts.isPropertyAssignment(par) && par.initializer === q) {
+      const k = par.name.getText().replace(/["']/g, "");
+      return UI_KEYS.has(k) ? "ui" : CODE_KEYS.has(k) ? "code" : "unknown";
+    }
+    if (
+      ts.isArrayLiteralExpression(par) ||
+      ts.isParenthesizedExpression(par) ||
+      ts.isConditionalExpression(par) ||
+      (ts.isBinaryExpression(par) && par.operatorToken.kind === ts.SyntaxKind.BarBarToken) ||
+      (ts.isBinaryExpression(par) && par.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken)
+    ) {
+      q = par;
+      hops++;
+      continue;
+    }
     break;
   }
   // JSX 자식 표현식 안의 조건 문자열 {cond ? "AI LIVE" : "AI Ready"}
-  let r = node; hops = 0;
-  while (r.parent && hops < 4) { const par = r.parent; if (ts.isJsxExpression(par) && !ts.isJsxAttribute(par.parent)) return "ui"; if (ts.isConditionalExpression(par) || ts.isParenthesizedExpression(par) || ts.isBinaryExpression(par)) { r = par; hops++; continue; } break; }
+  let r = node;
+  hops = 0;
+  while (r.parent && hops < 4) {
+    const par = r.parent;
+    if (ts.isJsxExpression(par) && !ts.isJsxAttribute(par.parent)) return "ui";
+    if (ts.isConditionalExpression(par) || ts.isParenthesizedExpression(par) || ts.isBinaryExpression(par)) {
+      r = par;
+      hops++;
+      continue;
+    }
+    break;
+  }
   // toast("…", "…")
   if (p && ts.isCallExpression(p) && /^(toast|alert|confirm)$/.test(p.expression.getText())) return "ui";
   return "unknown";
 }
 
-const files = argFiles.length ? argFiles : [...walk("src")].filter((f) => /\.(tsx?|mts)$/.test(f) && !f.endsWith("lib/types.ts"));
-function* walk(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) yield* walk(f); else yield f; } }
+const files = argFiles.length
+  ? argFiles
+  : [...walk("src")].filter((f) => /\.(tsx?|mts)$/.test(f) && !f.endsWith("lib/types.ts"));
+function* walk(d) {
+  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+    const f = path.join(d, e.name);
+    if (e.isDirectory()) yield* walk(f);
+    else yield f;
+  }
+}
 
-let changedFiles = 0, changedNodes = 0; const samples = [];
+let changedFiles = 0,
+  changedNodes = 0;
+const samples = [];
 for (const file of files) {
   const src = fs.readFileSync(file, "utf8");
-  const sf = ts.createSourceFile(file, src, ts.ScriptTarget.Latest, true, file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const sf = ts.createSourceFile(
+    file,
+    src,
+    ts.ScriptTarget.Latest,
+    true,
+    file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
   const edits = [];
   const visit = (node) => {
     if (ts.isJsxText(node)) {
-      const t = node.getText(sf); const nt = translate(t); if (nt !== t) edits.push([node.getStart(sf), node.getEnd(), nt]);
-    } else if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateHead(node) || ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) {
-      const host = ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) ? node : node.parent && ts.isTemplateSpan(node.parent) ? node.parent.parent : node.parent;
+      const t = node.getText(sf);
+      const nt = translate(t);
+      if (nt !== t) edits.push([node.getStart(sf), node.getEnd(), nt]);
+    } else if (
+      ts.isStringLiteral(node) ||
+      ts.isNoSubstitutionTemplateLiteral(node) ||
+      ts.isTemplateHead(node) ||
+      ts.isTemplateMiddle(node) ||
+      ts.isTemplateTail(node)
+    ) {
+      const host =
+        ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)
+          ? node
+          : node.parent && ts.isTemplateSpan(node.parent)
+            ? node.parent.parent
+            : node.parent;
       if (!isCodeContext(host)) {
         const place = uiByPlacement(host);
         const fullText = host.getText(sf);
         const ok = place === "ui" || (place !== "code" && hangul.test(fullText));
-        if (ok) { const raw = node.getText(sf); const nt = translate(raw); if (nt !== raw) edits.push([node.getStart(sf), node.getEnd(), nt]); }
+        if (ok) {
+          const raw = node.getText(sf);
+          const nt = translate(raw);
+          if (nt !== raw) edits.push([node.getStart(sf), node.getEnd(), nt]);
+        }
       }
     }
     ts.forEachChild(node, visit);
@@ -225,8 +424,16 @@ for (const file of files) {
   visit(sf);
   if (!edits.length) continue;
   edits.sort((a, b) => b[0] - a[0]);
-  let out = src; for (const [s, e, t] of edits) { if (samples.length < 400) samples.push(`${path.basename(file)}: ${src.slice(s, e).replace(/\s+/g, " ").slice(0, 70)}  →  ${t.replace(/\s+/g, " ").slice(0, 70)}`); out = out.slice(0, s) + t + out.slice(e); }
-  changedFiles++; changedNodes += edits.length;
+  let out = src;
+  for (const [s, e, t] of edits) {
+    if (samples.length < 400)
+      samples.push(
+        `${path.basename(file)}: ${src.slice(s, e).replace(/\s+/g, " ").slice(0, 70)}  →  ${t.replace(/\s+/g, " ").slice(0, 70)}`,
+      );
+    out = out.slice(0, s) + t + out.slice(e);
+  }
+  changedFiles++;
+  changedNodes += edits.length;
   if (WRITE) fs.writeFileSync(file, out);
 }
 console.log(`${WRITE ? "WROTE" : "DRY-RUN"} — files ${changedFiles}, text nodes ${changedNodes}`);

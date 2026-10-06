@@ -30,46 +30,125 @@ export function Term({ children, term }: { children?: ReactNode; term: string })
     <span className="relative inline-flex items-center gap-0.5">
       {children ?? term}
       {desc && (
-        <button type="button" aria-label={`${term} 설명`} onClick={() => setOpen((v) => !v)} onBlur={() => setOpen(false)} className="text-neutral-text2 hover:text-theme-primary inline-flex shrink-0 items-center justify-center h-10 w-10 -my-3 -mx-3 md:h-5 md:w-5 md:m-0"><HelpCircle size={14} /></button>
+        <button
+          type="button"
+          aria-label={`${term} 설명`}
+          onClick={() => setOpen((v) => !v)}
+          onBlur={() => setOpen(false)}
+          className="-mx-3 -my-3 inline-flex h-10 w-10 shrink-0 items-center justify-center text-neutral-text2 hover:text-theme-primary md:m-0 md:h-5 md:w-5"
+        >
+          <HelpCircle size={14} />
+        </button>
       )}
-      {open && desc && <span className="absolute left-0 top-full mt-1 z-40 w-64 rounded-xl bg-brand-black text-white text-[0.82rem] px-3 py-2 shadow-lift leading-snug animate-fadeIn">{desc}</span>}
+      {open && desc && (
+        <span className="absolute left-0 top-full z-40 mt-1 w-64 animate-fadeIn rounded-xl bg-brand-black px-3 py-2 text-[0.82rem] leading-snug text-white shadow-lift">
+          {desc}
+        </span>
+      )}
     </span>
   );
 }
 
-export function Price({ price, original, className, size = "md" }: { price: number; original?: number; className?: string; size?: "sm" | "md" | "lg" }) {
+export function Price({
+  price,
+  original,
+  className,
+  size = "md",
+}: {
+  price: number;
+  original?: number;
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}) {
   const rate = original && original > price ? Math.round(((original - price) / original) * 100) : 0;
   return (
-    <span className={cn("inline-flex items-baseline gap-1.5 flex-wrap max-w-full min-w-0", className)}>
-      {rate > 0 && <span className={cn("font-bold text-semantic-error", size === "lg" ? "text-[1.15rem]" : "text-[0.95rem]")}>{rate}%</span>}
-      <span className={cn("font-bold tabular min-w-0 max-w-full", size === "lg" ? "text-[1.5rem]" : size === "sm" ? "text-[0.95rem]" : "text-[1.05rem]")}><AutoFit>{krw(price)}</AutoFit></span>
-      {rate > 0 && original && <span className="text-neutral-text2 line-through text-[0.82rem] tabular">{krw(original)}</span>}
+    <span className={cn("inline-flex min-w-0 max-w-full flex-wrap items-baseline gap-1.5", className)}>
+      {rate > 0 && (
+        <span className={cn("font-bold text-semantic-error", size === "lg" ? "text-[1.15rem]" : "text-[0.95rem]")}>
+          {rate}%
+        </span>
+      )}
+      <span
+        className={cn(
+          "tabular min-w-0 max-w-full font-bold",
+          size === "lg" ? "text-[1.5rem]" : size === "sm" ? "text-[0.95rem]" : "text-[1.05rem]",
+        )}
+      >
+        <AutoFit>{krw(price)}</AutoFit>
+      </span>
+      {rate > 0 && original && (
+        <span className="tabular text-[0.82rem] text-neutral-text2 line-through">{krw(original)}</span>
+      )}
     </span>
   );
 }
 
 /** label: 스크린리더가 읽는 막대 이름(예: "추천 신뢰도") — 화면에 같은 문구가 있어도 막대와 연결되지 않으므로 넘긴다 */
-export function Progress({ value, className, tone = "primary", label }: { value: number; className?: string; tone?: "primary" | "warning" | "error" | "success"; label?: string }) {
-  const colors = { primary: "bg-theme-primary", warning: "bg-semantic-warning", error: "bg-semantic-error", success: "bg-semantic-success" };
+export function Progress({
+  value,
+  className,
+  tone = "primary",
+  label,
+}: {
+  value: number;
+  className?: string;
+  tone?: "primary" | "warning" | "error" | "success";
+  label?: string;
+}) {
+  const colors = {
+    primary: "bg-theme-primary",
+    warning: "bg-semantic-warning",
+    error: "bg-semantic-error",
+    success: "bg-semantic-success",
+  };
   return (
-    <div className={cn("h-2 w-full rounded-full bg-neutral-canvas overflow-hidden", className)} role="progressbar" aria-label={label} aria-valuenow={Math.round(value * 100)} aria-valuemin={0} aria-valuemax={100}>
-      <div className={cn("h-full rounded-full transition-all duration-normal", colors[tone])} style={{ width: `${Math.max(2, Math.min(100, value * 100))}%` }} />
+    <div
+      className={cn("h-2 w-full overflow-hidden rounded-full bg-neutral-canvas", className)}
+      role="progressbar"
+      aria-label={label}
+      aria-valuenow={Math.round(value * 100)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <div
+        className={cn("h-full rounded-full transition-all duration-normal", colors[tone])}
+        style={{ width: `${Math.max(2, Math.min(100, value * 100))}%` }}
+      />
     </div>
   );
 }
 
-export function Freshness({ source = "DEMO", at, className }: { source?: "DEMO" | "LIVE" | "SIMULATION"; at?: string; className?: string }) {
+export function Freshness({
+  source = "DEMO",
+  at,
+  className,
+}: {
+  source?: "DEMO" | "LIVE" | "SIMULATION";
+  at?: string;
+  className?: string;
+}) {
   // Hydration-safe: the timestamp is only rendered after mount (server renders a neutral placeholder).
   const [time, setTime] = useState<string | null>(null);
-  useEffect(() => { const d = at ? new Date(at) : new Date(); setTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); }, [at]);
+  useEffect(() => {
+    const d = at ? new Date(at) : new Date();
+    setTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`);
+  }, [at]);
   const label = source === "DEMO" ? "데모 데이터" : source === "SIMULATION" ? "시뮬레이션" : "실제 데이터";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-[0.82rem] text-neutral-text2 whitespace-nowrap", className)} title={`${label} · 마지막 업데이트 ${time ?? ""}`}>
-      <span aria-hidden className={cn("h-2 w-2 rounded-full", source === "LIVE" ? "bg-semantic-success" : "bg-[#e0b400]")} />
+    <span
+      className={cn("inline-flex items-center gap-1.5 whitespace-nowrap text-[0.82rem] text-neutral-text2", className)}
+      title={`${label} · 마지막 업데이트 ${time ?? ""}`}
+    >
+      <span
+        aria-hidden
+        className={cn("h-2 w-2 rounded-full", source === "LIVE" ? "bg-semantic-success" : "bg-[#e0b400]")}
+      />
       <span className="font-semibold">{label}</span>
       <span className="tabular">· {time ?? "--:--"} 기준</span>
     </span>
   );
 }
 
-export function Divider({ className }: { className?: string }) { return <hr className={cn("border-neutral-border", className)} />; }
+export function Divider({ className }: { className?: string }) {
+  return <hr className={cn("border-neutral-border", className)} />;
+}

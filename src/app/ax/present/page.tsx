@@ -3,7 +3,19 @@
    시작 → usePresentation().start() → 하단 컨트롤러가 route를 옮긴다. 특정 단계부터 = start() 후 goto(i). */
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
-import { Check, ChevronRight, Clock3, GraduationCap, Keyboard, MousePointerClick, Play, RotateCcw, Settings, TriangleAlert, Users } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  Clock3,
+  GraduationCap,
+  Keyboard,
+  MousePointerClick,
+  Play,
+  RotateCcw,
+  Settings,
+  TriangleAlert,
+  Users,
+} from "lucide-react";
 import { useApp, ROLE_LABEL, ROLE_NAME } from "@/lib/store";
 import { SEED_ACTIONS } from "@/lib/demo/seed";
 import { THEMES } from "@/lib/theme";
@@ -38,14 +50,39 @@ const STEP_META: { loop: string; tone: Tone; shows: string; sec: number }[] = [
   { loop: "순환 2 · 과제", tone: "warning", shows: "운영직원이 상품준비 → 출고 → 배송중으로 상태 변경", sec: 20 },
   { loop: "순환 2 · 환류", tone: "success", shows: "고객 마이페이지에서 같은 주문의 배송상태 확인", sec: 15 },
   { loop: "증빙", tone: "info", shows: "추천 → 승인 → 실행 → 결과 → 고객 상태가 한 줄로 남음", sec: 20 },
-  { loop: "확장", tone: "neutral", shows: "12개월 데이터 자산과 단계별 확장 (순환 4 재구매는 고객·재구매 화면)", sec: 20 },
+  {
+    loop: "확장",
+    tone: "neutral",
+    shows: "12개월 데이터 자산과 단계별 확장 (순환 4 재구매는 고객·재구매 화면)",
+    sec: 20,
+  },
 ];
 const TOTAL_SEC = STEP_META.reduce((s, m) => s + m.sec, 0);
 const LOOP_SUMMARY: { loop: string; tone: Tone; steps: string; desc: string }[] = [
-  { loop: "순환 1 · 관심 급증 → 재입고", tone: "accent", steps: "5 → 7 → 8 → 9 → 10", desc: "재입고 알림 → 수요 레이더 → 과제 완료 → 재고 반영 + 고객 알림" },
-  { loop: "순환 2 · 주문 → 재고·배송", tone: "warning", steps: "11 → 12 → 13 → 14", desc: "데모 주문 → 주문·매출·재고 반영 → 상태 변경 → 마이페이지" },
-  { loop: "순환 3 · 사이즈 반품 → 핏 개선", tone: "info", steps: "4 (+ 핏·반품 화면)", desc: "핏 추천 근거 · act-004 완료 시 상세 핏 안내 변경" },
-  { loop: "순환 4 · 구매주기 → 재구매", tone: "success", steps: "16 (+ 고객·재구매 화면)", desc: "cycle-due 42명 → act-005 캠페인 → 마이페이지 추천 + 알림" },
+  {
+    loop: "순환 1 · 관심 급증 → 재입고",
+    tone: "accent",
+    steps: "5 → 7 → 8 → 9 → 10",
+    desc: "재입고 알림 → 수요 레이더 → 과제 완료 → 재고 반영 + 고객 알림",
+  },
+  {
+    loop: "순환 2 · 주문 → 재고·배송",
+    tone: "warning",
+    steps: "11 → 12 → 13 → 14",
+    desc: "데모 주문 → 주문·매출·재고 반영 → 상태 변경 → 마이페이지",
+  },
+  {
+    loop: "순환 3 · 사이즈 반품 → 핏 개선",
+    tone: "info",
+    steps: "4 (+ 핏·반품 화면)",
+    desc: "핏 추천 근거 · act-004 완료 시 상세 핏 안내 변경",
+  },
+  {
+    loop: "순환 4 · 구매주기 → 재구매",
+    tone: "success",
+    steps: "16 (+ 고객·재구매 화면)",
+    desc: "cycle-due 42명 → act-005 캠페인 → 마이페이지 추천 + 알림",
+  },
 ];
 
 const surfaceOf = (route: string) => (route.startsWith("/ax") ? "AX" : "고객");
@@ -55,11 +92,22 @@ export default function PresentPage() {
     <div className="space-y-6">
       <PageHeader
         title="시연 모드"
-       
+
         desc="슬라이드가 아니라 실제 화면을 이동하는 3~5분 안내형 시연입니다. 고객 화면과 AX 운영화면을 오가며 데이터 순환 고리가 실제로 도는 것을 보여줍니다."
-        right={<Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" />}><Freshness source="DEMO" /></Hydrated>}
+        right={
+          <Hydrated fallback={<span className="skeleton inline-block h-5 w-40" />}>
+            <Freshness source="DEMO" />
+          </Hydrated>
+        }
       />
-      <Hydrated fallback={<div className="space-y-4"><SkeletonCard lines={4} /><SkeletonCard lines={8} /></div>}>
+      <Hydrated
+        fallback={
+          <div className="space-y-4">
+            <SkeletonCard lines={4} />
+            <SkeletonCard lines={8} />
+          </div>
+        }
+      >
         <PresentBody />
       </Hydrated>
     </div>
@@ -87,55 +135,175 @@ function PresentBody() {
   const [resetOpen, setResetOpen] = useState(false);
   const closeReset = useCallback(() => setResetOpen(false), []);
 
-  const changedActions = useMemo(() => actions.filter((a) => { const seed = SEED_ACTIONS.find((s) => s.id === a.id); return !seed || seed.status !== a.status; }).length, [actions]);
+  const changedActions = useMemo(
+    () =>
+      actions.filter((a) => {
+        const seed = SEED_ACTIONS.find((s) => s.id === a.id);
+        return !seed || seed.status !== a.status;
+      }).length,
+    [actions],
+  );
   const changes = orders.length + returns.length + restockSubs.length + cart.length + changedActions;
   const themeDef = THEMES.find((t) => t.id === theme) ?? THEMES[0];
   const effRole = role === "customer" ? "owner" : role;
 
-  const begin = () => { start(); toast("시연 모드 시작", "1단계 '기획의도'로 이동합니다. ←/→ 키로 이동, ESC로 종료.", "info"); };
-  const beginAt = (i: number) => { start(); goto(i); toast(`${i + 1}단계부터 시연 시작`, PRESENT_STEPS[i].title, "info"); };
-  const markToursDone = () => { setTutorialDone(true); setCustomerTourDone(true); toast("튜토리얼을 완료로 표시했습니다", "시연 중 튜토리얼 팝업이 뜨지 않습니다."); };
+  const begin = () => {
+    start();
+    toast("시연 모드 시작", "1단계 '기획의도'로 이동합니다. ←/→ 키로 이동, ESC로 종료.", "info");
+  };
+  const beginAt = (i: number) => {
+    start();
+    goto(i);
+    toast(`${i + 1}단계부터 시연 시작`, PRESENT_STEPS[i].title, "info");
+  };
+  const markToursDone = () => {
+    setTutorialDone(true);
+    setCustomerTourDone(true);
+    toast("튜토리얼을 완료로 표시했습니다", "시연 중 튜토리얼 팝업이 뜨지 않습니다.");
+  };
 
   const checklist: { ok: boolean; title: string; desc: string; action?: React.ReactNode }[] = [
-    { ok: changes === 0, title: "데모 초기화 여부", desc: changes === 0 ? `깨끗한 상태입니다${lastResetAt ? ` · 마지막 초기화 ${relTime(lastResetAt)}` : ""}.` : `변경 사항 ${num(changes)}건 (주문·반품·알림·장바구니·과제). 처음부터 보여주려면 초기화를 권장합니다.`, action: changes > 0 ? <Button size="sm" variant="outline" onClick={() => setResetOpen(true)} icon={<RotateCcw size={14} />}>데모 초기화</Button> : undefined },
-    { ok: effRole === "owner", title: "역할 = 대표", desc: effRole === "owner" ? `${ROLE_NAME.owner}로 시작합니다. 전체 KPI와 과제가 보입니다.` : `현재 ${ROLE_LABEL[effRole]} 역할입니다. 시연은 대표 역할로 시작하는 것을 권장합니다.`, action: effRole !== "owner" ? <Button size="sm" variant="outline" onClick={() => { setRole("owner"); toast("역할을 대표로 전환했습니다"); }} icon={<Users size={14} />}>대표로 전환</Button> : undefined },
-    { ok: true, title: "테마", desc: `테마 ${themeDef.no} ${themeDef.name}. 기본은 01 Deep Navy Blue이며, 설정에서 9개 모두 바꿀 수 있습니다.`, action: <Button size="sm" variant="ghost" href="/ax/settings#settings-theme" icon={<Settings size={14} />}>테마 바꾸기</Button> },
-    { ok: tutorialDone && customerTourDone, title: "튜토리얼 팝업", desc: tutorialDone && customerTourDone ? "완료 상태라 시연 중 튜토리얼이 뜨지 않습니다." : "미완료 상태입니다. 시연 6단계(대시보드 진입) 또는 고객 홈에서 튜토리얼이 먼저 열릴 수 있습니다.", action: !(tutorialDone && customerTourDone) ? <Button size="sm" variant="outline" onClick={markToursDone} icon={<GraduationCap size={14} />}>완료로 표시</Button> : undefined },
+    {
+      ok: changes === 0,
+      title: "데모 초기화 여부",
+      desc:
+        changes === 0
+          ? `깨끗한 상태입니다${lastResetAt ? ` · 마지막 초기화 ${relTime(lastResetAt)}` : ""}.`
+          : `변경 사항 ${num(changes)}건 (주문·반품·알림·장바구니·과제). 처음부터 보여주려면 초기화를 권장합니다.`,
+      action:
+        changes > 0 ? (
+          <Button size="sm" variant="outline" onClick={() => setResetOpen(true)} icon={<RotateCcw size={14} />}>
+            데모 초기화
+          </Button>
+        ) : undefined,
+    },
+    {
+      ok: effRole === "owner",
+      title: "역할 = 대표",
+      desc:
+        effRole === "owner"
+          ? `${ROLE_NAME.owner}로 시작합니다. 전체 KPI와 과제가 보입니다.`
+          : `현재 ${ROLE_LABEL[effRole]} 역할입니다. 시연은 대표 역할로 시작하는 것을 권장합니다.`,
+      action:
+        effRole !== "owner" ? (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setRole("owner");
+              toast("역할을 대표로 전환했습니다");
+            }}
+            icon={<Users size={14} />}
+          >
+            대표로 전환
+          </Button>
+        ) : undefined,
+    },
+    {
+      ok: true,
+      title: "테마",
+      desc: `테마 ${themeDef.no} ${themeDef.name}. 기본은 01 Deep Navy Blue이며, 설정에서 9개 모두 바꿀 수 있습니다.`,
+      action: (
+        <Button size="sm" variant="ghost" href="/ax/settings#settings-theme" icon={<Settings size={14} />}>
+          테마 바꾸기
+        </Button>
+      ),
+    },
+    {
+      ok: tutorialDone && customerTourDone,
+      title: "튜토리얼 팝업",
+      desc:
+        tutorialDone && customerTourDone
+          ? "완료 상태라 시연 중 튜토리얼이 뜨지 않습니다."
+          : "미완료 상태입니다. 시연 6단계(대시보드 진입) 또는 고객 홈에서 튜토리얼이 먼저 열릴 수 있습니다.",
+      action: !(tutorialDone && customerTourDone) ? (
+        <Button size="sm" variant="outline" onClick={markToursDone} icon={<GraduationCap size={14} />}>
+          완료로 표시
+        </Button>
+      ) : undefined,
+    },
   ];
   const readyCount = checklist.filter((c) => c.ok).length;
 
   return (
     <div className="space-y-6">
       {/* Hero */}
-      <Card pad="lg" className="!bg-brand-black text-white !border-transparent">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-5 items-center">
+      <Card pad="lg" className="!border-transparent !bg-brand-black text-white">
+        <div className="grid grid-cols-1 items-center gap-5 lg:grid-cols-[1fr_auto]">
           <div className="min-w-0">
-            <p className="text-[0.78rem] font-bold tracking-wider text-theme-highlight">시연 순서 · {PRESENT_STEPS.length}단계</p>
-            <h2 className="mt-1 text-[1.4rem] md:text-[1.8rem] font-bold leading-tight">고객의 클릭이 MD의 과제가 되고, 다시 고객에게 돌아오는 3~5분</h2>
-            <p className="mt-2 text-[0.92rem] text-white/75 leading-relaxed max-w-2xl">시작하면 화면 하단에 컨트롤러가 나타나고 단계마다 실제 화면으로 이동합니다. 👉 안내가 있는 단계는 직접 클릭해 보여주세요. 언제든 ESC로 종료할 수 있습니다.</p>
+            <p className="text-[0.78rem] font-bold tracking-wider text-theme-highlight">
+              시연 순서 · {PRESENT_STEPS.length}단계
+            </p>
+            <h2 className="mt-1 text-[1.4rem] font-bold leading-tight md:text-[1.8rem]">
+              고객의 클릭이 MD의 과제가 되고, 다시 고객에게 돌아오는 3~5분
+            </h2>
+            <p className="mt-2 max-w-2xl text-[0.92rem] leading-relaxed text-white/75">
+              시작하면 화면 하단에 컨트롤러가 나타나고 단계마다 실제 화면으로 이동합니다. 👉 안내가 있는 단계는 직접
+              클릭해 보여주세요. 언제든 ESC로 종료할 수 있습니다.
+            </p>
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[0.82rem] text-white/70">
-              <span className="inline-flex items-center gap-1.5"><Clock3 size={14} />예상 {Math.floor(TOTAL_SEC / 60)}분 {TOTAL_SEC % 60}초 (설명 속도에 따라 3~5분)</span>
-              <span className="inline-flex items-center gap-1.5"><Keyboard size={14} />← / → 이동 · ESC 종료</span>
-              <span className="inline-flex items-center gap-1.5"><MousePointerClick size={14} />고객 화면 ↔ AX 자동 전환</span>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock3 size={14} />
+                예상 {Math.floor(TOTAL_SEC / 60)}분 {TOTAL_SEC % 60}초 (설명 속도에 따라 3~5분)
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Keyboard size={14} />← / → 이동 · ESC 종료
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MousePointerClick size={14} />
+                고객 화면 ↔ AX 자동 전환
+              </span>
             </div>
           </div>
           <div className="flex flex-col gap-2 lg:min-w-[240px]">
-            <Button size="lg" onClick={begin} icon={<Play size={18} />} className="!bg-theme-highlight !text-brand-black hover:brightness-105 w-full">시연 시작</Button>
-            {active && <p className="text-center text-[0.8rem] text-theme-highlight font-semibold">진행 중 · {step + 1} / {PRESENT_STEPS.length} — 다시 시작하면 1단계부터</p>}
+            <Button
+              size="lg"
+              onClick={begin}
+              icon={<Play size={18} />}
+              className="w-full !bg-theme-highlight !text-brand-black hover:brightness-105"
+            >
+              시연 시작
+            </Button>
+            {active && (
+              <p className="text-center text-[0.8rem] font-semibold text-theme-highlight">
+                진행 중 · {step + 1} / {PRESENT_STEPS.length} — 다시 시작하면 1단계부터
+              </p>
+            )}
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={() => setResetOpen(true)} icon={<RotateCcw size={14} />} className="!bg-white/10 !border-white/20 !text-white hover:!bg-white/20 w-full">데모 초기화</Button>
-              <Button variant="outline" href="/ax/settings" icon={<Settings size={14} />} className="!bg-white/10 !border-white/20 !text-white hover:!bg-white/20 w-full">설정으로</Button>
+              <Button
+                variant="outline"
+                onClick={() => setResetOpen(true)}
+                icon={<RotateCcw size={14} />}
+                className="w-full !border-white/20 !bg-white/10 !text-white hover:!bg-white/20"
+              >
+                데모 초기화
+              </Button>
+              <Button
+                variant="outline"
+                href="/ax/settings"
+                icon={<Settings size={14} />}
+                className="w-full !border-white/20 !bg-white/10 !text-white hover:!bg-white/20"
+              >
+                설정으로
+              </Button>
             </div>
           </div>
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_360px]">
         {/* Steps */}
         <Card pad="md">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <div><h3 className="text-[1.15rem] font-bold">16단계 한눈에 보기</h3><p className="text-[0.85rem] text-neutral-text2">각 단계의 화면 경로와 무엇을 보여주는지. 번호 옆 버튼으로 특정 단계부터 시작할 수 있습니다.</p></div>
-            <Badge tone="neutral" size="sm">총 {Math.floor(TOTAL_SEC / 60)}분 {TOTAL_SEC % 60}초</Badge>
+            <div>
+              <h3 className="text-[1.15rem] font-bold">16단계 한눈에 보기</h3>
+              <p className="text-[0.85rem] text-neutral-text2">
+                각 단계의 화면 경로와 무엇을 보여주는지. 번호 옆 버튼으로 특정 단계부터 시작할 수 있습니다.
+              </p>
+            </div>
+            <Badge tone="neutral" size="sm">
+              총 {Math.floor(TOTAL_SEC / 60)}분 {TOTAL_SEC % 60}초
+            </Badge>
           </div>
           <ol className="space-y-2">
             {PRESENT_STEPS.map((s, i) => {
@@ -143,25 +311,57 @@ function PresentBody() {
               const cur = active && step === i;
               const surface = surfaceOf(s.route);
               return (
-                <li key={`${i}-${s.title}`} className={cn("rounded-2xl border p-3.5 md:p-4 transition-colors duration-fast", cur ? "border-theme-primary bg-theme-soft/40" : "border-neutral-border bg-white hover:bg-neutral-canvas/60")}>
+                <li
+                  key={`${i}-${s.title}`}
+                  className={cn(
+                    "rounded-2xl border p-3.5 transition-colors duration-fast md:p-4",
+                    cur
+                      ? "border-theme-primary bg-theme-soft/40"
+                      : "border-neutral-border bg-white hover:bg-neutral-canvas/60",
+                  )}
+                >
                   <div className="flex items-start gap-3">
-                    <span className={cn("h-9 w-9 shrink-0 rounded-xl inline-flex items-center justify-center font-bold tabular text-[0.9rem]", cur ? "bg-theme-primary text-white" : "bg-neutral-canvas text-neutral-text")}>{i + 1}</span>
+                    <span
+                      className={cn(
+                        "tabular inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[0.9rem] font-bold",
+                        cur ? "bg-theme-primary text-white" : "bg-neutral-canvas text-neutral-text",
+                      )}
+                    >
+                      {i + 1}
+                    </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <p className="font-bold leading-snug">{s.title}</p>
-                        <Badge tone={m.tone} size="sm">{m.loop}</Badge>
-                        {cur && <Badge tone="primary" size="sm">진행 중</Badge>}
+                        <Badge tone={m.tone} size="sm">
+                          {m.loop}
+                        </Badge>
+                        {cur && (
+                          <Badge tone="primary" size="sm">
+                            진행 중
+                          </Badge>
+                        )}
                       </div>
-                      <p className="mt-1 text-[0.88rem] text-neutral-text2 leading-relaxed">{m.shows}</p>
+                      <p className="mt-1 text-[0.88rem] leading-relaxed text-neutral-text2">{m.shows}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[0.78rem]">
-                        <Badge tone={surface === "AX" ? "dark" : "neutral"} size="sm">{surface}</Badge>
-                        <code className="rounded-md bg-neutral-canvas border border-neutral-border px-1.5 py-0.5 text-[0.78rem] break-anywhere">{s.route}</code>
-                        <span className="text-neutral-text2 tabular">≈{m.sec}초</span>
-                        {s.cta && <span className="text-theme-primary font-semibold">👉 {s.cta}</span>}
+                        <Badge tone={surface === "AX" ? "dark" : "neutral"} size="sm">
+                          {surface}
+                        </Badge>
+                        <code className="break-anywhere rounded-md border border-neutral-border bg-neutral-canvas px-1.5 py-0.5 text-[0.78rem]">
+                          {s.route}
+                        </code>
+                        <span className="tabular text-neutral-text2">≈{m.sec}초</span>
+                        {s.cta && <span className="font-semibold text-theme-primary">👉 {s.cta}</span>}
                       </div>
                     </div>
-                    <button type="button" onClick={() => beginAt(i)} aria-label={`${i + 1}단계부터 시작`} title="이 단계부터 시작" className="shrink-0 h-10 w-10 md:w-auto md:px-3 rounded-xl border border-neutral-border bg-white inline-flex items-center justify-center gap-1 text-[0.8rem] font-semibold hover:bg-neutral-canvas hover:border-neutral-text2 active:scale-95 transition-all duration-fast">
-                      <Play size={14} /><span className="hidden md:inline">여기부터</span>
+                    <button
+                      type="button"
+                      onClick={() => beginAt(i)}
+                      aria-label={`${i + 1}단계부터 시작`}
+                      title="이 단계부터 시작"
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center gap-1 rounded-xl border border-neutral-border bg-white text-[0.8rem] font-semibold transition-all duration-fast hover:border-neutral-text2 hover:bg-neutral-canvas active:scale-95 md:w-auto md:px-3"
+                    >
+                      <Play size={14} />
+                      <span className="hidden md:inline">여기부터</span>
                     </button>
                   </div>
                 </li>
@@ -175,44 +375,93 @@ function PresentBody() {
           <Card pad="md">
             <div className="mb-3 flex items-center justify-between gap-2">
               <h3 className="text-[1.05rem] font-bold">시연 전 확인</h3>
-              <Badge tone={readyCount === checklist.length ? "success" : "warning"} size="sm">{readyCount} / {checklist.length} 준비</Badge>
+              <Badge tone={readyCount === checklist.length ? "success" : "warning"} size="sm">
+                {readyCount} / {checklist.length} 준비
+              </Badge>
             </div>
             <ul className="space-y-3">
               {checklist.map((c) => (
                 <li key={c.title} className="flex items-start gap-3">
-                  <span className={cn("mt-0.5 h-6 w-6 shrink-0 rounded-full inline-flex items-center justify-center", c.ok ? "bg-[#e6f6ec] text-semantic-success" : "bg-[#fff1e6] text-semantic-warning")}>{c.ok ? <Check size={14} /> : <TriangleAlert size={13} />}</span>
+                  <span
+                    className={cn(
+                      "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
+                      c.ok ? "bg-[#e6f6ec] text-semantic-success" : "bg-[#fff1e6] text-semantic-warning",
+                    )}
+                  >
+                    {c.ok ? <Check size={14} /> : <TriangleAlert size={13} />}
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-[0.92rem]">{c.title}</p>
-                    <p className="text-[0.82rem] text-neutral-text2 leading-relaxed">{c.desc}</p>
+                    <p className="text-[0.92rem] font-bold">{c.title}</p>
+                    <p className="text-[0.82rem] leading-relaxed text-neutral-text2">{c.desc}</p>
                     {c.action && <div className="mt-1.5">{c.action}</div>}
                   </div>
                 </li>
               ))}
             </ul>
-            <div className="mt-4 rounded-xl bg-neutral-canvas p-3"><p className="text-[0.8rem] font-bold text-neutral-text2 mb-1.5">역할 빠른 전환</p><RoleSwitcher /></div>
+            <div className="mt-4 rounded-xl bg-neutral-canvas p-3">
+              <p className="mb-1.5 text-[0.8rem] font-bold text-neutral-text2">역할 빠른 전환</p>
+              <RoleSwitcher />
+            </div>
           </Card>
 
           <Card pad="md">
-            <h3 className="text-[1.05rem] font-bold mb-3">단계 ↔ 순환 매핑</h3>
+            <h3 className="mb-3 text-[1.05rem] font-bold">단계 ↔ 순환 매핑</h3>
             <ul className="space-y-2.5">
               {LOOP_SUMMARY.map((l) => (
                 <li key={l.loop} className="rounded-xl border border-neutral-border p-3">
-                  <div className="flex flex-wrap items-center gap-1.5"><Badge tone={l.tone} size="sm">{l.loop}</Badge><span className="text-[0.78rem] text-neutral-text2 tabular">단계 {l.steps}</span></div>
-                  <p className="mt-1 text-[0.85rem] text-neutral-text2 leading-relaxed">{l.desc}</p>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <Badge tone={l.tone} size="sm">
+                      {l.loop}
+                    </Badge>
+                    <span className="tabular text-[0.78rem] text-neutral-text2">단계 {l.steps}</span>
+                  </div>
+                  <p className="mt-1 text-[0.85rem] leading-relaxed text-neutral-text2">{l.desc}</p>
                 </li>
               ))}
             </ul>
           </Card>
 
           <Card pad="md">
-            <h3 className="text-[1.05rem] font-bold mb-2">진행 팁</h3>
-            <ul className="space-y-1.5 text-[0.88rem] text-neutral-text2 leading-relaxed">
-              <li className="flex gap-2"><Keyboard size={16} className="shrink-0 mt-0.5 text-theme-primary" /><span><kbd className="rounded border border-neutral-border bg-neutral-canvas px-1.5 text-[0.78rem] font-bold text-neutral-text">←</kbd> <kbd className="rounded border border-neutral-border bg-neutral-canvas px-1.5 text-[0.78rem] font-bold text-neutral-text">→</kbd> 단계 이동, <kbd className="rounded border border-neutral-border bg-neutral-canvas px-1.5 text-[0.78rem] font-bold text-neutral-text">ESC</kbd> 종료</span></li>
-              <li className="flex gap-2"><MousePointerClick size={16} className="shrink-0 mt-0.5 text-theme-primary" /><span>👉 안내가 있는 단계(3·4·5·7·8·9·11·13)는 직접 클릭해야 다음 단계 숫자가 바뀝니다.</span></li>
-              <li className="flex gap-2"><ChevronRight size={16} className="shrink-0 mt-0.5 text-theme-primary" /><span>컨트롤러는 화면 하단에 떠 있고 페이지를 옮겨도 유지됩니다. 고객 화면에서는 하단 메뉴 위에 표시됩니다.</span></li>
-              <li className="flex gap-2"><RotateCcw size={16} className="shrink-0 mt-0.5 text-theme-primary" /><span>두 번째 시연 전에는 데모 초기화로 재입고 알림·주문을 되돌리세요.</span></li>
+            <h3 className="mb-2 text-[1.05rem] font-bold">진행 팁</h3>
+            <ul className="space-y-1.5 text-[0.88rem] leading-relaxed text-neutral-text2">
+              <li className="flex gap-2">
+                <Keyboard size={16} className="mt-0.5 shrink-0 text-theme-primary" />
+                <span>
+                  <kbd className="rounded border border-neutral-border bg-neutral-canvas px-1.5 text-[0.78rem] font-bold text-neutral-text">
+                    ←
+                  </kbd>{" "}
+                  <kbd className="rounded border border-neutral-border bg-neutral-canvas px-1.5 text-[0.78rem] font-bold text-neutral-text">
+                    →
+                  </kbd>{" "}
+                  단계 이동,{" "}
+                  <kbd className="rounded border border-neutral-border bg-neutral-canvas px-1.5 text-[0.78rem] font-bold text-neutral-text">
+                    ESC
+                  </kbd>{" "}
+                  종료
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <MousePointerClick size={16} className="mt-0.5 shrink-0 text-theme-primary" />
+                <span>👉 안내가 있는 단계(3·4·5·7·8·9·11·13)는 직접 클릭해야 다음 단계 숫자가 바뀝니다.</span>
+              </li>
+              <li className="flex gap-2">
+                <ChevronRight size={16} className="mt-0.5 shrink-0 text-theme-primary" />
+                <span>
+                  컨트롤러는 화면 하단에 떠 있고 페이지를 옮겨도 유지됩니다. 고객 화면에서는 하단 메뉴 위에 표시됩니다.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <RotateCcw size={16} className="mt-0.5 shrink-0 text-theme-primary" />
+                <span>두 번째 시연 전에는 데모 초기화로 재입고 알림·주문을 되돌리세요.</span>
+              </li>
             </ul>
-            <p className="mt-3 text-[0.78rem] text-neutral-text2">모든 숫자는 데모 / 시뮬레이션이며 실제 성과가 아닙니다. <Link href="/ax/why" className="font-semibold text-neutral-text hover:text-theme-primary">기획의도</Link>에서 배경을 먼저 읽을 수 있습니다.</p>
+            <p className="mt-3 text-[0.78rem] text-neutral-text2">
+              모든 숫자는 데모 / 시뮬레이션이며 실제 성과가 아닙니다.{" "}
+              <Link href="/ax/why" className="font-semibold text-neutral-text hover:text-theme-primary">
+                기획의도
+              </Link>
+              에서 배경을 먼저 읽을 수 있습니다.
+            </p>
           </Card>
         </div>
       </div>

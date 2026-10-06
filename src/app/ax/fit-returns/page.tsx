@@ -5,5 +5,9 @@ import { FitReturnsPage } from "@/components/ax/ops/FitReturnsPage";
 export const metadata = axMeta("fit");
 
 export default function Page() {
-  return <Suspense fallback={null}><FitReturnsPage /></Suspense>;
+  return (
+    <Suspense fallback={null}>
+      <FitReturnsPage />
+    </Suspense>
+  );
 }
