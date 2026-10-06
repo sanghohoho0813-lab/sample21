@@ -125,10 +125,10 @@ function ActionsInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- pass는 같은 필터 값으로 만들어진다
   }, [order, byProduct, status, types, urgency, engine]);
 
-  // first card expanded by default when nothing is opened via URL
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- 목록 길이가 바뀔 때만 첫 카드 펼침(사용자가 접은 상태를 덮어쓰지 않음)
+  // URL로 연 과제가 없으면 첫 카드를 펼친다 — 목록 길이가 바뀔 때만(사용자가 접은 상태를 덮어쓰지 않음)
   useEffect(() => {
     if (!openId && list.length && expanded.size === 0) setExpanded(new Set([list[0].id]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 위 주석: 길이 변화에만 반응
   }, [list.length]);
 
   const toggle = (id: string) =>
