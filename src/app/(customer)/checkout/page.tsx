@@ -73,12 +73,11 @@ function CheckoutForm() {
     setSubmitting(true);
     const memo = request === "직접 입력" ? customRequest.trim() : request;
     const order = store.placeOrder({ address: `${address.trim()}${detail.trim() ? ` ${detail.trim()}` : ""}`, memo: `${memo} · 주문자 ${name.trim()} ${phone.trim()}${cp.code ? ` · 쿠폰 ${cp.code}` : ""}`, couponRate: cp.rate, payment });
-    toast("주문이 완료되었습니다", `주문번호 ${order.id}`);
     router.push(`/checkout/complete/${order.id}`);
   };
 
   return (
-    <form onSubmit={submit} noValidate className="grid lg:grid-cols-[minmax(0,1fr)_380px] gap-6 lg:gap-8 items-start">
+    <form id="checkout-form" onSubmit={submit} noValidate className="grid lg:grid-cols-[minmax(0,1fr)_380px] gap-6 lg:gap-8 items-start">
       <div className="space-y-5 min-w-0">
         <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
           <h2 className="font-bold text-[1.05rem] flex items-center gap-2 mb-4"><User size={18} />주문자 정보</h2>
@@ -128,9 +127,14 @@ function CheckoutForm() {
           <span className="text-[0.9rem] leading-relaxed"><span className="font-bold">데모 주문에 동의합니다</span><br /><span className="text-neutral-text2">실제 결제·배송은 이루어지지 않아요.</span></span>
         </label>
         {errors.agree && <p className="text-[0.82rem] text-semantic-error -mt-2">{errors.agree}</p>}
-        <Button type="submit" variant="brand" size="lg" full loading={submitting} icon={<ShieldCheck size={18} />}>데모 주문 완료</Button>
+        <Button type="submit" variant="brand" size="lg" full loading={submitting} icon={<ShieldCheck size={18} />} className="hidden lg:inline-flex">데모 주문 완료</Button>
         <LoopHint href="/ax/orders">주문하면 재고가 차감되고 AX 주문 목록에 바로 나타납니다</LoopHint>
       </aside>
+
+      {/* 휴대폰: 결제금액과 주문 버튼을 맨 아래에 고정 (주문서에서는 하단 탭을 숨긴다) */}
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 bg-white/95 backdrop-blur border-t border-neutral-border px-4 pt-2.5 safe-bottom" data-checkout-bar>
+        <Button type="submit" variant="brand" size="lg" full loading={submitting} icon={<ShieldCheck size={18} />}>{krw(total)} · 데모 주문 완료</Button>
+      </div>
     </form>
   );
 }

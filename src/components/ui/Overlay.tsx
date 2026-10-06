@@ -7,8 +7,9 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 let lockCount = 0;
-function lockScroll() { lockCount++; if (lockCount === 1) { document.body.dataset.prevOverflow = document.body.style.overflow; document.body.style.overflow = "hidden"; } }
-function unlockScroll() { lockCount = Math.max(0, lockCount - 1); if (lockCount === 0) { document.body.style.overflow = document.body.dataset.prevOverflow ?? ""; delete document.body.dataset.prevOverflow; } }
+// <html data-overlay-open> — 열린 창이 있는 동안 토스트는 위로 올리고, 화면 위에 떠 있는 보조 버튼(미래AI랩 이동 버튼)은 숨긴다
+function lockScroll() { lockCount++; if (lockCount === 1) { document.body.dataset.prevOverflow = document.body.style.overflow; document.body.style.overflow = "hidden"; document.documentElement.dataset.overlayOpen = ""; } }
+function unlockScroll() { lockCount = Math.max(0, lockCount - 1); if (lockCount === 0) { document.body.style.overflow = document.body.dataset.prevOverflow ?? ""; delete document.body.dataset.prevOverflow; delete document.documentElement.dataset.overlayOpen; } }
 
 interface BaseProps { open: boolean; onClose: () => void; title?: ReactNode; children: ReactNode; className?: string; hideClose?: boolean; footer?: ReactNode; z?: number; }
 

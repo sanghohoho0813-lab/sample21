@@ -61,12 +61,22 @@ function ActionsInner() {
   const counts = useMemo(() => Object.fromEntries(STATUS_TABS.map((s) => [s, s === "all" ? byProduct.length : byProduct.filter((a) => a.status === s).length])) as Record<StatusFilter, number>, [byProduct]);
   const kpi = useMemo(() => actionKpi(visible), [visible]);
 
-  const list = useMemo(() => {
-    const f = byProduct.filter((a) => (status === "all" || a.status === status) && (types.length === 0 || types.includes(a.type)) && (urgency === "all" || a.urgency === urgency) && (engine === "all" || a.engine === engine));
-    return status === "all"
+  const pass = (a: AXAction) => (status === "all" || a.status === status) && (types.length === 0 || types.includes(a.type)) && (urgency === "all" || a.urgency === urgency) && (engine === "all" || a.engine === engine);
+  // 정렬 순서는 '필터를 바꿀 때'만 다시 정한다 — 확인·실행·완료를 누를 때마다 카드가 다른 자리로 튀지 않게
+  const idsKey = byProduct.map((a) => a.id).join(",");
+  const order = useMemo(() => {
+    const f = byProduct.filter(pass);
+    return (status === "all"
       ? [...f].sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency] || (a.recommendedAt < b.recommendedAt ? 1 : -1))
-      : sortByUrgency(f);
-  }, [byProduct, status, types, urgency, engine]);
+      : sortByUrgency(f)).map((a) => a.id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- 과제 상태가 바뀌어도 순서는 유지(위 주석)
+  }, [idsKey, status, types, urgency, engine]);
+  const list = useMemo(() => {
+    const byId = new Map(byProduct.map((a) => [a.id, a]));
+    const kept = order.map((id) => byId.get(id)).filter((a): a is AXAction => !!a && pass(a));
+    return [...kept, ...byProduct.filter((a) => pass(a) && !order.includes(a.id))];
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- pass는 같은 필터 값으로 만들어진다
+  }, [order, byProduct, status, types, urgency, engine]);
 
   // first card expanded by default when nothing is opened via URL
   // eslint-disable-next-line react-hooks/exhaustive-deps -- 목록 길이가 바뀔 때만 첫 카드 펼침(사용자가 접은 상태를 덮어쓰지 않음)

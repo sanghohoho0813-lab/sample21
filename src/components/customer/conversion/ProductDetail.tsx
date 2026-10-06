@@ -30,7 +30,7 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
   const cur = SLOTS[slot];
   return (
     <div className="md:sticky md:top-[88px] space-y-3 min-w-0">
-      <ProductImage colors={product.colors} variant={colorIdx} label={`${product.name} · ${product.colors[colorIdx]} · ${cur.label}`} ratio="aspect-[3/4]" className="rounded-2xl md:rounded-cardlg">
+      <ProductImage colors={product.colors} variant={colorIdx} label={`${product.name} · ${product.colors[colorIdx]} · ${cur.label}`} caption={false} ratio="aspect-square md:aspect-[3/4]" className="rounded-2xl md:rounded-cardlg">
         {slot === 1 && <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.42), transparent 42%)" }} />}
         {slot === 2 && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 30%, rgba(17,17,17,0.28))" }} />}
         <div className="absolute right-3 top-3 flex items-center gap-1.5"><span className="rounded-full bg-white/85 px-2.5 py-1 text-[0.78rem] font-bold text-brand-black">{cur.label}</span></div>
@@ -186,7 +186,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const restock = () => {
     if (!variant) return;
     store.subscribeRestock(variant.id);
-    toast("재입고 알림을 신청했습니다", "AX 운영화면 수요신호에 반영");
+    toast("재입고 알림을 신청했습니다", "입고되면 알림으로 알려드려요");
   };
   const wish = () => {
     const on = store.toggleWishlist(product.id, variant?.id ?? null);
@@ -206,7 +206,7 @@ export function ProductDetail({ product }: { product: Product }) {
   );
 
   return (
-    <div className="pb-24 md:pb-0">
+    <div>
       <Container className="pt-4 md:pt-8">
         <nav className="hidden md:flex items-center gap-1 text-[0.82rem] text-neutral-text2 mb-5" aria-label="경로"><Link href="/" className="hover:text-neutral-text">홈</Link><ChevronRight size={14} /><Link href={`/shop?category=${product.categoryId}`} className="hover:text-neutral-text">{CATEGORY_NAME[product.categoryId]}</Link><ChevronRight size={14} /><Link href={`/brands/${brand.slug}`} className="hover:text-neutral-text">{brand.name}</Link></nav>
         <div className="grid md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-6 md:gap-10 items-start">
@@ -231,13 +231,13 @@ export function ProductDetail({ product }: { product: Product }) {
                   <span className="font-bold tabular">{price.toLocaleString("ko-KR")}원</span>
                 </div>
               )}
-              {/* 휴대폰은 하단 구매 바가 같은 역할 → 여기서는 숨김. 태블릿(768)은 '바로 주문'이 다음 줄로 내려가 전체 폭을 쓴다 */}
+              {/* 휴대폰은 하단 구매 바가 같은 역할 → 여기서는 숨김. 태블릿(768)은 '구매하기'이 다음 줄로 내려가 전체 폭을 쓴다 */}
               <div className="mt-4 hidden md:flex flex-wrap gap-2">
                 <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] !px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
                 {soldoutSelected ? <RestockCta tour="c-restock" /> : (
                   <>
                     <Button variant="outline" size="lg" className="flex-1 basis-[7rem] min-w-0 !px-3 sm:!px-6 md:!px-3 xl:!px-6" onClick={addCart} icon={<ShoppingBag size={18} className="hidden sm:block md:hidden lg:block" />}>장바구니</Button>
-                    <Button variant="brand" size="lg" className="flex-1 basis-[7rem] min-w-0 !px-3 sm:!px-6 md:!px-3 xl:!px-6" onClick={buyNow} icon={<Zap size={18} className="hidden sm:block md:hidden lg:block" />}>바로 주문</Button>
+                    <Button variant="brand" size="lg" className="flex-1 basis-[7rem] min-w-0 !px-3 sm:!px-6 md:!px-3 xl:!px-6" onClick={buyNow} icon={<Zap size={18} className="hidden sm:block md:hidden lg:block" />}>구매하기</Button>
                   </>
                 )}
               </div>

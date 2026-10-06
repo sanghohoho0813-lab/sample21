@@ -6,12 +6,12 @@ import type { Product } from "@/lib/types";
 import { BRAND_BY_ID, PRODUCT_BY_ID } from "@/lib/demo/seed";
 import { useApp, campaignStatus } from "@/lib/store";
 import { effPrice } from "@/lib/kpi";
-import { krw } from "@/lib/format";
+import { krw, num } from "@/lib/format";
 import { Hydrated } from "@/components/system/Hydrated";
 import { Container, PageTitle } from "@/components/customer/Section";
 import { ProductImage } from "@/components/ui/ProductImage";
 import { Button } from "@/components/ui/Button";
-import { Badge, DemoBadge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Form";
 import { EmptyState, SkeletonCard } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
@@ -72,7 +72,7 @@ function CartContent() {
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2 text-[0.82rem]">
                     <span className="inline-flex items-center gap-1 text-neutral-text2"><Truck size={14} />{etaLabel(subtotal >= FREE_SHIP_MIN)}</span>
-                    {st.key !== "normal" && <Badge tone={st.tone} size="sm">{st.label}</Badge>}
+                    {st.key !== "normal" && st.key !== "rising" && <Badge tone={st.tone} size="sm">{st.label}</Badge>}
                     {st.purchasable && st.stock < c.qty && <span className="text-semantic-error font-semibold">재고 {st.stock}개 · 수량을 줄여주세요</span>}
                   </div>
                 </div>
@@ -84,11 +84,11 @@ function CartContent() {
         {short.length > 0 && <p className="text-[0.88rem] text-semantic-warning font-semibold">일부 상품의 재고가 수량보다 적습니다. 주문 시 재고만큼만 반영됩니다.</p>}
 
         <div className="rounded-cardlg border border-neutral-border bg-white p-4 md:p-5">
-          <div className="flex items-center gap-2 mb-3"><Ticket size={18} /><p className="font-bold">쿠폰</p><DemoBadge /></div>
+          <div className="flex items-center gap-2 mb-3"><Ticket size={18} /><p className="font-bold">쿠폰</p></div>
           <Select name="coupon" aria-label="쿠폰 선택" value={coupon} onChange={(e) => { setCoupon(e.target.value); const sel = couponByCode(e.target.value); if (sel.code) toast(`${sel.code} 쿠폰을 적용했습니다`, `${sel.rate}% 할인 · ${sel.desc}`); }}>
             {coupons.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
           </Select>
-          <p className="text-[0.8rem] text-neutral-text2 mt-2">시연용 쿠폰입니다. 선택한 쿠폰은 주문서로 그대로 전달됩니다.{aernoRunning && <span className="ml-1 font-semibold text-brand-accent">AERNO 재구매 캠페인 진행중 · AERNO7 사용 가능</span>}</p>
+          {aernoRunning && <p className="text-[0.85rem] mt-2 font-semibold text-brand-accent">AERNO 재구매 혜택 진행 중 · AERNO7 쿠폰 사용 가능</p>}
         </div>
 
         {wishCandidates.length > 0 && <WishQuick products={wishCandidates} onPick={(p) => setSheet({ product: p, colorIdx: 0 })} />}
@@ -102,9 +102,17 @@ function CartContent() {
           className={cn("mt-5 h-[52px] w-full rounded-xl inline-flex items-center justify-center gap-2 font-bold text-[1rem] transition-all duration-fast active:scale-[0.98]", canCheckout ? "bg-brand-black text-white hover:bg-[#2a2a2a] hover:shadow-raised" : "bg-neutral-border text-neutral-text2 cursor-not-allowed")}>
           주문하기<ArrowRight size={18} />
         </Link>
-        <p className="mt-3 text-[0.78rem] text-neutral-text2 leading-relaxed">데모 주문입니다. 실제 결제는 이루어지지 않으며, 주문은 AX 운영화면 주문·매출·재고에 즉시 반영됩니다.</p>
       </aside>
       <OptionSheet product={sheet?.product ?? null} open={!!sheet} onClose={() => setSheet(null)} initialColorIdx={sheet?.colorIdx ?? 0} />
+
+      {/* 휴대폰: 총액과 '주문하기'를 하단 탭 바로 위에 고정 — 아래 요약까지 스크롤하지 않아도 된다 */}
+      <div className="lg:hidden fixed inset-x-0 z-30 bottom-[var(--tabbar-h)] md:bottom-0 bg-white/95 backdrop-blur border-t border-neutral-border px-4 py-2.5" data-checkout-bar>
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1"><p className="text-[0.8rem] text-neutral-text2">결제 예정 · {num(rows.reduce((n, r) => n + r.c.qty, 0))}개</p><p className="font-black text-[1.15rem] tabular leading-tight">{krw(total)}</p></div>
+          <Link href={canCheckout ? checkoutHref : "#"} aria-disabled={!canCheckout} onClick={(e) => { if (!canCheckout) { e.preventDefault(); toast("품절 옵션을 정리한 뒤 주문할 수 있습니다", undefined, "warning"); return; } store.track("begin_checkout", { items: rows.length, total, coupon: cp.code }); }}
+            className={cn("h-12 px-6 rounded-xl inline-flex items-center justify-center gap-1.5 font-bold transition-all duration-fast active:scale-[0.98]", canCheckout ? "bg-brand-black text-white" : "bg-neutral-border text-neutral-text2")}>주문하기<ArrowRight size={17} /></Link>
+        </div>
+      </div>
     </div>
   );
 }

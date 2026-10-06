@@ -8,8 +8,10 @@ export interface Column<T> { key: string; header: ReactNode; cell: (row: T) => R
 
 /* Desktop: 표 — 이름 열은 최소 폭을 보장하고(한글 세로 깨짐 방지) 나머지 값은 한 줄로 두어
    좁으면 표 안에서만 가로 스크롤된다. Mobile: 카드 — 라벨 위·값 아래로 쌓아 값이 잘리지 않는다. */
-export function DataTable<T>({ rows, columns, rowKey, onRowClick, empty, className, dense }: {
+export function DataTable<T>({ rows, columns, rowKey, onRowClick, empty, className, dense, mobileFooter }: {
   rows: T[]; columns: Column<T>[]; rowKey: (r: T) => string; onRowClick?: (r: T) => void; empty?: ReactNode; className?: string; dense?: boolean;
+  /** 모바일 카드 맨 아래(내용을 다 읽은 뒤)에 두는 처리 버튼 */
+  mobileFooter?: (r: T) => ReactNode;
 }) {
   if (!rows.length) return <div className={className}>{empty ?? <p className="text-center text-neutral-text2 py-10">데이터가 없습니다.</p>}</div>;
   return (
@@ -50,6 +52,7 @@ export function DataTable<T>({ rows, columns, rowKey, onRowClick, empty, classNa
                   </div>
                 ))}
               </dl>
+              {mobileFooter && <div className="mt-3 pt-3 border-t border-neutral-border">{mobileFooter(r)}</div>}
             </div>
           );
         })}

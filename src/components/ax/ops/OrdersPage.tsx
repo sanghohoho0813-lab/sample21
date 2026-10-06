@@ -106,7 +106,6 @@ function OrdersBody() {
     { key: "id", header: "주문번호", primary: true, cell: (o) => (
       <div className="min-w-0">
         <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold tabular">{o.id}</span>{isCustomerCreated(o.id) && <Badge tone="primary" size="sm"><Zap size={11} />고객 화면에서 접수</Badge>}{mobile && <OrderStatusBadge status={o.status} />}</div>
-        {mobile && <div className="mt-2"><ActionButtons o={o} /></div>}
       </div>
     ) },
     { key: "time", header: "시간", cell: (o) => <span title={fmtDate(o.createdAt, "datetime")}>{relTime(o.createdAt)}</span> },
@@ -151,11 +150,11 @@ function OrdersBody() {
       </div>
 
       <div className="mt-4">
-        <DataTable rows={filtered.slice(0, limit)} columns={columns} rowKey={(o) => o.id} onRowClick={(o) => setOpenId(o.id)} dense
+        <DataTable rows={filtered.slice(0, limit)} columns={columns} rowKey={(o) => o.id} onRowClick={(o) => setOpenId(o.id)} dense mobileFooter={(o) => <ActionButtons o={o} />}
           empty={<EmptyState title="조건에 맞는 주문이 없습니다" desc="상태 탭·기간·검색어를 바꿔 보세요." icon={<Search size={22} />} action={<Button variant="outline" onClick={() => { setTab("all"); setQ(""); setRange("all"); }}>필터 초기화</Button>} />} />
         <MoreButton hasMore={hasMore} onClick={more} remaining={filtered.length - limit} />
       </div>
-      <NoteCard className="mt-4">상태 흐름: 결제대기(데모) → 상품준비 → 출고완료 → 배송중 → 배송완료. 취소는 상품준비 전까지 가능합니다. 실제 결제·택배 API는 연동 예정(연결 준비)이며 데모에서는 상태만 바뀝니다.</NoteCard>
+      <NoteCard className="mt-4">상태 흐름: 결제대기 → 상품준비 → 출고완료 → 배송중 → 배송완료. 취소는 상품준비 전까지 가능합니다. 실제 결제·택배 API는 연동 예정(연결 준비)이며 데모에서는 상태만 바뀝니다.</NoteCard>
 
       <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `주문 ${open.id}` : ""} width="w-full max-w-lg" footer={open ? <ActionButtons o={open} /> : undefined}>
         {open && <OrderDetail o={open} role={role} customerCreated={isCustomerCreated(open.id)} />}

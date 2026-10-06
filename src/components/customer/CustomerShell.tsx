@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode, type FormEvent } from "react";
-import { Search, Heart, ShoppingBag, User, Menu, Bell, Home, LayoutGrid, ChevronRight, ChevronDown, ArrowRight, Play, Trophy, Tag, Store, Ruler, Package, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode, type FormEvent } from "react";
+import { Search, Heart, ShoppingBag, User, Menu, Bell, Home, LayoutGrid, ChevronRight, ChevronDown, ChevronLeft, ArrowRight, Play, Trophy, Tag, Store, Ruler, Package, Sparkles } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { BRANDS, CATEGORIES } from "@/lib/demo/seed";
 import { cn } from "@/lib/cn";
@@ -166,9 +166,46 @@ function SearchBox({ className, autoFocus, onDone }: { className?: string; autoF
   );
 }
 
+/** 휴대폰 하위 화면의 '뒤로' 목적지 — 앱 안에서 들어왔으면 이전 화면, 링크로 바로 열었으면 이 상위 화면으로 */
+function backTarget(pathname: string): string | null {
+  if (pathname.startsWith("/products/")) return "/shop";
+  if (pathname === "/checkout") return "/cart";
+  if (pathname === "/cart") return "/";
+  if (/^\/my\/orders\/.+/.test(pathname)) return "/my/orders";
+  if (/^\/my\/.+/.test(pathname)) return "/my";
+  if (/^\/brands\/.+/.test(pathname)) return "/brands";
+  if (pathname.startsWith("/next/")) return "/";
+  return null;
+}
+
+/** 화면 아래에 고정된 바(하단 탭·구매 바·결제 바)가 가리는 높이 — 푸터 아래 여백으로 줘서 마지막 줄까지 스크롤로 보이게 */
+function useBottomCover(key: string) {
+  const [h, setH] = useState(0);
+  useEffect(() => {
+    const measure = () => {
+      const tops = Array.from(document.querySelectorAll<HTMLElement>("[data-bottom-bar],[data-buy-bar],[data-checkout-bar]")).map((el) => el.getBoundingClientRect()).filter((r) => r.height > 0).map((r) => r.top);
+      setH(tops.length ? Math.max(0, Math.round(window.innerHeight - Math.min(...tops))) : 0);
+    };
+    measure();
+    // 페이지 내용이 늦게 그려지며(저장된 장바구니 등) 바가 생기거나 바뀌는 경우까지
+    const ro = new ResizeObserver(measure); ro.observe(document.body);
+    window.addEventListener("resize", measure);
+    return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
+  }, [key]);
+  return h;
+}
+
 export function CustomerShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const onPdp = pathname.startsWith("/products/"); // 상품 상세: 하단 탭 대신 구매 바
+  const hideTabs = onPdp || pathname === "/checkout"; // 주문서도 결제 바가 맨 아래를 쓴다
+  const back = backTarget(pathname);
+  // 이 탭에서 앱 안 이동이 있었는지 — 있으면 브라우저 뒤로, 없으면(바로 링크로 연 경우) 상위 화면으로
+  const moves = useRef(-1);
+  useEffect(() => { moves.current += 1; }, [pathname]);
+  const goBack = () => { if (back && moves.current <= 0) router.push(back); else router.back(); };
+  const cover = useBottomCover(pathname);
   const cart = useApp((s) => s.cart);
   const wishlist = useApp((s) => s.wishlist);
   const hydrated = useHydrated();
@@ -195,7 +232,9 @@ export function CustomerShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-neutral-border">
         <div className="mx-auto max-w-[1280px] px-4">
           <div className="h-[64px] md:h-[72px] flex items-center gap-3 md:gap-6">
-            <button onClick={() => setMenu(true)} className="lg:hidden h-11 w-11 -ml-2 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="전체 메뉴"><Menu size={24} /></button>
+            {back
+              ? <button onClick={goBack} className="lg:hidden h-11 w-11 -ml-2 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="뒤로"><ChevronLeft size={26} /></button>
+              : <button onClick={() => setMenu(true)} className="lg:hidden h-11 w-11 -ml-2 inline-flex items-center justify-center rounded-full hover:bg-neutral-canvas" aria-label="전체 메뉴"><Menu size={24} /></button>}
             <Link href="/" className="inline-flex items-center h-11 font-black tracking-tight text-[1.45rem] md:text-[1.6rem] leading-none hover:opacity-80 transition-opacity" aria-label="MORFIT 홈">MORFIT<span className="text-brand-accent">.</span></Link>
             <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 ml-1 xl:ml-2" aria-label="주요 메뉴">
               {NAV.map((n) => (
@@ -214,14 +253,14 @@ export function CustomerShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className={cn("flex-1 md:pb-0", onPdp ? "pb-0" : "pb-[calc(72px+env(safe-area-inset-bottom))]")}>{children}</main>
+      <main className="flex-1">{children}</main>
 
       {/* 미래AI랩 브릿지 — 모든 고객 화면 하단 공통 */}
       <div className="mx-auto w-full max-w-[1280px] px-4 mt-12 md:mt-16">
         <SampleBridgeCTA surface="customer" />
       </div>
 
-      <footer className="bg-brand-ivory border-t border-neutral-border mt-14 md:mt-16">
+      <footer className="bg-brand-ivory border-t border-neutral-border mt-14 md:mt-16" style={cover ? { paddingBottom: cover } : undefined}>
         <div className="mx-auto max-w-[1280px] px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-[0.9rem]">
           <div className="col-span-2 md:col-span-1">
             <p className="font-black text-[1.4rem] tracking-tight">MORFIT<span className="text-brand-accent">.</span></p>
@@ -247,7 +286,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
       </footer>
 
       {/* Mobile bottom navigation: 홈 / 카테고리 / 검색 / 찜 / 마이 */}
-      <nav className={cn("md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border safe-bottom", onPdp && "hidden")} aria-label="하단 메뉴">
+      <nav data-bottom-bar className={cn("md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border safe-bottom", hideTabs && "hidden")} aria-label="하단 메뉴">
         <ul className="grid grid-cols-5 h-[64px]">
           {([
             { key: "home", label: "홈", icon: Home, href: "/", active: pathname === "/" },

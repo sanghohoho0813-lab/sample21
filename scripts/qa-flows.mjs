@@ -1,4 +1,4 @@
-/* 실제 사용 흐름 + 예외 상황 E2E (UI/UX 고도화 v2 · 기능 안정화)
+/* 실제 사용 흐름 + 예외 상황 E2E (UI/UX 고도화 v2 · 기능 안정화 · 2차: 뒤로 버튼 · 하단 결제 바 · 완료 화면 · 카드 자리 유지)
    - 고객(휴대폰 390): 검색 0건/결과 · 상품 상세 하단 구매 바 → 옵션 시트 · 찜 · 장바구니 수량/삭제 ·
      주문서 입력 검증(오류 표시 → 고치면 즉시 해제) · 핏 프로필 범위 검증 · 주문 취소 · 품절 옵션 재입고 알림 · 하단 탭 숨김
    - AX(PC 1440): 실행 센터 필터/초기화 · 무시 사유 필수 · 주문 검색 0건 · 재고 상태 필터 · 증빙 필터 접기/열기 ·
@@ -75,12 +75,19 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
     await m.getByRole("button", { name: "삭제" }).first().click(); await m.waitForTimeout(300);
     must(/장바구니가 비어 있습니다/.test(await text(m)), "빈 장바구니 안내 없음");
   });
-  await step("주문서 — 오류 표시 후 고치면 즉시 해제 · 정상 주문", async () => {
+  await step("장바구니 → 주문서 — 하단 고정 결제 바(탭 위) · 주문서에서는 탭 숨김", async () => {
     await go(m, "/products/p-nove-oxford");
     await m.locator("[data-buy-bar]").getByRole("button", { name: "구매하기" }).click(); await m.waitForTimeout(300);
     const dlg = m.getByRole("dialog"); await dlg.getByRole("button", { name: /^사이즈 L/ }).click();
-    await dlg.getByRole("button", { name: /구매하기/ }).click(); await m.waitForURL(/\/cart/, { timeout: 6000 });
-    await go(m, "/checkout");
+    await dlg.getByRole("button", { name: /구매하기/ }).click(); await m.waitForURL(/\/cart/, { timeout: 6000 }); await m.waitForTimeout(400);
+    const bar = m.locator("[data-checkout-bar]"); must(await bar.isVisible(), "장바구니 결제 바 없음");
+    const bb = await bar.boundingBox(); const tab = await m.getByRole("navigation", { name: "하단 메뉴" }).boundingBox();
+    must(bb && tab && bb.y + bb.height <= tab.y + 1, "결제 바가 하단 탭과 겹침");
+    await bar.getByRole("link", { name: /주문하기/ }).click(); await m.waitForURL(/\/checkout/, { timeout: 6000 }); await m.waitForTimeout(400);
+    must(!(await m.getByRole("navigation", { name: "하단 메뉴" }).isVisible()), "주문서에서 하단 탭이 보임");
+    const cb = await m.locator("[data-checkout-bar]").boundingBox(); must(cb && cb.y + cb.height >= 844 - 2, "주문서 결제 버튼이 화면 맨 아래가 아님");
+  });
+  await step("주문서 — 오류 표시 후 고치면 즉시 해제 · 정상 주문", async () => {
     await m.locator('input[name="name"]').fill(""); await m.locator('input[name="phone"]').fill("123");
     await m.getByRole("button", { name: /데모 주문 완료/ }).click(); await m.waitForTimeout(300);
     let t = await text(m);
@@ -91,6 +98,13 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
     await m.locator('input[name="phone"]').fill("010-1234-5678");
     await m.locator('input[name="agree"]').check();
     await m.getByRole("button", { name: /데모 주문 완료/ }).click(); await m.waitForURL(/checkout\/complete/, { timeout: 8000 });
+  });
+  await step("주문 완료 — 버튼 높이 · 주문 정보 정리 · 중복 알림 없음", async () => {
+    await m.waitForTimeout(500);
+    for (const name of ["주문 상세 보기", "쇼핑 계속하기"]) { const h = (await m.getByRole("link", { name }).boundingBox())?.height ?? 0; must(h >= 44, `'${name}' 버튼 높이 ${h}px`); }
+    const t = await text(m); must(/결제수단/.test(t) && /주문자/.test(t), "결제수단·주문자 정보 행 없음");
+    must(!/결제수단\(데모\):/.test(t), "메모 원문이 그대로 노출됨");
+    must(!/주문.*완료/.test(await m.locator("[data-toaster]").innerText()), "완료 화면과 같은 내용의 토스트가 또 뜸");
   });
   await step("주문 취소 — 확인 모달 → 취소 상태", async () => {
     const id = m.url().split("/").pop();
@@ -119,6 +133,37 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
   await step("하단 탭 — 상품 상세 밖에서는 다시 보임", async () => {
     await go(m, "/wishlist"); must(await m.getByRole("navigation", { name: "하단 메뉴" }).isVisible(), "하단 탭이 안 보임");
   });
+  await step("페이지 맨 아래 — 마지막 줄이 하단 탭·구매 바에 가려지지 않음", async () => {
+    for (const u of ["/wishlist", "/products/p-nove-oxford"]) {
+      await go(m, u); await m.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await m.waitForTimeout(400);
+      const r = await m.evaluate(() => {
+        const last = document.querySelector("footer")?.lastElementChild?.getBoundingClientRect();
+        const tops = Array.from(document.querySelectorAll("[data-bottom-bar],[data-buy-bar],[data-checkout-bar]")).map((el) => el.getBoundingClientRect()).filter((b) => b.height > 0).map((b) => b.top);
+        return { bottom: last?.bottom ?? 0, top: Math.min(...tops) };
+      });
+      must(r.bottom <= r.top + 1, `${u}: 푸터 마지막 줄 ${Math.round(r.bottom)} > 바 ${Math.round(r.top)}`);
+    }
+  });
+  await step("뒤로 버튼 — 바로 들어온 하위 화면은 상위 화면으로", async () => {
+    await go(m, "/products/p-nove-oxford");
+    await m.locator("header").getByRole("button", { name: "뒤로" }).click(); await m.waitForURL(/\/shop/, { timeout: 6000 });
+  });
+  await step("뒤로 버튼 — 앱 안에서 이동했으면 직전 화면으로", async () => {
+    await go(m, "/ranking");
+    await m.locator('main a[href^="/products/"]').first().click(); await m.waitForURL(/\/products\//, { timeout: 6000 }); await m.waitForTimeout(300);
+    await m.locator("header").getByRole("button", { name: "뒤로" }).click(); await m.waitForURL(/\/ranking/, { timeout: 6000 });
+  });
+  await step("찜 — 평소 상태 배지('정상'·'가격 변동 없음') 없음", async () => {
+    await go(m, "/wishlist");
+    const t = await m.locator("main").innerText(); must(!/가격 변동 없음|관심 상승|(^|\s)정상(\s|$)/m.test(t), "의미 없는 상태 배지가 보임");
+  });
+  await step("AX 주문(휴대폰) — 처리 버튼은 카드 내용 아래", async () => {
+    await go(m, "/ax/orders");
+    const btn = m.getByRole("button", { name: /^(상품준비|출고완료|배송중|배송완료)$/ }).first();
+    const card = btn.locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
+    const dl = await card.locator("dl").boundingBox(); const bb = await btn.boundingBox();
+    must(dl && bb && bb.y >= dl.y + dl.height, "처리 버튼이 주문 내용보다 위에 있음");
+  });
   await ctx.close();
 }
 
@@ -141,6 +186,13 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
     must(await btn.isDisabled(), "사유 없이 무시 가능");
     await dlg.locator("textarea").fill("브랜드 정책상 보류"); must(!(await btn.isDisabled()), "사유 입력 후에도 비활성");
     await dlg.getByRole("button", { name: "취소" }).click(); await d.waitForTimeout(200);
+  });
+  await step("과제 확인 → 카드가 같은 자리에 남고 다음 단계 버튼으로", async () => {
+    await go(d, "/ax/actions");
+    const first = d.locator("[data-action-id]").first(); const id = await first.getAttribute("data-action-id");
+    await first.getByRole("button", { name: "확인", exact: true }).click(); await d.waitForTimeout(400);
+    must((await d.locator("[data-action-id]").first().getAttribute("data-action-id")) === id, "확인 후 카드 순서가 바뀜");
+    must((await d.locator(`[data-action-id="${id}"]`).getByRole("button", { name: "실행 시작" }).count()) === 1, "다음 단계(실행 시작) 버튼 없음");
   });
   await step("주문 검색 0건 — 빈 상태", async () => {
     await go(d, "/ax/orders");

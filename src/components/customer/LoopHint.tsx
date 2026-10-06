@@ -14,10 +14,12 @@ export function LoopHint({ children, href, className }: { children: ReactNode; h
   const hydrated = useHydrated();
   if (!hydrated || role === "customer") return null;
   return (
-    <p className={cn("flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.85rem] text-neutral-text2 leading-snug", className)}>
-      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-brand-accent shrink-0" />
-      <span className="min-w-0 break-keep">{children}</span>
-      {href && <Link href={href} className="tap inline-flex min-h-[40px] items-center gap-0.5 font-semibold text-brand-accent hover:underline underline-offset-2 whitespace-nowrap">AX에서 보기<ArrowUpRight size={14} /></Link>}
+    <p className={cn("flex items-start gap-2 text-[0.85rem] text-neutral-text2 leading-relaxed", className)}>
+      <span aria-hidden className="mt-[0.6em] h-1.5 w-1.5 rounded-full bg-brand-accent shrink-0" />
+      <span className="min-w-0 break-keep">
+        {children}
+        {href && <> <Link href={href} className="inline-flex items-center gap-0.5 py-2.5 -my-2.5 font-semibold text-brand-accent hover:underline underline-offset-2 whitespace-nowrap">AX에서 보기<ArrowUpRight size={14} /></Link></>}
+      </span>
     </p>
   );
 }

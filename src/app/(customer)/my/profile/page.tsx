@@ -16,7 +16,7 @@ import { INTERESTS_KEY, useDocumentTitle, useLocalPref } from "@/components/cust
 
 function InterestsCard() {
   const [prefs, setPrefs] = useLocalPref<{ ids: string[] }>(INTERESTS_KEY, { ids: [] });
-  const toggle = (id: string) => { const on = prefs.ids.includes(id); const ids = on ? prefs.ids.filter((x) => x !== id) : [...prefs.ids, id]; setPrefs({ ids }); toast(on ? "관심 카테고리에서 제외했습니다" : "관심 카테고리에 추가했습니다", "추천 상품에 반영됩니다 (데모)", on ? "info" : "success"); };
+  const toggle = (id: string) => { const on = prefs.ids.includes(id); const ids = on ? prefs.ids.filter((x) => x !== id) : [...prefs.ids, id]; setPrefs({ ids }); toast(on ? "관심 카테고리에서 제외했습니다" : "관심 카테고리에 추가했습니다", "추천 상품에 반영됩니다", on ? "info" : "success"); };
   return (
     <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
       <p className="font-bold flex items-center gap-2 mb-1"><LayoutGrid size={16} />관심 카테고리</p>

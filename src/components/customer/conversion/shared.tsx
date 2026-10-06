@@ -62,8 +62,8 @@ export function stockState(v: Variant, store: StoreLike): StockState {
   if (st === "restock-review") return { key: "review", label: purchasable ? `재입고 검토중 · 남은 재고 ${stock}개` : "재입고 검토중", short: "재입고 검토", tone: "info", purchasable, stock };
   if (!purchasable) return { key: "soldout", label: "품절", short: "품절", tone: "error", purchasable, stock };
   if (st === "low") return { key: "low", label: `품절 임박 · 재고 ${stock}개`, short: `품절 임박 ${stock}개`, tone: "warning", purchasable, stock };
-  if (st === "rising") return { key: "rising", label: "관심 상승 · 정상", short: "관심 상승", tone: "accent", purchasable, stock };
-  return { key: "normal", label: "정상", short: "정상", tone: "neutral", purchasable, stock };
+  if (st === "rising") return { key: "rising", label: "구매 가능", short: "구매 가능", tone: "accent", purchasable, stock };
+  return { key: "normal", label: "구매 가능", short: "구매 가능", tone: "neutral", purchasable, stock };
 }
 
 /** 상품 전체의 대표(최악) 재고 상태 — 찜 목록 배지용 */
@@ -71,7 +71,7 @@ export function productStockState(p: Product, store: StoreLike): StockState {
   const states = effVariants(p.id, store).map((v) => stockState(v, store));
   const order: StockKey[] = ["soldout", "low", "progress", "review", "restocked", "rising", "normal"];
   for (const k of order) { const hit = states.find((s) => s.key === k); if (hit) return k === "soldout" && states.some((s) => s.purchasable) ? { ...hit, label: "일부 옵션 품절", short: "일부 품절", tone: "warning" } : hit; }
-  return states[0] ?? { key: "normal", label: "정상", short: "정상", tone: "neutral", purchasable: true, stock: 0 };
+  return states[0] ?? { key: "normal", label: "구매 가능", short: "구매 가능", tone: "neutral", purchasable: true, stock: 0 };
 }
 
 export const findVariant = (productId: string, colorIdx: number | null, size: string | null): Variant | null => {

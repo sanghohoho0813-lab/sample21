@@ -133,7 +133,6 @@ function FitBody() {
     { key: "id", header: "접수", primary: true, cell: (r) => (
       <div className="min-w-0">
         <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold">{r.id}</span>{isCustomerCreated(r.id) && <Badge tone="primary" size="sm">고객 화면에서 접수</Badge>}{mobile && <Badge tone={RETURN_STATUS_TONE[effStatus(r)]} size="sm">{RETURN_STATUS_LABEL[effStatus(r)]}</Badge>}</div>
-        {mobile && <div className="mt-2 flex gap-2"><QueueButtons r={r} status={effStatus(r)} onProcess={process} /></div>}
       </div>
     ) },
     { key: "at", header: "접수 시각", cell: (r) => <span title={fmtDate(r.createdAt, "datetime")}>{relTime(r.createdAt)}</span> },
@@ -224,7 +223,7 @@ function FitBody() {
       {/* Return queue */}
       <SectionBlock title="반품·교환 요청 처리" desc="접수된 요청을 승인 → 완료 순서로 처리합니다. 고객 화면에서 접수된 요청은 표시가 붙습니다. 처리 상태는 이 브라우저(데모)에만 저장됩니다."
         right={<div className="inline-flex rounded-xl bg-neutral-canvas p-1 border border-neutral-border">{(["open", "all"] as const).map((k) => <button key={k} onClick={() => setQueueFilter(k)} className={cn("h-10 md:h-9 px-3 rounded-lg text-[0.85rem] font-semibold transition-all duration-fast", queueFilter === k ? "bg-white shadow-card" : "text-neutral-text2 hover:text-neutral-text")}>{k === "open" ? `미처리 (${returns.filter((r) => effStatus(r) === "requested" || effStatus(r) === "approved").length})` : `전체 (${returns.length})`}</button>)}</div>}>
-        <DataTable rows={queue.slice(0, limit)} columns={queueColumns} rowKey={(r) => r.id} dense
+        <DataTable rows={queue.slice(0, limit)} columns={queueColumns} rowKey={(r) => r.id} dense mobileFooter={(r) => <QueueButtons r={r} status={effStatus(r)} onProcess={process} />}
           empty={<EmptyState title="처리할 요청이 없습니다" desc="모든 반품·교환 요청이 완료되었습니다. 고객 화면 마이페이지 > 주문에서 반품을 요청하면 여기에 접수됩니다." icon={<CheckCircle2 size={22} />} action={<Button variant="outline" href="/my/orders">고객 화면에서 반품 요청해 보기</Button>} />} />
         <MoreButton hasMore={hasMore} onClick={more} remaining={queue.length - limit} />
       </SectionBlock>

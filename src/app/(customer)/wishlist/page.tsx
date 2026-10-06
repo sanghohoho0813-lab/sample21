@@ -21,8 +21,7 @@ import { parseVariant, productStockState, stockState, useDocumentTitle } from "@
 import { LoopHint } from "@/components/customer/LoopHint";
 
 function priceNote(p: Product, current: number, overridden: boolean) {
-  if (current < p.price) { const rate = Math.round(((p.price - current) / p.price) * 100); return { text: overridden ? `찜한 뒤 가격 인하 · ${rate}% 할인 중` : `${rate}% 할인 중`, tone: "error" as const }; }
-  return { text: "가격 변동 없음", tone: "neutral" as const };
+  return overridden && current < p.price ? "찜한 뒤 가격 인하" : null;
 }
 
 function WishRow({ item, onPick }: { item: WishItem; onPick: (p: Product, colorIdx: number, size: string | null) => void }) {
@@ -35,13 +34,15 @@ function WishRow({ item, onPick }: { item: WishItem; onPick: (p: Product, colorI
   const note = priceNote(p, price, !!store.salePriceOverride[p.id]);
   const pState = productStockState(p, store);
   const vState = variant ? stockState(variant, store) : null;
+  const stock = vState ?? pState;
+  const quiet = stock.key === "normal" || stock.key === "rising"; // 평소 상태는 배지 없이
   const subscribed = variant ? store.restockSubs.some((s) => s.variantId === variant.id && s.status === "waiting") : false;
   const remove = () => { store.removeWishlist(p.id); toast("찜 목록에서 삭제했습니다", undefined, "info"); };
   const toCart = () => {
     if (variant && vState?.purchasable) { store.addToCart(variant.id); toast("장바구니에 담았습니다", `${p.name} · ${variant.color} · ${variant.size}`); return; }
     onPick(p, parsed?.colorIdx ?? 0, variant?.size ?? null);
   };
-  const restock = () => { if (!variant) return; store.subscribeRestock(variant.id); toast("재입고 알림을 신청했습니다", "AX 운영화면 수요신호에 반영"); };
+  const restock = () => { if (!variant) return; store.subscribeRestock(variant.id); toast("재입고 알림을 신청했습니다", "입고되면 알림으로 알려드려요"); };
   return (
     <li className="rounded-cardlg border border-neutral-border bg-white p-4 md:p-5 transition-shadow hover:shadow-raised">
       <div className="flex gap-4">
@@ -54,14 +55,14 @@ function WishRow({ item, onPick }: { item: WishItem; onPick: (p: Product, colorI
           <p className="text-[0.82rem] text-neutral-text2 mt-0.5">{variant ? `선택 옵션 · ${variant.color} · ${variant.size}` : "옵션 미선택"} · {relTime(item.addedAt)} 찜</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <Price price={price} original={p.price} size="sm" />
-            <Badge tone={note.tone === "error" ? "error" : "neutral"} size="sm">{note.text}</Badge>
-            <Badge tone={(vState ?? pState).tone} size="sm">{(vState ?? pState).label}</Badge>
+            {note && <Badge tone="error" size="sm">{note}</Badge>}
+            {!quiet && <Badge tone={stock.tone} size="sm">{stock.label}</Badge>}
           </div>
           <div className="mt-3 hidden sm:flex gap-2">
             {variant && vState && !vState.purchasable ? (
               <Button size="sm" variant="brand" onClick={restock} disabled={subscribed} icon={<Bell size={14} />}>{subscribed ? "재입고 알림 신청 완료" : "재입고 알림"}</Button>
             ) : (
-              <Button size="sm" variant="brand" onClick={toCart} icon={<ShoppingBag size={14} />}>{variant ? "장바구니 이동" : "옵션 선택 후 담기"}</Button>
+              <Button size="sm" variant="brand" onClick={toCart} icon={<ShoppingBag size={14} />}>{variant ? "장바구니 담기" : "옵션 선택 후 담기"}</Button>
             )}
             <Button size="sm" variant="outline" href={`/products/${p.id}`}>상세 보기</Button>
           </div>
@@ -71,7 +72,7 @@ function WishRow({ item, onPick }: { item: WishItem; onPick: (p: Product, colorI
         {variant && vState && !vState.purchasable ? (
           <Button size="md" variant="brand" className="flex-1" onClick={restock} disabled={subscribed} icon={<Bell size={14} />}>{subscribed ? "재입고 알림 신청 완료" : "재입고 알림"}</Button>
         ) : (
-          <Button size="md" variant="brand" className="flex-1" onClick={toCart} icon={<ShoppingBag size={14} />}>{variant ? "장바구니 이동" : "옵션 선택 후 담기"}</Button>
+          <Button size="md" variant="brand" className="flex-1" onClick={toCart} icon={<ShoppingBag size={14} />}>{variant ? "장바구니 담기" : "옵션 선택 후 담기"}</Button>
         )}
         <Button size="md" variant="outline" href={`/products/${p.id}`}>상세</Button>
       </div>

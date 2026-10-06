@@ -66,13 +66,36 @@ export function OrderItemRow({ item, linkable = true }: { item: Order["items"][n
   return linkable ? <Link href={`/products/${p.id}`} className="block rounded-xl -mx-2 px-2 py-1.5 hover:bg-brand-ivory transition-colors">{inner}</Link> : inner;
 }
 
+/** 주문 메모("요청 · 주문자 이름 번호 · 쿠폰 X · 결제수단(데모): 카드")를 읽기 쉬운 행으로 나눈다 — 저장 형식은 그대로 */
+export function memoParts(memo?: string) {
+  const out = { request: "", orderer: "", coupon: "", payment: "" };
+  for (const part of (memo ?? "").split(" · ").map((x) => x.trim()).filter(Boolean)) {
+    if (part.startsWith("주문자 ")) out.orderer = part.slice(4);
+    else if (part.startsWith("쿠폰 ")) out.coupon = part.slice(3);
+    else if (part.startsWith("결제수단")) out.payment = part.replace(/^결제수단(\(데모\))?:\s*/, "");
+    else out.request = out.request ? `${out.request} · ${part}` : part;
+  }
+  return out;
+}
+
+/** 주문 정보 행 — 배송지 · 요청사항 · 주문자 · 결제수단 · 쿠폰 (있는 것만) */
+export function OrderInfoRows({ order }: { order: Order }) {
+  const m = memoParts(order.memo);
+  const rows: [string, string][] = [["배송지", order.address], ["요청사항", m.request], ["주문자", m.orderer], ["결제수단", m.payment || "카드"], ["쿠폰", m.coupon]].filter((r): r is [string, string] => !!r[1]);
+  return (
+    <dl className="space-y-2 text-[0.92rem]">
+      {rows.map(([k, v]) => <div key={k} className="flex gap-4"><dt className="w-16 shrink-0 text-neutral-text2">{k}</dt><dd className="min-w-0 flex-1 text-right break-keep">{v}</dd></div>)}
+    </dl>
+  );
+}
+
 export function OrderCard({ order }: { order: Order }) {
   const first = PRODUCT_BY_ID[order.items[0]?.productId];
   const v = VARIANT_BY_ID[order.items[0]?.variantId];
   return (
     <Link href={`/my/orders/${order.id}`} className="block rounded-cardlg border border-neutral-border bg-white p-4 md:p-5 hover-lift active:bg-brand-ivory">
       <div className="flex items-center justify-between gap-2 mb-3">
-        <p className="text-[0.82rem] text-neutral-text2 tabular">{fmtDate(order.createdAt, "datetime")} · 주문번호 {order.id}</p>
+        <p className="min-w-0 text-[0.82rem] text-neutral-text2 tabular">{fmtDate(order.createdAt, "datetime")} · <span className="whitespace-nowrap">{order.id}</span></p>
         <OrderStatusBadge status={order.status} />
       </div>
       <div className="flex gap-3 items-center">

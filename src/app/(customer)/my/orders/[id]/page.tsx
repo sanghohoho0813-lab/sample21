@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, MapPin, CreditCard, XCircle, RotateCcw, Repeat, PackageSearch, ExternalLink } from "lucide-react";
+import { ChevronLeft, XCircle, RotateCcw, Repeat, PackageSearch } from "lucide-react";
 import type { ReturnReason } from "@/lib/types";
 import { DEMO_CUSTOMER_NAME, PRODUCT_BY_ID, RETURN_REASON_LABEL, VARIANT_BY_ID } from "@/lib/demo/seed";
 import { useApp } from "@/lib/store";
@@ -11,14 +11,14 @@ import { krw } from "@/lib/format";
 import { Hydrated } from "@/components/system/Hydrated";
 import { Container } from "@/components/customer/Section";
 import { Button } from "@/components/ui/Button";
-import { DemoBadge } from "@/components/ui/Badge";
+
 import { Modal, Responsive } from "@/components/ui/Overlay";
 import { Select, Textarea } from "@/components/ui/Form";
 import { EmptyState, SkeletonCard } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { cn } from "@/lib/cn";
-import { OrderItemRow, OrderTimeline } from "@/components/customer/conversion/OrderBits";
+import { OrderInfoRows, OrderItemRow, OrderTimeline } from "@/components/customer/conversion/OrderBits";
 import { myOrders, useDocumentTitle } from "@/components/customer/conversion/shared";
 import { LoopHint } from "@/components/customer/LoopHint";
 
@@ -46,19 +46,19 @@ function OrderDetail({ id }: { id: string }) {
   const myReturns = store.returns.filter((r) => r.orderId === order.id);
   const openPicker = (setter: (v: boolean) => void) => { setPickVid(order.items[0]?.variantId ?? ""); setReason("size-small"); setNote(""); setErr(""); setter(true); };
 
-  const doCancel = () => { store.updateOrderStatus(order.id, "cancelled", DEMO_CUSTOMER_NAME); setCancelOpen(false); toast("취소 요청이 접수되었습니다", "AX 운영화면 주문 목록에 '취소' 상태로 반영됩니다", "info"); };
+  const doCancel = () => { store.updateOrderStatus(order.id, "cancelled", DEMO_CUSTOMER_NAME); setCancelOpen(false); toast("주문이 취소되었습니다", undefined, "info"); };
   const doReturn = () => {
     if (!pickVid) { setErr("반품할 상품을 선택해주세요."); return; }
     if ((reason === "other" || reason === "fit") && note.trim().length < 2) { setErr("사유를 조금 더 자세히 적어주세요."); return; }
     store.requestReturn(order.id, pickVid, reason, note.trim() || undefined);
     setReturnOpen(false);
-    toast("반품 요청이 접수되었습니다", `사유 '${RETURN_REASON_LABEL[reason]}'가 핏 위험도 계산에 반영됩니다`);
+    toast("반품 요청이 접수되었습니다", `사유: ${RETURN_REASON_LABEL[reason]} · 확인 후 회수 안내를 드려요`);
   };
   const doExchange = () => {
     if (!pickVid) { setErr("교환할 상품을 선택해주세요."); return; }
     store.updateOrderStatus(order.id, "exchange-requested", DEMO_CUSTOMER_NAME);
     setExchangeOpen(false);
-    toast("교환 요청이 접수되었습니다", "운영팀 확인 후 교환 상품이 발송됩니다 (데모)");
+    toast("교환 요청이 접수되었습니다", "확인 후 교환 상품을 보내드려요");
   };
   const ItemPicker = () => (
     <div className="space-y-2" role="radiogroup" aria-label="상품 선택">
@@ -73,14 +73,14 @@ function OrderDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[880px] mx-auto space-y-5">
-      <div className="flex items-center gap-2"><Link href="/my/orders" className="h-10 w-10 -ml-2 inline-flex items-center justify-center rounded-full hover:bg-brand-ivory" aria-label="주문내역으로"><ChevronLeft size={22} /></Link><div className="min-w-0 flex-1"><p className="text-[0.82rem] text-neutral-text2 tabular">{fmtDate(order.createdAt, "datetime")} 주문</p><h1 className="text-[1.3rem] md:text-[1.6rem] font-bold tracking-tight leading-tight tabular">주문번호 {order.id}</h1></div><OrderStatusBadge status={order.status} size="md" /></div>
+      <div className="flex items-start gap-2"><Link href="/my/orders" className="hidden lg:inline-flex h-10 w-10 -ml-2 items-center justify-center rounded-full hover:bg-brand-ivory" aria-label="주문내역으로"><ChevronLeft size={22} /></Link><div className="min-w-0 flex-1"><p className="text-[0.85rem] text-neutral-text2 tabular">{fmtDate(order.createdAt, "datetime")} 주문</p><h1 className="mt-0.5 text-[1.3rem] md:text-[1.6rem] font-bold tracking-tight leading-tight tabular whitespace-nowrap">{order.id}</h1></div><span className="mt-1 shrink-0"><OrderStatusBadge status={order.status} size="md" /></span></div>
 
       <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-5 items-start">
         <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 min-w-0">
-          <p className="font-bold mb-4 flex items-center gap-2">배송 진행 상태 <DemoBadge /></p>
+          <p className="font-bold mb-4">배송 진행 상태</p>
           <OrderTimeline order={order} tour="c-order-status" />
-          <p className="mt-4 text-[0.8rem] text-neutral-text2 leading-relaxed">상태는 AX 운영화면 주문·배송 화면에서 운영직원이 변경하며, 이 화면과 알림에 동시에 반영됩니다.</p>
-          {store.role !== "customer" && <Link href="/ax/orders" className="tap mt-2 inline-flex items-center gap-1 text-[0.82rem] font-bold text-brand-accent hover:underline underline-offset-2"><ExternalLink size={13} />AX 운영화면 보기 · 상태 변경</Link>}
+          <p className="mt-4 text-[0.85rem] text-neutral-text2 leading-relaxed">상태가 바뀌면 이 화면과 알림으로 바로 알려드려요.</p>
+          <LoopHint href="/ax/orders" className="mt-1">상태는 AX 주문·배송 화면에서 운영직원이 바꿉니다</LoopHint>
         </section>
 
         <div className="space-y-5 min-w-0">
@@ -90,8 +90,7 @@ function OrderDetail({ id }: { id: string }) {
             {myReturns.length > 0 && <div className="mt-4 rounded-xl bg-brand-ivory px-4 py-3 text-[0.85rem]"><p className="font-bold">반품 요청 {myReturns.length}건</p>{myReturns.map((r) => <p key={r.id} className="text-neutral-text2">{PRODUCT_BY_ID[r.productId]?.name} · {RETURN_REASON_LABEL[r.reason]}{r.note ? ` · ${r.note}` : ""} · {fmtDate(r.createdAt)}</p>)}</div>}
           </section>
           <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 space-y-3 text-[0.92rem]">
-            <div className="flex gap-3"><MapPin size={18} className="shrink-0 text-neutral-text2 mt-0.5" /><div><p className="text-[0.8rem] text-neutral-text2">배송지</p><p className="font-semibold">{order.address}</p></div></div>
-            <div className="flex gap-3"><CreditCard size={18} className="shrink-0 text-neutral-text2 mt-0.5" /><div><p className="text-[0.8rem] text-neutral-text2">결제·요청사항</p><p className="font-semibold leading-relaxed">{order.memo ?? "결제수단(데모): 카드"}</p></div></div>
+            <OrderInfoRows order={order} />
             <dl className="pt-3 border-t border-neutral-border space-y-1.5">
               <div className="flex justify-between"><dt className="text-neutral-text2">상품금액</dt><dd className="tabular">{krw(order.subtotal + order.items.reduce((s, i) => s + i.discount * i.qty, 0))}</dd></div>
               <div className="flex justify-between"><dt className="text-neutral-text2">할인 합계</dt><dd className="tabular">{order.discount > 0 ? `−${krw(order.discount)}` : "0원"}</dd></div>

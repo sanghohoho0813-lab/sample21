@@ -37,7 +37,7 @@ export function OptionSheet({ product, open, onClose, initialColorIdx = 0, initi
   const restock = () => {
     if (!variant) return;
     store.subscribeRestock(variant.id);
-    toast("재입고 알림을 신청했습니다", "AX 운영화면 수요신호에 반영됩니다");
+    toast("재입고 알림을 신청했습니다", "입고되면 알림으로 알려드려요");
     onClose();
   };
   return (

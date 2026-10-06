@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bell, ChevronRight, Sparkles, Ticket, Ruler, User, Package, Heart, BellRing, X } from "lucide-react";
+import { Bell, Sparkles, Ticket, Ruler, User, Package, Heart, BellRing, X } from "lucide-react";
 import type { Order } from "@/lib/types";
 import { CAMPAIGNS, CUSTOMER_BY_ID, DEMO_CUSTOMER_ID, DEMO_CUSTOMER_NAME, PRODUCTS, PRODUCT_BY_ID, VARIANT_BY_ID } from "@/lib/demo/seed";
 import { useApp, campaignStatus } from "@/lib/store";
@@ -116,7 +116,7 @@ export function RestockList({ limit, tour, compact }: { limit?: number; tour?: s
                     {s.status === "notified" && <Button size="sm" variant="brand" href={href} icon={<Sparkles size={14} />}>지금 구매</Button>}
                     {s.status === "waiting" && <Button size="sm" variant="outline" href={href}>상품 보기</Button>}
                     {s.status === "purchased" && s.purchaseOrderId && <Button size="sm" variant="outline" href={`/my/orders/${s.purchaseOrderId}`}>주문 보기</Button>}
-                    {s.status !== "purchased" && <Button size="sm" variant="ghost" onClick={() => { store.cancelRestock(s.id); toast("재입고 알림을 취소했습니다", "수요 레이더 수요신호에서 제외됩니다", "info"); }} icon={<X size={14} />}>취소</Button>}
+                    {s.status !== "purchased" && <Button size="sm" variant="ghost" onClick={() => { store.cancelRestock(s.id); toast("재입고 알림을 취소했습니다", undefined, "info"); }} icon={<X size={14} />}>취소</Button>}
                   </div>
                 )}
               </div>
@@ -137,9 +137,9 @@ export function ProfileCard() {
     <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
       <span className="h-16 w-16 rounded-2xl bg-brand-black text-white inline-flex items-center justify-center text-[1.4rem] font-black shrink-0">{DEMO_CUSTOMER_NAME.slice(0, 1)}</span>
       <div className="min-w-0 flex-1">
-        <p className="text-[1.25rem] font-bold leading-tight">{DEMO_CUSTOMER_NAME}님 <Badge tone="demo" size="sm">데모 회원</Badge></p>
+        <p className="text-[1.25rem] font-bold leading-tight">{DEMO_CUSTOMER_NAME}님</p>
         <p className="text-[0.85rem] text-neutral-text2 mt-0.5 tabular">{ME ? `${fmtDate(ME.joinedAt)} 가입 · ${ME.favoriteBrandId ? "AERNO 애호가" : "취향 탐색중"}` : "회원 정보"}</p>
-        <p className="text-[0.9rem] mt-2 flex flex-wrap items-center gap-x-2 gap-y-1"><Ruler size={14} className="text-neutral-text2" />{parts.length ? parts.join(" · ") : <span className="text-neutral-text2">사이즈·취향 정보가 아직 없습니다</span>}{complete ? <Badge tone="success" size="sm">핏 프로필 완성</Badge> : <Badge tone="warning" size="sm">프로필 {parts.length ? "일부" : "미"}입력</Badge>}</p>
+        <p className="text-[0.9rem] mt-2 flex flex-wrap items-center gap-x-2 gap-y-1"><Ruler size={14} className="text-neutral-text2" />{parts.length ? parts.join(" · ") : <span className="text-neutral-text2">사이즈·취향 정보가 아직 없습니다</span>}</p>
       </div>
       <Button variant={complete ? "outline" : "brand"} href="/my/profile" icon={<User size={16} />} className="shrink-0">{complete ? "프로필 수정" : "사이즈·취향 입력"}</Button>
     </div>
@@ -175,7 +175,7 @@ export function RecentlyViewed() {
 }
 
 export function TabLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
-  return <Link href={href} role="tab" aria-selected={active} className={cn("h-11 px-4 inline-flex items-center rounded-xl font-semibold whitespace-nowrap transition-colors", active ? "bg-brand-black text-white" : "text-neutral-text2 hover:bg-brand-ivory hover:text-neutral-text")}>{children}<ChevronRight size={14} className={cn("ml-0.5", active ? "opacity-70" : "opacity-0")} /></Link>;
+  return <Link href={href} role="tab" aria-selected={active} className={cn("h-11 px-4 inline-flex items-center rounded-xl font-semibold whitespace-nowrap transition-colors", active ? "bg-brand-black text-white" : "text-neutral-text2 hover:bg-brand-ivory hover:text-neutral-text")}>{children}</Link>;
 }
 
 export const ALL_PRODUCT_COUNT = PRODUCTS.length;
