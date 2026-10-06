@@ -100,7 +100,6 @@ function SearchInner() {
   const filters = useMemo(() => parseFilters(new URLSearchParams(sp.toString())), [sp]);
   const q = filters.q;
 
-  useEffect(() => { document.title = q ? `‘${q}’ 검색 | MORFIT` : "검색 | MORFIT"; }, [q]);
   useEffect(() => { if (q) pushRecentSearch(q); }, [q]);
 
   const go = useCallback((next: string) => {

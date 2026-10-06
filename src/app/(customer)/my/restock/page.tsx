@@ -4,7 +4,6 @@ import { Hydrated } from "@/components/system/Hydrated";
 import { Container, PageTitle } from "@/components/customer/Section";
 import { SkeletonCard } from "@/components/ui/States";
 import { RestockList } from "@/components/customer/conversion/MyBits";
-import { useDocumentTitle } from "@/components/customer/conversion/shared";
 import { LoopHint } from "@/components/customer/LoopHint";
 
 function RestockContent() {
@@ -25,7 +24,6 @@ function RestockContent() {
 }
 
 export default function RestockPage() {
-  useDocumentTitle("재입고 알림");
   return (
     <Container className="py-6 md:py-10 max-w-[960px]">
       <PageTitle title="재입고 알림" desc="품절 옵션의 재입고 알림 신청 현황입니다." />

@@ -1,7 +1,7 @@
 "use client";
 /* /style — 스타일 찾기 = 핏/스타일 프로필 허브. */
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { AlertTriangle, Sparkles, ChevronRight } from "lucide-react";
 import { DEMO_CUSTOMER_NAME } from "@/lib/demo/seed";
 import { useApp } from "@/lib/store";
@@ -63,7 +63,6 @@ function StyleBody() {
 }
 
 export default function StylePage() {
-  useEffect(() => { document.title = "스타일 찾기 | MORFIT"; }, []);
   return (
     <Container className="py-6 md:py-10 animate-fadeIn">
       <PageTitle title="스타일 찾기" desc="키·몸무게·평소 사이즈를 알려주시면 브랜드마다 다른 사이즈를 대신 계산해드려요." />

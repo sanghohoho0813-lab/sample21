@@ -16,6 +16,7 @@ import { ProductImage } from "@/components/ui/ProductImage";
 import { toast } from "@/components/ui/Toast";
 import { FilterChip } from "./FilterChip";
 import { FITS, FIT_LABEL } from "./filters";
+import { FIT_RANGE, parseFitNumber } from "@/lib/validation";
 
 const SIZES = ["XS", "S", "M", "L", "XL"];
 const BODY_TYPES: { value: NonNullable<FitProfile["bodyType"]>; label: string; desc: string }[] = [
@@ -31,8 +32,7 @@ export const isProfileComplete = (p: FitProfile) => !!(p.height && p.weight && p
 type Draft = { height: string; weight: string; topSize: string | null; bottomSize: string | null; preferredFit: Fit | null; bodyType: FitProfile["bodyType"] };
 const toDraft = (p: FitProfile): Draft => ({ height: p.height ? String(p.height) : "", weight: p.weight ? String(p.weight) : "", topSize: p.topSize, bottomSize: p.bottomSize, preferredFit: p.preferredFit, bodyType: p.bodyType });
 const toProfile = (d: Draft): FitProfile => {
-  const h = Number(d.height), w = Number(d.weight);
-  return { height: Number.isFinite(h) && h >= 120 && h <= 220 ? h : null, weight: Number.isFinite(w) && w >= 30 && w <= 200 ? w : null, topSize: d.topSize, bottomSize: d.bottomSize, preferredFit: d.preferredFit, bodyType: d.bodyType };
+  return { height: parseFitNumber("height", d.height).value, weight: parseFitNumber("weight", d.weight).value, topSize: d.topSize, bottomSize: d.bottomSize, preferredFit: d.preferredFit, bodyType: d.bodyType };
 };
 
 function PreviewCard({ product, profile }: { product: Product; profile: FitProfile }) {
@@ -84,8 +84,8 @@ export function FitProfileForm({ onSaved }: { onSaved?: (p: FitProfile) => void 
   }, [wishlist]);
 
   // 범위 밖 값은 조용히 버리지 않고 칸 아래에 알려준다 (예전: 300cm를 넣으면 '저장됨'인데 키가 비어 있었음)
-  const heightErr = draft.height && live.height === null ? "키는 120~220cm 사이로 입력해주세요." : null;
-  const weightErr = draft.weight && live.weight === null ? "몸무게는 30~200kg 사이로 입력해주세요." : null;
+  const heightErr = parseFitNumber("height", draft.height).error;
+  const weightErr = parseFitNumber("weight", draft.weight).error;
   const save = () => {
     if (heightErr || weightErr) { toast("입력 내용을 확인해주세요", heightErr ?? weightErr ?? undefined, "warning"); return; }
     if (!live.height && !live.weight && !live.topSize && !live.bottomSize) { toast("입력한 정보가 없어요", "키·몸무게 또는 평소 사이즈부터 입력해주세요.", "warning"); return; }
@@ -102,12 +102,12 @@ export function FitProfileForm({ onSaved }: { onSaved?: (p: FitProfile) => void 
       <div className="lg:col-span-7 rounded-cardlg border border-neutral-border bg-white p-4 md:p-6 space-y-6">
         <div>
           <div className="flex items-center justify-between gap-3 mb-2"><p className="font-bold">프로필 완성도</p><span className="text-[0.85rem] text-neutral-text2 tabular">{filled}/6 · {complete ? "추천 가능" : "4개 필수"}</span></div>
-          <Progress value={filled / 6} tone={complete ? "success" : "primary"} />
+          <Progress value={filled / 6} tone={complete ? "success" : "primary"} label="프로필 입력 정도" />
           <p className="mt-1.5 text-[0.8rem] text-neutral-text2">필수: 키 · 몸무게 · 평소 상의 · 평소 하의 (선호 핏·체형은 선택)</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <Input label="키" name="height" type="number" inputMode="numeric" min={120} max={220} placeholder="170" suffix="cm" value={draft.height} onChange={(e) => set({ height: e.target.value })} aria-invalid={!!heightErr} className={heightErr ? "border-semantic-error" : undefined} />
-          <Input label="몸무게" name="weight" type="number" inputMode="numeric" min={30} max={200} placeholder="62" suffix="kg" value={draft.weight} onChange={(e) => set({ weight: e.target.value })} aria-invalid={!!weightErr} className={weightErr ? "border-semantic-error" : undefined} />
+          <Input label="키" name="height" type="number" inputMode="numeric" min={FIT_RANGE.height.min} max={FIT_RANGE.height.max} placeholder="170" suffix="cm" value={draft.height} onChange={(e) => set({ height: e.target.value })} aria-invalid={!!heightErr} className={heightErr ? "border-semantic-error" : undefined} />
+          <Input label="몸무게" name="weight" type="number" inputMode="numeric" min={FIT_RANGE.weight.min} max={FIT_RANGE.weight.max} placeholder="62" suffix="kg" value={draft.weight} onChange={(e) => set({ weight: e.target.value })} aria-invalid={!!weightErr} className={weightErr ? "border-semantic-error" : undefined} />
         </div>
         {(heightErr || weightErr) && <p role="alert" className="-mt-3 text-[0.85rem] text-semantic-error">{heightErr ?? weightErr}</p>}
         <fieldset>

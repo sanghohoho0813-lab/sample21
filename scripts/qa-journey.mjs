@@ -83,7 +83,7 @@ await step("AX → 고객 플랫폼 보기 / 고객 → AX 운영화면 보기",
 await step("모바일 햄버거: 왼쪽 · 1차 메뉴 수 · 스크롤 잠금 · 하단 CTA", async () => {
   const m = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: "ko-KR", hasTouch: true });
   const mp = await m.newPage(); await mp.route("**/*", (r) => (r.request().url().startsWith(BASE) ? r.continue() : r.abort()));
-  await mp.addInitScript(() => { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 4; localStorage.setItem(k, JSON.stringify(s)); });
+  await mp.addInitScript(() => { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 5; localStorage.setItem(k, JSON.stringify(s)); });
   for (const [route, btnName, expectMax, ctaSel] of [["/ax", "메뉴 열기", 8, '[data-tour="drawer-customer-cta"]'], ["/", "전체 메뉴", 7, '[data-tour="c-drawer-ax-cta"]']]) {
     await mp.goto(BASE + route, { waitUntil: "networkidle" }); await mp.waitForTimeout(900);
     const btn = mp.getByRole("button", { name: btnName }).first(); const box = await btn.boundingBox(); if (!box || box.x > 60) throw new Error(`${route} hamburger not on the left (x=${box?.x})`);

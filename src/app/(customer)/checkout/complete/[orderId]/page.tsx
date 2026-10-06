@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState, SkeletonCard } from "@/components/ui/States";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { OrderInfoRows, OrderItemRow } from "@/components/customer/conversion/OrderBits";
-import { useDocumentTitle } from "@/components/customer/conversion/shared";
 import { LoopHint } from "@/components/customer/LoopHint";
 
 function CompleteContent({ orderId }: { orderId: string }) {
@@ -58,7 +57,6 @@ function CompleteContent({ orderId }: { orderId: string }) {
 export default function CompletePage() {
   const params = useParams<{ orderId: string }>();
   const orderId = decodeURIComponent(String(params?.orderId ?? ""));
-  useDocumentTitle("주문 완료 (데모)");
   return (
     <Container className="py-8 md:py-12">
       <Hydrated fallback={<div className="max-w-[720px] mx-auto space-y-5"><SkeletonCard lines={3} /><SkeletonCard lines={5} /></div>}><CompleteContent orderId={orderId} /></Hydrated>

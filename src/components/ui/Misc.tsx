@@ -48,10 +48,11 @@ export function Price({ price, original, className, size = "md" }: { price: numb
   );
 }
 
-export function Progress({ value, className, tone = "primary" }: { value: number; className?: string; tone?: "primary" | "warning" | "error" | "success" }) {
+/** label: 스크린리더가 읽는 막대 이름(예: "추천 신뢰도") — 화면에 같은 문구가 있어도 막대와 연결되지 않으므로 넘긴다 */
+export function Progress({ value, className, tone = "primary", label }: { value: number; className?: string; tone?: "primary" | "warning" | "error" | "success"; label?: string }) {
   const colors = { primary: "bg-theme-primary", warning: "bg-semantic-warning", error: "bg-semantic-error", success: "bg-semantic-success" };
   return (
-    <div className={cn("h-2 w-full rounded-full bg-neutral-canvas overflow-hidden", className)} role="progressbar" aria-valuenow={Math.round(value * 100)} aria-valuemin={0} aria-valuemax={100}>
+    <div className={cn("h-2 w-full rounded-full bg-neutral-canvas overflow-hidden", className)} role="progressbar" aria-label={label} aria-valuenow={Math.round(value * 100)} aria-valuemin={0} aria-valuemax={100}>
       <div className={cn("h-full rounded-full transition-all duration-normal", colors[tone])} style={{ width: `${Math.max(2, Math.min(100, value * 100))}%` }} />
     </div>
   );

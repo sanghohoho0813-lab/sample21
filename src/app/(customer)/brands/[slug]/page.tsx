@@ -27,7 +27,6 @@ function BrandBody({ slug }: { slug: string }) {
   const { isFollowing, toggle, ready } = useBrandFollow();
   const [cat, setCat] = useState<CategoryId | "all">("all");
   useEffect(() => { setCat("all"); }, [slug]);
-  useEffect(() => { document.title = brand ? `${brand.name} | MORFIT` : "브랜드를 찾을 수 없음 | MORFIT"; }, [brand]);
 
   const products = useMemo(() => (brand ? PRODUCTS.filter((p) => p.brandId === brand.id) : []), [brand]);
   const aggs = useMemo(() => (brand ? allProductAgg(store).filter((a) => a.product.brandId === brand.id) : []), [store, brand]);

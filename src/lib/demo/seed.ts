@@ -11,6 +11,7 @@ import type {
 } from "../types";
 import { mulberry32, hashStr, pick, randInt } from "./rng";
 import { daysAgoKey, isoDaysAgo, todayKey } from "../dates";
+import { shippingFeeFor } from "../pricing";
 
 export const TODAY = todayKey();
 export const DEMO_CUSTOMER_ID = "c-me";
@@ -248,9 +249,21 @@ export const CUSTOMER_BY_ID: Record<string, Customer> = Object.fromEntries(CUSTO
 const ADDRESSES = ["서울 마포구 성산로", "서울 성동구 왕십리로", "경기 성남시 분당구 판교역로", "부산 해운대구 센텀중앙로", "대구 수성구 동대구로", "서울 강남구 테헤란로", "인천 연수구 송도과학로", "서울 송파구 올림픽로"];
 const orderRand = mulberry32(777);
 export const SEED_ORDERS: Order[] = [];
+
+/* 오늘 주문이 '아직 오지 않은 시각'에 찍히지 않게 한다 — 미래 시각이면 지금보다 몇 분 전으로 당긴다.
+   (난수를 더 쓰지 않고 이미 뽑은 분 값으로 정해 시드의 나머지 데이터는 그대로 유지) */
+const SEED_NOW = Date.now();
+function notFuture(iso: string, minute: number) {
+  if (Date.parse(iso) <= SEED_NOW) return iso;
+  const startOfToday = new Date(SEED_NOW).setHours(0, 0, 0, 0);
+  return new Date(Math.max(startOfToday, SEED_NOW - (5 + minute) * 60_000)).toISOString();
+}
+/** 상태 변경 시각은 주문 시각 이후, 지금 이전 */
+const between = (iso: string, from: string) => new Date(Math.max(Math.min(Date.parse(iso), SEED_NOW), Date.parse(from))).toISOString();
 {
-  const totalWeightByDay: number[] = [];
-  for (let d = 0; d < 90; d++) totalWeightByDay.push(VARIANT_BASES.reduce((s, v) => s + dayWeight(v, d), 0));
+  // 날짜별 옵션 가중치를 한 번만 계산해 둔다(주문 상품을 뽑을 때마다 다시 계산하던 약 36만 회 호출 제거 — 결과 동일)
+  const weightsByDay = Array.from({ length: 90 }, (_, d) => VARIANT_BASES.map((v) => dayWeight(v, d)));
+  const totalWeightByDay = weightsByDay.map((ws) => ws.reduce((s, w) => s + w, 0));
   let seq = 1;
   const nonDemoCustomers = CUSTOMERS.filter((c) => c.id !== DEMO_CUSTOMER_ID && c.orderCount > 0);
   const A_BASE = VARIANT_BASES.find((v) => v.id === SCENARIO.A_VARIANT)!;
@@ -271,20 +284,21 @@ export const SEED_ORDERS: Order[] = [];
         let target = orderRand() * totalWeightByDay[d];
         let chosen = VARIANT_BASES[0];
         if (forced.length && it === 0 && k < forced.length) chosen = forced[k];
-        else for (const v of VARIANT_BASES) { target -= dayWeight(v, d); if (target <= 0) { chosen = v; break; } }
+        else for (let i = 0; i < VARIANT_BASES.length; i++) { target -= weightsByDay[d][i]; if (target <= 0) { chosen = VARIANT_BASES[i]; break; } }
         const p = PRODUCT_BY_ID[chosen.productId];
         const unit = p.salePrice ?? p.price;
         items.push({ variantId: chosen.id, productId: p.id, qty: orderRand() < 0.9 ? 1 : 2, unitPrice: unit, discount: p.salePrice ? p.price - p.salePrice : 0 });
       }
       const subtotal = items.reduce((s, i) => s + i.unitPrice * i.qty, 0);
       const couponDiscount = orderRand() < 0.22 ? Math.round(subtotal * 0.05 / 1000) * 1000 : 0;
-      const shippingFee = subtotal >= 50000 ? 0 : 3000;
+      const shippingFee = shippingFeeFor(subtotal);
       const total = subtotal - couponDiscount + shippingFee;
       // 42% 비회원(1회) 주문 → 재구매율이 현실적인 수준(약 30%)이 되도록 한다
       const isGuest = orderRand() < 0.42;
       const cust = isGuest ? { id: `g-${String(seq).padStart(4, "0")}`, name: `${pick(orderRand, FAMILY)}${pick(orderRand, GIVEN)}` } : pick(orderRand, nonDemoCustomers);
       const hour = randInt(orderRand, 8, 23);
-      const createdAt = isoDaysAgo(d, hour, randInt(orderRand, 0, 59));
+      const minute = randInt(orderRand, 0, 59);
+      const createdAt = notFuture(isoDaysAgo(d, hour, minute), minute);
       let status: OrderStatus = "delivered";
       if (d === 0) status = orderRand() < 0.6 ? "preparing" : "pending";
       else if (d === 1) status = orderRand() < 0.5 ? "shipped" : "preparing";
@@ -294,7 +308,7 @@ export const SEED_ORDERS: Order[] = [];
       SEED_ORDERS.push({
         id, customerId: cust.id, customerName: cust.name, createdAt, status, items, subtotal, discount: couponDiscount + items.reduce((s, i) => s + i.discount * i.qty, 0),
         shippingFee, total, channel: orderRand() < 0.68 ? "mobile" : "web", address: pick(orderRand, ADDRESSES), source: "DEMO",
-        statusHistory: [{ status: "pending", at: createdAt, actor: "고객" }, ...(status !== "pending" ? [{ status, at: isoDaysAgo(Math.max(0, d - 1), 14), actor: "운영팀" }] : [])],
+        statusHistory: [{ status: "pending", at: createdAt, actor: "고객" }, ...(status !== "pending" ? [{ status, at: between(isoDaysAgo(Math.max(0, d - 1), 14), createdAt), actor: "운영팀" }] : [])],
       });
     }
   }
@@ -346,7 +360,10 @@ export const VARIANTS: Variant[] = VARIANT_BASES.map((vb) => {
   return { id: vb.id, productId: vb.productId, color: vb.color, size: vb.size, stock, incoming, sales7d: s.d7, salesPrev7d: s.p7, sales30d: s.d30, views7d, wishlist7d, wishlistPrev7d, cart7d, restockRequests, returns30d, fitReturns30d };
 });
 export const VARIANT_BY_ID: Record<string, Variant> = Object.fromEntries(VARIANTS.map((v) => [v.id, v]));
-export const variantsOf = (productId: string) => VARIANTS.filter((v) => v.productId === productId);
+const VARIANTS_BY_PRODUCT = new Map<string, Variant[]>();
+for (const v of VARIANTS) VARIANTS_BY_PRODUCT.set(v.productId, [...(VARIANTS_BY_PRODUCT.get(v.productId) ?? []), v]);
+/** 상품의 옵션 목록(새 배열 — 호출한 쪽에서 정렬해도 원본이 바뀌지 않는다) */
+export const variantsOf = (productId: string) => [...(VARIANTS_BY_PRODUCT.get(productId) ?? [])];
 
 /* ----------------------------- Daily series ----------------------------- */
 export const DAILY: DailyPoint[] = [];
@@ -363,13 +380,25 @@ export const DAILY: DailyPoint[] = [];
   for (const dp of map.values()) { dp.views = Math.round(dp.orders * (52 + r() * 18)); dp.wishlist = Math.round(dp.views * (0.07 + r() * 0.03)); dp.returns = Math.round(dp.units * (0.05 + r() * 0.04)); DAILY.push(dp); }
 }
 
+/* 날짜 × 상품 판매수량 색인 — 상품마다 전체 주문을 30번씩 다시 훑던 계산(약 200만 회)을 주문 1회 순회로 바꿨다.
+   브라우저가 시작할 때 실행되는 코드라 휴대폰에서 첫 화면이 늦게 반응하던 주원인이었다. */
+const unitsByDayProduct = new Map<string, number>();
+for (const o of SEED_ORDERS) {
+  if (o.status === "cancelled") continue;
+  const day = o.createdAt.slice(0, 10);
+  for (const it of o.items) {
+    const key = `${day}|${it.productId}`;
+    unitsByDayProduct.set(key, (unitsByDayProduct.get(key) ?? 0) + it.qty);
+  }
+}
+const LAST_30_DAYS = Array.from({ length: 30 }, (_, i) => daysAgoKey(29 - i));
+
 export const PRODUCT_DAILY: ProductDaily[] = PRODUCTS.map((p) => {
   const r = mulberry32(hashStr(p.id + "d"));
   const series: ProductDaily["series"] = [];
   for (let d = 29; d >= 0; d--) {
-    const k = daysAgoKey(d);
-    let units = 0;
-    for (const o of SEED_ORDERS) { if (o.status === "cancelled" || !o.createdAt.startsWith(k)) continue; for (const it of o.items) if (it.productId === p.id) units += it.qty; }
+    const k = LAST_30_DAYS[29 - d];
+    const units = unitsByDayProduct.get(`${k}|${p.id}`) ?? 0;
     let views = Math.round(units * (16 + r() * 10) + POP[p.id] * (8 + r() * 10));
     let wishlist = Math.round(views * (0.06 + r() * 0.04));
     if (p.id === SCENARIO.A_PRODUCT && d <= 7) { views = Math.round(views * (1.6 + (7 - d) * 0.12)); wishlist = Math.round(wishlist * 2.1); }

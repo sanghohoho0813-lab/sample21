@@ -13,7 +13,7 @@ import { SkeletonCard } from "@/components/ui/States";
 import { cn } from "@/lib/cn";
 import { NotifyPrefsCard, OrderList, ProfileCard, QuickStats, RecentlyViewed, RecommendSection, RestockList, TabLink } from "@/components/customer/conversion/MyBits";
 import { OrderCard } from "@/components/customer/conversion/OrderBits";
-import { myOrders, useDocumentTitle } from "@/components/customer/conversion/shared";
+import { myOrders } from "@/components/customer/conversion/shared";
 
 type Tab = "overview" | "orders" | "recommend";
 const TABS: { key: Tab; label: string }[] = [{ key: "overview", label: "한눈에 보기" }, { key: "orders", label: "주문내역" }, { key: "recommend", label: "추천상품" }];
@@ -90,7 +90,6 @@ function MyContent() {
 }
 
 export default function MyPage() {
-  useDocumentTitle("마이페이지");
   return (
     <Container className="py-6 md:py-10">
       <PageTitle title="마이페이지" desc="주문·찜·재입고 알림·추천을 한곳에서 확인하세요." />

@@ -40,9 +40,9 @@ export function Toaster() {
   const { items, dismiss } = useToast();
   const pos = useToastPosition(items[items.length - 1]?.id);
   return (
-    <div data-toaster style={pos} className="fixed left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-[calc(100%-32px)] max-w-md pointer-events-none max-md:[&>*:not(:last-child)]:hidden">
+    <div data-toaster role="status" aria-live="polite" style={pos} className="fixed left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-[calc(100%-32px)] max-w-md pointer-events-none max-md:[&>*:not(:last-child)]:hidden">
       {items.map((t) => (
-        <div key={t.id} className="pointer-events-auto rounded-2xl bg-brand-black text-white shadow-lift px-4 py-3 flex items-start gap-3 animate-fadeUp" role="status">
+        <div key={t.id} className="pointer-events-auto rounded-2xl bg-brand-black text-white shadow-lift px-4 py-3 flex items-start gap-3 animate-fadeUp">
           {t.tone === "warning" ? <AlertTriangle size={20} className="text-[#f5c451] mt-0.5 shrink-0" /> : t.tone === "info" ? <Info size={20} className="text-[#8fb4ff] mt-0.5 shrink-0" /> : <CheckCircle2 size={20} className="text-[#6ee7a2] mt-0.5 shrink-0" />}
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-[0.95rem] leading-snug">{t.title}</p>

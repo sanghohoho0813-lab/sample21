@@ -12,7 +12,7 @@ import { SkeletonCard } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { FitProfileForm } from "@/components/customer/conversion/FitSignal";
 import { NotifyPrefsCard } from "@/components/customer/conversion/MyBits";
-import { INTERESTS_KEY, useDocumentTitle, useLocalPref } from "@/components/customer/conversion/shared";
+import { INTERESTS_KEY, useLocalPref } from "@/components/customer/conversion/shared";
 
 function InterestsCard() {
   const [prefs, setPrefs] = useLocalPref<{ ids: string[] }>(INTERESTS_KEY, { ids: [] });
@@ -59,7 +59,6 @@ function ProfileContent() {
 }
 
 export default function ProfilePage() {
-  useDocumentTitle("사이즈·취향 프로필");
   return (
     <Container className="py-6 md:py-10">
       <PageTitle title="사이즈·취향 프로필" desc="입력할수록 추천 사이즈의 신뢰도가 올라갑니다." />

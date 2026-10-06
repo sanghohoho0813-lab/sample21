@@ -1,4 +1,4 @@
-/* 실제 사용 흐름 + 예외 상황 E2E (UI/UX 고도화 v2 · 기능 안정화 · 2차: 뒤로 버튼 · 하단 결제 바 · 완료 화면 · 카드 자리 유지)
+/* 실제 사용 흐름 + 예외 상황 E2E (UI/UX 고도화 v2 · 기능 안정화 · 2차: 뒤로 버튼 · 하단 결제 바 · 완료 화면 · 카드 자리 유지 · 3차: 쿠폰 금액 · 키보드 · 탭 제목)
    - 고객(휴대폰 390): 검색 0건/결과 · 상품 상세 하단 구매 바 → 옵션 시트 · 찜 · 장바구니 수량/삭제 ·
      주문서 입력 검증(오류 표시 → 고치면 즉시 해제) · 핏 프로필 범위 검증 · 주문 취소 · 품절 옵션 재입고 알림 · 하단 탭 숨김
    - AX(PC 1440): 실행 센터 필터/초기화 · 무시 사유 필수 · 주문 검색 0건 · 재고 상태 필터 · 증빙 필터 접기/열기 ·
@@ -14,7 +14,7 @@ const exe = fs.existsSync("/opt/pw-browsers/chromium-1194/chrome-linux/chrome") 
 const browser = await chromium.launch({ executablePath: exe });
 const results = [];
 const problems = [];
-const init = () => { try { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 4; localStorage.setItem(k, JSON.stringify(s)); } catch { /* 저장소 차단 환경 */ } };
+const init = () => { try { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 5; localStorage.setItem(k, JSON.stringify(s)); } catch { /* 저장소 차단 환경 */ } };
 
 async function ctxFor(viewport, touch) {
   const ctx = await browser.newContext({ viewport, locale: "ko-KR", hasTouch: touch });
@@ -113,6 +113,19 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
     await m.getByRole("dialog").getByRole("button", { name: "취소 요청" }).click(); await m.waitForTimeout(400);
     const o = (await store(m)).orders.find((x) => x.id === id); must(o?.status === "cancelled", `상태 ${o?.status}`);
   });
+  await step("쿠폰 주문 — 주문서에 보인 금액 그대로 저장 (할인 100배 계산 회귀)", async () => {
+    await go(m, "/products/p-nove-oxford");
+    await m.locator("[data-buy-bar]").getByRole("button", { name: "구매하기" }).click(); await m.waitForTimeout(300);
+    const dlg = m.getByRole("dialog"); await dlg.getByRole("button", { name: /^사이즈 L/ }).click();
+    await dlg.getByRole("button", { name: /구매하기/ }).click(); await m.waitForURL(/\/cart/, { timeout: 6000 }); await m.waitForTimeout(300);
+    await m.locator("main select").first().selectOption({ label: "WELCOME5 · 5% 할인" }); await m.waitForTimeout(200);
+    await m.locator("[data-checkout-bar]").getByRole("link", { name: /주문하기/ }).click(); await m.waitForURL(/\/checkout\?coupon=WELCOME5/, { timeout: 6000 }); await m.waitForTimeout(400);
+    const shown = Number((await m.locator("[data-checkout-bar]").innerText()).replace(/[^0-9]/g, ""));
+    await m.locator('input[name="agree"]').check();
+    await m.locator("[data-checkout-bar]").getByRole("button").click(); await m.waitForURL(/checkout\/complete/, { timeout: 8000 });
+    const o = (await store(m)).orders[0];
+    must(o.total === shown && o.total > 0, `주문서 ${shown}원 ≠ 저장 ${o.total}원`);
+  });
   await step("핏 프로필 — 범위 밖 값 거부 · 정상 저장", async () => {
     await go(m, "/style");
     const h = m.locator('input[name="height"]').first(); await h.fill("300");
@@ -193,6 +206,38 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
     await first.getByRole("button", { name: "확인", exact: true }).click(); await d.waitForTimeout(400);
     must((await d.locator("[data-action-id]").first().getAttribute("data-action-id")) === id, "확인 후 카드 순서가 바뀜");
     must((await d.locator(`[data-action-id="${id}"]`).getByRole("button", { name: "실행 시작" }).count()) === 1, "다음 단계(실행 시작) 버튼 없음");
+  });
+  await step("키보드 — 모달은 열면 안으로 포커스 · Tab이 밖으로 새지 않음 · ESC로 닫으면 연 버튼으로", async () => {
+    await go(d, "/ax/actions");
+    const opener = d.locator("[data-action-id]").first().getByRole("button", { name: "무시" });
+    await opener.focus(); await d.keyboard.press("Enter"); await d.waitForTimeout(300);
+    const inDialog = () => d.evaluate(() => !!document.activeElement?.closest('[role="dialog"]'));
+    must(await inDialog(), "모달을 열어도 포커스가 바깥에 있음");
+    for (let i = 0; i < 12; i++) { await d.keyboard.press(i % 3 === 2 ? "Shift+Tab" : "Tab"); must(await inDialog(), `Tab ${i + 1}번째에 포커스가 모달 밖으로 나감`); }
+    await d.keyboard.press("Escape"); await d.waitForTimeout(300);
+    must((await d.getByRole("dialog").count()) === 0, "ESC로 닫히지 않음");
+    must(await d.evaluate(() => document.activeElement?.textContent?.includes("무시") ?? false), "닫은 뒤 포커스가 연 버튼으로 돌아오지 않음");
+  });
+  await step("키보드 — 첫 Tab에 '본문 바로가기'", async () => {
+    await go(d, "/ax/inventory");
+    await d.keyboard.press("Tab");
+    must(await d.evaluate(() => document.activeElement?.textContent === "본문 바로가기"), "건너뛰기 링크가 첫 포커스가 아님");
+    await d.keyboard.press("Enter"); await d.waitForTimeout(200);
+    must(await d.evaluate(() => document.activeElement?.id === "main"), "본문으로 이동하지 않음");
+  });
+  await step("탭 제목 — 화면마다 다르고 메뉴 이름과 같음", async () => {
+    const cases = [["/ranking", "랭킹 | MORFIT"], ["/products/p-nove-oxford", /^오버핏 옥스포드 셔츠 · NOVE STUDIO \| MORFIT$/], ["/ax/actions", "실행 센터 · MORFIT AX"], ["/ax/orders", "주문·배송 · MORFIT AX"]];
+    for (const [url, want] of cases) { await go(d, url); const t = await d.title(); must(typeof want === "string" ? t === want : want.test(t), `${url}: '${t}'`); }
+    // 첫 HTML(서버 응답)에 이미 제목이 들어 있어야 한다 — 404도 마찬가지
+    const html = await (await fetch(BASE + "/ranking")).text(); must(html.includes("<title>랭킹 | MORFIT</title>"), "서버 HTML에 제목 없음");
+    const nf = await fetch(BASE + "/nope-page"); must(nf.status === 404 && (await nf.text()).includes("<title>페이지를 찾을 수 없음 | MORFIT</title>"), "404 제목");
+  });
+  await step("메타 리소스 — manifest · robots · 공유 이미지 · 보안 헤더", async () => {
+    const mf = await fetch(BASE + "/manifest.webmanifest"); must(mf.ok && (await mf.json()).short_name === "MORFIT", "manifest");
+    must(/Disallow: \/ax/.test(await (await fetch(BASE + "/robots.txt")).text()), "robots에 /ax 제외 없음");
+    const og = await fetch(BASE + "/opengraph-image"); must(og.ok && og.headers.get("content-type") === "image/png", "OG 이미지");
+    const home = await fetch(BASE + "/"); must(home.headers.get("x-content-type-options") === "nosniff" && !home.headers.get("x-powered-by"), "보안 헤더");
+    must((await home.text()).includes('property="og:image"'), "og:image 메타 없음");
   });
   await step("주문 검색 0건 — 빈 상태", async () => {
     await go(d, "/ax/orders");

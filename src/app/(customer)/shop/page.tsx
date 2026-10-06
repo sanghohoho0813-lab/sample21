@@ -23,7 +23,6 @@ function ShopInner() {
   }, [router, pathname]);
 
   const { title, desc } = listingTitle(filters);
-  useEffect(() => { document.title = `${title} | MORFIT`; }, [title]);
 
   // select_category tracking (once per category change)
   const lastCat = useRef<string | null>(null);

@@ -267,7 +267,6 @@ export default function HomePage() {
   const hydrated = useHydrated();
   const track = useApp((s) => s.track);
   const tracked = useRef(false);
-  useEffect(() => { document.title = "MORFIT — 멀티브랜드 패션 플랫폼"; }, []);
   useEffect(() => { if (hydrated && !tracked.current) { tracked.current = true; track("view_home"); } }, [hydrated, track]);
 
   return (

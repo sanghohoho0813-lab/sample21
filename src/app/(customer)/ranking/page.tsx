@@ -82,7 +82,6 @@ export default function RankingPage() {
   const [tab, setTab] = useState<Tab>("all");
   const [period, setPeriod] = useState<Period>("7d");
   const [basis, setBasis] = useState<Basis>("sales");
-  useEffect(() => { document.title = "랭킹 | MORFIT"; }, []);
   const b = BASES.find((x) => x.value === basis)!;
 
   return (

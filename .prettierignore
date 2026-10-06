@@ -1,0 +1,8 @@
+.next
+node_modules
+qa
+qa-output
+package-lock.json
+*.md
+# 미래AI랩 공용 스크립트 — 다른 저장소에서 관리하므로 형식을 바꾸지 않는다
+public/mirae-history-nav.js

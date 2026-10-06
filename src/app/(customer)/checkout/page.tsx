@@ -15,14 +15,16 @@ import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { OrderItemRow, PriceSummary } from "@/components/customer/conversion/OrderBits";
 import { LoopHint } from "@/components/customer/LoopHint";
-import { couponByCode, couponDiscount, etaLabel, parseVariant, shippingFeeFor, useDocumentTitle } from "@/components/customer/conversion/shared";
+import { couponByCode, couponDiscount, etaLabel, parseVariant, shippingFeeFor } from "@/components/customer/conversion/shared";
+import { CHECKOUT_FIELDS, CUSTOM_REQUEST, validateCheckout } from "@/lib/validation";
+import { buildOrderMemo } from "@/lib/orderMemo";
 
 const PAYMENTS = [
   { key: "카드", label: "신용·체크카드", desc: "카드사 결제창 연결 예정", icon: CreditCard },
   { key: "계좌이체", label: "계좌이체", desc: "실시간 계좌이체 연결 예정", icon: Landmark },
   { key: "간편결제", label: "간편결제", desc: "네이버·카카오·토스 연결 예정", icon: Smartphone },
 ];
-const REQUESTS = ["문 앞에 놓아주세요", "경비실에 맡겨주세요", "배송 전 연락 부탁드립니다", "부재 시 문자 남겨주세요", "직접 입력"];
+const REQUESTS = ["문 앞에 놓아주세요", "경비실에 맡겨주세요", "배송 전 연락 부탁드립니다", "부재 시 문자 남겨주세요", CUSTOM_REQUEST];
 
 function CheckoutForm() {
   const store = useApp();
@@ -55,24 +57,19 @@ function CheckoutForm() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const err: Record<string, string> = {};
-    if (!name.trim()) err.name = "주문자 이름을 입력해주세요.";
-    if (!/^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(phone.trim())) err.phone = "휴대폰 번호 형식을 확인해주세요. (예: 010-1234-5678)";
-    if (address.trim().length < 5) err.address = "배송지 주소를 입력해주세요.";
-    if (request === "직접 입력" && !customRequest.trim()) err.request = "배송 요청사항을 입력해주세요.";
-    if (!agree) err.agree = "데모 주문 안내에 동의해주세요.";
+    const err = validateCheckout({ name, phone, address, request, customRequest, agree });
     setErrors(err);
     if (Object.keys(err).length) {
       toast("입력 내용을 확인해주세요", `${Object.keys(err).length}곳을 고쳐주세요`, "warning");
       // 첫 번째로 잘못된 칸으로 이동해 바로 고칠 수 있게
-      const first = ["name", "phone", "address", "customRequest", "agree"].find((k) => err[k === "customRequest" ? "request" : k]);
-      const el = first ? document.querySelector<HTMLElement>(`[name="${first}"]`) : null;
+      const first = CHECKOUT_FIELDS.find((k) => err[k]);
+      const el = first ? document.querySelector<HTMLElement>(`[name="${first === "request" ? "customRequest" : first}"]`) : null;
       el?.scrollIntoView({ behavior: "smooth", block: "center" }); el?.focus({ preventScroll: true });
       return;
     }
     setSubmitting(true);
-    const memo = request === "직접 입력" ? customRequest.trim() : request;
-    const order = store.placeOrder({ address: `${address.trim()}${detail.trim() ? ` ${detail.trim()}` : ""}`, memo: `${memo} · 주문자 ${name.trim()} ${phone.trim()}${cp.code ? ` · 쿠폰 ${cp.code}` : ""}`, couponRate: cp.rate, payment });
+    const memo = request === CUSTOM_REQUEST ? customRequest.trim() : request;
+    const order = store.placeOrder({ address: `${address.trim()}${detail.trim() ? ` ${detail.trim()}` : ""}`, memo: buildOrderMemo({ request: memo, name, phone, coupon: cp.code }), couponRate: cp.rate, payment });
     router.push(`/checkout/complete/${order.id}`);
   };
 
@@ -93,7 +90,7 @@ function CheckoutForm() {
             <div><Input label="주소" name="address" value={address} onChange={(e) => { setAddress(e.target.value); clearErr("address"); }} placeholder="도로명 주소" required aria-invalid={!!errors.address} className={cn(errors.address && "border-semantic-error")} />{errors.address && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.address}</p>}</div>
             <Input label="상세 주소 (선택)" name="addressDetail" value={detail} onChange={(e) => setDetail(e.target.value)} placeholder="동·호수 등" />
             <Select label="배송 요청사항" name="request" value={request} onChange={(e) => setRequest(e.target.value)}>{REQUESTS.map((r) => <option key={r} value={r}>{r}</option>)}</Select>
-            {request === "직접 입력" && <div><Textarea name="customRequest" value={customRequest} onChange={(e) => { setCustomRequest(e.target.value); clearErr("request"); }} placeholder="배송 기사님께 전달할 내용을 입력하세요" maxLength={100} />{errors.request && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.request}</p>}</div>}
+            {request === CUSTOM_REQUEST && <div><Textarea name="customRequest" value={customRequest} onChange={(e) => { setCustomRequest(e.target.value); clearErr("request"); }} placeholder="배송 기사님께 전달할 내용을 입력하세요" maxLength={100} />{errors.request && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.request}</p>}</div>}
             <p className="text-[0.85rem] text-neutral-text2 inline-flex items-center gap-1.5"><ShieldCheck size={14} />{etaLabel(ship === 0)} · {ship === 0 ? "무료배송" : "배송비 3,000원"}</p>
           </div>
         </section>
@@ -140,7 +137,6 @@ function CheckoutForm() {
 }
 
 export default function CheckoutPage() {
-  useDocumentTitle("주문서 (데모)");
   return (
     <Container className="py-6 md:py-10">
       <PageTitle title="주문서" desc="배송지와 결제수단을 확인하세요. 실제 결제 없이 주문 흐름을 체험하는 데모입니다." />

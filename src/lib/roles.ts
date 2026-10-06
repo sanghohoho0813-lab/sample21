@@ -4,9 +4,11 @@ import { ICON_TONE, type IconTone } from "./theme";
 export type NavKey = "dashboard" | "actions" | "sales" | "products" | "inventory" | "customers" | "fit" | "campaigns" | "brands" | "orders" | "evidence" | "why" | "present" | "settings";
 export type NavEntryId = "dashboard" | "actions" | "supply" | "demand" | "growth" | "evidence" | "story" | "settings";
 
-export interface NavItem { key: NavKey; no: string; label: string; href: string; group: NavEntryId; tone: IconTone; accent: string; roles: Role[]; icon: string; tour?: string }
+/** 메뉴 아이콘 이름 — 실제 컴포넌트는 AxShell의 NAV_ICONS에 등록된 것만 번들에 들어간다 */
+export type NavIconName = "BookOpen" | "Boxes" | "FileCheck2" | "LayoutDashboard" | "Megaphone" | "PackageCheck" | "Presentation" | "Ruler" | "Settings" | "Shirt" | "Store" | "TrendingUp" | "Users" | "Zap";
+export interface NavItem { key: NavKey; no: string; label: string; href: string; group: NavEntryId; tone: IconTone; accent: string; roles: Role[]; icon: NavIconName; tour?: string }
 /** 1차 메뉴 — 단일 화면이면 key, 여러 화면을 묶으면 children(2차) */
-export interface NavEntry { id: NavEntryId; label: string; desc: string; icon: string; tone: IconTone; key?: NavKey; children?: NavKey[]; tour?: string }
+export interface NavEntry { id: NavEntryId; label: string; desc: string; icon: NavIconName; tone: IconTone; key?: NavKey; children?: NavKey[]; tour?: string }
 
 /* ------------------------------------------------------------------
    AX 정보구조 (UI/UX 안정화 v1.0) — 1차 메뉴 14개 → 8개, 최대 2단계.
@@ -26,7 +28,7 @@ export const NAV_TREE: NavEntry[] = [
 ];
 const ENTRY_OF: Record<NavKey, NavEntry> = Object.fromEntries(NAV_TREE.flatMap((e) => (e.key ? [[e.key, e]] : (e.children ?? []).map((k) => [k, e])))) as Record<NavKey, NavEntry>;
 const tone = (k: NavKey) => ENTRY_OF[k].tone;
-const item = (key: NavKey, no: string, label: string, href: string, icon: string, roles: Role[], tour?: string): NavItem =>
+const item = (key: NavKey, no: string, label: string, href: string, icon: NavIconName, roles: Role[], tour?: string): NavItem =>
   ({ key, no, label, href, group: ENTRY_OF[key].id, tone: tone(key), accent: ICON_TONE[tone(key)], roles, icon, tour });
 
 const ALL: Role[] = ["owner", "md", "ops"];

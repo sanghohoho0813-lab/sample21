@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+import { axMeta } from "@/lib/meta";
 import { EvidencePackPage } from "@/components/ax/ops/EvidencePackPage";
 
-export const metadata: Metadata = { title: "증빙 리포트 · AX 운영화면" };
+export const metadata = axMeta("evidence", "증빙 리포트");
 
 export default function Page() {
   return <EvidencePackPage />;

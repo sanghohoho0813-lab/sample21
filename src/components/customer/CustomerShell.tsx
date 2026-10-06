@@ -16,14 +16,10 @@ import { SampleBridgeCTA } from "@/components/system/SampleBridgeCTA";
 import { Tutorial, CUSTOMER_TOUR } from "@/components/system/Tutorial";
 import { LiveClock } from "@/components/system/LiveClock";
 import { relTime } from "@/lib/dates";
+import { NEXT_MENUS } from "@/lib/nextMenus";
+import { SkipLink } from "@/components/system/SkipLink";
 
-export const NEXT_MENUS = [
-  { slug: "membership", label: "멤버십", desc: "등급별 적립·무료배송·선공개" },
-  { slug: "partner-center", label: "브랜드 파트너센터", desc: "브랜드 직접 상품등록·재고연동·정산" },
-  { slug: "ads", label: "광고·기획전 상품", desc: "브랜드 노출 상품과 기획전 신청" },
-  { slug: "style-content", label: "스타일 콘텐츠", desc: "룩북·매거진·스타일링 가이드" },
-  { slug: "b2b", label: "B2B 단체구매", desc: "기업·단체 유니폼·단체복 견적" },
-];
+export { NEXT_MENUS };
 
 /* ------------------------------------------------------------------
    고객 플랫폼 정보구조 (UI/UX 안정화 v1.0) — 햄버거 1차 메뉴 7개, 최대 2단계.
@@ -227,6 +223,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-neutral-text">
+      <SkipLink />
       <SurfaceMarker surface="customer" />
       <DemoControlBar />
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-neutral-border">
@@ -253,7 +250,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
 
       {/* 미래AI랩 브릿지 — 모든 고객 화면 하단 공통 */}
       <div className="mx-auto w-full max-w-[1280px] px-4 mt-12 md:mt-16">

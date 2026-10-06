@@ -19,7 +19,7 @@ import { toast } from "@/components/ui/Toast";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { cn } from "@/lib/cn";
 import { OrderInfoRows, OrderItemRow, OrderTimeline } from "@/components/customer/conversion/OrderBits";
-import { myOrders, useDocumentTitle } from "@/components/customer/conversion/shared";
+import { myOrders } from "@/components/customer/conversion/shared";
 import { LoopHint } from "@/components/customer/LoopHint";
 
 const REASONS = Object.keys(RETURN_REASON_LABEL) as ReturnReason[];
@@ -140,7 +140,6 @@ function OrderDetail({ id }: { id: string }) {
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>();
   const id = decodeURIComponent(String(params?.id ?? ""));
-  useDocumentTitle(`주문 ${id}`);
   return (
     <Container className="py-6 md:py-10">
       <Hydrated fallback={<div className="max-w-[880px] mx-auto grid md:grid-cols-2 gap-5"><SkeletonCard lines={6} /><SkeletonCard lines={6} /></div>}><OrderDetail id={id} /></Hydrated>

@@ -1,10 +1,10 @@
 "use client";
 /* /next/[slug] — 향후 확장 Preview. 구현되지 않은 기능임을 명확히 표시. 모르는 slug도 404 대신 EmptyState. */
 import Link from "next/link";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useParams } from "next/navigation";
 import { Crown, Store, Megaphone, BookOpen, Building2, Sparkles, AlertTriangle, ChevronRight, CheckCircle2 } from "lucide-react";
-import { NEXT_MENUS } from "@/components/customer/CustomerShell";
+import { NEXT_MENUS } from "@/lib/nextMenus";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/States";
@@ -44,7 +44,6 @@ export default function NextPreviewPage() {
   const slug = typeof params?.slug === "string" ? params.slug : "";
   const menu = NEXT_MENUS.find((m) => m.slug === slug);
   const content = CONTENT[slug];
-  useEffect(() => { document.title = menu ? `${menu.label} (예정) | MORFIT` : "향후 확장 | MORFIT"; }, [menu]);
 
   if (!menu || !content) {
     return (

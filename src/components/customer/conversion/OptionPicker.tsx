@@ -51,11 +51,11 @@ export function OptionPicker({ product, colorIdx, size, onColor, onSize, compact
               const st = v ? stockState(v, store) : null;
               const active = size === s;
               return (
-                <button key={s} type="button" onClick={() => onSize(s)} aria-pressed={active} aria-label={`사이즈 ${s}${st ? ` · ${st.label}` : ""}`}
+                <button key={s} type="button" onClick={() => onSize(s)} aria-pressed={active}
                   className={cn("relative min-h-[52px] rounded-xl border px-2 py-1.5 flex flex-col items-center justify-center gap-0.5 transition-all duration-fast active:scale-[0.98]",
                     active ? "border-brand-black bg-brand-black text-white" : "border-neutral-border bg-white hover:border-neutral-text2",
                     st && !st.purchasable && !active && "bg-brand-ivory text-neutral-text2")}>
-                  <span className={cn("text-[1rem] font-bold leading-none", st && !st.purchasable && !active && "line-through decoration-neutral-text2/60")}>{single ? "FREE" : s}</span>
+                  <span className={cn("text-[1rem] font-bold leading-none", st && !st.purchasable && !active && "line-through decoration-neutral-text2/60")}><span className="sr-only">사이즈 </span>{single ? "FREE" : s}</span>
                   {st && st.key !== "normal" && st.key !== "rising" && (
                     <span className={cn("text-[0.78rem] font-semibold leading-tight text-center", active ? "text-white/80" : st.key === "soldout" ? "text-semantic-error" : st.key === "low" ? "text-semantic-warning" : st.key === "restocked" ? "text-semantic-success" : "text-brand-accent")}>{st.short}</span>
                   )}

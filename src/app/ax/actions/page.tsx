@@ -134,7 +134,7 @@ function ActionsInner() {
 
       {/* List */}
       <div className="space-y-4" data-tour="action-list">
-        <p className="text-[0.85rem] text-neutral-text2 tabular">{num(list.length)}건 · 긴급한 것부터</p>
+        <h2 className="text-[0.85rem] font-normal text-neutral-text2 tabular">{num(list.length)}건 · 긴급한 것부터</h2>
         {list.length === 0 ? (
           <EmptyState title={status === "all" ? "표시할 과제가 없습니다" : `'${ACTION_STATUS_LABEL[status]}' 상태의 과제가 없습니다`} desc={hasFilter ? "필터를 바꾸거나 초기화해보세요." : "새 추천이 생성되면 여기에 나타납니다."} action={hasFilter ? <Button variant="outline" onClick={clearFilters}>필터 초기화</Button> : undefined} />
         ) : list.map((a, i) => (

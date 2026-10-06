@@ -18,7 +18,7 @@ import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { OptionSheet } from "@/components/customer/conversion/OptionSheet";
 import { PriceSummary } from "@/components/customer/conversion/OrderBits";
-import { AERNO_COUPON, COUPONS, FREE_SHIP_MIN, couponByCode, couponDiscount, etaLabel, parseVariant, shippingFeeFor, stockState, useDocumentTitle } from "@/components/customer/conversion/shared";
+import { AERNO_COUPON, COUPONS, FREE_SHIP_MIN, couponByCode, couponDiscount, etaLabel, parseVariant, shippingFeeFor, stockState } from "@/components/customer/conversion/shared";
 
 function CartContent() {
   const store = useApp();
@@ -137,7 +137,6 @@ function WishQuick({ products, onPick }: { products: Product[]; onPick: (p: Prod
 }
 
 export default function CartPage() {
-  useDocumentTitle("장바구니");
   return (
     <Container className="py-6 md:py-10">
       <PageTitle title="장바구니" desc="수량과 쿠폰을 확인하고 주문서로 이동하세요." />

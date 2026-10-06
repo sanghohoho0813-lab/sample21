@@ -118,7 +118,7 @@ function FitBody() {
     { key: "returns", header: "반품", align: "right", cell: (a) => num(a.returns30d) },
     { key: "fit", header: "사이즈 반품", align: "right", cell: (a) => num(a.fitReturns30d) },
     { key: "risk", header: <Term term="핏 위험도">핏 위험도</Term>, width: "150px", cell: (a) => (
-      <div className="min-w-[110px]"><div className="flex items-center justify-between text-[0.8rem] mb-1"><span className={cn("font-semibold tabular", a.fitReturnRate > 0.15 ? "text-semantic-error" : a.fitReturnRate > 0.08 ? "text-semantic-warning" : "text-neutral-text2")}>{pct(a.fitReturnRate, 1)}</span></div><Progress value={Math.min(1, a.fitReturnRate / 0.3)} tone={a.fitReturnRate > 0.15 ? "error" : a.fitReturnRate > 0.08 ? "warning" : "primary"} /></div>
+      <div className="min-w-[110px]"><div className="flex items-center justify-between text-[0.8rem] mb-1"><span className={cn("font-semibold tabular", a.fitReturnRate > 0.15 ? "text-semantic-error" : a.fitReturnRate > 0.08 ? "text-semantic-warning" : "text-neutral-text2")}>{pct(a.fitReturnRate, 1)}</span></div><Progress value={Math.min(1, a.fitReturnRate / 0.3)} label="핏 반품률" tone={a.fitReturnRate > 0.15 ? "error" : a.fitReturnRate > 0.08 ? "warning" : "primary"} /></div>
     ) },
     { key: "reason", header: "반복 사유", cell: (a) => { const r = topReasonOf.get(a.product.id); return r ? <Badge tone={isSizeReason(r) ? "warning" : "neutral"} size="sm">{RETURN_REASON_LABEL[r]}</Badge> : <span className="text-neutral-text2">-</span>; } },
     { key: "sizing", header: "사이징 경향", cell: (a) => <Badge tone={SIZING_TONE[a.product.sizing]} size="sm">{SIZING_LABEL[a.product.sizing]}</Badge> },

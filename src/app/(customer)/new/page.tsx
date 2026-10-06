@@ -1,6 +1,6 @@
 "use client";
 /* 신상품 — 최근 30일 등록 상품을 주 단위로 묶어 보여준다. */
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { PRODUCTS } from "@/lib/demo/seed";
 import { Hydrated } from "@/components/system/Hydrated";
 import { Button } from "@/components/ui/Button";
@@ -13,7 +13,6 @@ const weekLabel = (ageDays: number) => (ageDays < 7 ? "이번 주" : ageDays < 1
 const WEEK_ORDER = ["이번 주", "지난 주", "2주 전", "3주 전", "4주 전"];
 
 export default function NewPage() {
-  useEffect(() => { document.title = "신상품 | MORFIT"; }, []);
   const groups = useMemo(() => {
     const now = Date.now();
     const fresh = PRODUCTS.filter((p) => now - new Date(p.createdAt).getTime() < 30 * DAY).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

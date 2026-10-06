@@ -1,6 +1,6 @@
 "use client";
 /* /brands — 브랜드 인덱스. 성격(무드) 필터 + 팔로우(localStorage). 사입/입점 구분은 고객에게 보이지 않는다. */
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Heart } from "lucide-react";
 import { BRANDS } from "@/lib/demo/seed";
 import { Hydrated } from "@/components/system/Hydrated";
@@ -37,7 +37,6 @@ function BrandsBody() {
 }
 
 export default function BrandsPage() {
-  useEffect(() => { document.title = "브랜드 | MORFIT"; }, []);
   return (
     <Container className="py-6 md:py-10 animate-fadeIn">
       <PageTitle title="브랜드" desc={`${BRANDS.length}개 브랜드, 네 가지 무드. 팔로우하면 신상품과 세일 소식을 먼저 받아요.`} />

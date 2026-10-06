@@ -13,6 +13,7 @@ import { toast } from "@/components/ui/Toast";
 import { AIReadyBadge } from "@/components/ax/AIReady";
 import { cn } from "@/lib/cn";
 import { PREFERRED_FIT_OPTIONS, SIZE_OPTIONS } from "./shared";
+import { parseFitNumber } from "@/lib/validation";
 
 const CONF_LABEL = { high: "높음", mid: "보통", low: "낮음" } as const;
 const CONF_TONE = { high: "success", mid: "primary", low: "warning" } as const;
@@ -31,13 +32,13 @@ export function FitProfileForm({ compact, onSaved, submitLabel = "저장하고 �
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const err: Record<string, string> = {};
-    const h = Number(height), w = Number(weight);
-    if (height && (h < 120 || h > 220)) err.height = "키는 120~220cm 사이로 입력해주세요.";
-    if (weight && (w < 30 || w > 200)) err.weight = "몸무게는 30~200kg 사이로 입력해주세요.";
+    const h = parseFitNumber("height", height), w = parseFitNumber("weight", weight);
+    if (h.error) err.height = h.error;
+    if (w.error) err.weight = w.error;
     if (!height && !weight && !topSize && !bottomSize) err.form = "키·몸무게 또는 평소 사이즈 중 하나는 입력해주세요.";
     setErrors(err);
     if (Object.keys(err).length) return;
-    updateFitProfile({ height: height ? h : null, weight: weight ? w : null, topSize: topSize || null, bottomSize: bottomSize || null, preferredFit: preferredFit || null, bodyType: bodyType || null });
+    updateFitProfile({ height: h.value, weight: w.value, topSize: topSize || null, bottomSize: bottomSize || null, preferredFit: preferredFit || null, bodyType: bodyType || null });
     toast("핏 프로필을 저장했습니다", "상품마다 추천 사이즈와 이유를 보여드립니다");
     onSaved?.();
   };
@@ -107,7 +108,7 @@ export function FitSignal({ product, selectedSize, onPickSize }: { product: Prod
             </div>
             <div className="rounded-2xl border border-neutral-border p-4 flex flex-col justify-center gap-2">
               <div className="flex items-center justify-between gap-2 text-[0.9rem]"><span className="font-bold">신뢰도</span><Badge tone={CONF_TONE[result.confidence] === "primary" ? "accent" : CONF_TONE[result.confidence]} size="sm">{CONF_LABEL[result.confidence]} · {Math.round(result.confidenceScore * 100)}%</Badge></div>
-              <Progress value={result.confidenceScore} tone={CONF_TONE[result.confidence]} />
+              <Progress value={result.confidenceScore} tone={CONF_TONE[result.confidence]} label="사이즈 추천 신뢰도" />
               <p className="text-[0.8rem] text-neutral-text2">{result.confidence === "high" ? "프로필과 실측이 잘 맞습니다." : result.confidence === "mid" ? "평소 사이즈나 선호 핏을 더 입력하면 정확해집니다." : "참고용으로만 활용하세요. 실측 확인을 권장합니다."}</p>
               {sizeSelectable && (
                 <Button size="sm" variant={selectedSize === result.size ? "secondary" : "brand"} onClick={() => { onPickSize(result.size!); toast(`추천 사이즈 ${result.size}을(를) 선택했습니다`); }} icon={selectedSize === result.size ? <CheckCircle2 size={14} /> : <Sparkles size={14} />} className="mt-1 self-start">{selectedSize === result.size ? "추천 사이즈 선택됨" : "추천 사이즈 선택"}</Button>

@@ -23,9 +23,8 @@ export const PREFERRED_FIT_OPTIONS: { value: Fit; label: string }[] = [
 ];
 
 /* ------------------------------ Shipping / coupon ------------------------------ */
-export const FREE_SHIP_MIN = 50000;
-export const SHIP_FEE = 3000;
-export const shippingFeeFor = (subtotal: number) => (subtotal >= FREE_SHIP_MIN ? 0 : SHIP_FEE);
+// 금액 규칙은 lib/pricing 한 곳에서 (주문 저장과 같은 함수)
+export { FREE_SHIP_MIN, SHIP_FEE, couponDiscount, shippingFeeFor } from "@/lib/pricing";
 export interface Coupon { code: string; label: string; rate: number; desc: string }
 export const COUPONS: Coupon[] = [
   { code: "", label: "쿠폰 없음", rate: 0, desc: "" },
@@ -35,8 +34,6 @@ export const COUPONS: Coupon[] = [
 /** Loop 4: cp-06 캠페인이 running일 때만 장바구니 목록에 노출되는 재구매 쿠폰 */
 export const AERNO_COUPON: Coupon = { code: "AERNO7", label: "AERNO7 · 7% 할인", rate: 7, desc: "AERNO 재구매 감사 쿠폰 · 캠페인 기간 한정 (데모)" };
 export const couponByCode = (code: string | null | undefined): Coupon => [...COUPONS, AERNO_COUPON].find((c) => c.code === (code ?? "")) ?? COUPONS[0];
-/** 스토어 placeOrder와 동일한 계산: 100원 단위 절사 */
-export const couponDiscount = (subtotal: number, rate: number) => Math.round((subtotal * rate) / 100 / 100) * 100;
 
 /** 예상 도착일 (내일 = 무료배송 상품 / 모레 = 유료배송) */
 export function etaLabel(free: boolean) {
@@ -145,15 +142,3 @@ export const NOTIFY_KEY = "morfit-notify-prefs";
 export const DEFAULT_NOTIFY: NotifyPrefs = { restock: true, order: true, recommend: true };
 export const INTERESTS_KEY = "morfit-interests";
 
-export function useDocumentTitle(title: string) {
-  useEffect(() => {
-    const full = `${title} | MORFIT`;
-    const apply = () => { if (document.title !== full) document.title = full; };
-    apply();
-    // Next 15 streams route metadata after mount and may overwrite <title>; keep ours while this page is mounted.
-    const mo = new MutationObserver(apply);
-    mo.observe(document.head, { childList: true, subtree: true, characterData: true });
-    const t = window.setTimeout(apply, 800);
-    return () => { mo.disconnect(); window.clearTimeout(t); };
-  }, [title]);
-}

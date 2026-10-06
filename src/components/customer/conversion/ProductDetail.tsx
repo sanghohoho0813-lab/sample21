@@ -87,7 +87,7 @@ function SizeGuide({ product, selectedSize, recommended }: { product: Product; s
 }
 
 function StarRow({ n, size = 14 }: { n: number; size?: number }) {
-  return <span className="inline-flex gap-0.5" aria-label={`별점 ${n}점`}>{[1, 2, 3, 4, 5].map((i) => <Star key={i} size={size} className={i <= n ? "text-brand-black" : "text-neutral-border"} fill={i <= n ? "currentColor" : "none"} />)}</span>;
+  return <span role="img" className="inline-flex gap-0.5" aria-label={`별점 ${n}점`}>{[1, 2, 3, 4, 5].map((i) => <Star key={i} size={size} className={i <= n ? "text-brand-black" : "text-neutral-border"} fill={i <= n ? "currentColor" : "none"} />)}</span>;
 }
 
 function Reviews({ product }: { product: Product }) {
@@ -103,7 +103,7 @@ function Reviews({ product }: { product: Product }) {
       </div>
       {(product.categoryId !== "bag" && product.categoryId !== "acc") && (
         <div className="grid grid-cols-3 gap-3 mb-5">
-          {[["작아요", dist[0]], ["딱 맞아요", dist[1]], ["커요", dist[2]]].map(([l, v]) => <div key={l as string} className="rounded-xl bg-brand-ivory px-3 py-2.5"><p className="text-[0.78rem] text-neutral-text2">{l}</p><p className="font-bold tabular">{v}%</p><Progress value={(v as number) / 100} className="mt-1.5 h-1.5 bg-white" tone={l === "딱 맞아요" ? "success" : "warning"} /></div>)}
+          {[["작아요", dist[0]], ["딱 맞아요", dist[1]], ["커요", dist[2]]].map(([l, v]) => <div key={l as string} className="rounded-xl bg-brand-ivory px-3 py-2.5"><p className="text-[0.78rem] text-neutral-text2">{l}</p><p className="font-bold tabular">{v}%</p><Progress value={(v as number) / 100} className="mt-1.5 h-1.5 bg-white" tone={l === "딱 맞아요" ? "success" : "warning"} label={`구매자 후기 ‘${l}’ 비율`} /></div>)}
         </div>
       )}
       <ul className="divide-y divide-neutral-border">
@@ -200,7 +200,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const badge = agg.worst === "rising" || product.tags.includes("급상승") ? { t: "급상승", tone: "accent" as const } : product.tags.includes("베스트") ? { t: "베스트", tone: "dark" as const } : Date.now() - new Date(product.createdAt).getTime() < 30 * 86400000 ? { t: "신상", tone: "dark" as const } : null;
 
   const RestockCta = ({ full, tour }: { full?: boolean; tour?: string }) => subscribed ? (
-    <Button variant="secondary" size="lg" full={full} className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")} onClick={() => router.push("/my/restock")} icon={<Bell size={18} className="hidden sm:block" />} data-tour={tour} aria-label="재입고 알림 신청 완료 · 내 재입고 알림 목록 보기">신청 완료 · 목록 보기</Button>
+    <Button variant="secondary" size="lg" full={full} className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")} onClick={() => router.push("/my/restock")} icon={<Bell size={18} className="hidden sm:block" />} data-tour={tour} aria-label="신청 완료 · 목록 보기 (재입고 알림)">신청 완료 · 목록 보기</Button>
   ) : (
     <Button variant="brand" size="lg" full={full} className={cn(!full && "flex-[2]", "min-w-0 !px-3 sm:!px-6")} onClick={restock} icon={<Bell size={18} className="hidden sm:block" />} data-tour={tour}>재입고 알림 신청</Button>
   );
@@ -246,7 +246,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 <div className="mt-3 rounded-xl border border-semantic-warning/30 bg-[#fff8f1] px-4 py-3 animate-fadeIn">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                     <p className="text-[0.85rem] leading-snug flex-1"><span className="font-bold text-semantic-warning">품절 임박 · 재고 {st?.stock}개.</span> <span className="text-neutral-text2">놓칠까 걱정되면 재입고 알림을 함께 신청해 두세요. 신청은 MD의 재입고 판단 신호가 됩니다.</span></p>
-                    {subscribed ? <Button variant="secondary" size="sm" onClick={() => router.push("/my/restock")} icon={<Bell size={14} />} data-tour="c-restock" aria-label="재입고 알림 신청 완료 · 목록 보기">신청 완료 · 목록</Button> : <Button variant="outline" size="sm" onClick={restock} icon={<Bell size={14} />} data-tour="c-restock">재입고 알림 신청</Button>}
+                    {subscribed ? <Button variant="secondary" size="sm" onClick={() => router.push("/my/restock")} icon={<Bell size={14} />} data-tour="c-restock" aria-label="신청 완료 · 목록 (재입고 알림)">신청 완료 · 목록</Button> : <Button variant="outline" size="sm" onClick={restock} icon={<Bell size={14} />} data-tour="c-restock">재입고 알림 신청</Button>}
                   </div>
                 </div>
               )}

@@ -17,7 +17,7 @@ import { Price } from "@/components/ui/Misc";
 import { EmptyState, SkeletonCard } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { OptionSheet } from "@/components/customer/conversion/OptionSheet";
-import { parseVariant, productStockState, stockState, useDocumentTitle } from "@/components/customer/conversion/shared";
+import { parseVariant, productStockState, stockState } from "@/components/customer/conversion/shared";
 import { LoopHint } from "@/components/customer/LoopHint";
 
 function priceNote(p: Product, current: number, overridden: boolean) {
@@ -105,7 +105,6 @@ function WishlistContent() {
 }
 
 export default function WishlistPage() {
-  useDocumentTitle("찜한 상품");
   return (
     <Container className="py-6 md:py-10 max-w-[960px]">
       <PageTitle title="찜한 상품" desc="선택한 옵션의 재고·가격 변화를 함께 보여드립니다." />

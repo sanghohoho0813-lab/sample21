@@ -13,6 +13,9 @@ import type {
 } from "./types";
 import type { ThemeId } from "./theme";
 import { DEFAULT_THEME } from "./theme";
+import { orderAmounts } from "./pricing";
+import { withPayment } from "./orderMemo";
+import { repairCouponOrder } from "./migrations";
 import {
   SEED_ACTIONS, SEED_EVIDENCE, SEED_ORDERS, PRODUCT_BY_ID, VARIANT_BY_ID, DEMO_CUSTOMER_ID, DEMO_CUSTOMER_NAME, CAMPAIGNS,
 } from "./demo/seed";
@@ -149,14 +152,12 @@ export const useApp = create<AppState>()(
       placeOrder: ({ address, memo, couponRate = 0, payment }) => {
         const { cart } = get();
         const items = cart.map((c) => { const p = PRODUCT_BY_ID[c.productId]; const price = get().salePriceOverride[p.id] ?? p.salePrice ?? p.price; return { variantId: c.variantId, productId: c.productId, qty: c.qty, unitPrice: price, discount: p.price - price }; });
-        const subtotal = items.reduce((s, i) => s + i.unitPrice * i.qty, 0);
-        const coupon = Math.round(subtotal * couponRate / 100) * 100;
-        const shippingFee = subtotal >= 50000 ? 0 : 3000;
-        const total = subtotal - coupon + shippingFee;
+        // 금액 규칙은 장바구니·주문서 화면과 같은 함수로 계산한다(lib/pricing) — 화면 금액 = 저장 금액
+        const { subtotal, coupon, shippingFee, total } = orderAmounts(items.map((i) => ({ unitPrice: i.unitPrice, listPrice: i.unitPrice + i.discount, qty: i.qty })), couponRate);
         const at = nowIso();
         const d = new Date();
         const id = `MF${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}-${String(get().orders.length + 1).padStart(2, "0")}${Math.floor(Math.random() * 90 + 10)}`;
-        const order: Order = { id, customerId: DEMO_CUSTOMER_ID, customerName: DEMO_CUSTOMER_NAME, createdAt: at, status: "pending", items, subtotal, discount: coupon + items.reduce((s, i) => s + i.discount * i.qty, 0), shippingFee, total, channel: typeof window !== "undefined" && window.innerWidth < 768 ? "mobile" : "web", address, memo: memo ? `${memo} · 결제수단(데모): ${payment}` : `결제수단(데모): ${payment}`, source: "DEMO", statusHistory: [{ status: "pending", at, actor: DEMO_CUSTOMER_NAME }] };
+        const order: Order = { id, customerId: DEMO_CUSTOMER_ID, customerName: DEMO_CUSTOMER_NAME, createdAt: at, status: "pending", items, subtotal, discount: coupon + items.reduce((s, i) => s + i.discount * i.qty, 0), shippingFee, total, channel: typeof window !== "undefined" && window.innerWidth < 768 ? "mobile" : "web", address, memo: withPayment(memo, payment), source: "DEMO", statusHistory: [{ status: "pending", at, actor: DEMO_CUSTOMER_NAME }] };
         // Loop 1 완결: 재입고 알림을 받았던(또는 기다리던) 옵션을 이 주문에서 구매하면 '구매 완료'로 닫는다 (D-17)
         const bought = new Set(items.map((i) => i.variantId));
         const closing = get().restockSubs.filter((r) => bought.has(r.variantId) && r.status !== "purchased");
@@ -273,10 +274,15 @@ export const useApp = create<AppState>()(
     {
       name: "morfit-demo-v1",
       // v4: 화면 문구 한글화(D-28)로 시드의 담당자·엔진 이름이 바뀜 → 이전 저장본은 새 시드로 초기화
-      version: 4,
+      // v5: 쿠폰 할인 100배로 저장된 고객 주문 금액을 바로잡음(D-42) — 나머지 데이터는 유지
+      version: 5,
       storage: createJSONStorage(() => (typeof window !== "undefined" ? window.localStorage : noopStorage)),
       partialize: (s) => { const { hydrated: _h, ...rest } = s; void _h; return rest as AppState; },
-      migrate: (persisted, version) => (version < 4 ? ({} as AppState) : (persisted as AppState)),
+      migrate: (persisted, version) => {
+        if (version < 4) return {} as AppState;
+        const state = persisted as AppState;
+        return version < 5 ? { ...state, orders: (state.orders ?? []).map(repairCouponOrder) } : state;
+      },
       onRehydrateStorage: () => (state) => { state?.setHydrated(true); },
     },
   ),

@@ -4,7 +4,7 @@ import fs from "node:fs";
 const BASE = process.env.QA_BASE ?? "http://localhost:3000";
 fs.mkdirSync("qa-output", { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH ?? "/opt/pw-browsers/chromium-1194/chrome-linux/chrome" });
-const init = () => { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 4; localStorage.setItem(k, JSON.stringify(s)); };
+const init = () => { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 5; localStorage.setItem(k, JSON.stringify(s)); };
 const shot = async (ctx, name, route, before) => {
   const page = await ctx.newPage();
   await page.route("**/*", (r) => (r.request().url().startsWith(BASE) ? r.continue() : r.abort()));

@@ -5,6 +5,7 @@
 import type { CategoryId, Fit, Product } from "@/lib/types";
 import { BRAND_BY_ID, CATEGORY_NAME, PRODUCTS } from "@/lib/demo/seed";
 import type { ProductAgg } from "@/lib/kpi";
+import { FREE_SHIP_MIN } from "@/lib/pricing";
 
 export type SortKey = "recommend" | "popular" | "newest" | "priceAsc" | "priceDesc";
 export const SORT_OPTIONS: { value: SortKey; label: string; desc: string }[] = [
@@ -35,7 +36,8 @@ export interface ListingFilters {
 
 export const EMPTY_FILTERS: ListingFilters = { gender: null, category: null, brands: [], colors: [], sizes: [], min: null, max: null, sale: false, free: false, fit: null, sort: "recommend", q: "" };
 
-export const FREE_SHIPPING_MIN = 50000;
+/** 무료배송 기준 — 금액 규칙은 lib/pricing 한 곳에서 */
+export const FREE_SHIPPING_MIN = FREE_SHIP_MIN;
 
 export const PRICE_RANGES: { label: string; min: number | null; max: number | null }[] = [
   { label: "5만원 이하", min: null, max: 50000 },

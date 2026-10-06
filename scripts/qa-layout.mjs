@@ -89,7 +89,7 @@ const detectScript = () => {
 for (const width of WIDTHS) {
   const mobile = width < 768;
   const ctx = await browser.newContext({ viewport: { width, height: mobile ? 800 : 900 }, deviceScaleFactor: 1, locale: "ko-KR", hasTouch: mobile });
-  await ctx.addInitScript(() => { try { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 4; localStorage.setItem(k, JSON.stringify(s)); } catch {} });
+  await ctx.addInitScript(() => { try { const k = "morfit-demo-v1"; const s = JSON.parse(localStorage.getItem(k) || "{}"); s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true }; s.version = 5; localStorage.setItem(k, JSON.stringify(s)); } catch {} });
   const page = await ctx.newPage();
   await page.route("**/*", (r) => (r.request().url().startsWith(BASE) ? r.continue() : r.abort()));
   for (const route of ROUTES) {

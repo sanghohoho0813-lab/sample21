@@ -8,13 +8,11 @@ import { Container } from "@/components/customer/Section";
 import { EmptyState } from "@/components/ui/States";
 import { Button } from "@/components/ui/Button";
 import { ProductDetail, ProductDetailSkeleton } from "@/components/customer/conversion/ProductDetail";
-import { useDocumentTitle } from "@/components/customer/conversion/shared";
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
   const id = decodeURIComponent(String(params?.id ?? ""));
   const product = PRODUCT_BY_ID[id];
-  useDocumentTitle(product ? `${product.name} — 상품 상세` : "상품을 찾을 수 없습니다");
   if (!product) {
     return (
       <Container className="py-16">
