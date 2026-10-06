@@ -14,7 +14,6 @@ import { krw, num } from "@/lib/format";
 import { fmtDate, relTime, todayKey } from "@/lib/dates";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Input, Segmented } from "@/components/ui/Form";
 import { KpiCard, Stat } from "@/components/ui/Kpi";
@@ -43,8 +42,7 @@ const NEXT_STEP: Partial<Record<OrderStatus, { status: OrderStatus; label: strin
 export function OrdersPage() {
   return (
     <>
-      <PageHeader title="주문·배송" desc="고객 화면에서 접수된 데모 주문이 이 목록에 바로 나타나고, 여기서 바꾼 배송 상태는 고객 마이페이지에 그대로 반영됩니다 (순환 2)."
-        badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
+      <PageHeader title="주문·배송" desc="고객 주문을 처리하면 고객 마이페이지에 바로 반영됩니다." right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><OrdersBody /></Hydrated>
     </>
   );
@@ -124,24 +122,18 @@ function OrdersBody() {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 stagger">
         <KpiCard label="오늘 주문" value={num(summary.today)} icon={<PackageCheck size={18} />} accent={ICON_TONE.t3} sub={`고객 화면 데모 주문 ${newOrders.length}건 포함`} />
         <KpiCard label="처리 대기" value={num(summary.waiting)} icon={<Clock size={18} />} accent={ICON_TONE.t6} sub="신규주문 + 상품준비" />
         <KpiCard label="배송중" value={num(summary.shipping)} icon={<Truck size={18} />} accent={ICON_TONE.t6} sub="출고완료 + 배송중" />
         <KpiCard label="반품·교환 요청" value={num(summary.returns)} icon={<Undo2 size={18} />} accent={ICON_TONE.t4} sub="핏·반품 화면에서 처리" href="/ax/fit-returns" />
       </div>
 
-      {/* Customer-created orders (Loop 2) */}
-      <Card className={cn("mt-6", newOrders.length ? "border-theme-primary/40" : "")} pad="md" data-tour="orders-new">
-        <div className="flex flex-col md:flex-row md:items-center gap-3">
-          <span className="h-11 w-11 rounded-2xl bg-theme-soft text-theme-primary flex items-center justify-center shrink-0"><Zap size={20} /></span>
-          <div className="min-w-0 flex-1">
-            <p className="font-bold">고객 화면에서 접수된 데모 주문 {newOrders.length ? `${newOrders.length}건` : "없음"}</p>
-            <p className="text-[0.88rem] text-neutral-text2 mt-0.5 leading-relaxed">{newOrders.length ? "목록 맨 위에 '고객 화면에서 접수' 표시로 나타납니다. 상태를 바꾸면 고객 마이페이지와 알림에 즉시 반영됩니다." : "고객 화면에서 장바구니 → 주문하면 이 목록 맨 위에 바로 나타납니다. 시연 시 '고객 화면 보기'로 주문해 보세요."}</p>
-          </div>
-          {newOrders.length ? <Button variant="outline" onClick={() => setOpenId(newOrders[0].id)} icon={<ChevronRight size={16} />}>최근 주문 {newOrders[0].id}</Button> : <Button variant="outline" href="/cart" icon={<ExternalLink size={16} />}>고객 화면에서 주문하기</Button>}
-        </div>
-      </Card>
+      {/* 고객 화면에서 들어온 주문 (순환 2) — 한 줄 */}
+      <div className={cn("mt-4 rounded-2xl border bg-white px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3", newOrders.length ? "border-theme-primary/40" : "border-neutral-border")} data-tour="orders-new">
+        <p className="min-w-0 flex-1 text-[0.92rem] leading-snug"><span className="font-bold">고객 화면에서 들어온 주문 {num(newOrders.length)}건</span><span className="text-neutral-text2"> · {newOrders.length ? "상태를 바꾸면 고객 마이페이지에 바로 반영돼요" : "고객 화면에서 주문하면 이 목록 맨 위에 나타나요"}</span></p>
+        {newOrders.length ? <Button size="sm" variant="outline" onClick={() => setOpenId(newOrders[0].id)} icon={<ChevronRight size={16} />} className="shrink-0">최근 주문 열기</Button> : <Button size="sm" variant="outline" href="/cart" icon={<ExternalLink size={16} />} className="shrink-0">고객 화면에서 주문하기</Button>}
+      </div>
 
       {/* Tabs */}
       <div className="mt-6 -mx-4 px-4 md:mx-0 md:px-0 overflow-x-auto hide-scrollbar">

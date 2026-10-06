@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 
 const DOT_KEYS = ["shell", "primary", "secondary", "accent", "highlight", "soft"] as const;
-const DOT_LABEL: Record<(typeof DOT_KEYS)[number], string> = { shell: "Shell(사이드바)", primary: "Primary", secondary: "Secondary", accent: "Accent", highlight: "Highlight", soft: "Soft" };
+const DOT_LABEL: Record<(typeof DOT_KEYS)[number], string> = { shell: "사이드바", primary: "주 색상", secondary: "보조 색상", accent: "강조 색상", highlight: "포인트", soft: "옅은 배경" };
 const FONT_LABEL: Record<FontScale, string> = { small: "작게", default: "기본", large: "크게" };
 
 export function ThemePicker() {
@@ -67,7 +67,7 @@ export function PreviewStrip() {
     <div className="rounded-2xl border border-neutral-border bg-neutral-canvas p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-[0.82rem] font-bold text-neutral-text2">실시간 미리보기 · 테마 {t.no} {t.name}</p>
-        <Badge tone="neutral" size="sm">본문·표·폼 Neutral 고정</Badge>
+        <Badge tone="neutral" size="sm">본문·표·폼은 무채색 고정</Badge>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="rounded-cardlg bg-white border border-neutral-border shadow-card p-4">
@@ -77,7 +77,7 @@ export function PreviewStrip() {
         </div>
         <div className="rounded-cardlg bg-white border border-neutral-border shadow-card p-4 flex flex-col justify-center gap-2">
           <button type="button" onClick={() => toast("미리보기 버튼", "주 색상이 테마를 따릅니다.", "info")} className="h-11 rounded-xl bg-theme-primary text-white font-semibold hover:brightness-110 active:scale-[0.98] transition-all duration-fast">주 색상 버튼</button>
-          <div className="flex flex-wrap gap-2"><Badge tone="accent">관심 상승</Badge><Badge tone="primary">Primary</Badge></div>
+          <div className="flex flex-wrap gap-2"><Badge tone="accent">관심 상승</Badge><Badge tone="primary">주 색상</Badge></div>
         </div>
         <div className="rounded-cardlg bg-theme-shell p-4 flex flex-col justify-center gap-2">
           <div className="rounded-xl bg-white/[0.12] px-3 py-2.5 flex items-center gap-3">

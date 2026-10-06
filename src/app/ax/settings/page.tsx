@@ -66,7 +66,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <PageHeader
         title="설정"
-        badge={<Badge tone="demo" size="sm">데모</Badge>}
+       
         desc="테마·글자 크기·역할·데모 초기화가 실제로 동작합니다. 실제 연결이 필요한 항목은 연결 준비로 표시했습니다."
         right={<Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" />}><Freshness source="DEMO" /></Hydrated>}
       />

@@ -10,7 +10,6 @@ import { cn } from "@/lib/cn";
 import { Hydrated } from "@/components/system/Hydrated";
 import { SkeletonCard, SkeletonGrid } from "@/components/ui/States";
 import { Badge } from "@/components/ui/Badge";
-import { Freshness } from "@/components/ui/Misc";
 import { Container, PageTitle, SectionHead } from "@/components/customer/Section";
 import { ProductGrid } from "@/components/customer/ProductCard";
 import { FitProfileForm, isProfileComplete } from "@/components/customer/discovery/FitProfileForm";
@@ -44,8 +43,7 @@ function StyleBody() {
         <section>
           <SectionHead title={<span className="inline-flex items-center gap-2"><Sparkles size={20} className="text-brand-accent" />{DEMO_CUSTOMER_NAME}님을 위한 추천</span>} desc="완성된 핏 프로필과 최근 본 상품·찜 목록을 바탕으로 골랐어요" more="/ranking" moreLabel="랭킹" />
           <ProductGrid products={recs.map((r) => r.product)} reasons={reasons} />
-          <div className="mt-4"><Freshness source="DEMO" /></div>
-        </section>
+            </section>
       ) : (
         <section className="rounded-cardlg border border-dashed border-neutral-border bg-brand-ivory p-5 md:p-6 text-center">
           <p className="font-bold text-[1.05rem]">{DEMO_CUSTOMER_NAME}님을 위한 추천이 준비 중이에요</p>

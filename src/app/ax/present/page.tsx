@@ -55,7 +55,7 @@ export default function PresentPage() {
     <div className="space-y-6">
       <PageHeader
         title="시연 모드"
-        badge={<Badge tone="demo" size="sm">데모</Badge>}
+       
         desc="슬라이드가 아니라 실제 화면을 이동하는 3~5분 안내형 시연입니다. 고객 화면과 AX 운영화면을 오가며 데이터 순환 고리가 실제로 도는 것을 보여줍니다."
         right={<Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" />}><Freshness source="DEMO" /></Hydrated>}
       />

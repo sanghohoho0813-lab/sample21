@@ -8,9 +8,7 @@ import { allProductAgg, productSeries, type ProductAgg } from "@/lib/kpi";
 import { num } from "@/lib/format";
 import { Hydrated } from "@/components/system/Hydrated";
 import { Segmented } from "@/components/ui/Form";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Freshness } from "@/components/ui/Misc";
 import { SkeletonGrid, EmptyState } from "@/components/ui/States";
 import { Container, PageTitle } from "@/components/customer/Section";
 import { ProductCard } from "@/components/customer/ProductCard";
@@ -89,7 +87,7 @@ export default function RankingPage() {
 
   return (
     <Container className="py-6 md:py-10 animate-fadeIn">
-      <PageTitle title="랭킹" desc="브랜드를 넘어, 지금 가장 반응이 좋은 상품" right={<Freshness source="DEMO" />} />
+      <PageTitle title="랭킹" desc="브랜드를 넘어, 지금 가장 반응이 좋은 상품" />
 
       <div className="space-y-3 md:space-y-4">
         <Segmented value={tab} onChange={setTab} options={TABS} className="w-full md:w-auto" />
@@ -104,7 +102,6 @@ export default function RankingPage() {
           </div>
         </div>
         <p className="flex items-start gap-1.5 text-[0.85rem] text-neutral-text2"><Info size={15} className="mt-0.5 shrink-0" /><span><strong className="text-neutral-text">{b.label} 기준</strong> · {b.desc} 순위 변화(▲▼)는 직전 7일 대비 판매 변화로 계산합니다.</span></p>
-        <p className="text-[0.8rem] text-neutral-text2 inline-flex items-center gap-2"><Badge tone="demo" size="sm">데모</Badge>이 랭킹은 시연용 데모 데이터로 계산된 값이며 실제 판매 실적이 아닙니다.</p>
       </div>
 
       <div data-tour="c-ranking" className="mt-6 md:mt-8">

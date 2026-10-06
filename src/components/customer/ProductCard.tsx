@@ -23,7 +23,7 @@ export function ProductCard({ product, rank, reason, className, compact }: { pro
     <div className={cn("group relative", className)}>
       <Link href={`/products/${product.id}`} className="block" onClick={() => store.track("view_product", { productId: product.id })}>
         <div className="relative overflow-hidden rounded-2xl">
-          <ProductImage colors={product.colors} label={product.name} className="transition-transform duration-normal group-hover:scale-[1.03]" />
+          <ProductImage colors={product.colors} label={product.name} caption={false} className="transition-transform duration-normal group-hover:scale-[1.03]" />
           {rank !== undefined && <span className="absolute left-0 top-0 h-9 min-w-[36px] px-2 rounded-br-2xl bg-brand-black text-white font-black text-[0.95rem] flex items-center justify-center tabular">{rank}</span>}
           {badge && <span className="absolute left-2 bottom-2"><Badge tone={badge.tone} size="sm">{badge.t}</Badge></span>}
         </div>

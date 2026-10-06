@@ -17,6 +17,7 @@ npm run qa:a11y      # 접근 가능한 이름 · 모바일 터치 타겟 · Hov
 npm run qa:layout    # 8폭 × 34 Route 레이아웃 결함(가로 넘침·한글 세로 쪼개짐·숫자/날짜 줄바꿈·잘림) → qa-output/qa-layout-*.json
                      #   QA_DRAWER=1 햄버거 연 상태 · QA_STRESS=1 긴 상품명/브랜드명/고객명
 npm run qa:english   # 화면에 남은 영문 단어 수집(한글 UI 점검) → qa-output/qa-english.json
+npm run qa:flows     # 실제 사용 흐름 20개 + 예외 상황(옵션 미선택·입력 오류·0건 검색·취소·CSV 필수 열) → qa-output/qa-flows.json
 npm run lint         # ESLint (next/core-web-vitals + typescript)
 ```
 

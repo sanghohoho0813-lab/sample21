@@ -33,8 +33,7 @@ interface BrandStat { brand: Brand; products: number; revenue30d: number; orders
 export function BrandsPage() {
   return (
     <>
-      <PageHeader title="브랜드·입점사" desc="브랜드별 매출·마진(또는 수수료)·반품·품절위험을 한 화면에서 비교합니다. 파트너가 직접 로그인하는 파트너센터는 예정 단계입니다."
-        badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
+      <PageHeader title="브랜드·입점사" desc="브랜드별 매출·마진·반품·품절위험을 비교합니다." right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><BrandsBody /></Hydrated>
     </>
   );
@@ -72,7 +71,7 @@ function BrandsBody() {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 stagger">
         <KpiCard label="브랜드" value={num(BRANDS.length)} icon={<Store size={18} />} accent={ICON_TONE.t5} sub={`사입 ${totals.purchase} · 입점·위탁 ${totals.consignment}`} />
         <KpiCard label="브랜드 매출 합계 (30일)" value={<KpiMoney>{krwShort(totals.revenue)}</KpiMoney>} icon={<Building2 size={18} />} accent={ICON_TONE.t6} sub="판매수량 × 판매가 (데모)" />
         <KpiCard label="계약 갱신·신규" value={`${totals.renewal} · ${totals.newB}`} icon={<Handshake size={18} />} accent={ICON_TONE.t3} sub="갱신 예정 · 신규 입점" />
@@ -123,7 +122,7 @@ function BrandDetail({ s, showMargin }: { s: BrandStat; showMargin: boolean }) {
   return (
     <div className="space-y-5">
       <GradientImage gradient={b.gradient} ratio="aspect-[3/1]" label={b.name} overlay><div className="absolute inset-0 flex items-end px-4 pb-3"><span className="text-white font-black text-[1.3rem]">{b.name}</span></div></GradientImage>
-      <div className="flex items-center gap-2 flex-wrap"><Badge tone="neutral">{SOURCING_LABEL[b.sourcing]}</Badge><Badge tone={CONTRACT_TONE[b.contractStatus]}>{CONTRACT_LABEL[b.contractStatus]}</Badge><Badge tone="demo" size="sm">데모</Badge></div>
+      <div className="flex items-center gap-2 flex-wrap"><Badge tone="neutral">{SOURCING_LABEL[b.sourcing]}</Badge><Badge tone={CONTRACT_TONE[b.contractStatus]}>{CONTRACT_LABEL[b.contractStatus]}</Badge></div>
       <p className="text-[0.92rem] leading-relaxed text-neutral-text2">{b.description}</p>
       <dl className="rounded-xl border border-neutral-border px-4">
         <KV label="담당 MD">{b.manager}</KV>

@@ -2,8 +2,8 @@
 /* ------------------------------------------------------------------
    MORFIT Home — Editorial multi-brand fashion home.
    3초 안에: 멀티브랜드 패션 플랫폼 · 탐색 CTA · 브랜드/스타일 차별점 · 개인화 진입.
-   Sections: Hero → 오늘의 랭킹 → 취향별 추천 → 신규 입점 브랜드 → 반응 빠른 상품
-             → 시즌 스타일 편집 → 사이즈 프로필 CTA → 신뢰·배송·교환
+   Sections: Hero → 오늘의 랭킹 → 핏 프로필(대표 기능) → 맞춤 추천 → 반응 빠른 상품
+             → 새 브랜드 → 시즌 스타일 편집 → 신뢰·배송·교환
 ------------------------------------------------------------------- */
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
@@ -20,12 +20,13 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { GradientImage } from "@/components/ui/ProductImage";
 import { SkeletonGrid, Skeleton } from "@/components/ui/States";
-import { Freshness } from "@/components/ui/Misc";
 import { Container, SectionHead } from "@/components/customer/Section";
 import { ProductCard, ProductGrid, HScroll } from "@/components/customer/ProductCard";
 import { BRAND_ASSET, isNewBrand, brandProductCount } from "@/components/customer/discovery/BrandCard";
 
 const VARIANT_COUNT = PRODUCTS.reduce((s, p) => s + p.colors.length * p.sizes.length, 0);
+/** 휴대폰에서는 목록을 4개(2줄)까지만 — 나머지는 '전체 보기'로. 홈이 끝없이 길어지지 않게 */
+const MOBILE_FOUR = "[&>*:nth-child(n+5)]:hidden md:[&>*:nth-child(n+5)]:block";
 
 /* ------------------------------ Hero ------------------------------ */
 function Hero() {
@@ -38,7 +39,7 @@ function Hero() {
             오늘의 취향을<br />브랜드 너머로
           </h1>
           <p className="mt-4 md:mt-5 text-[1rem] md:text-[1.1rem] text-neutral-text2 leading-relaxed max-w-[34rem]">
-            MORFIT은 AERNO·NOVE STUDIO·PLANE ARCHIVE 등 10개 브랜드의 옷과 신발을 한곳에서 비교하고, 내 사이즈에 맞는 상품까지 찾아주는 <strong className="text-neutral-text">멀티브랜드 패션 플랫폼</strong>입니다.
+            {BRANDS.length}개 브랜드의 옷과 신발을 한곳에서 비교하고,<br className="hidden sm:block" /> <strong className="text-neutral-text">내 사이즈에 맞는 상품</strong>까지 찾아드려요.
           </p>
           <div className="mt-6 md:mt-7 flex flex-wrap gap-2.5">
             <Button variant="brand" size="lg" href="/ranking" icon={<TrendingUp size={18} />}>랭킹 보기</Button>
@@ -46,8 +47,8 @@ function Hero() {
           </div>
           <ul className="mt-7 md:mt-8 grid grid-cols-3 gap-2 max-w-[32rem]" aria-label="MORFIT 특징">
             {[
-              { v: `${BRANDS.length}`, l: "브랜드 · 4가지\u00a0무드" },
-              { v: `${PRODUCTS.length}`, l: `상품 · ${num(VARIANT_COUNT)}\u00a0옵션` },
+              { v: `${BRANDS.length}`, l: "입점 브랜드" },
+              { v: `${num(VARIANT_COUNT)}`, l: "색상·사이즈 옵션" },
               { v: "핏 추천", l: "내 사이즈 기준" },
             ].map((s) => (
               <li key={s.l} className="rounded-2xl bg-white/70 border border-neutral-border px-3 py-2.5">
@@ -100,33 +101,20 @@ function RankingSection() {
   const top = useMemo(() => [...allProductAgg(store)].sort((a, b) => b.rankScore - a.rankScore).slice(0, 8), [store]);
   return (
     <section>
-      <SectionHead title="오늘의 랭킹" desc="판매·찜·조회를 합쳐 계산한 지금 가장 반응이 좋은 상품" more="/ranking" moreLabel="랭킹 전체" />
-      <ProductGrid products={top.map((a) => a.product)} ranked />
-      <div className="mt-4"><Freshness source="DEMO" /></div>
+      <SectionHead title="오늘의 랭킹" desc="판매·찜·조회를 합친 지금 가장 반응 좋은 상품" more="/ranking" moreLabel="랭킹 전체" />
+      <ProductGrid products={top.map((a) => a.product)} ranked className={MOBILE_FOUR} />
     </section>
   );
 }
 
 function RecommendSection() {
   const store = useApp();
-  const fp = store.fitProfile;
-  const profileDone = !!(fp.height && fp.weight && fp.topSize && fp.bottomSize);
   const recs = useMemo(() => recommendForCustomer({ recentlyViewed: store.recentlyViewed, wishlist: store.wishlist.map((w) => w.productId), limit: 8 }), [store.recentlyViewed, store.wishlist]);
   const reasons = Object.fromEntries(recs.map((r) => [r.product.id, r.reason]));
   return (
     <section>
-      <SectionHead title="취향별 추천" desc={`${DEMO_CUSTOMER_NAME}님이 자주 본 브랜드·카테고리와 찜 목록을 바탕으로 골랐어요`} more="/style" moreLabel="취향 설정" />
-      {!profileDone && (
-        <Link href="/style" className="mb-5 flex items-center gap-3 rounded-2xl border border-dashed border-neutral-border bg-brand-ivory px-4 py-3.5 hover:border-neutral-text2 transition-colors group">
-          <span className="h-10 w-10 shrink-0 rounded-xl bg-white border border-neutral-border flex items-center justify-center text-brand-accent"><Ruler size={18} /></span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-semibold text-[0.95rem]">핏 프로필을 완성하면 사이즈까지 맞춰 추천해요</span>
-            <span className="block text-[0.82rem] text-neutral-text2">키·몸무게·평소 사이즈 4가지만 입력하면 됩니다 · 1분</span>
-          </span>
-          <ChevronRight size={18} className="shrink-0 text-neutral-text2 group-hover:text-neutral-text" />
-        </Link>
-      )}
-      <ProductGrid products={recs.map((r) => r.product)} reasons={reasons} />
+      <SectionHead title={`${DEMO_CUSTOMER_NAME}님을 위한 추천`} desc="자주 본 브랜드·카테고리와 찜 목록을 바탕으로 골랐어요" more="/my?tab=recommend" moreLabel="더 보기" />
+      <ProductGrid products={recs.map((r) => r.product)} reasons={reasons} className={MOBILE_FOUR} />
     </section>
   );
 }
@@ -138,7 +126,7 @@ function NewBrandsSection() {
   const now = new Date();
   return (
     <section>
-      <SectionHead title="신규 입점 브랜드" desc="새로 합류한 브랜드부터 최근 입점 순으로" more="/brands" moreLabel="브랜드 전체" />
+      <SectionHead title="새로 들어온 브랜드" more="/brands" moreLabel="브랜드 전체" />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {list.map((b) => {
           const newer = isNewBrand(b);
@@ -172,11 +160,11 @@ function RisingSection() {
   }, [store]);
   return (
     <section>
-      <SectionHead title="지금 반응이 빠른 상품" desc="직전 7일보다 판매가 크게 늘었거나 찜·재입고 신청이 몰리는 상품" more="/ranking" moreLabel="랭킹" />
+      <SectionHead title="지금 반응이 빠른 상품" desc="지난주보다 판매와 찜이 크게 늘어난 상품" more="/ranking" moreLabel="랭킹" />
       <HScroll className="pb-1">
         {rising.map((a) => (
           <div key={a.product.id} className="w-[168px] sm:w-[200px] md:w-[220px] shrink-0 snap-start">
-            <ProductCard product={a.product} reason={a.worst === "rising" ? "급상승 · 관심 상승 중" : `7일 판매 ${signed(a.velocity, 0)}`} compact />
+            <ProductCard product={a.product} reason={a.worst === "rising" ? "찜·재입고 신청 급증" : `지난주 대비 판매 ${signed(a.velocity, 0)}`} compact />
           </div>
         ))}
       </HScroll>
@@ -193,11 +181,11 @@ const EDITS = [
 function SeasonEditSection() {
   return (
     <section>
-      <SectionHead title="시즌 스타일 편집" desc="에디터가 고른 세 가지 테마" />
+      <SectionHead title="시즌 스타일 편집" />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
         {EDITS.map((e) => (
           <Link key={e.href} href={e.href} className="group block">
-            <GradientImage gradient={e.gradient} ratio="aspect-[16/9] sm:aspect-[4/5]" asset={e.asset} overlay label={e.title} className="rounded-cardlg transition-shadow group-hover:shadow-raised">
+            <GradientImage gradient={e.gradient} ratio="aspect-[2/1] sm:aspect-[4/5]" asset={e.asset} overlay label={e.title} className="rounded-cardlg transition-shadow group-hover:shadow-raised">
               <div className="absolute inset-0 p-4 md:p-5 flex flex-col justify-end text-white">
                 <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/75">{e.eyebrow}</p>
                 <p className="mt-1 font-black text-[1.3rem] md:text-[1.5rem] leading-tight">{e.title}</p>
@@ -217,9 +205,8 @@ function FitCtaDynamic() {
   const done = !!(fp.height && fp.weight && fp.topSize && fp.bottomSize);
   return (
     <>
-      <div className="mt-6 flex flex-wrap gap-2.5">
-        <Button variant="accent" size="lg" href="/style" icon={<Ruler size={18} />}>{done ? "핏 프로필 수정" : "핏 프로필 만들기"}</Button>
-        <Button variant="ghost" size="lg" href="/ranking" className="text-white hover:bg-white/10">먼저 둘러보기</Button>
+      <div className="mt-6">
+        <Button variant="accent" size="lg" href="/style" icon={<Ruler size={18} />}>{done ? "핏 프로필 수정" : "1분 만에 핏 프로필 만들기"}</Button>
       </div>
       {done && <p className="mt-4 text-[0.82rem] text-white/60">현재 프로필: 키 {fp.height}cm · {fp.weight}kg · 상의 {fp.topSize} · 하의 {fp.bottomSize}</p>}
     </>
@@ -233,8 +220,8 @@ function FitCtaSection() {
         <div className="md:col-span-7 p-6 md:p-10">
           <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/60 inline-flex items-center gap-2"><Sparkles size={14} />FIT SIGNAL</p>
           <h2 className="mt-3 text-[1.6rem] md:text-[2.1rem] font-black tracking-tight leading-tight">내 사이즈, 브랜드마다<br className="md:hidden" /> 다르다면?</h2>
-          <p className="mt-3 text-white/75 leading-relaxed max-w-[30rem]">키·몸무게·평소 사이즈를 입력하면 상품마다 추천 사이즈와 그 이유를 보여드려요. 작게 나온 옷, 크게 나온 옷도 미리 알 수 있습니다.</p>
-          <Hydrated fallback={<div className="mt-6 flex gap-2.5"><Skeleton className="h-[52px] w-44 rounded-xl" /><Skeleton className="h-[52px] w-32 rounded-xl" /></div>}>
+          <p className="mt-3 text-white/75 leading-relaxed max-w-[30rem]">키·몸무게·평소 사이즈만 입력하면 상품마다 추천 사이즈와 이유를 알려드려요.</p>
+          <Hydrated fallback={<div className="mt-6"><Skeleton className="h-[52px] w-56 rounded-xl" /></div>}>
             <FitCtaDynamic />
           </Hydrated>
         </div>
@@ -288,11 +275,11 @@ export default function HomePage() {
       <Hero />
       <Container className="py-10 md:py-14 space-y-14 md:space-y-20">
         <Hydrated fallback={<SectionSkeleton />}><RankingSection /></Hydrated>
-        <Hydrated fallback={<SectionSkeleton />}><RecommendSection /></Hydrated>
-        <NewBrandsSection />
-        <Hydrated fallback={<SectionSkeleton n={4} />}><RisingSection /></Hydrated>
-        <SeasonEditSection />
         <FitCtaSection />
+        <Hydrated fallback={<SectionSkeleton />}><RecommendSection /></Hydrated>
+        <Hydrated fallback={<SectionSkeleton n={4} />}><RisingSection /></Hydrated>
+        <NewBrandsSection />
+        <SeasonEditSection />
         <TrustSection />
       </Container>
     </div>

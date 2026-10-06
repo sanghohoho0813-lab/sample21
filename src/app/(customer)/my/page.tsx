@@ -50,24 +50,24 @@ function MyContent() {
           <QuickStats orders={orders} />
           <div className="grid lg:grid-cols-2 gap-6">
             <section className="min-w-0">
-              <SectionHead title="최근 주문" desc="운영팀의 상태 변경이 즉시 반영됩니다." more="/my/orders" moreLabel="전체 주문" />
+              <SectionHead title="최근 주문" more="/my/orders" moreLabel="전체 주문" />
               {orders.length === 0 ? <div className="rounded-cardlg border border-dashed border-neutral-border bg-white p-6 text-center text-[0.9rem] text-neutral-text2">아직 주문이 없습니다. <Link href="/ranking" className="font-semibold text-neutral-text underline underline-offset-2">상품 둘러보기</Link></div> : <ul className="space-y-3">{orders.slice(0, 3).map((o) => <li key={o.id}><OrderCard order={o} /></li>)}</ul>}
             </section>
             <section className="min-w-0">
-              <SectionHead title="재입고 알림" desc="신청 즉시 AX 운영화면 수요 레이더에 반영됩니다." more="/my/restock" moreLabel="전체 보기" />
+              <SectionHead title="재입고 알림" more="/my/restock" moreLabel="전체 보기" />
               <RestockList limit={2} compact />
               {store.restockSubs.length > 2 && <Link href="/my/restock" className="tap mt-3 inline-flex items-center gap-0.5 text-[0.88rem] font-semibold hover:underline underline-offset-2">재입고 알림 {store.restockSubs.length}건 모두 보기<ChevronRight size={14} /></Link>}
               <div className="mt-6"><NotificationsCard /></div>
             </section>
           </div>
           <section>
-            <SectionHead title="최근 본 상품" desc="조회 데이터는 관심 신호로 집계됩니다." />
+            <SectionHead title="최근 본 상품" />
             <RecentlyViewed />
           </section>
           <RecommendSection limit={4} tour="c-recommend" title="추천 상품" />
           <div className="grid lg:grid-cols-2 gap-6">
             <NotifyPrefsCard />
-            <div className="rounded-cardlg bg-brand-ivory p-5 flex flex-col justify-center gap-2 text-[0.9rem]"><p className="font-bold flex items-center gap-2"><Sparkles size={16} />내 데이터가 어떻게 쓰이나요?</p><p className="text-neutral-text2 leading-relaxed">조회·찜·재입고 신청·사이즈 선택은 AX 운영화면의 수요 레이더와 핏 추천 규칙에 반영됩니다. 실제 개인정보는 저장하지 않으며, 데모 데이터는 이 기기에만 남습니다.</p><Link href="/my/profile" className="tap inline-flex items-center gap-0.5 font-semibold hover:underline underline-offset-2">프로필·알림 설정<ChevronRight size={14} /></Link></div>
+            <div className="rounded-cardlg bg-brand-ivory p-5 flex flex-col justify-center gap-2 text-[0.9rem]"><p className="font-bold flex items-center gap-2"><Sparkles size={16} />내 데이터가 어떻게 쓰이나요?</p><p className="text-neutral-text2 leading-relaxed">조회·찜·재입고 신청·사이즈 선택은 사이즈 추천과 상품 추천을 더 정확하게 만드는 데만 쓰여요. 실제 개인정보는 저장하지 않습니다.</p><Link href="/my/profile" className="tap inline-flex items-center gap-0.5 font-semibold hover:underline underline-offset-2">프로필·알림 설정<ChevronRight size={14} /></Link></div>
           </div>
         </div>
       )}

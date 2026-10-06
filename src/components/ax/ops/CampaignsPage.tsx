@@ -52,8 +52,7 @@ function verdict(c: Row): { label: string; tone: Tone; why: string } {
 export function CampaignsPage() {
   return (
     <>
-      <PageHeader title="캠페인·기획전" desc="세그먼트·상품·할인율을 조합한 캠페인의 노출→클릭→장바구니→주문 흐름과 마진·반품을 함께 봅니다. 매출만 보고 판단하지 않습니다."
-        badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
+      <PageHeader title="캠페인·기획전" desc="캠페인별 주문·마진·반품을 함께 보고 계속할지 판단합니다." right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><CampaignsBody /></Hydrated>
     </>
   );
@@ -107,7 +106,7 @@ function CampaignsBody() {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 stagger">
         <KpiCard label="진행중" value={num(counts.running)} icon={<Megaphone size={18} />} accent={ICON_TONE.t8} sub={`예정 ${counts.scheduled} · 종료 ${counts.ended}`} />
         <KpiCard label="캠페인 매출 합계" value={<KpiMoney>{krwShort(totalRevenue)}</KpiMoney>} icon={<PackageCheck size={18} />} accent={ICON_TONE.t6} sub="전체 캠페인 · 시뮬레이션" />
         <KpiCard label="평균 클릭→주문" value={pct(safeDiv(rows.reduce((s, r) => s + r.orders, 0), Math.max(1, rows.reduce((s, r) => s + r.clicks, 0))), 1)} icon={<MousePointerClick size={18} />} accent={ICON_TONE.t3} sub="주문 ÷ 클릭" />

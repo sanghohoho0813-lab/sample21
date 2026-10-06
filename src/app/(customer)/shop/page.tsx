@@ -6,7 +6,6 @@ import { CATEGORIES } from "@/lib/demo/seed";
 import { useApp } from "@/lib/store";
 import { Hydrated } from "@/components/system/Hydrated";
 import { SkeletonGrid } from "@/components/ui/States";
-import { Freshness } from "@/components/ui/Misc";
 import { Container, PageTitle } from "@/components/customer/Section";
 import { ProductListing } from "@/components/customer/discovery/ProductListing";
 import { FilterChip } from "@/components/customer/discovery/FilterChip";
@@ -35,7 +34,7 @@ function ShopInner() {
 
   return (
     <Container className="py-6 md:py-10 animate-fadeIn">
-      <PageTitle title={title} desc={desc} right={<Freshness source="DEMO" />} />
+      <PageTitle title={title} desc={desc} />
       {/* Quick category strip (mobile-first; sidebar has the full set on desktop) */}
       <div className="flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4 md:hidden" role="tablist" aria-label="카테고리 빠른 선택">
         <FilterChip size="sm" active={!filters.category} onClick={() => setFilters({ ...filters, category: null })}>전체</FilterChip>

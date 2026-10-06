@@ -18,6 +18,7 @@ import { ProductImage } from "@/components/ui/ProductImage";
 import { cn } from "@/lib/cn";
 import { OrderCard } from "./OrderBits";
 import { DEFAULT_NOTIFY, NOTIFY_KEY, ORDER_FILTERS, filterOrders, productHref, stockState, useLocalPref, type NotifyPrefs } from "./shared";
+import { LoopHint } from "@/components/customer/LoopHint";
 
 export const ME = CUSTOMER_BY_ID[DEMO_CUSTOMER_ID];
 
@@ -34,10 +35,10 @@ export function RecommendSection({ limit = 8, tour, title = "추천 상품", sho
   const reasons = Object.fromEntries(recs.map((r) => [r.product.id, r.reason]));
   return (
     <section data-tour={tour} className="space-y-4">
-      {showHead && <SectionHead title={title} desc="자주 구매한 브랜드 · 최근 본 카테고리 · 신상품을 기준으로 규칙 계산했습니다." />}
+      {showHead && <SectionHead title={title} desc="자주 산 브랜드와 최근 본 카테고리를 기준으로 골랐어요." />}
       {running && cp06 && (
         <div className="rounded-cardlg border border-brand-accent/40 bg-brand-accent/5 p-5 animate-fadeIn" onClickCapture={(e) => { const a = (e.target as HTMLElement).closest("a[href^='/products/']"); if (a) track("click_recommendation", { productId: a.getAttribute("href")?.split("/")[2]?.split("?")[0] ?? "", campaign: "cp-06" }); }}>
-          <div className="flex flex-wrap items-center gap-2 mb-1"><Badge tone="accent" size="sm">데이터 순환 4</Badge><Badge tone="live" size="sm">캠페인 진행중</Badge></div>
+          <Badge tone="accent" size="sm" className="mb-1.5">회원 전용 혜택</Badge>
           <p className="font-bold text-[1.15rem] flex items-center gap-2"><Ticket size={20} className="text-brand-accent" />AERNO 재구매 감사 쿠폰 7%</p>
           <p className="text-[0.88rem] text-neutral-text2 mt-1 leading-relaxed">지난 AERNO 구매 후 {ME?.avgCycleDays ?? 45}일이 지났어요. 장바구니에서 <span className="font-bold text-neutral-text">AERNO7</span> 쿠폰을 선택하면 7% 할인이 적용됩니다 (데모 · {fmtDate(cp06.endAt)}까지).</p>
           <div className="mt-4 grid grid-cols-3 gap-3">{aerno.map((p) => <ProductCard key={p.id} product={p} compact reason="재구매 추천" />)}</div>
@@ -48,7 +49,7 @@ export function RecommendSection({ limit = 8, tour, title = "추천 상품", sho
           <ProductGrid products={recs.map((r) => r.product)} reasons={reasons} />
         </div>
       )}
-      <p className="text-[0.78rem] text-neutral-text2">추천 근거는 각 상품 아래에 표시됩니다 · 규칙 기반 (재구매 엔진) · <Badge tone="ready" size="sm">AI 준비</Badge></p>
+      <LoopHint href="/ax/customers">추천은 AX 재구매 엔진(규칙 기반)이 계산합니다 · AI 연결 준비</LoopHint>
     </section>
   );
 }

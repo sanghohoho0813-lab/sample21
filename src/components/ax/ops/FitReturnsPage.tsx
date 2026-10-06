@@ -46,8 +46,7 @@ function recommendation(a: ProductAgg, topReason: ReturnReason | null): { label:
 export function FitReturnsPage() {
   return (
     <>
-      <PageHeader title="핏·반품" desc="반품 사유를 구조화해 어떤 상품이 사이즈·핏 때문에 돌아오는지 찾고, 핏 안내와 추천 규칙을 고칩니다 (엔진 2 · 핏 · 규칙). 반품률이 높다고 자동으로 불이익을 주지 않습니다 — 판단은 사람이 합니다."
-        badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
+      <PageHeader title="핏·반품" desc="사이즈·핏 때문에 돌아오는 상품을 찾아 핏 안내를 고칩니다." right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><FitBody /></Hydrated>
     </>
   );
@@ -150,7 +149,7 @@ function FitBody() {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 stagger">
         <KpiCard label="반품률 (30일)" value={pct(kpi.returnRate, 1)} icon={<Undo2 size={18} />} accent={ICON_ACCENTS.risk} sub={`반품 ${num(kpi.returns)}건 ÷ 판매 ${num(kpi.cur.units)}개`} />
         <KpiCard label="사이즈 관련 반품률" value={pct(kpi.fitReturnRate, 1)} icon={<Ruler size={18} />} accent={ICON_TONE.t7} sub="사이즈 작음·큼·핏 불만족" />
         <KpiCard label="반품 요청 (30일)" value={num(kpi.returns)} icon={<Inbox size={18} />} accent={ICON_ACCENTS.operations} sub={`전체 기록 ${num(returns.length)}건 (90일)`} />

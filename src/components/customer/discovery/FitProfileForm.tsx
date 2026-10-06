@@ -83,7 +83,11 @@ export function FitProfileForm({ onSaved }: { onSaved?: (p: FitProfile) => void 
     return fromWish ?? PRODUCT_BY_ID["p-nove-oxford"] ?? PRODUCTS[0];
   }, [wishlist]);
 
+  // 범위 밖 값은 조용히 버리지 않고 칸 아래에 알려준다 (예전: 300cm를 넣으면 '저장됨'인데 키가 비어 있었음)
+  const heightErr = draft.height && live.height === null ? "키는 120~220cm 사이로 입력해주세요." : null;
+  const weightErr = draft.weight && live.weight === null ? "몸무게는 30~200kg 사이로 입력해주세요." : null;
   const save = () => {
+    if (heightErr || weightErr) { toast("입력 내용을 확인해주세요", heightErr ?? weightErr ?? undefined, "warning"); return; }
     if (!live.height && !live.weight && !live.topSize && !live.bottomSize) { toast("입력한 정보가 없어요", "키·몸무게 또는 평소 사이즈부터 입력해주세요.", "warning"); return; }
     updateFitProfile(live);
     toast(isProfileComplete(live) ? "핏 프로필을 완성했어요" : "핏 프로필을 저장했어요", isProfileComplete(live) ? "이제 상품마다 추천 사이즈가 표시됩니다." : "키·몸무게·상의·하의 4가지를 채우면 추천이 더 정확해져요.", "success");
@@ -102,9 +106,10 @@ export function FitProfileForm({ onSaved }: { onSaved?: (p: FitProfile) => void 
           <p className="mt-1.5 text-[0.8rem] text-neutral-text2">필수: 키 · 몸무게 · 평소 상의 · 평소 하의 (선호 핏·체형은 선택)</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <Input label="키" name="height" type="number" inputMode="numeric" min={120} max={220} placeholder="170" suffix="cm" value={draft.height} onChange={(e) => set({ height: e.target.value })} />
-          <Input label="몸무게" name="weight" type="number" inputMode="numeric" min={30} max={200} placeholder="62" suffix="kg" value={draft.weight} onChange={(e) => set({ weight: e.target.value })} />
+          <Input label="키" name="height" type="number" inputMode="numeric" min={120} max={220} placeholder="170" suffix="cm" value={draft.height} onChange={(e) => set({ height: e.target.value })} aria-invalid={!!heightErr} className={heightErr ? "border-semantic-error" : undefined} />
+          <Input label="몸무게" name="weight" type="number" inputMode="numeric" min={30} max={200} placeholder="62" suffix="kg" value={draft.weight} onChange={(e) => set({ weight: e.target.value })} aria-invalid={!!weightErr} className={weightErr ? "border-semantic-error" : undefined} />
         </div>
+        {(heightErr || weightErr) && <p role="alert" className="-mt-3 text-[0.85rem] text-semantic-error">{heightErr ?? weightErr}</p>}
         <fieldset>
           <legend className="mb-2 text-[0.9rem] font-semibold">평소 상의 사이즈</legend>
           <div className="flex flex-wrap gap-2">{SIZES.map((s) => <FilterChip key={s} size="sm" active={draft.topSize === s} onClick={() => set({ topSize: draft.topSize === s ? null : s })}>{s}</FilterChip>)}</div>

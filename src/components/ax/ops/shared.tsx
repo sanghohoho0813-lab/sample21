@@ -79,11 +79,16 @@ export function PageSkeleton({ kpis = 4 }: { kpis?: number }) {
 export function FilterBar({ children, activeCount = 0, className, right }: { children: ReactNode; activeCount?: number; className?: string; right?: ReactNode }) {
   const mobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  // PC: 필터는 접어 두고 버튼 하나로 연다 — 조건이 걸려 있으면 처음부터 펼친다
+  const [openDesk, setOpenDesk] = useState(activeCount > 0);
   if (!mobile) {
     return (
-      <div className={cn("rounded-cardlg border border-neutral-border bg-white p-4 flex flex-wrap gap-3 items-end", className)}>
-        {children}
-        {right && <div className="ml-auto flex items-center gap-2">{right}</div>}
+      <div className={className}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setOpenDesk((v) => !v)} aria-expanded={openDesk} icon={<SlidersHorizontal size={15} />}>필터{activeCount ? ` ${activeCount}` : ""}</Button>
+          {right}
+        </div>
+        {openDesk && <div className="mt-3 rounded-cardlg border border-neutral-border bg-white p-4 flex flex-wrap gap-3 items-end animate-fadeIn">{children}</div>}
       </div>
     );
   }

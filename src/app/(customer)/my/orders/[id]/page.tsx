@@ -11,7 +11,7 @@ import { krw } from "@/lib/format";
 import { Hydrated } from "@/components/system/Hydrated";
 import { Container } from "@/components/customer/Section";
 import { Button } from "@/components/ui/Button";
-import { Badge, DemoBadge } from "@/components/ui/Badge";
+import { DemoBadge } from "@/components/ui/Badge";
 import { Modal, Responsive } from "@/components/ui/Overlay";
 import { Select, Textarea } from "@/components/ui/Form";
 import { EmptyState, SkeletonCard } from "@/components/ui/States";
@@ -20,6 +20,7 @@ import { OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { cn } from "@/lib/cn";
 import { OrderItemRow, OrderTimeline } from "@/components/customer/conversion/OrderBits";
 import { myOrders, useDocumentTitle } from "@/components/customer/conversion/shared";
+import { LoopHint } from "@/components/customer/LoopHint";
 
 const REASONS = Object.keys(RETURN_REASON_LABEL) as ReturnReason[];
 
@@ -95,7 +96,7 @@ function OrderDetail({ id }: { id: string }) {
               <div className="flex justify-between"><dt className="text-neutral-text2">상품금액</dt><dd className="tabular">{krw(order.subtotal + order.items.reduce((s, i) => s + i.discount * i.qty, 0))}</dd></div>
               <div className="flex justify-between"><dt className="text-neutral-text2">할인 합계</dt><dd className="tabular">{order.discount > 0 ? `−${krw(order.discount)}` : "0원"}</dd></div>
               <div className="flex justify-between"><dt className="text-neutral-text2">배송비</dt><dd className="tabular">{order.shippingFee === 0 ? "무료" : krw(order.shippingFee)}</dd></div>
-              <div className="flex justify-between pt-2 border-t border-neutral-border"><dt className="font-bold">결제금액 <Badge tone="demo" size="sm">데모</Badge></dt><dd className="font-black text-[1.2rem] tabular">{krw(order.total)}</dd></div>
+              <div className="flex justify-between pt-2 border-t border-neutral-border"><dt className="font-bold">결제금액</dt><dd className="font-black text-[1.2rem] tabular">{krw(order.total)}</dd></div>
             </dl>
           </section>
           <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
@@ -106,7 +107,7 @@ function OrderDetail({ id }: { id: string }) {
               {canAfter && <Button variant="outline" onClick={() => openPicker(setExchangeOpen)} icon={<Repeat size={16} />}>교환 요청</Button>}
               {!canCancel && !canAfter && <p className="text-[0.88rem] text-neutral-text2">{order.status === "cancelled" ? "취소된 주문입니다." : order.status === "return-requested" ? "반품 요청이 접수되어 운영팀이 확인 중입니다." : order.status === "exchange-requested" ? "교환 요청이 접수되어 운영팀이 확인 중입니다." : "출고 이후에는 취소할 수 없습니다. 배송 완료 후 반품·교환을 요청하세요."}</p>}
             </div>
-            <p className="mt-3 text-[0.8rem] text-neutral-text2">반품 사유는 구조화되어 AX 운영화면 핏·반품(핏 위험도) 계산에 반영됩니다 — 데이터 순환 3.</p>
+            <LoopHint href="/ax/fit-returns" className="mt-3">반품 사유는 AX 핏·반품 분석에 바로 반영됩니다</LoopHint>
           </section>
         </div>
       </div>

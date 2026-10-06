@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Users, ShoppingBag, UserPlus, Ruler, Repeat, Heart, ShoppingCart, BellRing, PackageCheck, Undo2, ChevronRight, Sparkles, Search, Clock, Store, Zap, ShieldAlert } from "lucide-react";
+import { UserPlus, Repeat, Heart, ShoppingCart, BellRing, PackageCheck, Undo2, ChevronRight, Sparkles, Search, Clock, Store, Zap, ShieldAlert } from "lucide-react";
 import { PageHeader } from "@/components/ax/AxShell";
 import { Hydrated } from "@/components/system/Hydrated";
 import { useIsMobile } from "@/components/system/hooks";
@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Input, Select } from "@/components/ui/Form";
-import { KpiCard, Stat } from "@/components/ui/Kpi";
+import { KpiTile, Stat } from "@/components/ui/Kpi";
 import { Term } from "@/components/ui/Misc";
 import { Drawer, Modal } from "@/components/ui/Overlay";
 import { EmptyState } from "@/components/ui/States";
@@ -89,7 +89,7 @@ function suggestionsFor(c: Row, role: Role): { title: string; reason: string; hr
 export function CustomersPage() {
   return (
     <>
-      <PageHeader title="고객·재구매" desc="구매이력·관심·구매주기 데이터를 세그먼트로 나누고, 지금 할 수 있는 행동을 제안합니다. 모든 고객은 가상 데이터이며 전화번호·이메일 같은 개인정보는 존재하지 않습니다."
+      <PageHeader title="고객·재구매" desc="누가 다시 살지, 지금 어떤 고객에게 무엇을 제안할지 봅니다."
         badge={<Badge tone="demo">개인정보 없음 · 가상 고객</Badge>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={5} />}><CustomersBody /></Hydrated>
     </>
@@ -168,12 +168,12 @@ function CustomersBody() {
   return (
     <div className="animate-fadeIn">
       {/* KPI */}
-      <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-4 stagger">
-        <KpiCard label="전체 고객" value={num(kpi.total)} icon={<Users size={18} />} accent={ICON_ACCENTS.customer} sub="가상 고객 (데모)" />
-        <KpiCard label="구매 고객" value={num(kpi.buyers)} icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} sub="90일 내 1회 이상 주문" />
-        <KpiCard label="신규 30일" value={num(kpi.newCust30)} icon={<UserPlus size={18} />} accent={ICON_ACCENTS.overview} sub="최근 30일 가입" />
-        <KpiCard label="사이즈 프로필 완성률" value={pct(kpi.profileRate, 0)} icon={<Ruler size={18} />} accent={ICON_TONE.t7} sub="핏 프로필 입력 고객 비율" />
-        <KpiCard label="재구매율 (90일)" value={pct(repeat, 1)} icon={<Repeat size={18} />} accent={ICON_ACCENTS.evidence} sub={<span><Term term="재구매율">2회 이상 구매</Term> 고객 비율</span>} />
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 stagger-sm">
+        <KpiTile label="전체 고객" value={`${num(kpi.total)}명`} sub="가상 고객" />
+        <KpiTile label="구매 고객" value={`${num(kpi.buyers)}명`} sub="90일 내 1회 이상" />
+        <KpiTile label="신규 가입" value={`${num(kpi.newCust30)}명`} sub="최근 30일" />
+        <KpiTile label="핏 프로필 완성률" value={pct(kpi.profileRate, 0)} sub="사이즈 정보 입력 고객" />
+        <KpiTile label="재구매율 (90일)" value={pct(repeat, 1)} sub={<Term term="재구매율">2회 이상 구매 고객</Term>} />
       </div>
 
       {/* 현재 시연 고객 */}

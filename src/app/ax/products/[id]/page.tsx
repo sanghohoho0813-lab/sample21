@@ -63,7 +63,7 @@ function DetailInner() {
   if (!product || !agg || !md) {
     return (
       <div className="space-y-6">
-        <PageHeader title="상품 상세" badge={<Badge tone="demo" size="sm">데모</Badge>} />
+        <PageHeader title="상품 상세" />
         <EmptyState title="상품을 찾을 수 없습니다" desc={`'${id}'에 해당하는 상품이 데모 저장소에 없습니다.`} action={<Button href="/ax/products" icon={<ArrowLeft size={16} />}>상품 목록으로</Button>} />
       </div>
     );
@@ -81,10 +81,10 @@ function DetailInner() {
     <div className="space-y-6">
       <Link href="/ax/products" className="tap inline-flex items-center gap-1 text-[0.88rem] font-semibold text-neutral-text2 hover:text-neutral-text"><ArrowLeft size={16} />상품·옵션 목록</Link>
       <div className="rounded-cardlg bg-white border border-neutral-border shadow-card p-5 md:p-6 flex flex-col md:flex-row gap-5">
-        <ProductImage colors={product.colors} label={product.name} className="w-full md:w-40 shrink-0" ratio="aspect-[4/5] md:aspect-[3/4]" />
+        <ProductImage colors={product.colors} label={product.name} className="hidden md:block w-40 shrink-0" ratio="aspect-[3/4]" />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap mb-2"><Badge tone="neutral">{brand.name}</Badge><Badge tone="neutral">{CATEGORY_NAME[product.categoryId]}</Badge><InventoryStatusBadge status={agg.worst} size="md" />{discountRate(product, app) > 0 && <Badge tone="error">할인 {pct(discountRate(product, app), 0)}</Badge>}{fitChanged && <Badge tone="success">핏 안내 변경됨</Badge>}<Badge tone="demo" size="sm">데모</Badge></div>
-          <h1 className="text-[1.5rem] md:text-[1.9rem] font-bold tracking-tight leading-tight">{product.name}</h1>
+          <div className="flex items-center gap-2 flex-wrap mb-2"><Badge tone="neutral">{brand.name}</Badge><Badge tone="neutral">{CATEGORY_NAME[product.categoryId]}</Badge><InventoryStatusBadge status={agg.worst} size="md" />{discountRate(product, app) > 0 && <Badge tone="error">할인 {pct(discountRate(product, app), 0)}</Badge>}{fitChanged && <Badge tone="success">핏 안내 변경됨</Badge>}</div>
+          <div className="flex items-center gap-3"><ProductImage colors={product.colors} label={product.name} caption={false} className="md:hidden w-14 shrink-0 !rounded-xl" ratio="aspect-square" /><h1 className="min-w-0 text-[1.5rem] md:text-[1.9rem] font-bold tracking-tight leading-tight">{product.name}</h1></div>
           <p className="text-neutral-text2 mt-1">{product.subtitle} · {product.material}</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2"><Price price={price} original={product.price} size="lg" />{showMargin && <span className="text-[0.9rem] text-neutral-text2">원가 {krw(product.cost)} · <Term term="마진">마진율</Term> <span className="font-semibold text-neutral-text">{pct(agg.marginRate, 0)}</span></span>}</div>
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">

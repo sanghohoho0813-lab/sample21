@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { BookOpen, Boxes, FileCheck2, PackageCheck, RotateCcw, Ruler, ShoppingBag, Sparkles, TrendingUp, Zap, Wand2 } from "lucide-react";
+import { BookOpen, Boxes, FileCheck2, PackageCheck, RotateCcw, ShoppingBag, Sparkles, TrendingUp, Zap, Wand2 } from "lucide-react";
 import { useApp, ROLE_NAME } from "@/lib/store";
 import { BRANDS, DAILY, PRODUCT_BY_ID, VARIANTS } from "@/lib/demo/seed";
 import { actionKpi, allOrders, allReturns, daysOfStock, demandScore, effVariant, inventoryStatus, inventoryKpi, periodOrders, salesKpi, PERIOD_LABEL, type Period } from "@/lib/kpi";
@@ -12,15 +12,15 @@ import { aiStatus, explain, type AIExplainResponse } from "@/lib/ai";
 import { toast } from "@/components/ui/Toast";
 import { krwShort, num, pct, pctDelta, safeDiv } from "@/lib/format";
 import { relTime } from "@/lib/dates";
-import { ICON_ACCENTS, ICON_TONE } from "@/lib/theme";
+import { ICON_ACCENTS } from "@/lib/theme";
 import type { Role } from "@/lib/types";
 import { Hydrated } from "@/components/system/Hydrated";
 import { PageHeader } from "@/components/ax/AxShell";
 import { AIReadyBadge } from "@/components/ax/AIReady";
 import { InventoryStatusBadge, OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { ActionCard } from "@/components/ax/core/ActionCard";
-import { AxLink, Big, BigLg, CHART, ChartTip, InfoNote, MiniBar, OPEN_STATUSES, PageSkeleton, RoleNote, SectionCard, axisKrw, dayLabel, demandTone, sortByUrgency, visibleActions } from "@/components/ax/core/shared";
-import { KpiCard } from "@/components/ui/Kpi";
+import { AxLink, CHART, ChartTip, InfoNote, MiniBar, OPEN_STATUSES, PageSkeleton, RoleNote, SectionCard, axisKrw, dayLabel, demandTone, sortByUrgency, visibleActions } from "@/components/ax/core/shared";
+import { KpiCard, KpiTile } from "@/components/ui/Kpi";
 import { Segmented } from "@/components/ui/Form";
 import { Freshness, Term } from "@/components/ui/Misc";
 import { Badge } from "@/components/ui/Badge";
@@ -119,8 +119,8 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="경영 대시보드" desc={role === "ops" ? "오늘 처리할 주문·반품·재입고 문의와 담당 과제를 한 화면에서 확인합니다." : "무엇이 잘되고, 어디서 돈이 새고, 무엇을 먼저 봐야 하는지 10초 안에 확인합니다."}
-        badge={<Badge tone="demo" size="sm">데모</Badge>}
+      <PageHeader title="경영 대시보드" desc={role === "ops" ? "오늘 처리할 주문·반품·재입고 문의와 담당 과제입니다." : "오늘의 매출·위험·할 일을 한눈에 확인합니다."}
+       
         right={<div className="flex flex-col items-start md:items-end gap-2"><Segmented value={period} onChange={setPeriod} options={PERIODS.map((p) => ({ value: p, label: PERIOD_LABEL[p].replace("최근 ", "") }))} /><Freshness source="DEMO" /></div>} />
 
       {role === "ops" ? (
@@ -153,35 +153,32 @@ function Dashboard() {
       ) : (
         <>
           {role === "md" && <RoleNote>MD 화면 — 전체 손익 대신 담당 브랜드({derived.mdBrandNames.join(" · ")}) 마진을 보여줍니다.</RoleNote>}
-          {/* Row 1 — large */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 stagger" data-tour="kpi-row">
-            <KpiCard size="lg" label={`총 주문액 (${periodLabel})`} value={<BigLg>{krwShort(k.cur.revenue)}</BigLg>} delta={revDelta} href="/ax/sales" icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} />
-            <KpiCard size="lg" label="순매출 (반품 추정 차감)" value={<BigLg>{krwShort(derived.net)}</BigLg>} delta={pctDelta(derived.net, derived.netPrev)} href="/ax/sales" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.overview} />
+          {/* 주요 지표 4 — 돈의 흐름 */}
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 stagger" data-tour="kpi-row">
+            <KpiCard size="lg" label="총 주문액" value={krwShort(k.cur.revenue)} delta={revDelta} href="/ax/sales" icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.sales} />
+            <KpiCard size="lg" label="순매출" value={krwShort(derived.net)} delta={pctDelta(derived.net, derived.netPrev)} href="/ax/sales" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.overview} />
             {role === "owner"
-              ? <KpiCard size="lg" label="추정 매출총이익" value={<BigLg>{krwShort(k.cur.grossMargin)}</BigLg>} delta={pctDelta(k.cur.grossMargin, k.prev.grossMargin)} href="/ax/sales" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.evidence} />
-              : <KpiCard size="lg" label="담당 브랜드 마진" value={<BigLg>{krwShort(derived.mdMargin)}</BigLg>} delta={pctDelta(derived.mdMargin, derived.mdMarginPrev)} href="/ax/sales" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.evidence} />}
-            <KpiCard size="lg" label="구매 전환율" value={<BigLg>{pct(k.conversion, 2)}</BigLg>} delta={pctDelta(k.conversion, derived.convPrev)} href="/ax/customers" icon={<Zap size={18} />} accent={ICON_ACCENTS.customer} />
+              ? <KpiCard size="lg" label="추정 매출총이익" value={krwShort(k.cur.grossMargin)} delta={pctDelta(k.cur.grossMargin, k.prev.grossMargin)} href="/ax/sales" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.evidence} />
+              : <KpiCard size="lg" label="담당 브랜드 마진" value={krwShort(derived.mdMargin)} delta={pctDelta(derived.mdMargin, derived.mdMarginPrev)} href="/ax/sales" icon={<Sparkles size={18} />} accent={ICON_ACCENTS.evidence} />}
+            <KpiCard size="lg" label="구매 전환율" value={pct(k.conversion, 2)} delta={pctDelta(k.conversion, derived.convPrev)} href="/ax/customers" icon={<Zap size={18} />} accent={ICON_ACCENTS.customer} />
           </div>
-          {/* Row 2 */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-            <KpiCard label="재구매율" value={<Big>{pct(k.repeat, 1)}</Big>} sub="2회 이상 구매 고객 비율 (90일)" href="/ax/customers" />
-            <KpiCard label="판매소진율 (30일)" value={<Big>{pct(inv.sellThrough, 1)}</Big>} sub="판매 ÷ (판매 + 현재고)" href="/ax/inventory" />
-            <KpiCard label="품절위험 옵션 수" value={<Big>{num(inv.lowRisk)}</Big>} sub={`관심 상승 ${num(inv.rising)}개 · 7일 품절 추정손실 ${krwShort(inv.lostSales7d)}`} href="/ax/inventory?filter=low" accent={ICON_ACCENTS.risk} />
-            <KpiCard label="저회전 재고금액" value={<Big>{krwShort(inv.slowValue)}</Big>} sub={`총 재고원가 ${krwShort(inv.totalStockValue)} 중`} href="/ax/inventory?filter=slow" accent={ICON_ACCENTS.settings} />
-          </div>
-          {/* Row 3 */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-            <KpiCard label="반품률" value={<Big>{pct(k.returnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 ÷ 판매 ${num(k.cur.units)}개`} href="/ax/fit-returns" />
-            <KpiCard label="사이즈 관련 반품률" value={<Big>{pct(k.fitReturnRate, 1)}</Big>} sub={`반품 ${num(k.returns)}건 중 사이즈·핏 사유`} href="/ax/fit-returns" icon={<Ruler size={18} />} accent={ICON_TONE.t7} />
-            <KpiCard label="재입고 신청" value={<Big>{num(inv.restockRequests)}</Big>} sub="옵션별 재입고 알림 신청 누적" href="/ax/inventory" />
-            <KpiCard label="미처리 과제" value={<Big>{num(ak.open)}</Big>} sub={`긴급 ${num(ak.high)}건 · 완료율 ${pct(ak.executionRate, 0)}`} href="/ax/actions" icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} />
+          {/* 운영 지표 8 — 작게, 눌러서 상세로 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-sm">
+            <KpiTile label="품절위험 옵션" value={`${num(inv.lowRisk)}개`} sub={`7일 추정손실 ${krwShort(inv.lostSales7d)}`} href="/ax/inventory?filter=low" tone={inv.lowRisk > 0 ? "error" : undefined} />
+            <KpiTile label="미처리 과제" value={`${num(ak.open)}건`} sub={`긴급 ${num(ak.high)}건 · 완료율 ${pct(ak.executionRate, 0)}`} href="/ax/actions" tone={ak.high > 0 ? "warning" : undefined} />
+            <KpiTile label="재입고 신청" value={`${num(inv.restockRequests)}건`} sub="옵션별 알림 신청 누적" href="/ax/inventory" />
+            <KpiTile label="저회전 재고" value={krwShort(inv.slowValue)} sub={`총 재고원가 ${krwShort(inv.totalStockValue)} 중`} href="/ax/inventory?filter=slow" />
+            <KpiTile label="재구매율" value={pct(k.repeat, 1)} sub="2회 이상 구매 고객 (90일)" href="/ax/customers" />
+            <KpiTile label="판매소진율 (30일)" value={pct(inv.sellThrough, 1)} sub="판매 ÷ (판매 + 현재고)" href="/ax/inventory" />
+            <KpiTile label="반품률" value={pct(k.returnRate, 1)} sub={`반품 ${num(k.returns)}건 ÷ 판매 ${num(k.cur.units)}개`} href="/ax/fit-returns" />
+            <KpiTile label="사이즈 반품률" value={pct(k.fitReturnRate, 1)} sub="반품 중 사이즈·핏 사유" href="/ax/fit-returns" />
           </div>
         </>
       )}
 
       {/* AI 브리핑 + 오늘의 Action */}
       <div className="grid lg:grid-cols-5 gap-5">
-        <SectionCard tour="ai-briefing" className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">AI 브리핑 <AIReadyBadge kind="briefing" label={llm?.configured ? "AI 연결됨" : undefined} /></span>} desc={llm?.configured ? `규칙 기반 요약 + LLM 설명 (${llm.model}) · 숫자는 코드가 계산` : "규칙 기반 요약 · LLM 연결 시 자연어 설명 추가"}>
+        <SectionCard tour="ai-briefing" className="lg:col-span-3" title={<span className="inline-flex items-center gap-2">AI 브리핑 <AIReadyBadge kind="briefing" label={llm?.configured ? "AI 연결됨" : undefined} /></span>} desc={llm?.configured ? `규칙 기반 요약 + AI 설명 (${llm.model})` : "규칙 기반 요약"}>
           <p className="text-[1.15rem] md:text-[1.3rem] font-bold leading-snug tracking-tight">{briefing.headline}</p>
           <ul className="mt-4 space-y-2">
             {briefing.points.map((p) => <li key={p} className="flex gap-2.5 text-[0.95rem] leading-relaxed"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-theme-primary shrink-0" />{p}</li>)}
@@ -191,8 +188,8 @@ function Dashboard() {
             <Button size="sm" href="/ax/actions" icon={<Zap size={16} />} className="shrink-0">실행 센터 열기</Button>
           </div>
           <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
-            <p className="text-[0.78rem] text-neutral-text2 inline-flex items-center gap-1.5 flex-wrap"><Badge tone={llm?.configured ? "live" : "ready"} size="sm">{llm === null ? "LLM 확인 중" : llm.configured ? "LLM 연결됨" : "LLM 미연결 · AI 준비"}</Badge>숫자는 코드로 계산됨 (AI 아님){llm?.configured ? ` · 설명만 ${llm.model}` : " · 서버 ANTHROPIC_API_KEY 설정 시 자연어 설명 활성"}</p>
-            <Button size="sm" variant="outline" onClick={runAi} loading={aiLoading} icon={<Wand2 size={15} />} data-tour="ai-explain" aria-label="AI 설명 생성">{llm?.configured ? "AI 설명 생성" : "AI 설명 생성 (연결 준비 확인)"}</Button>
+            <p className="text-[0.82rem] text-neutral-text2">숫자는 코드가 계산합니다{llm?.configured ? ` · 설명만 ${llm.model}` : " · AI 연결 시 설명이 붙습니다"}</p>
+            <Button size="sm" variant="outline" onClick={runAi} loading={aiLoading} icon={<Wand2 size={15} />} data-tour="ai-explain" aria-label="AI 설명 생성">AI 설명 생성</Button>
           </div>
           {aiText && (
             <div className={`mt-3 rounded-xl border p-4 ${aiText.status === "LIVE" ? "border-theme-primary/40 bg-theme-soft/60" : "border-dashed border-neutral-border bg-neutral-canvas"}`} aria-live="polite">
@@ -252,9 +249,9 @@ function Dashboard() {
               {evidence.map((e) => (
                 <li key={e.id}>
                   <Link href={`/ax/evidence?id=${e.id}`} className="block rounded-xl border border-neutral-border p-3.5 hover:border-neutral-text2 transition-colors">
-                    <div className="flex flex-wrap items-center gap-2 mb-1"><Badge tone={e.type === "RESULT" || e.type === "REVENUE" ? "success" : e.type === "RISK" || e.type === "EXCEPTION" ? "warning" : "info"} size="sm">{EVIDENCE_TYPE_LABEL[e.type]}</Badge><Badge tone={e.source === "SIMULATION" ? "demo" : "neutral"} size="sm">{SOURCE_LABEL[e.source]}</Badge><span className="ml-auto text-[0.78rem] text-neutral-text2 tabular">{relTime(e.at)}</span></div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1"><Badge tone={e.type === "RESULT" || e.type === "REVENUE" ? "success" : e.type === "RISK" || e.type === "EXCEPTION" ? "warning" : "info"} size="sm">{EVIDENCE_TYPE_LABEL[e.type]}</Badge><span className="ml-auto text-[0.8rem] text-neutral-text2 tabular">{SOURCE_LABEL[e.source]} · {relTime(e.at)}</span></div>
                     <p className="font-semibold text-[0.92rem] leading-snug">{e.title}</p>
-                    <p className="text-[0.8rem] text-neutral-text2 mt-0.5 leading-snug">{e.detail}</p>
+                    <p className="text-[0.82rem] text-neutral-text2 mt-0.5 leading-snug line-clamp-2">{e.detail}</p>
                   </Link>
                 </li>
               ))}

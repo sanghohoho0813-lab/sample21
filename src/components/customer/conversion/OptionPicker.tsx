@@ -56,7 +56,7 @@ export function OptionPicker({ product, colorIdx, size, onColor, onSize, compact
                     active ? "border-brand-black bg-brand-black text-white" : "border-neutral-border bg-white hover:border-neutral-text2",
                     st && !st.purchasable && !active && "bg-brand-ivory text-neutral-text2")}>
                   <span className={cn("text-[1rem] font-bold leading-none", st && !st.purchasable && !active && "line-through decoration-neutral-text2/60")}>{single ? "FREE" : s}</span>
-                  {st && st.key !== "normal" && (
+                  {st && st.key !== "normal" && st.key !== "rising" && (
                     <span className={cn("text-[0.78rem] font-semibold leading-tight text-center", active ? "text-white/80" : st.key === "soldout" ? "text-semantic-error" : st.key === "low" ? "text-semantic-warning" : st.key === "restocked" ? "text-semantic-success" : "text-brand-accent")}>{st.short}</span>
                   )}
                 </button>
@@ -67,7 +67,7 @@ export function OptionPicker({ product, colorIdx, size, onColor, onSize, compact
         {!compact && colorIdx !== null && size && (() => {
           const v = variants.find((x) => x.color === product.colors[colorIdx] && x.size === size);
           const st = v ? stockState(v, store) : null;
-          return st ? <div className="mt-2.5 flex items-center gap-2 text-[0.85rem]"><Badge tone={st.tone} size="sm">{st.label}</Badge>{st.key === "soldout" && <span className="text-neutral-text2">재입고 알림을 신청하면 입고 즉시 알려드립니다.</span>}{st.key === "restocked" && <span className="text-neutral-text2">기다리던 옵션이 다시 준비되었습니다.</span>}</div> : null;
+          return st && st.key !== "normal" && st.key !== "rising" ? <div className="mt-2.5 flex items-center gap-2 text-[0.85rem]"><Badge tone={st.tone} size="sm">{st.label}</Badge>{st.key === "soldout" && <span className="text-neutral-text2">재입고 알림을 신청하면 입고 즉시 알려드립니다.</span>}{st.key === "restocked" && <span className="text-neutral-text2">기다리던 옵션이 다시 준비되었습니다.</span>}</div> : null;
         })()}
       </div>
     </div>

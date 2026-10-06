@@ -132,6 +132,8 @@ export function CsvImportModal({ open, onClose }: { open: boolean; onClose: () =
 
   const close = useCallback(() => { onClose(); }, [onClose]);
   const cur = FILES[fileKey];
+  // 올린 파일의 첫 줄(열 이름)에 필수 열이 다 있는지 — 반영 전에 사람이 바로 고칠 수 있게
+  const missing = parsed ? cur.fields.filter((f) => f.required && !parsed.header.some((h) => h.trim().toLowerCase() === f.name)).map((f) => f.name) : [];
 
   return (
     <Modal open={open} onClose={close} title={<span className="inline-flex items-center gap-2">CSV 가져오기 <Badge tone="ready" size="sm">연결 준비</Badge></span>} size="lg"
@@ -184,6 +186,9 @@ export function CsvImportModal({ open, onClose }: { open: boolean; onClose: () =
                   <span className="text-neutral-text2 tabular">{(parsed.size / 1024).toFixed(1)}KB · 열 {parsed.header.length}개 · 행 {parsed.total.toLocaleString("ko-KR")}{parsed.truncated ? "+" : ""}개</span>
                   <Badge tone="demo" size="sm" className="ml-auto">미리보기만</Badge>
                 </div>
+                {missing.length > 0
+                  ? <p role="alert" className="rounded-xl bg-[#fff1e6] px-4 py-3 text-[0.88rem] text-[#b45309] font-semibold">{cur.file} 형식의 필수 열이 없습니다: {missing.join(", ")} — 첫 줄 열 이름을 확인하거나 위에서 파일 종류를 바꿔주세요.</p>
+                  : <p className="rounded-xl bg-[#e6f6ec] px-4 py-3 text-[0.88rem] text-[#15803d] font-semibold">{cur.file} 필수 열 {cur.fields.filter((f) => f.required).length}개가 모두 있습니다.</p>}
                 <MiniTable header={parsed.header} rows={parsed.rows} />
                 <p className="text-[0.82rem] text-neutral-text2">처음 5행만 표시합니다. 실제 반영은 Supabase 연결 후 가능 (연결 준비) — 데모 스토어는 변경되지 않았습니다.</p>
               </div>

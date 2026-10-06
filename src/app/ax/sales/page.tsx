@@ -119,7 +119,7 @@ function SalesInner() {
   if (!can(role, "brand-margin") && !can(role, "company-pnl")) {
     return (
       <div className="space-y-6">
-        <PageHeader title="매출·마진" badge={<Badge tone="demo" size="sm">데모</Badge>} right={<Freshness source="DEMO" />} />
+        <PageHeader title="매출·마진" right={<Freshness source="DEMO" />} />
         <EmptyState icon={<Lock size={22} />} title="권한 없음 — 운영직원은 매출·마진을 볼 수 없습니다" desc="매출·손익과 브랜드·상품 마진은 대표·MD 권한입니다. 설정 > 권한표에서 역할별 권한을 확인할 수 있습니다. 상단 역할 전환으로 대표/MD로 바꾸면 이 화면을 볼 수 있습니다." action={<div className="flex gap-2"><Button variant="outline" href="/ax/settings">권한 보기</Button><Button href="/ax/orders">주문·배송으로 이동</Button></div>} />
       </div>
     );
@@ -127,12 +127,12 @@ function SalesInner() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="매출·마진" desc="기간과 채널을 바꿔 매출·할인·반품·마진을 확인하고, 상품별 위험·기회를 과제로 연결합니다." badge={<Badge tone="demo" size="sm">데모</Badge>}
+      <PageHeader title="매출·마진" desc="기간·채널별 매출과 마진, 상품별 위험·기회를 확인합니다."
         right={<div className="flex flex-col items-start md:items-end gap-2"><div className="flex flex-wrap gap-2"><Segmented value={period} onChange={setPeriod} options={PERIODS.map((x) => ({ value: x, label: PERIOD_LABEL[x].replace("최근 ", "") }))} /><Segmented value={channel} onChange={setChannel} options={(["all", "web", "mobile"] as Channel[]).map((c) => ({ value: c, label: CHANNEL_LABEL[c] }))} /></div><Freshness source="DEMO" /></div>} />
 
       {role === "md" && <RoleNote>MD 화면 — 회사 전체 손익(추정 마진 합계)은 대표 권한이라 숨겼습니다. 상품·브랜드 마진은 표시됩니다.</RoleNote>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 stagger">
+      <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4 stagger">
         <KpiCard size="lg" label="매출" value={krwShort(a.revenue)} delta={pctDelta(a.revenue, p.revenue)} icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.sales} />
         <KpiCard label="주문 수" value={`${num(a.orders)}건`} delta={pctDelta(a.orders, p.orders)} icon={<ShoppingBag size={18} />} accent={ICON_ACCENTS.overview} />
         <KpiCard label="객단가" value={krw(a.aov)} delta={pctDelta(a.aov, p.aov)} icon={<Receipt size={18} />} accent={ICON_ACCENTS.operations} />

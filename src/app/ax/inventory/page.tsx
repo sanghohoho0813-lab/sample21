@@ -16,7 +16,7 @@ import { Hydrated } from "@/components/system/Hydrated";
 import { PageHeader } from "@/components/ax/AxShell";
 import { AIReadyBadge } from "@/components/ax/AIReady";
 import { ActionStatusBadge, InventoryStatusBadge } from "@/components/ax/StatusBadges";
-import { AxLink, BigLg, InfoNote, MiniBar, PageSkeleton, SectionCard, UnitDelta, demandTone } from "@/components/ax/core/shared";
+import { AxLink, InfoNote, MiniBar, PageSkeleton, SectionCard, UnitDelta, demandTone } from "@/components/ax/core/shared";
 import { useIsMobile } from "@/components/system/hooks";
 import { KpiCard } from "@/components/ui/Kpi";
 import { Freshness, Term } from "@/components/ui/Misc";
@@ -43,7 +43,7 @@ function InventoryInner() {
   const role: Role = app.role === "customer" ? "owner" : app.role;
   const showCost = can(role, "brand-margin");
   const [filter, setFilter] = useState<Filter>(PARAM_FILTER[sp.get("filter") ?? ""] ?? "all");
-  const [limit, setLimit] = useState(PAGE);
+  const [pages, setPages] = useState(1);
   const mobile = useIsMobile(); // data-tour goes only on the visible (table vs card) Scenario A element
   useEffect(() => { const f = PARAM_FILTER[sp.get("filter") ?? ""]; if (f) setFilter(f); }, [sp]);
 
@@ -55,6 +55,8 @@ function InventoryInner() {
   }).sort((a, b) => b.score - a.score || b.rp.score - a.rp.score), [app]);
   const counts = useMemo(() => Object.fromEntries(STATUS_ORDER.map((s) => [s, rows.filter((r) => r.status === s).length])) as Record<InventoryStatus, number>, [rows]);
   const filtered = useMemo(() => (filter === "all" ? rows : rows.filter((r) => r.status === filter)), [rows, filter]);
+  // 휴대폰은 카드가 길어 한 번에 10개씩, PC 표는 25개씩
+  const limit = pages * (mobile ? 10 : PAGE);
   const shown = filtered.slice(0, limit);
 
   const slow = useMemo(() => PRODUCTS.map((p) => ({ p, m: markdownReview(p, app), action: app.actions.find((a) => a.type === "markdown" && a.productId === p.id && a.status !== "dismissed") })).filter((x) => x.m.shouldReview).sort((a, b) => b.m.stockValue - a.m.stockValue), [app]);
@@ -64,13 +66,13 @@ function InventoryInner() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="재고·재입고" desc="옵션(색상×사이즈) 단위 수요신호로 어떤 옵션을 언제 확보할지, 무엇을 할인할지 먼저 봅니다." badge={<Badge tone="demo" size="sm">데모</Badge>} right={<Freshness source="DEMO" />} />
+      <PageHeader title="재고·재입고" desc="옵션(색상×사이즈)별로 무엇을 채우고 무엇을 할인할지 봅니다." right={<Freshness source="DEMO" />} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 stagger">
-        <KpiCard size="lg" label="품절위험 옵션" value={<BigLg>{num(inv.lowRisk)}</BigLg>} sub={`품절 임박 ${counts.low} · 품절 ${counts.soldout} · 7일 추정손실 ${krwShort(inv.lostSales7d)}`} icon={<AlertTriangle size={18} />} accent={ICON_ACCENTS.risk} />
-        <KpiCard size="lg" label="관심 상승 옵션" value={<BigLg>{num(inv.rising)}</BigLg>} sub="판매속도 +30% & 찜·재입고 신청 증가" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.customer} />
-        <KpiCard size="lg" label="판매소진율 (30일)" value={<BigLg>{pct(inv.sellThrough, 1)}</BigLg>} sub={<><Term term="판매소진율">판매 ÷ (판매 + 현재고)</Term></>} icon={<Boxes size={18} />} accent={ICON_ACCENTS.overview} />
-        <KpiCard size="lg" label="저회전·과잉 재고원가" value={<BigLg>{showCost ? krwShort(inv.slowValue) : "권한 없음"}</BigLg>} sub={showCost ? `총 재고원가 ${krwShort(inv.totalStockValue)} · 재입고 신청 ${num(inv.restockRequests)}건` : "원가는 대표·MD 권한"} icon={<TrendingDown size={18} />} accent={ICON_ACCENTS.settings} />
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 stagger">
+        <KpiCard label="품절위험 옵션" value={num(inv.lowRisk)} sub={`품절 임박 ${counts.low} · 품절 ${counts.soldout} · 추정손실 ${krwShort(inv.lostSales7d)}`} icon={<AlertTriangle size={18} />} accent={ICON_ACCENTS.risk} />
+        <KpiCard label="관심 상승 옵션" value={num(inv.rising)} sub="판매속도·찜·재입고 신청 증가" icon={<TrendingUp size={18} />} accent={ICON_ACCENTS.customer} />
+        <KpiCard label="판매소진율 (30일)" value={pct(inv.sellThrough, 1)} sub={<><Term term="판매소진율">판매 ÷ (판매 + 현재고)</Term></>} icon={<Boxes size={18} />} accent={ICON_ACCENTS.overview} />
+        <KpiCard label="저회전·과잉 재고" value={showCost ? krwShort(inv.slowValue) : "권한 없음"} sub={showCost ? `재고원가 기준 · 전체 ${krwShort(inv.totalStockValue)}` : "원가는 대표·MD 권한"} icon={<TrendingDown size={18} />} accent={ICON_ACCENTS.settings} />
       </div>
 
       {/* Demand Radar */}
@@ -78,16 +80,16 @@ function InventoryInner() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
           <div>
             <h2 className="text-[1.25rem] md:text-[1.4rem] font-bold tracking-tight inline-flex items-center gap-2"><Radar size={22} className="text-theme-primary" />수요 레이더 <AIReadyBadge kind="demand" /></h2>
-            <p className="mt-1 text-neutral-text2 text-[0.92rem]"><Term term="수요 신호">수요 점수</Term> = 판매속도 변화 30% + 찜 변화 20% + 재고 압박 25% + 재입고 신청 15% + 장바구니 10% · 규칙 기반 (0~100)</p>
+            <p className="mt-1 text-neutral-text2 text-[0.92rem]" title="판매속도 변화 30% + 찜 변화 20% + 재고 압박 25% + 재입고 신청 15% + 장바구니 10%"><Term term="수요 신호">수요 점수</Term>(0~100)는 판매속도·찜·재고·재입고 신청·장바구니를 합쳐 계산합니다.</p>
           </div>
           <p className="text-[0.82rem] text-neutral-text2 tabular">{num(filtered.length)}개 옵션 · 점수 높은 순</p>
         </div>
 
         {/* Status chips */}
-        <div className="flex flex-wrap gap-2">
-          <button onClick={() => { setFilter("all"); setLimit(PAGE); }} className={cn("h-10 md:h-9 px-3 rounded-full text-[0.85rem] font-semibold border transition-colors", filter === "all" ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2")}>전체 <span className="tabular opacity-70">{rows.length}</span></button>
-          {STATUS_ORDER.map((s) => (
-            <button key={s} onClick={() => { setFilter(s); setLimit(PAGE); }} aria-pressed={filter === s} className={cn("h-10 md:h-9 px-3 rounded-full text-[0.85rem] font-semibold border transition-colors inline-flex items-center gap-1.5", filter === s ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2")}>
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar -mx-5 px-5 md:mx-0 md:px-0 md:flex-wrap">
+          <button onClick={() => { setFilter("all"); setPages(1); }} className={cn("shrink-0 whitespace-nowrap h-10 md:h-9 px-3 rounded-full text-[0.85rem] font-semibold border transition-colors", filter === "all" ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2")}>전체 <span className="tabular opacity-70">{rows.length}</span></button>
+          {STATUS_ORDER.filter((s) => counts[s] > 0 || filter === s).map((s) => (
+            <button key={s} onClick={() => { setFilter(s); setPages(1); }} aria-pressed={filter === s} className={cn("shrink-0 whitespace-nowrap h-10 md:h-9 px-3 rounded-full text-[0.85rem] font-semibold border transition-colors inline-flex items-center gap-1.5", filter === s ? "bg-brand-black text-white border-brand-black" : "bg-white border-neutral-border hover:border-neutral-text2")}>
               <span className={cn("h-2 w-2 rounded-full", filter === s ? "bg-white" : INVENTORY_STATUS_TONE[s] === "error" ? "bg-semantic-error" : INVENTORY_STATUS_TONE[s] === "warning" ? "bg-semantic-warning" : INVENTORY_STATUS_TONE[s] === "success" ? "bg-semantic-success" : INVENTORY_STATUS_TONE[s] === "accent" ? "bg-theme-accent" : INVENTORY_STATUS_TONE[s] === "info" ? "bg-theme-secondary" : "bg-neutral-border")} />
               {INVENTORY_STATUS_LABEL[s]} <span className="tabular opacity-70">{counts[s]}</span>
             </button>
@@ -109,7 +111,7 @@ function InventoryInner() {
             </div>
             {/* Mobile cards */}
             <div className="md:hidden space-y-3">{shown.map((r) => <RadarCard key={r.v.id} r={r} onRequest={requestReview} tourable={mobile} />)}</div>
-            {filtered.length > limit && <div className="flex justify-center"><Button variant="outline" onClick={() => setLimit((l) => l + PAGE)}>더 보기 ({num(filtered.length - limit)}개 남음)</Button></div>}
+            {filtered.length > limit && <div className="flex justify-center"><Button variant="outline" onClick={() => setPages((n) => n + 1)}>더 보기 ({num(filtered.length - limit)}개 남음)</Button></div>}
           </>
         )}
         <InfoNote className="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">

@@ -55,7 +55,7 @@ export default function WhyPage() {
       <PageHeader
         tour="why-top"
         title="기획의도 — 기획의도"
-        badge={<Badge tone="demo" size="sm">데모</Badge>}
+       
         desc="고객의 쇼핑 행동이 옵션별 수요 데이터가 되고, 그 데이터가 MD의 재고·할인·재구매 판단을 바꾸며, 처리 결과가 다시 고객 경험으로 돌아오는 구조를 16개 장면으로 설명합니다."
         right={<div className="flex items-center gap-2 flex-wrap"><Hydrated fallback={<span className="inline-block h-5 w-40 skeleton" />}><Freshness source="DEMO" /></Hydrated><Button size="sm" onClick={() => { start(); toast("시연 모드 시작", "하단 컨트롤러로 이동합니다.", "info"); }} icon={<Play size={14} />}>시연 시작</Button></div>}
       />

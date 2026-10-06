@@ -1,13 +1,11 @@
 "use client";
-import Link from "next/link";
-import { Radar, ChevronRight } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { Hydrated } from "@/components/system/Hydrated";
 import { Container, PageTitle } from "@/components/customer/Section";
-import { Badge } from "@/components/ui/Badge";
 import { SkeletonCard } from "@/components/ui/States";
 import { RestockList } from "@/components/customer/conversion/MyBits";
 import { useDocumentTitle } from "@/components/customer/conversion/shared";
+import { LoopHint } from "@/components/customer/LoopHint";
 
 function RestockContent() {
   const store = useApp();
@@ -16,12 +14,11 @@ function RestockContent() {
   const purchased = store.restockSubs.filter((s) => s.status === "purchased").length;
   return (
     <div className="space-y-5">
-      <div className="rounded-cardlg border border-brand-accent/30 bg-brand-accent/5 p-5 flex flex-col sm:flex-row sm:items-center gap-3">
-        <span className="h-11 w-11 rounded-xl bg-white text-brand-accent inline-flex items-center justify-center shrink-0 shadow-card"><Radar size={22} /></span>
-        <div className="flex-1"><p className="font-bold flex flex-wrap items-center gap-2">신청 즉시 AX 운영화면 수요 레이더에 반영됩니다 <Badge tone="accent" size="sm">데이터 순환 1</Badge></p><p className="text-[0.85rem] text-neutral-text2 mt-0.5 leading-relaxed">재입고 알림 신청은 옵션 단위 수요신호가 되어 MD의 재입고 과제 판단에 쓰입니다. 입고가 완료되면 알림이 도착하고 ‘지금 구매’ 버튼이 열립니다.</p></div>
-        {store.role !== "customer" && <Link href="/ax/inventory" className="tap text-[0.82rem] font-bold text-brand-accent hover:underline underline-offset-2 inline-flex items-center gap-0.5 whitespace-nowrap">수요 레이더 보기<ChevronRight size={14} /></Link>}
+      <div className="space-y-1.5">
+        <p className="text-[0.95rem] text-neutral-text2 leading-relaxed">품절된 색상·사이즈가 입고되면 알림으로 알려드리고, 바로 구매할 수 있게 열어드려요.</p>
+        <LoopHint href="/ax/inventory">신청하면 AX 수요 레이더에 옵션별 수요로 바로 반영됩니다</LoopHint>
       </div>
-      <div className="flex flex-wrap gap-2 text-[0.88rem]"><Badge tone="warning">대기중 {waiting}</Badge><Badge tone="success">재입고 알림 도착 {notified}</Badge><Badge tone="neutral">구매 완료 {purchased}</Badge><Badge tone="neutral">전체 {store.restockSubs.length}</Badge></div>
+      <p className="text-[0.9rem] text-neutral-text2 tabular">전체 <b className="text-neutral-text">{store.restockSubs.length}</b> · 대기 <b className="text-neutral-text">{waiting}</b> · 알림 도착 <b className="text-semantic-success">{notified}</b> · 구매 완료 <b className="text-neutral-text">{purchased}</b></p>
       <div data-tour="c-restock-list"><RestockList /></div>
     </div>
   );

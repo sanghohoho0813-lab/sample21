@@ -63,7 +63,7 @@ export function UnitEconomicsPanel({ showMargin, compact }: { showMargin: boolea
   const rows = useMemo(() => unitEconomicsRows(u, showMargin), [u, showMargin]);
   return (
     <div className="space-y-4" data-tour="unit-economics">
-      {!compact && <NoteCard tone="warning" icon={<Calculator size={16} />}><b>단위 경제성은 “측정 설계”까지만.</b> 지금 계산 가능한 항목만 값을 보여주고, CAC·LTV·회수 기간은 실증(실증)에서 마케팅비·코호트 데이터를 연결한 뒤 채웁니다. 값을 추정해 넣지 않습니다.</NoteCard>}
+      {!compact && <NoteCard tone="warning" icon={<Calculator size={16} />}><b>단위 경제성은 “측정 설계”까지만.</b> 지금 계산 가능한 항목만 값을 보여주고, CAC·LTV·회수 기간은 실증에서 마케팅비·코호트 데이터를 연결한 뒤 채웁니다. 값을 추정해 넣지 않습니다.</NoteCard>}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="객단가 (30일)" value={krw(u.aov)} sub={`주문 ${num(u.orders)}건`} />
         {showMargin ? <Stat label="주문당 매출총이익" value={krw(u.cmPerOrder)} sub={`마진율 ${pct(u.marginRate, 1)}`} /> : <Stat label="주문당 매출총이익" value={<span className="inline-flex items-center gap-1 text-neutral-text2 text-[1rem]"><Lock size={14} />대표 권한</span>} sub="MD·운영은 비공개" />}

@@ -12,7 +12,8 @@
     "qa:journey": "node scripts/qa-journey.mjs",
     "qa:a11y": "node scripts/qa-a11y.mjs",
     "qa:layout": "node scripts/qa-layout.mjs",
-    "qa:english": "node scripts/qa-english.mjs"
+    "qa:english": "node scripts/qa-english.mjs",
+    "qa:flows": "node scripts/qa-flows.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",

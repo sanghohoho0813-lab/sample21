@@ -15,13 +15,12 @@ import { fmtDate, relTime } from "@/lib/dates";
 import { krw, num, pct } from "@/lib/format";
 import type { ActionStatus, AXAction } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Overlay";
 import { Input, Textarea } from "@/components/ui/Form";
 import { Term } from "@/components/ui/Misc";
 import { toast } from "@/components/ui/Toast";
 import { AIReadyBadge } from "@/components/ax/AIReady";
-import { ActionStatusBadge, UrgencyBadge, ACTION_STATUS_LABEL } from "@/components/ax/StatusBadges";
+import { ActionStatusBadge, UrgencyLabel, ACTION_STATUS_LABEL } from "@/components/ax/StatusBadges";
 import { ACTION_TYPE_LABEL, ActionEntityChips, ENGINE_LABEL, ERROR_COST_LABEL, StatPill } from "./shared";
 
 type Live = { label: string; value: ReactNode; sub?: ReactNode; tone?: "neutral" | "warning" | "error" | "success" | "accent" }[];
@@ -91,13 +90,13 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
     if (action.type === "markdown" && status === "done") {
       const p = action.productId ? PRODUCT_BY_ID[action.productId] : null;
       const rate = action.discountRate ?? 0.15;
-      return p ? `판매가 ${krw(p.price)} → ${krw(Math.round(p.price * (1 - rate) / 1000) * 1000)} 반영 · 세일 목록 노출 · 증빙(REVENUE) 기록` : "할인가 반영";
+      return p ? `판매가 ${krw(p.price)} → ${krw(Math.round(p.price * (1 - rate) / 1000) * 1000)} 반영 · 세일 목록 노출 · 증빙 기록` : "할인가 반영";
     }
     if (action.type === "fit-guide" && status === "done") return "상품 상세 핏 안내 변경 · 핏 추천 규칙 +1 사이즈 보정 · 증빙 기록";
     if (action.type === "segment-campaign" && (status === "in-progress" || status === "done")) return status === "done" ? "캠페인 cp-06 종료 처리 · 결과는 증빙에서 비교" : "캠페인 cp-06 진행 시작 · 대상 고객 42명에게 추천 알림 발송";
     if (action.type === "cart-reminder" && (status === "in-progress" || status === "done")) return "장바구니 리마인드 알림 발송 · 고객 알림함에 표시";
-    if (status === "hold") return "보류 처리 · 증빙(EXCEPTION) 기록 · 다시 검토 가능";
-    if (status === "dismissed") return "무시 처리 · 사유가 증빙(EXCEPTION)에 기록됨";
+    if (status === "hold") return "보류 처리 · 증빙(예외) 기록 · 다시 검토 가능";
+    if (status === "dismissed") return "무시 처리 · 사유가 증빙(예외)에 기록됨";
     return "상태 변경이 증빙 기록에 기록되었습니다";
   };
 
@@ -122,7 +121,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
       <Link href={`/ax/actions?open=${action.id}`} className={cn("group block rounded-2xl border border-neutral-border bg-white p-4 hover-lift hover:border-theme-primary/35 active:bg-neutral-canvas", className)} data-tour={tour}>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap mb-1"><UrgencyBadge urgency={action.urgency} /><Badge tone="neutral" size="sm">{ACTION_TYPE_LABEL[action.type]}</Badge><ActionStatusBadge status={action.status} size="sm" /></div>
+            <div className="flex items-center gap-2 flex-wrap mb-1.5 text-[0.85rem]"><UrgencyLabel urgency={action.urgency} /><span className="text-neutral-text2 font-semibold">{ACTION_TYPE_LABEL[action.type]}</span><ActionStatusBadge status={action.status} size="sm" /></div>
             <p className="font-bold text-[0.98rem] leading-snug">{action.title}</p>
             <p className="mt-1 text-[0.82rem] text-neutral-text2 leading-snug">{action.trigger}</p>
           </div>
@@ -140,15 +139,13 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
       <div role={onToggle ? "button" : undefined} tabIndex={onToggle ? 0 : undefined} onClick={onToggle} onKeyDown={onToggle ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(); } } : undefined}
         className={cn("w-full text-left px-5 pt-5 pb-4 flex items-start gap-3 min-w-0", onToggle && "cursor-pointer hover:bg-neutral-canvas/60 rounded-t-cardlg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary/30")} aria-expanded={onToggle ? expanded : undefined} data-card-header>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 flex-wrap mb-2">
-            <UrgencyBadge urgency={action.urgency} />
-            <Badge tone="neutral" size="sm">{ACTION_TYPE_LABEL[action.type]}</Badge>
+          <div className="flex items-center gap-2.5 flex-wrap mb-2 text-[0.88rem]">
+            <UrgencyLabel urgency={action.urgency} />
+            <span className="text-neutral-text2 font-semibold">{ACTION_TYPE_LABEL[action.type]}</span>
             <ActionStatusBadge status={action.status} size="sm" />
-            <Badge tone="neutral" size="sm"><Term term={action.automation}>{action.automation}</Term></Badge>
-            {action.engine === "demand" && <Badge tone="ready" size="sm">수요 엔진</Badge>}
           </div>
           <h3 className="font-bold text-[1.1rem] md:text-[1.2rem] leading-snug tracking-tight">{action.title}</h3>
-          <p className="mt-1.5 text-[0.9rem] text-neutral-text2 leading-snug"><span className="font-semibold text-neutral-text">트리거</span> · {action.trigger}</p>
+          <p className="mt-1.5 text-[0.92rem] text-neutral-text2 leading-snug">{action.trigger}</p>
           <div className="mt-2.5"><ActionEntityChips action={action} /></div>
         </div>
         <div className="shrink-0 flex flex-col items-end gap-1 text-[0.8rem] text-neutral-text2">
@@ -163,7 +160,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
           {/* Live data strip */}
           {live && (
             <div>
-              <p className="text-[0.8rem] font-semibold text-neutral-text2 mb-2 inline-flex items-center gap-1.5"><Cpu size={14} />지금 데이터 (기본 데이터 + 고객 행동 반영)</p>
+              <p className="text-[0.85rem] font-semibold text-neutral-text2 mb-2">지금 데이터</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">{live.map((l) => <StatPill key={l.label} label={l.label} value={l.value} sub={l.sub} tone={l.tone} />)}</div>
             </div>
           )}
@@ -177,7 +174,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
               <div className="rounded-xl bg-theme-soft p-4">
                 <p className="font-bold text-[0.92rem] mb-1">예상 영향</p>
                 <p className="text-[0.9rem] leading-snug">{action.expectedImpact}</p>
-                <p className="mt-1.5 text-[0.78rem] text-neutral-text2">데모 추정치 · 실제 개선율은 실증에서 측정 (기준값 필요)</p>
+                <p className="mt-1.5 text-[0.8rem] text-neutral-text2">데모 추정치 · 실제 효과는 실증에서 측정</p>
               </div>
               {action.caution && <div className="rounded-xl bg-[#fff1e6] p-4 text-[0.88rem] leading-snug text-[#b45309] flex gap-2"><AlertTriangle size={16} className="shrink-0 mt-0.5" /><span><span className="font-bold">주의</span> · {action.caution}</span></div>}
             </div>
@@ -229,7 +226,7 @@ export function ActionCard({ action, expanded = true, onToggle, compact, tour, c
       {/* Dismiss modal */}
       <Modal open={dismissOpen} onClose={() => setDismissOpen(false)} title="과제 무시 — 이유를 남겨주세요" size="sm"
         footer={<div className="flex gap-2 justify-end"><Button variant="outline" onClick={() => setDismissOpen(false)}>취소</Button><Button variant="danger" disabled={!reason.trim()} onClick={() => { change("dismissed", reason.trim()); setDismissOpen(false); setReason(""); }}>무시 처리</Button></div>}>
-        <p className="text-[0.9rem] text-neutral-text2 mb-3">이유는 증빙(EXCEPTION)에 기록되어 추천 규칙을 개선하는 데 쓰입니다.</p>
+        <p className="text-[0.9rem] text-neutral-text2 mb-3">이유는 증빙(예외)에 기록되어 추천 규칙을 개선하는 데 쓰입니다.</p>
         <Textarea label="무시 이유" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="예: 브랜드 정책상 할인 불가 / CS 직접 응대로 대체" />
       </Modal>
 

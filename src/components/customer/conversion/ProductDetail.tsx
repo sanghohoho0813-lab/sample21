@@ -12,6 +12,7 @@ import { fmtDate } from "@/lib/dates";
 import { Container, SectionHead } from "@/components/customer/Section";
 import { ProductGrid } from "@/components/customer/ProductCard";
 import { ProductImage } from "@/components/ui/ProductImage";
+import { BottomSheet } from "@/components/ui/Overlay";
 import { Button } from "@/components/ui/Button";
 import { Badge, DemoBadge } from "@/components/ui/Badge";
 import { Price, Progress } from "@/components/ui/Misc";
@@ -20,6 +21,7 @@ import { cn } from "@/lib/cn";
 import { OptionPicker } from "./OptionPicker";
 import { FitSignal } from "./FitSignal";
 import { FIT_LABEL, FIT_DESC, SIZING_LABEL, FREE_SHIP_MIN, etaLabel, findVariant, stockState, demoReviews, type DemoReview } from "./shared";
+import { LoopHint } from "@/components/customer/LoopHint";
 
 const SLOTS = [{ key: "front", label: "정면" }, { key: "detail", label: "디테일" }, { key: "wear", label: "착용컷" }];
 
@@ -165,6 +167,9 @@ export function ProductDetail({ product }: { product: Product }) {
     document.getElementById("options")?.scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   };
+  const [sheet, setSheet] = useState<null | "cart" | "buy">(null);
+  /** 하단 구매 바(모바일) — 옵션이 정해졌으면 바로 실행, 아니면 옵션 시트 */
+  const fromBar = (mode: "cart" | "buy") => { if (!variant) { setSheet(mode); return; } if (mode === "cart") addCart(); else buyNow(); };
   const addCart = () => {
     if (!requireOption() || !variant || !st) return;
     if (!st.purchasable) { toast("품절된 옵션입니다", "재입고 알림을 신청해 주세요", "warning"); return; }
@@ -226,9 +231,9 @@ export function ProductDetail({ product }: { product: Product }) {
                   <span className="font-bold tabular">{price.toLocaleString("ko-KR")}원</span>
                 </div>
               )}
-              {/* 구매 박스가 좁은 태블릿(768)에서는 '바로 주문'이 다음 줄로 내려가 전체 폭을 쓴다 */}
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
+              {/* 휴대폰은 하단 구매 바가 같은 역할 → 여기서는 숨김. 태블릿(768)은 '바로 주문'이 다음 줄로 내려가 전체 폭을 쓴다 */}
+              <div className="mt-4 hidden md:flex flex-wrap gap-2">
+                <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] !px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
                 {soldoutSelected ? <RestockCta tour="c-restock" /> : (
                   <>
                     <Button variant="outline" size="lg" className="flex-1 basis-[7rem] min-w-0 !px-3 sm:!px-6 md:!px-3 xl:!px-6" onClick={addCart} icon={<ShoppingBag size={18} className="hidden sm:block md:hidden lg:block" />}>장바구니</Button>
@@ -245,7 +250,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   </div>
                 </div>
               )}
-              {soldoutSelected && <p className="mt-3 text-[0.82rem] text-neutral-text2 leading-relaxed">품절 옵션의 재입고 알림 신청은 AX 운영화면의 <span className="font-semibold text-neutral-text">수요 레이더</span> 수요신호가 되어 MD의 재입고 판단에 바로 반영됩니다. 입고되면 알림으로 알려드립니다.</p>}
+              {soldoutSelected && <div className="mt-3 space-y-1"><p className="text-[0.85rem] text-neutral-text2">입고되면 알림으로 바로 알려드려요.</p><LoopHint href="/ax/inventory">신청은 AX 수요 레이더에 옵션별 수요로 반영됩니다</LoopHint></div>}
             </div>
 
             <FitSignal product={product} selectedSize={size} onPickSize={pickSize} />
@@ -284,18 +289,28 @@ export function ProductDetail({ product }: { product: Product }) {
         {alsoViewed.length > 0 && <section><SectionHead title="함께 본 상품" desc={`${CATEGORY_NAME[product.categoryId]} 카테고리에서 반응이 좋은 상품`} more={`/shop?category=${product.categoryId}`} /><ProductGrid products={alsoViewed} /></section>}
       </Container>
 
-      {/* Mobile sticky CTA — sits above the 64px bottom nav */}
-      <div className="md:hidden fixed inset-x-0 z-30 bg-white/95 backdrop-blur border-t border-neutral-border px-4 py-2.5 bottom-[calc(64px+env(safe-area-inset-bottom))]">
+      {/* 모바일 하단 구매 바 — 상품 상세에서는 하단 탭 대신 이 바가 화면 맨 아래를 쓴다 (쇼핑앱 표준) */}
+      <div className="md:hidden fixed inset-x-0 bottom-0 z-40 bg-white/95 backdrop-blur border-t border-neutral-border px-4 pt-2.5 safe-bottom" data-buy-bar>
         <div className="flex gap-2">
-          <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
+          <Button variant="outline" size="lg" onClick={wish} aria-pressed={wished} aria-label={wished ? "찜 해제" : "찜하기"} className="w-[52px] !px-0 shrink-0" icon={<Heart size={20} fill={wished ? "currentColor" : "none"} className={wished ? "text-brand-accent" : undefined} />} />
           {soldoutSelected ? <RestockCta /> : (
             <>
-              <Button variant="outline" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={addCart} icon={<ShoppingBag size={18} className="hidden sm:block" />}>장바구니</Button>
-              <Button variant="brand" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={buyNow}>바로 주문</Button>
+              <Button variant="outline" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={() => fromBar("cart")}>장바구니</Button>
+              <Button variant="brand" size="lg" className="flex-1 min-w-0 !px-3 sm:!px-6" onClick={() => fromBar("buy")}>구매하기</Button>
             </>
           )}
         </div>
       </div>
+
+      <BottomSheet open={!!sheet} onClose={() => setSheet(null)} title="옵션 선택"
+        footer={soldoutSelected ? <RestockCta full /> : (
+          <Button variant="brand" size="lg" full disabled={!variant} onClick={() => { const m = sheet; setSheet(null); if (m === "cart") addCart(); else buyNow(); }}>
+            {!variant ? "색상과 사이즈를 선택해주세요" : sheet === "cart" ? `장바구니 담기 · ${price.toLocaleString("ko-KR")}원` : `구매하기 · ${price.toLocaleString("ko-KR")}원`}
+          </Button>
+        )}>
+        <OptionPicker product={product} colorIdx={colorIdx} size={size} onColor={pickColor} onSize={pickSize} compact />
+        {fit.ready && fit.size && <p className="mt-4 text-[0.88rem] text-neutral-text2"><Ruler size={14} className="inline -mt-0.5 mr-1 text-brand-accent" />내 추천 사이즈 <b className="text-brand-accent">{fit.size}</b></p>}
+      </BottomSheet>
     </div>
   );
 }

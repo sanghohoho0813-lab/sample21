@@ -168,6 +168,7 @@ function SearchBox({ className, autoFocus, onDone }: { className?: string; autoF
 
 export function CustomerShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const onPdp = pathname.startsWith("/products/"); // 상품 상세: 하단 탭 대신 구매 바
   const cart = useApp((s) => s.cart);
   const wishlist = useApp((s) => s.wishlist);
   const hydrated = useHydrated();
@@ -213,7 +214,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 pb-[calc(72px+env(safe-area-inset-bottom))] md:pb-0">{children}</main>
+      <main className={cn("flex-1 md:pb-0", onPdp ? "pb-0" : "pb-[calc(72px+env(safe-area-inset-bottom))]")}>{children}</main>
 
       {/* 미래AI랩 브릿지 — 모든 고객 화면 하단 공통 */}
       <div className="mx-auto w-full max-w-[1280px] px-4 mt-12 md:mt-16">
@@ -246,7 +247,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
       </footer>
 
       {/* Mobile bottom navigation: 홈 / 카테고리 / 검색 / 찜 / 마이 */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border safe-bottom" aria-label="하단 메뉴">
+      <nav className={cn("md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-border safe-bottom", onPdp && "hidden")} aria-label="하단 메뉴">
         <ul className="grid grid-cols-5 h-[64px]">
           {([
             { key: "home", label: "홈", icon: Home, href: "/", active: pathname === "/" },

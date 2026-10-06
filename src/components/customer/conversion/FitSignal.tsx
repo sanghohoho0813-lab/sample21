@@ -32,8 +32,8 @@ export function FitProfileForm({ compact, onSaved, submitLabel = "저장하고 �
     e.preventDefault();
     const err: Record<string, string> = {};
     const h = Number(height), w = Number(weight);
-    if (height && (h < 130 || h > 210)) err.height = "키는 130~210cm 사이로 입력해주세요.";
-    if (weight && (w < 30 || w > 150)) err.weight = "몸무게는 30~150kg 사이로 입력해주세요.";
+    if (height && (h < 120 || h > 220)) err.height = "키는 120~220cm 사이로 입력해주세요.";
+    if (weight && (w < 30 || w > 200)) err.weight = "몸무게는 30~200kg 사이로 입력해주세요.";
     if (!height && !weight && !topSize && !bottomSize) err.form = "키·몸무게 또는 평소 사이즈 중 하나는 입력해주세요.";
     setErrors(err);
     if (Object.keys(err).length) return;
@@ -44,10 +44,10 @@ export function FitProfileForm({ compact, onSaved, submitLabel = "저장하고 �
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
       <div className="grid grid-cols-2 gap-3">
-        <Input label="키" name="height" inputMode="numeric" placeholder="예: 165" suffix="cm" value={height} onChange={(e) => setHeight(e.target.value.replace(/[^0-9]/g, ""))} />
-        <Input label="몸무게" name="weight" inputMode="numeric" placeholder="예: 55" suffix="kg" value={weight} onChange={(e) => setWeight(e.target.value.replace(/[^0-9]/g, ""))} />
+        <Input label="키" name="height" inputMode="numeric" placeholder="예: 165" suffix="cm" value={height} onChange={(e) => { setHeight(e.target.value.replace(/[^0-9]/g, "")); setErrors((x) => ({ ...x, height: "", form: "" })); }} />
+        <Input label="몸무게" name="weight" inputMode="numeric" placeholder="예: 55" suffix="kg" value={weight} onChange={(e) => { setWeight(e.target.value.replace(/[^0-9]/g, "")); setErrors((x) => ({ ...x, weight: "", form: "" })); }} />
       </div>
-      {(errors.height || errors.weight) && <p className="text-[0.85rem] text-semantic-error">{errors.height ?? errors.weight}</p>}
+      {(errors.height || errors.weight) && <p className="text-[0.85rem] text-semantic-error">{errors.height || errors.weight}</p>}
       <div className="grid grid-cols-2 gap-3">
         <Select label="평소 상의" name="topSize" value={topSize} onChange={(e) => setTopSize(e.target.value)}><option value="">선택</option>{SIZE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}</Select>
         <Select label="평소 하의" name="bottomSize" value={bottomSize} onChange={(e) => setBottomSize(e.target.value)}><option value="">선택</option>{SIZE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}</Select>
@@ -63,7 +63,7 @@ export function FitProfileForm({ compact, onSaved, submitLabel = "저장하고 �
       )}
       {errors.form && <p className="text-[0.85rem] text-semantic-error">{errors.form}</p>}
       <Button type="submit" variant="brand" full icon={<Ruler size={16} />}>{submitLabel}</Button>
-      <p className="text-[0.78rem] text-neutral-text2 leading-relaxed">입력한 정보는 이 기기의 데모 저장소에만 보관되며 개인화 추천에 사용됩니다. 실제 개인정보는 저장하지 않습니다.</p>
+      <p className="text-[0.8rem] text-neutral-text2 leading-relaxed">입력한 정보는 이 기기에만 저장되고 사이즈 추천에만 쓰여요.</p>
     </form>
   );
 }
@@ -77,6 +77,7 @@ export function FitSignal({ product, selectedSize, onPickSize }: { product: Prod
   const fitNote = effFitNote(product, store);
   const [editing, setEditing] = useState(false);
   const track = store.track;
+  const role = store.role;
   useEffect(() => { if (result.ready) track("view_fit_recommendation", { productId: product.id, size: result.size ?? "", confidence: result.confidence }); }, [product.id, result.ready, result.size, result.confidence, track]);
   const profileSummary = [profile.height && `${profile.height}cm`, profile.weight && `${profile.weight}kg`, profile.topSize && `상의 ${profile.topSize}`, profile.bottomSize && `하의 ${profile.bottomSize}`].filter(Boolean).join(" · ");
   const sizeSelectable = !!result.size && product.sizes.includes(result.size);
@@ -85,16 +86,15 @@ export function FitSignal({ product, selectedSize, onPickSize }: { product: Prod
     <section id="fit-signal" data-tour="c-fit-signal" className="rounded-cardlg border border-neutral-border bg-white shadow-card overflow-hidden scroll-mt-24">
       <div className="px-5 pt-5 pb-3 flex flex-wrap items-center gap-2">
         <span className="h-9 w-9 rounded-xl bg-brand-accent/10 text-brand-accent inline-flex items-center justify-center"><Ruler size={18} /></span>
-        <div className="min-w-0 flex-1">
-          <p className="font-bold text-[1.05rem] leading-tight">핏 추천 미리보기 <span className="text-neutral-text2 font-semibold text-[0.85rem]">· 규칙 기반</span></p>
-          <p className="text-[0.82rem] text-neutral-text2">키·몸무게·평소 사이즈·상품 실측·반품 데이터로 계산</p>
+        <div className="min-w-[10rem] flex-1 break-keep">
+          <p className="font-bold text-[1.05rem] leading-tight">내 사이즈 추천</p>
+          <p className="text-[0.85rem] text-neutral-text2">{result.ready ? "내 정보 · 상품 실측 · 실제 반품 데이터로 계산했어요" : "키·몸무게 또는 평소 사이즈만 입력하면 30초면 돼요"}</p>
         </div>
-        <AIReadyBadge kind="fit" />
+        {role !== "customer" && <AIReadyBadge kind="fit" />}
       </div>
 
       {!result.ready ? (
         <div className="px-5 pb-5">
-          <div className="rounded-xl bg-brand-ivory px-4 py-3 mb-4 text-[0.9rem] leading-relaxed"><span className="font-bold">30초면 충분해요.</span> 키·몸무게 또는 평소 사이즈만 입력하면 이 상품의 추천 사이즈와 이유를 바로 보여드립니다.</div>
           <FitProfileForm compact />
         </div>
       ) : (

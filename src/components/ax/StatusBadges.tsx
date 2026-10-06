@@ -12,6 +12,12 @@ export function UrgencyBadge({ urgency, size = "sm" }: { urgency: Urgency; size?
   return <Badge tone={urgencyTone[urgency]} size={size}>{urgency === "high" && <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current animate-breathe" />}{URGENCY_LABEL[urgency]}</Badge>;
 }
 
+/** 배지 대신 점 + 글자 — 카드 머리에 배지가 겹겹이 쌓이지 않게 긴급도는 글자로만 표시 */
+export function UrgencyLabel({ urgency }: { urgency: Urgency }) {
+  const color = urgency === "high" ? "text-semantic-error" : urgency === "mid" ? "text-semantic-warning" : "text-neutral-text2";
+  return <span className={`inline-flex items-center gap-1.5 font-bold ${color}`}><span aria-hidden className={`h-2 w-2 rounded-full bg-current ${urgency === "high" ? "animate-breathe" : ""}`} />{URGENCY_LABEL[urgency]}</span>;
+}
+
 export function InventoryStatusBadge({ status, size = "sm" }: { status: InventoryStatus; size?: "sm" | "md" }) { return <Badge tone={INVENTORY_STATUS_TONE[status]} size={size}>{INVENTORY_STATUS_LABEL[status]}</Badge>; }
 
 const orderTone: Record<OrderStatus, Tone> = { pending: "demo", preparing: "info", shipped: "accent", "in-transit": "warning", delivered: "success", cancelled: "neutral", "return-requested": "error", "exchange-requested": "error" };

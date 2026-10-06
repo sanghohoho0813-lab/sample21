@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { FileCheck2, ListTree, GitBranch, Download, ChevronRight, Package, Zap, CheckCircle2, Circle, Clock, UserRound, Lightbulb, ThumbsUp, Play, Flag, MessageSquare, Search, Lock } from "lucide-react";
+import { ListTree, GitBranch, Download, ChevronRight, Package, Zap, CheckCircle2, Circle, UserRound, Lightbulb, ThumbsUp, Play, Flag, MessageSquare, Search, Lock } from "lucide-react";
 import { PageHeader } from "@/components/ax/AxShell";
 import { Hydrated } from "@/components/system/Hydrated";
 import { useApp, type AppState } from "@/lib/store";
@@ -10,21 +10,20 @@ import { PRODUCT_BY_ID } from "@/lib/demo/seed";
 import type { AXAction, DataSource, EvidenceLog, EvidenceType } from "@/lib/types";
 import { num, pct, safeDiv } from "@/lib/format";
 import { fmtDate, relTime } from "@/lib/dates";
-import { ICON_ACCENTS } from "@/lib/theme";
+
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Chip, Segmented, Select } from "@/components/ui/Form";
-import { KpiCard } from "@/components/ui/Kpi";
+import { KpiTile } from "@/components/ui/Kpi";
 import { Term } from "@/components/ui/Misc";
 import { Modal } from "@/components/ui/Overlay";
 import { EmptyState } from "@/components/ui/States";
 import { ActionStatusBadge } from "@/components/ax/StatusBadges";
-import { EVIDENCE_TYPE_LABEL, EVIDENCE_TYPES, EvidenceTypeBadge, FilterBar, LiveFreshness, MoreButton, NoteCard, PageSkeleton, SectionBlock, SourceBadge, useMore } from "./shared";
+import { EVIDENCE_TYPE_LABEL, EVIDENCE_TYPES, EvidenceTypeBadge, FilterBar, LiveFreshness, MoreButton, NoteCard, PageSkeleton, SectionBlock, SOURCE_LABEL, useMore } from "./shared";
 import { cn } from "@/lib/cn";
 
 const STATUS_LABEL: Record<EvidenceLog["status"], string> = { demo: "데모", "pilot-ready": "실증 준비", live: "실제 데이터" };
-const STATUS_TONE = { demo: "demo", "pilot-ready": "ready", live: "live" } as const;
 
 const PACK_PHASES: { weeks: string; title: string; items: string[] }[] = [
   { weeks: "1~2주", title: "기준값 측정", items: ["구매전환율·찜→구매·재입고알림→구매 측정 지점 고정", "반품률·사이즈 반품률·재고일수 현재값 기록", "MD 주간 분석시간·수기 보고서 수 측정"] },
@@ -36,8 +35,7 @@ const PACK_PHASES: { weeks: string; title: string; items: string[] }[] = [
 export function EvidencePage() {
   return (
     <>
-      <PageHeader title="성과 증빙" desc={<span><Term term="증빙">증빙</Term>는 추천 → 승인 → 실행 → 결과 → 고객 반영을 시간 순서로 남긴 기록입니다. 나중에 “정말 효과가 있었나”를 증명하는 재료가 됩니다 (순환 5 · 실증).</span>}
-        badge={<Badge tone="demo">데모</Badge>} right={<LiveFreshness />} />
+      <PageHeader title="성과 증빙" desc={<span><Term term="증빙">증빙</Term>은 추천 → 승인 → 실행 → 결과를 시간 순서로 남긴 기록입니다.</span>} right={<LiveFreshness />} />
       <Hydrated fallback={<PageSkeleton kpis={4} />}><EvidenceBody /></Hydrated>
     </>
   );
@@ -88,24 +86,19 @@ function EvidenceBody() {
 
   return (
     <div className="animate-fadeIn">
-      <NoteCard tone="warning" icon={<Flag size={16} />}><b>기준값: 미측정 · 실증 필요</b> — 아래 모든 숫자는 데모 또는 시뮬레이션입니다. 실제 개선율은 실증(실증) 단계에서 기준값을 측정한 뒤에만 말할 수 있습니다. 이 화면은 “무엇을 어떻게 기록할지”를 보여줍니다.</NoteCard>
+      <NoteCard tone="warning" icon={<Flag size={16} />}><b>기준값: 미측정 · 실증 필요</b> — 이 화면의 숫자는 모두 데모·시뮬레이션입니다. 실제 개선율은 실증에서 기준값을 잰 뒤에 말할 수 있습니다.</NoteCard>
 
-      <div className="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard label="증빙 총 건수" value={num(evidence.length)} icon={<FileCheck2 size={18} />} accent={ICON_ACCENTS.evidence} sub="시드 8건 + 시연 중 생성" />
-        <KpiCard label="최근 7일" value={num(week)} icon={<Clock size={18} />} accent={ICON_ACCENTS.overview} sub="고객 행동·과제 기록" />
-        <KpiCard label="과제 연결 비율" value={pct(safeDiv(linked, Math.max(1, evidence.length)), 0)} icon={<Zap size={18} />} accent={ICON_ACCENTS.ai} sub={`${linked}건이 과제와 연결`} />
-        <KpiCard label="결과 기록" value={num(results)} icon={<CheckCircle2 size={18} />} accent={ICON_ACCENTS.sales} sub="실행 결과가 남은 건수" />
+      <div className="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <KpiTile label="증빙 총 건수" value={`${num(evidence.length)}건`} sub="시드 8건 + 시연 중 생성" />
+        <KpiTile label="최근 7일" value={`${num(week)}건`} sub="고객 행동·과제 기록" />
+        <KpiTile label="과제 연결" value={pct(safeDiv(linked, Math.max(1, evidence.length)), 0)} sub={`${linked}건이 과제와 연결`} />
+        <KpiTile label="결과 기록" value={`${num(results)}건`} sub="실행 결과가 남은 건수" />
       </div>
 
-      <Card className="mt-6" pad="md">
-        <p className="font-bold mb-2">증빙 한 줄이 만들어지는 순서</p>
-        <ol className="flex flex-wrap items-center gap-2 text-[0.88rem]">
-          {[["CUSTOMER", "고객 행동"], ["RISK", "인사이트·추천"], ["ACTION", "승인·실행"], ["RESULT", "결과"], ["CUSTOMER", "고객 반영"]].map(([t, l], i) => (
-            <li key={`${t}-${i}`} className="inline-flex items-center gap-2"><span className="inline-flex items-center gap-1.5 rounded-full bg-neutral-canvas px-3 h-9 font-semibold"><span className="text-[0.78rem] text-neutral-text2">{i + 1}</span>{l}</span>{i < 4 && <ChevronRight size={14} className="text-neutral-text2" />}</li>
-          ))}
-        </ol>
-        <p className="mt-2 text-[0.85rem] text-neutral-text2">10가지 유형: {EVIDENCE_TYPES.map((t) => EVIDENCE_TYPE_LABEL[t]).join(" · ")}</p>
-      </Card>
+      <p className="mt-5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.88rem] text-neutral-text2">
+        <span className="font-semibold text-neutral-text mr-1">기록 순서</span>
+        {["고객 행동", "인사이트·추천", "승인·실행", "결과", "고객 반영"].map((l, i) => <span key={l} className="inline-flex items-center gap-1.5"><span className="text-neutral-text">{l}</span>{i < 4 && <ChevronRight size={13} />}</span>)}
+      </p>
 
       <SectionBlock title="기록" desc={`${num(filtered.length)}건 · 최신순`} right={<Segmented value={view} onChange={setView} options={[{ value: "list", label: <span className="inline-flex items-center gap-1.5"><ListTree size={15} />목록</span> }, { value: "loop", label: <span className="inline-flex items-center gap-1.5"><GitBranch size={15} />순환 보기</span> }]} />}>
         <FilterBar activeCount={active} className="mb-4" right={active > 0 ? <Button variant="ghost" size="sm" onClick={resetFilters}>초기화</Button> : undefined}>
@@ -173,7 +166,7 @@ function EvidenceItem({ e, action }: { e: EvidenceLog; action?: AXAction }) {
     <li className="pl-5 md:pl-6 relative">
       <span className={cn("absolute -left-[7px] top-2 h-3 w-3 rounded-full border-2 border-white", e.type === "RESULT" || e.type === "REVENUE" ? "bg-semantic-success" : e.type === "RISK" ? "bg-semantic-error" : e.type === "CUSTOMER" ? "bg-theme-primary" : "bg-neutral-text2")} />
       <div className="rounded-cardlg border border-neutral-border bg-white p-4 hover:border-neutral-text2/40 transition-colors">
-        <div className="flex items-center gap-2 flex-wrap"><EvidenceTypeBadge type={e.type} /><SourceBadge source={e.source} /><Badge tone={STATUS_TONE[e.status]} size="sm">{STATUS_LABEL[e.status]}</Badge><span className="text-[0.8rem] text-neutral-text2 tabular ml-auto" title={fmtDate(e.at, "datetime")}>{relTime(e.at)}</span></div>
+        <div className="flex items-center gap-2 flex-wrap"><EvidenceTypeBadge type={e.type} /><span className="text-[0.8rem] text-neutral-text2 ml-auto tabular" title={fmtDate(e.at, "datetime")}>{SOURCE_LABEL[e.source]}{e.status !== "demo" ? ` · ${STATUS_LABEL[e.status]}` : ""} · {relTime(e.at)}</span></div>
         <p className="mt-2 font-bold text-[1rem] leading-snug">{e.title}</p>
         <p className="mt-1 text-[0.9rem] text-neutral-text2 leading-relaxed">{e.detail}</p>
         {e.kpiDelta && <span className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-neutral-canvas px-2.5 py-1 text-[0.82rem] font-semibold tabular"><Flag size={12} />{e.kpiDelta}</span>}

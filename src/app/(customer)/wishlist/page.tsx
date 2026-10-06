@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Heart, ShoppingBag, Bell, Trash2, ChevronRight } from "lucide-react";
+import { Heart, ShoppingBag, Bell, Trash2 } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { BRAND_BY_ID, PRODUCTS, PRODUCT_BY_ID } from "@/lib/demo/seed";
 import { useApp, type WishItem } from "@/lib/store";
@@ -18,6 +18,7 @@ import { EmptyState, SkeletonCard } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { OptionSheet } from "@/components/customer/conversion/OptionSheet";
 import { parseVariant, productStockState, stockState, useDocumentTitle } from "@/components/customer/conversion/shared";
+import { LoopHint } from "@/components/customer/LoopHint";
 
 function priceNote(p: Product, current: number, overridden: boolean) {
   if (current < p.price) { const rate = Math.round(((p.price - current) / p.price) * 100); return { text: overridden ? `찜한 뒤 가격 인하 · ${rate}% 할인 중` : `${rate}% 할인 중`, tone: "error" as const }; }
@@ -95,7 +96,7 @@ function WishlistContent() {
       ) : (
         <ul className="space-y-3">{items.map((w) => <WishRow key={w.productId} item={w} onPick={(product, colorIdx, size) => setSheet({ product, colorIdx, size })} />)}</ul>
       )}
-      <div className="mt-6 rounded-cardlg bg-brand-ivory px-5 py-4 text-[0.88rem] flex flex-wrap items-center justify-between gap-2"><span>찜 데이터는 AX 운영화면의 <span className="font-semibold">수요 레이더</span> 관심 신호로 집계됩니다.</span><Link href="/my/restock" className="tap inline-flex items-center gap-0.5 font-semibold hover:underline underline-offset-2">내 재입고 알림<ChevronRight size={14} /></Link></div>
+      <LoopHint href="/ax/inventory" className="mt-6">찜은 AX 수요 레이더의 관심 신호로 집계됩니다</LoopHint>
       {similar.length > 0 && <section className="mt-12"><SectionHead title="비슷한 상품 추천" desc={items.length ? "찜한 상품의 카테고리·브랜드를 기준으로 골랐습니다." : "지금 반응이 좋은 상품"} more="/ranking" /><ProductGrid products={similar} /></section>}
       <OptionSheet product={sheet?.product ?? null} open={!!sheet} onClose={() => setSheet(null)} initialColorIdx={sheet?.colorIdx ?? 0} initialSize={sheet?.size ?? null} />
     </>

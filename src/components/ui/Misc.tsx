@@ -60,11 +60,13 @@ export function Progress({ value, className, tone = "primary" }: { value: number
 export function Freshness({ source = "DEMO", at, className }: { source?: "DEMO" | "LIVE" | "SIMULATION"; at?: string; className?: string }) {
   // Hydration-safe: the timestamp is only rendered after mount (server renders a neutral placeholder).
   const [time, setTime] = useState<string | null>(null);
-  useEffect(() => { const d = at ? new Date(at) : new Date(); setTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`); }, [at]);
+  useEffect(() => { const d = at ? new Date(at) : new Date(); setTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); }, [at]);
+  const label = source === "DEMO" ? "데모 데이터" : source === "SIMULATION" ? "시뮬레이션" : "실제 데이터";
   return (
-    <span className={cn("inline-flex items-center gap-2 text-[0.8rem] text-neutral-text2", className)}>
-      <span className={cn("rounded-md px-1.5 py-0.5 font-bold text-[0.78rem]", source === "LIVE" ? "bg-[#e6f6ec] text-[#15803d]" : "bg-[#fff7d6] text-[#8a6d00]")}>{source === "DEMO" ? "데모 데이터" : source === "SIMULATION" ? "시뮬레이션" : "실제 데이터"}</span>
-      <span className="tabular">마지막 업데이트 {time ?? "--:--:--"}</span>
+    <span className={cn("inline-flex items-center gap-1.5 text-[0.82rem] text-neutral-text2 whitespace-nowrap", className)} title={`${label} · 마지막 업데이트 ${time ?? ""}`}>
+      <span aria-hidden className={cn("h-2 w-2 rounded-full", source === "LIVE" ? "bg-semantic-success" : "bg-[#e0b400]")} />
+      <span className="font-semibold">{label}</span>
+      <span className="tabular">· {time ?? "--:--"} 기준</span>
     </span>
   );
 }

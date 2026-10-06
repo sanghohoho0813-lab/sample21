@@ -1,18 +1,18 @@
 "use client";
-import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CheckCircle2, ExternalLink, PackageSearch, ArrowRight } from "lucide-react";
+import { CheckCircle2, PackageSearch, ArrowRight } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { fmtDate } from "@/lib/dates";
 import { krw } from "@/lib/format";
 import { Hydrated } from "@/components/system/Hydrated";
 import { Container } from "@/components/customer/Section";
 import { Button } from "@/components/ui/Button";
-import { Badge, DemoBadge } from "@/components/ui/Badge";
+import { DemoBadge } from "@/components/ui/Badge";
 import { EmptyState, SkeletonCard } from "@/components/ui/States";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { OrderItemRow } from "@/components/customer/conversion/OrderBits";
 import { useDocumentTitle } from "@/components/customer/conversion/shared";
+import { LoopHint } from "@/components/customer/LoopHint";
 
 function CompleteContent({ orderId }: { orderId: string }) {
   const store = useApp();
@@ -43,9 +43,9 @@ function CompleteContent({ orderId }: { orderId: string }) {
         </dl>
       </div>
 
-      <div className="rounded-cardlg border border-brand-accent/30 bg-brand-accent/5 p-5 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex-1"><p className="font-bold flex items-center gap-2"><Badge tone="accent" size="sm">데이터 순환 2</Badge>이 주문은 AX 운영화면 주문·매출·재고에 즉시 반영되었습니다</p><p className="text-[0.85rem] text-neutral-text2 mt-1">운영팀이 상품준비 → 출고 → 배송 상태로 바꾸면 마이페이지 주문상태와 알림에 그대로 나타납니다.</p></div>
-        {store.role !== "customer" && <Link href="/ax/orders" className="inline-flex items-center gap-1 text-[0.85rem] font-bold text-brand-accent hover:underline underline-offset-2 whitespace-nowrap"><ExternalLink size={14} />AX 운영화면 보기</Link>}
+      <div className="space-y-1.5">
+        <p className="text-[0.92rem] text-neutral-text2 leading-relaxed">상품이 준비·출고되면 주문내역과 알림에서 바로 확인할 수 있어요.</p>
+        <LoopHint href="/ax/orders">이 주문은 AX 주문·매출·재고에 즉시 반영되었습니다</LoopHint>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">

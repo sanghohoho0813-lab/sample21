@@ -3,12 +3,12 @@
 PROJECT FINAL OBJECTIVE: 고객의 패션 쇼핑 행동이 옵션별 수요 데이터가 되고, 그 데이터가 MD의 재고·할인·재구매 Action을 바꾸며, 처리결과가 다시 고객 경험으로 돌아오는 실제 작동형 패션 AX+플랫폼 (DEMO).
 
 ```text
-현재 상태            : Demo Ready — 5차 UI/UX 안정화 완료 (메뉴 1차 33→15 · 한글 UI · 레이아웃 결함 0 · 태블릿 폭 안정화)
+현재 상태            : Demo Ready — 6차 UI/UX 고도화 완료 (지표 위계 · 데모 표시 정리 · 모바일 구매 바 · 입력 검증 · 흐름 테스트 20)
 FRONT_REFERENCE      : PENDING — Drive 「샘플 21. 의류」 2026-09-15 재확인, 여전히 비어 있음. 사진 추후 적용 (등록 경로 준비됨)
 DELIVERY STAGE       : DEMO
 현재 구현률          : 약 88% — MORFIT 최종 MVP 목표 대비 (남은 것: 사진 자산 · 실측 Baseline · LLM 키)
 빌드                 : next build 성공 · 36 Route(정적 32 + 동적 3 + API 1) · typecheck 0 error · ESLint 0
-수용 테스트          : Whole-Hybrid Journey 25/25 PASS (프로덕션 빌드) · 8폭 × 33 Route 404 0 · overflow 0 · 접근 이름 누락 0 · 레이아웃 결함 0 (일반·햄버거·긴 데이터 × 8폭 × 34 Route)
+수용 테스트          : Whole-Hybrid Journey 25/25 PASS · 사용 흐름·예외 20/20 PASS (qa:flows) (프로덕션 빌드) · 8폭 × 33 Route 404 0 · overflow 0 · 접근 이름 누락 0 · 레이아웃 결함 0 (일반·햄버거·긴 데이터 × 8폭 × 34 Route)
 ```
 
 ## STRATEGIC GATES
@@ -87,6 +87,7 @@ Demand&Restock(RULE+STAT, L3) · Fit(RULE, L2) · Markdown(RULE+OPT, L3) · Repe
 4. Pilot 1~2주차 Baseline 측정 → Evidence Pack의 UNKNOWN/VALIDATE LATER 칸 채우기
 
 ## 최근 주요 변경
+- 6차: UI/UX 고도화 — 지표 위계(주요 4 + 보조 칸, D-33) · '데모' 표시 한 곳 + 고객 화면 운영 설명 분리(LoopHint, D-34) · 휴대폰 상품 상세 구매 바·옵션 시트(D-35) · 입력 검증(핏 프로필 범위·주문서 즉시 해제·CSV 필수 열, D-36) · 찜 버튼 아이콘·탭 겹침·카드 캡션 겹침 수정(D-37)
 - 5차: UI/UX 안정화 — 메뉴 1차 노출 33 → 15(AX 14→8 · 고객 19→7, 기능 삭제 0, D-27) · 한글 UI(D-28) · 타이포 하한·줄바꿈 규칙·AutoFit(D-29) · 레이아웃 결함 268 → 0(D-30) · ESLint 0(D-31) · AX 사이드바 1280px부터(D-32)
 - 4차: 미래AI랩 브릿지 CTA(상담·다른 샘플·홈페이지) 양쪽 셸에 공통 배치(D-25) · 장식 반복 모션의 reduced-motion 점멸 위험 제거(D-26)
 - 3차: 사이드바 4그룹 재편(D-21) · 아이콘 '같은 색 10단계 톤'으로 통일하고 테마 연동(D-22) · 모션/호버 프리미티브 도입(D-23)
