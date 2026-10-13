@@ -8,6 +8,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type {
+  ActionChange,
   ActionStatus,
   AXAction,
   CartItem,
@@ -29,10 +30,21 @@ import { DEFAULT_THEME } from "./theme";
 import { orderAmounts } from "./pricing";
 import { withPayment } from "./orderMemo";
 import { repairCouponOrder } from "./migrations";
+import { candidateKey, type Candidate } from "./intel/candidates";
+import { approvalOf, approvalPolicy, assigneeOf, dueOf, needsApproval } from "./intel/policy";
+import { snapshot } from "./intel/measure";
+
+export interface ActionParamPatch {
+  quantity?: number;
+  discountRate?: number;
+  assigneeName?: string;
+  dueAt?: string;
+}
 import {
   SEED_ACTIONS,
   SEED_EVIDENCE,
   SEED_ORDERS,
+  BRAND_BY_ID,
   PRODUCT_BY_ID,
   VARIANT_BY_ID,
   DEMO_CUSTOMER_ID,
@@ -118,7 +130,14 @@ export interface AppState {
   campaignStatusOverride: Record<string, "scheduled" | "running" | "ended">;
   // ----- AX
   actions: AXAction[];
-  updateActionStatus: (id: string, status: ActionStatus, actor: string, note?: string) => void;
+  /** 상태 변경 — 승인이 필요한 과제는 승인 전에 '실행중'으로 갈 수 없다(false 반환) */
+  updateActionStatus: (id: string, status: ActionStatus, actor: string, note?: string) => boolean;
+  /** 신호 엔진 후보를 실행 센터 과제로 등록 */
+  createActionFromCandidate: (c: Candidate, actor: string) => string;
+  /** 수량·할인율·담당자·기한 변경 — 변경 이력과 증빙을 남긴다 */
+  updateActionParams: (id: string, patch: ActionParamPatch, actor: string, note?: string) => void;
+  /** 정책상 필요한 승인 */
+  approveAction: (id: string, actor: string) => void;
   evidence: EvidenceLog[];
   addEvidence: (e: Omit<EvidenceLog, "id" | "at"> & { at?: string }) => void;
   updateOrderStatus: (orderId: string, status: OrderStatus, actor: string) => void;
@@ -168,9 +187,43 @@ const initialCustomer = () => ({
   variantRestockState: {},
   orderStatusOverride: {},
   campaignStatusOverride: {},
-  actions: structuredClone(SEED_ACTIONS),
+  actions: withSeedBaselines(structuredClone(SEED_ACTIONS)),
   evidence: structuredClone(SEED_EVIDENCE),
 });
+
+/** 시연 시작 시 이미 검토·실행 중인 시나리오 과제는 그 시점(데모 시작) 지표를 '전'으로 둔다.
+ *  데모 이전에 끝난 과제는 전/후를 만들지 않는다(꾸민 성과 방지). */
+function withSeedBaselines(actions: AXAction[]): AXAction[] {
+  const empty = {
+    viewDelta: {},
+    wishlistDelta: {},
+    cartDelta: {},
+    restockDelta: {},
+    inventoryDelta: {},
+    returnDelta: {},
+    salePriceOverride: {},
+    fitNoteOverride: {},
+    variantRestockState: {},
+    orderStatusOverride: {},
+    orders: [],
+    returns: [],
+    restockSubs: [],
+    fitProfile: { height: null, weight: null, topSize: null, bottomSize: null, preferredFit: null, bodyType: null },
+    notifications: [],
+    campaignStatusOverride: {},
+  } as unknown as Parameters<typeof snapshot>[1];
+  return actions.map((a) =>
+    (a.status === "confirmed" || a.status === "in-progress") && !a.baseline
+      ? {
+          ...a,
+          baseline: {
+            at: a.statusHistory.find((h) => h.status === "confirmed")?.at ?? a.recommendedAt,
+            metrics: snapshot(a, empty),
+          },
+        }
+      : a,
+  );
+}
 
 const noopStorage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined };
 
@@ -446,14 +499,23 @@ export const useApp = create<AppState>()(
 
       updateActionStatus: (id, status, actor, note) => {
         const action = get().actions.find((a) => a.id === id);
-        if (!action) return;
+        if (!action) return false;
+        // 승인 게이트 — 돈이 크게 움직이는 과제는 승인 전에 실행을 시작하거나 완료할 수 없다
+        if ((status === "in-progress" || status === "done") && needsApproval(action)) return false;
         const at = nowIso();
+        // 성과 비교의 '전' — 검토 확정(또는 바로 실행) 시점의 지표를 한 번만 기록한다
+        const baseline =
+          action.baseline ??
+          (status === "confirmed" || status === "in-progress" || status === "done"
+            ? { at, metrics: snapshot(action, get()) }
+            : undefined);
         set((s) => ({
           actions: s.actions.map((a) =>
             a.id === id
               ? {
                   ...a,
                   status,
+                  baseline,
                   statusHistory: [...a.statusHistory, { status, at, actor, note }],
                   resultNote: status === "done" ? (note ?? a.resultNote ?? "실행 완료 (데모)") : a.resultNote,
                 }
@@ -587,6 +649,169 @@ export const useApp = create<AppState>()(
             href: "/cart",
           });
         }
+        // 성과 비교의 '후' — 실행 결과(재고 반영·알림·가격)가 반영된 뒤의 지표
+        if (status === "done") {
+          const done = get().actions.find((a) => a.id === id);
+          if (done) {
+            const result = { at: nowIso(), metrics: snapshot(done, get()) };
+            set((s) => ({ actions: s.actions.map((a) => (a.id === id ? { ...a, result } : a)) }));
+          }
+        }
+        return true;
+      },
+
+      createActionFromCandidate: (c, actor) => {
+        const existing = get().actions.find(
+          (a) => a.status !== "dismissed" && a.status !== "done" && candidateKey(a) === c.key,
+        );
+        if (existing) return existing.id;
+        const at = nowIso();
+        const id = `act-e-${(get().actions.filter((a) => a.origin === "engine").length + 1).toString().padStart(3, "0")}-${Date.now().toString(36).slice(-4)}`;
+        const p = c.productId ? PRODUCT_BY_ID[c.productId] : undefined;
+        const manager = p ? BRAND_BY_ID[p.brandId]?.manager : undefined;
+        const engineLabel: Record<AXAction["engine"], string> = {
+          demand: "수요 엔진",
+          fit: "핏·반품 엔진",
+          markdown: "할인 판단 엔진",
+          repeat: "재구매 엔진",
+        };
+        const action: AXAction = {
+          id,
+          type: c.type,
+          engine: c.engine,
+          automation: "L3",
+          errorCost: c.type === "markdown" ? "HIGH" : c.type === "fit-guide" ? "LOW" : "MID",
+          title: c.title,
+          productId: c.productId,
+          variantId: c.variantId,
+          brandId: p?.brandId,
+          trigger: c.why,
+          reasons: c.reasons,
+          expectedImpact: c.impactLabel,
+          urgency: c.urgency,
+          owner: "md",
+          ownerName: manager ?? ROLE_NAME.md,
+          recommendedAt: at,
+          status: "recommended",
+          statusHistory: [
+            { status: "recommended", at, actor: engineLabel[c.engine], note: "신호 엔진 후보" },
+            { status: "recommended", at, actor, note: "운영자가 과제로 등록" },
+          ],
+          quantity: c.quantity,
+          discountRate: c.discountRate,
+          origin: "engine",
+          pattern: c.pattern,
+        };
+        set((s) => ({ actions: [action, ...s.actions] }));
+        get().addEvidence({
+          type: "ACTION",
+          title: `신호 → 과제 등록: ${c.title}`,
+          detail: `${engineLabel[c.engine]}가 찾은 후보를 ${actor}이(가) 실행 센터에 등록했습니다. 근거: ${c.why}`,
+          actor,
+          actionId: id,
+          productId: c.productId,
+          kpiDelta: c.impactLabel,
+          source: "DEMO",
+          status: "demo",
+        });
+        return id;
+      },
+
+      updateActionParams: (id, patch, actor, note) => {
+        const action = get().actions.find((a) => a.id === id);
+        if (!action || action.status === "done" || action.status === "dismissed") return;
+        const at = nowIso();
+        const changes: ActionChange[] = [];
+        const pct = (n?: number) => (n === undefined ? "-" : `${Math.round(n * 100)}%`);
+        if (patch.quantity !== undefined && patch.quantity !== action.quantity)
+          changes.push({
+            at,
+            actor,
+            field: "quantity",
+            from: `${action.quantity ?? 0}개`,
+            to: `${patch.quantity}개`,
+            note,
+          });
+        if (patch.discountRate !== undefined && patch.discountRate !== action.discountRate)
+          changes.push({
+            at,
+            actor,
+            field: "discountRate",
+            from: pct(action.discountRate),
+            to: pct(patch.discountRate),
+            note,
+          });
+        if (patch.assigneeName !== undefined && patch.assigneeName !== assigneeOf(action))
+          changes.push({ at, actor, field: "assignee", from: assigneeOf(action), to: patch.assigneeName, note });
+        if (patch.dueAt !== undefined && patch.dueAt !== dueOf(action).toISOString())
+          changes.push({
+            at,
+            actor,
+            field: "dueAt",
+            from: dueOf(action).toISOString().slice(0, 10),
+            to: patch.dueAt.slice(0, 10),
+            note,
+          });
+        if (!changes.length) return;
+        const next: AXAction = {
+          ...action,
+          quantity: patch.quantity ?? action.quantity,
+          discountRate: patch.discountRate ?? action.discountRate,
+          assigneeName: patch.assigneeName ?? action.assigneeName,
+          dueAt: patch.dueAt ?? action.dueAt,
+          changes: [...(action.changes ?? []), ...changes],
+        };
+        // 승인 뒤 수량·할인율이 바뀌어 정책 근거가 달라지면 승인은 무효 — 다시 받아야 한다
+        const wasApproved = !!approvalOf(action).approvedBy;
+        const reapprove = wasApproved && !approvalOf(next).approvedBy && approvalOf(next).required;
+        set((s) => ({ actions: s.actions.map((a) => (a.id === id ? next : a)) }));
+        const fieldLabel: Record<ActionChange["field"], string> = {
+          quantity: "수량",
+          discountRate: "할인율",
+          assignee: "담당자",
+          dueAt: "기한",
+        };
+        get().addEvidence({
+          type: "ACTION",
+          title: `${action.title} — ${changes.map((c) => fieldLabel[c.field]).join("·")} 변경`,
+          detail:
+            changes.map((c) => `${fieldLabel[c.field]} ${c.from} → ${c.to}`).join(" · ") +
+            (note ? ` (사유: ${note})` : "") +
+            (reapprove ? " · 정책 근거가 바뀌어 승인을 다시 받아야 합니다." : ""),
+          actor,
+          actionId: id,
+          productId: action.productId,
+          source: "DEMO",
+          status: "demo",
+        });
+      },
+
+      approveAction: (id, actor) => {
+        const action = get().actions.find((a) => a.id === id);
+        if (!action) return;
+        const at = nowIso();
+        const policy = approvalPolicy(action);
+        set((s) => ({
+          actions: s.actions.map((a) =>
+            a.id === id
+              ? {
+                  ...a,
+                  approval: { ...policy, approvedBy: actor, approvedAt: at },
+                  statusHistory: [...a.statusHistory, { status: a.status, at, actor, note: `승인 — ${policy.reason}` }],
+                }
+              : a,
+          ),
+        }));
+        get().addEvidence({
+          type: "ACTION",
+          title: `${action.title} → 승인`,
+          detail: `${actor} 승인. 근거: ${policy.reason}`,
+          actor,
+          actionId: id,
+          productId: action.productId,
+          source: "DEMO",
+          status: "demo",
+        });
       },
 
       updateOrderStatus: (orderId, status, actor) => {
@@ -658,7 +883,8 @@ export const useApp = create<AppState>()(
       name: "morfit-demo-v1",
       // v4: 화면 문구 한글화(D-28)로 시드의 담당자·엔진 이름이 바뀜 → 이전 저장본은 새 시드로 초기화
       // v5: 쿠폰 할인 100배로 저장된 고객 주문 금액을 바로잡음(D-42) — 나머지 데이터는 유지
-      version: 5,
+      // v6: 운영 통제 — 시연 시작 시 검토·실행 중인 시나리오 과제에 성과 비교 기준값을 채움 (D-48)
+      version: 6,
       storage: createJSONStorage(() => (typeof window !== "undefined" ? window.localStorage : noopStorage)),
       partialize: (s) => {
         const { hydrated: _h, ...rest } = s;
@@ -667,8 +893,17 @@ export const useApp = create<AppState>()(
       },
       migrate: (persisted, version) => {
         if (version < 4) return {} as AppState;
-        const state = persisted as AppState;
-        return version < 5 ? { ...state, orders: (state.orders ?? []).map(repairCouponOrder) } : state;
+        let state = persisted as AppState;
+        if (version < 5) state = { ...state, orders: (state.orders ?? []).map(repairCouponOrder) };
+        if (version < 6 && state.actions) {
+          // 사용자가 상태를 바꾸지 않은 시나리오 과제만 — 바꾼 과제는 당시 지표를 알 수 없으므로 비워 둔다
+          const seedStatus = new Map(SEED_ACTIONS.map((a) => [a.id, a.status]));
+          state = {
+            ...state,
+            actions: state.actions.map((a) => (seedStatus.get(a.id) === a.status ? withSeedBaselines([a])[0] : a)),
+          };
+        }
+        return state;
       },
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

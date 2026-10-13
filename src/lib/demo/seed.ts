@@ -1296,6 +1296,8 @@ export const SCENARIO = {
   C_PRODUCT: "p-still-balmacaan", // 발마칸 코트 — 저회전
   D_BRAND: "b-aerno", // 재구매 주기 도래
   D_SEGMENT: "cycle-due" as SegmentId,
+  E_PRODUCT: "p-plane-trucker", // 데님 트러커 자켓 — 관심은 오르는데 인디고 S·M 품절로 전환 하락
+  F_VARIANT: variantId("p-aerno-sweat", 1, "L"), // 헤비 코튼 스웻셔츠 블랙 L — 장바구니에 담고 사지 않음
 };
 
 interface VariantBase {
@@ -1699,6 +1701,64 @@ export const VARIANTS: Variant[] = VARIANT_BASES.map((vb) => {
   // a few sold-out / low variants for realism
   if (vRand() < 0.05 && vb.id !== SCENARIO.A_VARIANT) stock = 0;
   if (vRand() < 0.06) incoming = randInt(vRand, 10, 40);
+  // 직전 7일 조회·장바구니 — 별도 난수열로 만들어 위의 시드 값은 그대로 유지한다
+  const prevRand = mulberry32(hashStr(`${vb.id}:prev`));
+  let viewsPrev7d = Math.round(views7d * (0.8 + prevRand() * 0.4));
+  let cartPrev7d = Math.round(cart7d * (0.75 + prevRand() * 0.5));
+  if (vb.id === SCENARIO.A_VARIANT) {
+    viewsPrev7d = Math.round(views7d * 0.55); // 조회 급등
+    cartPrev7d = 10;
+  }
+  if (vb.productId === SCENARIO.C_PRODUCT) {
+    viewsPrev7d = Math.round(views7d * 1.9) + 6; // 관심 식음
+    cartPrev7d = cart7d + 2;
+  }
+  // Scenario F: AERNO 스웻셔츠 블랙 L — 재고는 있는데 장바구니에 담고 사지 않는다(장바구니 이탈)
+  if (vb.id === SCENARIO.F_VARIANT) {
+    cartPrev7d = Math.round(cart7d * 2) + 1;
+    cart7d = Math.round(cart7d * 4) + 4;
+  }
+  // Scenario E: 인디고 S·M 품절 — 관심(조회·찜·장바구니)은 오르는데 살 수 있는 옵션이 없어 전환이 떨어진다
+  if (vb.productId === SCENARIO.E_PRODUCT && vb.colorIdx === 0) {
+    viewsPrev7d = views7d;
+    const boosted = Math.round(views7d * 1.5) + 14;
+    wishlistPrev7d = wishlist7d;
+    wishlist7d = Math.round(wishlist7d * 1.9) + 4;
+    cartPrev7d = cart7d;
+    cart7d = Math.round(cart7d * 1.7) + 3;
+    if (vb.size === "S" || vb.size === "M") {
+      stock = 0;
+      incoming = 0;
+      restockRequests = vb.size === "M" ? 12 : 9;
+    }
+    // M을 찾던 고객이 L을 보고 담지만 사지 않는다 — 대체 사이즈로는 전환되지 않음
+    const substitute = vb.size === "L" ? 10 : 0;
+    if (substitute) {
+      viewsPrev7d += substitute;
+      cartPrev7d = 3;
+      cart7d += 6;
+    }
+    return {
+      id: vb.id,
+      productId: vb.productId,
+      color: vb.color,
+      size: vb.size,
+      stock,
+      incoming,
+      sales7d: s.d7,
+      salesPrev7d: s.p7,
+      sales30d: s.d30,
+      views7d: boosted + substitute,
+      viewsPrev7d,
+      wishlist7d,
+      wishlistPrev7d,
+      cart7d,
+      cartPrev7d,
+      restockRequests,
+      returns30d,
+      fitReturns30d,
+    };
+  }
   return {
     id: vb.id,
     productId: vb.productId,
@@ -1710,9 +1770,11 @@ export const VARIANTS: Variant[] = VARIANT_BASES.map((vb) => {
     salesPrev7d: s.p7,
     sales30d: s.d30,
     views7d,
+    viewsPrev7d,
     wishlist7d,
     wishlistPrev7d,
     cart7d,
+    cartPrev7d,
     restockRequests,
     returns30d,
     fitReturns30d,
@@ -1845,6 +1907,15 @@ export const RETURNS: ReturnRequest[] = [];
       });
     }
   }
+  /* 데모 시나리오(가설): 핏 프로필을 입력한 고객은 사이즈 사유 반품이 적다.
+     위 난수열을 건드리지 않도록 생성 뒤에 결정적으로(번호 기준) 60%를 덜어낸다 — 실증에서 검증할 가설이다. */
+  const SIZE_REASONS: ReturnReason[] = ["size-small", "size-large", "fit"];
+  for (let i = RETURNS.length - 1; i >= 0; i--) {
+    const rt = RETURNS[i];
+    if (SIZE_REASONS.includes(rt.reason) && CUSTOMER_BY_ID[rt.customerId]?.hasFitProfile && hashStr(rt.id) % 5 < 3)
+      RETURNS.splice(i, 1);
+  }
+  RETURNS.forEach((rt, i) => (rt.id = `RT-${String(i + 1).padStart(4, "0")}`));
 }
 
 /* ----------------------------- Campaigns ----------------------------- */

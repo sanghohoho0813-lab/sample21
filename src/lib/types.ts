@@ -72,9 +72,13 @@ export interface Variant {
   salesPrev7d: number;
   sales30d: number;
   views7d: number;
+  /** 직전 7일 조회 — 증감 신호 계산용 */
+  viewsPrev7d: number;
   wishlist7d: number;
   wishlistPrev7d: number;
   cart7d: number;
+  /** 직전 7일 장바구니 담기 */
+  cartPrev7d: number;
   restockRequests: number;
   returns30d: number;
   fitReturns30d: number;
@@ -226,6 +230,45 @@ export interface AXAction {
   engine: "demand" | "fit" | "markdown" | "repeat";
   automation: "L2" | "L3";
   errorCost: "LOW" | "MID" | "HIGH";
+  /* ---- 운영 통제 (없으면 정책·기본값으로 계산) ---- */
+  /** 실무 담당자 — 기본은 ownerName */
+  assigneeName?: string;
+  /** 처리 기한 — 기본은 추천 시각 + 긴급도별 SLA */
+  dueAt?: string;
+  approval?: ActionApproval;
+  /** 수량·할인율·담당자·기한 변경 이력 */
+  changes?: ActionChange[];
+  /** 검토 확정 시점의 지표 — 성과 전/후 비교의 '전' */
+  baseline?: ActionSnapshot;
+  /** 완료 시점의 지표 — 성과 전/후 비교의 '후' */
+  result?: ActionSnapshot;
+  /** seed: 데모 시나리오 · engine: 신호 엔진이 만든 후보를 운영자가 등록 */
+  origin?: "seed" | "engine";
+  /** 이 과제를 만든 신호 패턴 */
+  pattern?: string;
+}
+
+export interface ActionApproval {
+  required: boolean;
+  /** 승인이 필요한 이유 (정책) */
+  reason: string;
+  approverRole: Role;
+  approvedBy?: string;
+  approvedAt?: string;
+}
+
+export interface ActionChange {
+  at: string;
+  actor: string;
+  field: "quantity" | "discountRate" | "assignee" | "dueAt";
+  from: string;
+  to: string;
+  note?: string;
+}
+
+export interface ActionSnapshot {
+  at: string;
+  metrics: Record<string, number>;
 }
 
 export type EvidenceType =

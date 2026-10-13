@@ -3,6 +3,8 @@
    Fit Recommendation · Repeat Recommendation · AI Briefing (rule text).
    LLM is "AI READY": interface prepared in src/lib/ai.ts.
 ------------------------------------------------------------------- */
+import type { FitLearning, ProductReturnSignal } from "./intel/lifecycle";
+import { fitGroupOf } from "./intel/lifecycle";
 import type { FitProfile, Product } from "./types";
 import { PRODUCTS, PRODUCT_BY_ID, BRAND_BY_ID, SCENARIO } from "./demo/seed";
 
@@ -26,8 +28,22 @@ function baseTopSizeByHW(height: number | null, weight: number | null, gender: P
   return SIZE_ORDER[Math.min(4, Math.max(0, idx))];
 }
 
-export function recommendFit(p: Product, profile: FitProfile, fitNoteOverride?: string): FitResult {
-  const hasBasic = !!(profile.height && profile.weight) || !!profile.topSize || !!profile.bottomSize;
+/** 추천에 더하는 데이터 — 내 구매·반품 기록에서 배운 사이즈, 이 상품의 반품 신호 */
+export interface FitContext {
+  history?: FitLearning[];
+  returnSignal?: ProductReturnSignal | null;
+}
+
+export function recommendFit(
+  p: Product,
+  profile: FitProfile,
+  fitNoteOverride?: string,
+  ctx: FitContext = {},
+): FitResult {
+  const group = fitGroupOf(p.categoryId);
+  const learned = group ? ctx.history?.find((h) => h.group === group) : undefined;
+  // 프로필이 없어도 내 구매 기록에서 배운 사이즈가 있으면 추천할 수 있다 (핏 학습)
+  const hasBasic = !!(profile.height && profile.weight) || !!profile.topSize || !!profile.bottomSize || !!learned;
   if (p.categoryId === "bag" || p.categoryId === "acc")
     return {
       size: "FREE",
@@ -66,6 +82,15 @@ export function recommendFit(p: Product, profile: FitProfile, fitNoteOverride?: 
   const cautions: string[] = [];
   if (usual) reasons.push(`평소 ${isBottom ? "하의" : "상의"} 사이즈 ${usual} 기준`);
   if (fromHW) reasons.push(`키 ${profile.height}cm · 몸무게 ${profile.weight}kg 체형 기준 ${fromHW}`);
+  // 핏 학습 — 실제로 입어본 기록이 자기 입력보다 우선한다 (반품으로 보정된 경우)
+  if (learned) {
+    if (!usual || learned.corrected) {
+      if (usual && learned.size !== usual)
+        reasons.push(`평소 ${usual}로 입력했지만 내 반품 기록에서 ${learned.size}(으)로 보정`);
+      base = learned.size;
+    }
+    reasons.push(`내 구매 기록: ${learned.evidence[0]}`);
+  }
   let shift = 0;
   // Sizing tendency rule
   if (p.sizing === "small") {
@@ -84,6 +109,22 @@ export function recommendFit(p: Product, profile: FitProfile, fitNoteOverride?: 
   if (profile.preferredFit === "slim" && (p.fit === "relaxed" || p.fit === "oversized")) {
     shift -= 1;
     reasons.push("선호 핏(슬림) 반영 −1");
+  }
+  // 이 상품을 산 고객의 반품 데이터 — 사이즈 반품이 한쪽으로 몰린 상품은 그 방향으로 보정
+  const rs = ctx.returnSignal;
+  if (rs) {
+    const dir = rs.direction === "small" ? 1 : -1;
+    const tendency = p.sizing === "small" ? 1 : p.sizing === "large" ? -1 : 0;
+    const word = rs.direction === "small" ? "사이즈 작음" : "사이즈 큼";
+    if (tendency !== dir) {
+      shift += dir;
+      reasons.push(
+        `구매 고객 반품 데이터: '${word}' 반품이 평균의 ${rs.lift.toFixed(1)}배 → 한 치수 ${dir > 0 ? "크게" : "작게"} 보정`,
+      );
+    } else
+      reasons.push(
+        `구매 고객 반품 데이터도 같은 방향 — '${word}' 반품이 평균의 ${rs.lift.toFixed(1)}배 (${rs.count}건)`,
+      );
   }
   // Loop 3: fit-guide action applied → stronger correction for Scenario B
   if (p.id === SCENARIO.B_PRODUCT && fitNoteOverride) {
@@ -106,6 +147,7 @@ export function recommendFit(p: Product, profile: FitProfile, fitNoteOverride?: 
   let score = 0.55;
   if (usual) score += 0.2;
   if (fromHW) score += 0.15;
+  if (learned) score += learned.kept >= 2 || (usual && learned.size === usual) ? 0.15 : 0.1;
   if (profile.preferredFit) score += 0.05;
   if (p.id === SCENARIO.B_PRODUCT && !fitNoteOverride) {
     score -= 0.2;
