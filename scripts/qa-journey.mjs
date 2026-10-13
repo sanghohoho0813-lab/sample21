@@ -290,7 +290,7 @@ await step("모바일 햄버거: 왼쪽 · 1차 메뉴 수 · 스크롤 잠금 �
     const k = "morfit-demo-v1";
     const s = JSON.parse(localStorage.getItem(k) || "{}");
     s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true };
-    s.version = 5;
+    s.version = 6;
     localStorage.setItem(k, JSON.stringify(s));
   });
   for (const [route, btnName, expectMax, ctaSel] of [

@@ -175,7 +175,7 @@ for (const width of WIDTHS) {
       const k = "morfit-demo-v1";
       const s = JSON.parse(localStorage.getItem(k) || "{}");
       s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true };
-      s.version = 5;
+      s.version = 6;
       localStorage.setItem(k, JSON.stringify(s));
     } catch {}
   });

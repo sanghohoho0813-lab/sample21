@@ -3,12 +3,12 @@
 PROJECT FINAL OBJECTIVE: 고객의 패션 쇼핑 행동이 옵션별 수요 데이터가 되고, 그 데이터가 MD의 재고·할인·재구매 Action을 바꾸며, 처리결과가 다시 고객 경험으로 돌아오는 실제 작동형 패션 AX+플랫폼 (DEMO).
 
 ```text
-현재 상태            : Demo Ready — 8차 3차 고도화 완료 (쿠폰 금액 결함 수정 · 금액·검증 규칙 단일화 · 서버 메타데이터 · 창 키보드 접근성 · 시드 5배 가속 · 단위 테스트 44 · CI)
+현재 상태            : Demo Ready — 9차 Commerce Intelligence 완료 (신호 조합 판독 · 옵션/사이즈 커브 · 반품 패턴·Fit Closed Loop · 근거 기반 할인 시뮬레이터 · 후보→등록→승인→실행→성과 전/후 · 핏 학습 · Loop 검증 8/8 · 의류 실루엣 이미지)
 FRONT_REFERENCE      : PENDING — Drive 「샘플 21. 의류」 2026-09-15 재확인, 여전히 비어 있음. 사진 추후 적용 (등록 경로 준비됨)
 DELIVERY STAGE       : DEMO
-현재 구현률          : 약 88% — MORFIT 최종 MVP 목표 대비 (남은 것: 사진 자산 · 실측 Baseline · LLM 키)
-빌드                 : next build 성공(빌드 시 ESLint 포함) · Next 15.5.27 · typecheck 0 · ESLint 0 · Prettier 형식 통일 · 운영 의존성 보안 경고 0 · 단위 테스트 44/44 (npm run check · GitHub Actions)
-수용 테스트          : Whole-Hybrid Journey 25/25 PASS · 사용 흐름·예외 33/33 PASS (qa:flows) (프로덕션 빌드) · 8폭 × 33 Route 404 0 · overflow 0 · 접근 이름 누락 0 · 레이아웃 결함 0 (일반·햄버거·긴 데이터 × 8폭 × 34 Route)
+현재 구현률          : 약 92% — MORFIT 최종 MVP 목표 대비 (남은 것: 사진 자산 · 실측 Baseline · 가정값 보정 · LLM 키)
+빌드                 : next build 성공(빌드 시 ESLint 포함) · Next 15.5.27 · typecheck 0 · ESLint 0 · Prettier 형식 통일 · 단위 테스트 75/75 (npm run check · GitHub Actions)
+수용 테스트          : Commerce Intelligence Loop 9/9 PASS (qa:loop · 순환 검증 8/8) · Whole-Hybrid Journey 25/25 · 사용 흐름·예외 33/33 (프로덕션 빌드) · 레이아웃 결함 0 (일반·햄버거·긴 데이터 × 8폭 × 34 Route) · 접근 이름 누락 0 · 40px 미만 터치 타겟 0
 ```
 
 ## STRATEGIC GATES
@@ -53,6 +53,15 @@ DELIVERY STAGE       : DEMO
 - [x] 매출·마진(+**Unit Economics 측정 설계**) · 상품·SKU(+상세 9탭) · 재고·재입고(**Demand Radar** 365 옵션 · 저회전 · 입고 예정)
 - [x] 고객·재구매(7 세그먼트 · Scenario D) · 핏·반품(Fit Risk · Scenario B · 반품 큐) · 캠페인·기획전(판정 · 생성 Demo) · 브랜드·파트너(NEXT 구분) · 주문·배송(상태 변경 → 고객 반영) · AX Evidence(Loop 보기 · 12주 체크리스트) · **Evidence Pack 미리보기(/ax/evidence/pack · 인쇄 · JSON)**
 
+## COMMERCE INTELLIGENCE (9차, docs/COMMERCE_INTELLIGENCE.md)
+- [x] SKU 신호 판독 — 365옵션을 5패턴(수요 급등·재고 부족 / 팔리지만 돌아옴 / 관심↑·구매↓(대체 탐색 포함) / 장바구니 이탈 / 관심 식음·재고 과잉)으로 판독 · "왜 지금" 한 문장 · 금액 영향 · 노이즈 가드 (재고·재입고 화면)
+- [x] 옵션 판단 — 색상×사이즈 매트릭스 · 사이즈 커브(판매 vs 재고 비중) · 재입고 수량 단일 공식 · 상품 판독 헤드라인 (상품 상세)
+- [x] 반품 패턴 — 사이즈 집중·상품·고객군·핏 프로필 효과(표본·배수) · Fit Closed Loop 5단계 (핏·반품 화면)
+- [x] 할인 판단 — 근거 5개 + 가드 · 할인율별 시즌 손익 시뮬레이터 · 권장 1 / 보류 2 / 불필요 45 · 사람이 만든 할인 과제에도 엔진 판단 경고
+- [x] MD 실행 센터 — 엔진 후보 큐(등록 전 실행 없음) · 우선순위 정렬 · 담당자·기한(SLA)·승인 정책·승인 게이트·변경 이력 · 성과 전/후 스냅샷 · Loop 단계별 건수
+- [x] 고객 Lifecycle · 핏 학습 — 첫 구매 → 핏 학습 → 재구매 → 찜·재입고 → 반품 (AX 고객 상세) · 내 구매·반품 기록과 상품 반품 신호를 근거로 쓰는 핏 추천 · My '내 핏 학습'
+- [x] 순환 검증(Loop 검증) 패널 — SKU 하나를 8단계(고객 행동 → 신호 → 후보·과제 → 승인·실행 → 재고 → 알림 → 구매 → 증빙·성과)로 저장 상태에서 판정 (성과 증빙)
+
 ## DATA BRIDGE (Closed Loop, 실동작 확인)
 - [x] Loop 1 재입고 알림 → Demand Radar +1 → act-001 승인·실행·완료 → 재고 +60 · 고객 알림 · 옵션 '입고 완료' → **고객이 해당 옵션 주문 시 '구매 완료' + RESULT Evidence(알림→구매 전환)**
 - [x] Loop 2 DEMO 주문 → AX 주문 목록 최상단 → 상품준비 → 고객 My Page 상태 반영
@@ -67,7 +76,8 @@ Demand&Restock(RULE+STAT, L3) · Fit(RULE, L2) · Markdown(RULE+OPT, L3) · Repe
 모션: 진입(stagger)·페이지 전환·호버 프리미티브(tile/press/sheen/link-line/nudge). 차트 애니메이션은 D-14대로 비활성.
 
 ## KNOWN ISSUES
-- 사진 자산 미적용(의도) — Hero/Why AX/브랜드/상품은 색상 기반 Gradient placeholder
+- 사진 자산 미적용(의도) — 상품 이미지는 카테고리별 의류 실루엣(상품 색), Hero/Why AX/브랜드는 Gradient placeholder
+- 할인 시뮬레이터의 가격탄력성 2.0 · 핏 안내 반품 40% 감소 · 이월 회수율 30%는 가정값(화면 표기, 실증에서 보정)
 - Pretendard 웹폰트는 CDN 차단 환경에서 시스템 폰트로 폴백(정상 동작)
 - 리뷰·캠페인 초안·반품 처리 상태는 localStorage(Demo) — Supabase 전환 시 store로 승격 필요
 
@@ -87,6 +97,7 @@ Demand&Restock(RULE+STAT, L3) · Fit(RULE, L2) · Markdown(RULE+OPT, L3) · Repe
 4. Pilot 1~2주차 Baseline 측정 → Evidence Pack의 UNKNOWN/VALIDATE LATER 칸 채우기
 
 ## 최근 주요 변경
+- 9차: Commerce Intelligence — 신호 조합 판독·대체 탐색 규칙·시나리오 E/F(D-48) · 옵션 매트릭스·사이즈 커브·수량 공식 통일(D-49) · 반품 패턴·Fit Closed Loop·핏 학습(D-50) · 근거 5개+가드+시즌 손익 할인 판단(D-51) · 후보 큐·승인 정책/게이트·변경 이력·성과 전/후·저장 v6(D-52) · AX 고밀도 패널 / 고객 의류 실루엣 이미지(D-53) · Evidence 순환 보기 중복 라벨('승인 · 승인' 등) 수정
 - 6차: UI/UX 고도화 — 지표 위계(주요 4 + 보조 칸, D-33) · '데모' 표시 한 곳 + 고객 화면 운영 설명 분리(LoopHint, D-34) · 휴대폰 상품 상세 구매 바·옵션 시트(D-35) · 입력 검증(핏 프로필 범위·주문서 즉시 해제·CSV 필수 열, D-36) · 찜 버튼 아이콘·탭 겹침·카드 캡션 겹침 수정(D-37)
 - 7차: 2차 고도화(처음 쓰는 사람 기준 재점검) — 휴대폰 하위 화면 뒤로 버튼·장바구니/주문서 하단 고정 결제 바·`--tabbar-h`(D-38) · 토스트 2개 제한·위치 자동·시트 열림 시 공용 이동 버튼 숨김(D-39) · 평소 상태 배지 제거·고객 문구 통일(D-40) · 실행 센터 카드 자리 유지·AX 주문 카드 버튼 아래로·주문 정보 행 분리(D-41) · 주문 완료 버튼 높이 붕괴 수정
 - 8차: 3차 고도화(개발자 시선) — 쿠폰 할인 100배 저장 결함 수정·금액/검증/메모 규칙 단일화·저장 데이터 v5 마이그레이션(D-42) · 라우트 서버 메타데이터·OG/manifest/robots(D-43) · 시드 생성 316→65ms·미래 시각 주문 정리(D-44) · 창 포커스 관리·본문 바로가기·오류 경계(D-45) · Vitest·Prettier·CI·보안 헤더·의존성 경고 0(D-46) · lucide 전체 import 제거(D-47)

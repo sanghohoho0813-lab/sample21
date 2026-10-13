@@ -21,7 +21,7 @@ const init = () => {
     const k = "morfit-demo-v1";
     const s = JSON.parse(localStorage.getItem(k) || "{}");
     s.state = { ...(s.state || {}), tutorialDone: true, customerTourDone: true };
-    s.version = 5;
+    s.version = 6;
     localStorage.setItem(k, JSON.stringify(s));
   } catch {
     /* 저장소 차단 환경 */
@@ -289,7 +289,7 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
 /* ------------------------------ AX · PC ------------------------------ */
 {
   const { ctx, page: d } = await ctxFor({ width: 1440, height: 900 }, false);
-  const countText = async () => (await text(d)).match(/(\d+)건 · 긴급한 것부터/)?.[1];
+  const countText = async () => (await text(d)).match(/(\d+)건 · 우선순위순/)?.[1];
 
   await step("실행 센터 — 유형 필터 · 초기화", async () => {
     await go(d, "/ax/actions");

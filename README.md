@@ -1,7 +1,8 @@
 # MORFIT — 패션·의류 AX + 멀티브랜드 플랫폼 (DEMO)
 
 > 고객의 조회·검색·찜·사이즈·구매·반품 데이터를 **상품 옵션 단위의 수요신호**로 바꾸고,
-> 이를 MD·재고·할인·재구매 판단에 연결하는 **Business AX + Customer Platform Hybrid**.
+> 이를 MD·재고·할인·재구매 판단에 연결하는 **Fashion Commerce Intelligence** (Business AX + Customer Platform Hybrid).
+> 엔진이 신호 조합을 판독해 후보 과제를 만들고, 사람이 검토·승인·실행하면 재고·가격·핏 안내가 고객 화면에 반영되고 성과 전/후가 증빙으로 남는다 — [docs/COMMERCE_INTELLIGENCE.md](docs/COMMERCE_INTELLIGENCE.md).
 > 미래AI랩 AX + Platform Unified Design & Development System v3.0 기반 · 가상 브랜드 · 모든 데이터는 DEMO.
 
 ## 빠른 시작
@@ -35,11 +36,18 @@ flowchart LR
   subgraph Store["공유 스토어 (lib/store)"]
     Delta[(조회·찜·재고·주문 Delta)]
   end
+  subgraph Intel["판단 계층 (lib/intel · 순수 함수)"]
+    Sig[신호 판독] --> Cand[후보 과제]
+    Opt[옵션·사이즈 커브]
+    Ret[반품 패턴]
+    Md[할인 근거·시뮬레이션]
+    Pol[승인·기한·성과 전/후]
+  end
   subgraph AX["운영화면 (/ax)"]
-    Radar[수요 레이더] --> Actions[실행 센터] --> Evidence[성과 증빙]
+    Board[SKU 신호 판독] --> Actions[실행 센터 · 검토·승인·실행] --> Evidence[순환 검증 · 성과 증빙]
     Orders[주문·배송]
   end
-  Customer -- 행동 --> Store -- KPI 계산(lib/kpi) --> AX
+  Customer -- 행동 --> Store --> Intel --> AX
   AX -- 재입고·할인·핏 안내·주문 상태 --> Store -- 반영 --> Customer
 ```
 
@@ -55,7 +63,10 @@ src/lib/pricing.ts       주문 금액 규칙 — 화면과 저장이 같은 함
 src/lib/validation.ts    입력 검증 규칙·문구 (주문서·핏 프로필)
 src/lib/orderMemo.ts     주문 메모 저장 형식 ↔ 화면 항목
 src/lib/meta.ts          라우트 메타데이터 도우미
-src/lib/engine.ts        규칙 엔진: 핏 추천 · 재구매 추천 · 브리핑
+src/lib/engine.ts        규칙 엔진: 핏 추천(내 기록·반품 신호 반영) · 재구매 추천 · 브리핑
+src/lib/intel/           Commerce Intelligence — signals · options · returns · markdown · lifecycle · candidates · policy · measure
+src/components/ax/intel  고밀도 판단 화면 — 신호 판독 보드 · 후보 큐 · 운영 통제 · 옵션 매트릭스 · 할인 시뮬레이터 · 반품 패턴 · Loop 검증
+src/components/ui/Garment.tsx  사진 전까지 쓰는 의류 실루엣(상품 색 · 16종)
 ```
 
 ## 품질 관리
@@ -63,9 +74,10 @@ src/lib/engine.ts        규칙 엔진: 핏 추천 · 재구매 추천 · 브리
 | 명령 | 내용 |
 |---|---|
 | `npm run check` | 타입 검사 + ESLint + Prettier 형식 + 단위 테스트 (CI와 동일) |
-| `npm test` | Vitest — 금액·검증·메모·KPI·스토어 순환 (`src/lib/__tests__`) |
+| `npm test` | Vitest — 금액·검증·메모·KPI·스토어 순환·신호 판독·할인 판단·승인 게이트·핏 학습·전체 Loop (`src/lib/__tests__`) |
 | `npm run qa:flows` | 실제 사용 흐름·예외 E2E (Playwright, 프로덕션 서버 대상) |
 | `npm run qa:journey` | 전체 순환 수용 여정 25단계 |
+| `npm run qa:loop` | Commerce Intelligence Loop — 고객 신청 → 신호 → 후보 등록 → 실행 → 재고·알림 → 구매 → Loop 검증 8/8 · 승인 게이트 · 변경 이력 |
 | `npm run qa:layout` | 8개 화면 폭 × 34 Route 레이아웃 결함 (`QA_DRAWER=1` · `QA_STRESS=1`) |
 | `npm run qa:a11y` | 접근 가능한 이름 · 터치 타겟 40px · hover 커버리지 |
 | `npm run qa:english` · `qa:shots` | 남은 영문 UI · 전 Route 스크린샷/넘침 |
@@ -77,5 +89,6 @@ E2E 스크립트는 `npm run build && npm start`로 띄운 서버(`QA_BASE`, 기
 - `PROJECT_STATE.md` — 진행상황 · USER ACTION QUEUE
 - `DECISIONS.md` — 설계 결정 기록 (왜 이렇게 · 왜 아닌지)
 - `QA_REPORT.md` — 회차별 진단 · 개선 · 검증 수치
+- `docs/COMMERCE_INTELLIGENCE.md` — 판단 계층 아키텍처 · 엔진별 규칙·임계값·가정 · 검증된 Loop
 - `docs/RECOMMENDATIONS.md` — 다음 개선 후보
 - `SETUP.md` — Supabase / AI API / 이미지 자산 연결 가이드
