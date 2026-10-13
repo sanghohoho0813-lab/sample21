@@ -29,6 +29,9 @@ import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/States";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import { CandidateQueue } from "@/components/ax/intel/CandidateQueue";
+import { useReadings } from "@/components/ax/intel/useIntel";
+import { dueInDays, needsApproval, priorityOf } from "@/lib/intel/policy";
 
 type StatusFilter = "all" | ActionStatus;
 const STATUS_TABS: StatusFilter[] = ["all", "recommended", "confirmed", "in-progress", "done", "hold", "dismissed"];
@@ -96,6 +99,18 @@ function ActionsInner() {
     [byProduct],
   );
   const kpi = useMemo(() => actionKpi(visible), [visible]);
+  const readings = useReadings();
+  const priority = useMemo(
+    () => new Map(visible.map((a) => [a.id, priorityOf(a, readings).score])),
+    [visible, readings],
+  );
+  const openActions = visible.filter(
+    (a) => a.status === "recommended" || a.status === "confirmed" || a.status === "in-progress",
+  );
+  const waitingApproval = openActions.filter(needsApproval).length;
+  const overdue = openActions.filter((a) => (dueInDays(a) ?? 0) < 0).length;
+  const measured = visible.filter((a) => a.status === "done" && a.result).length;
+  const evidenceCount = app.evidence.filter((e) => e.actionId && visible.some((a) => a.id === e.actionId)).length;
 
   const pass = (a: AXAction) =>
     (status === "all" || a.status === status) &&
@@ -111,10 +126,11 @@ function ActionsInner() {
         ? [...f].sort(
             (a, b) =>
               STATUS_ORDER[a.status] - STATUS_ORDER[b.status] ||
+              (priority.get(b.id) ?? 0) - (priority.get(a.id) ?? 0) ||
               URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency] ||
               (a.recommendedAt < b.recommendedAt ? 1 : -1),
           )
-        : sortByUrgency(f)
+        : [...sortByUrgency(f)].sort((a, b) => (priority.get(b.id) ?? 0) - (priority.get(a.id) ?? 0))
     ).map((a) => a.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 과제 상태가 바뀌어도 순서는 유지(위 주석)
   }, [idsKey, status, types, urgency, engine]);
@@ -151,21 +167,31 @@ function ActionsInner() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="실행 센터"
-        desc="데이터에서 나온 추천을 확인하고 승인·실행합니다."
+        title="MD 실행 센터"
+        desc="고객 행동 신호에서 나온 과제를 우선순위대로 검토 → 승인 → 실행 → 결과 측정 → 증빙까지 추적합니다."
         right={<Freshness source="DEMO" />}
       />
 
       {/* 요약 — 상태 탭에도 숫자가 있으므로 작은 칸으로만 */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <KpiTile label="미처리" value={`${num(kpi.open)}건`} sub="추천됨 · 확인 · 실행중" />
         <KpiTile
-          label="긴급"
-          value={`${num(kpi.high)}건`}
-          sub="먼저 처리할 과제"
+          label="미처리"
+          value={`${num(kpi.open)}건`}
+          sub={`긴급 ${num(kpi.high)}건 포함`}
           tone={kpi.high > 0 ? "error" : undefined}
         />
-        <KpiTile label="생성된 과제" value={`${num(kpi.created)}건`} sub="엔진 4개가 규칙으로 생성" />
+        <KpiTile
+          label="승인 대기"
+          value={`${num(waitingApproval)}건`}
+          sub="대량 발주·큰 할인은 대표 승인"
+          tone={waitingApproval > 0 ? "warning" : undefined}
+        />
+        <KpiTile
+          label="기한 지남"
+          value={`${num(overdue)}건`}
+          sub="긴급 1일 · 보통 3일 · 낮음 7일"
+          tone={overdue > 0 ? "error" : undefined}
+        />
         <KpiTile
           label="완료율"
           value={pct(kpi.executionRate, 0)}
@@ -173,17 +199,55 @@ function ActionsInner() {
         />
       </div>
 
-      {/* 처리 과정 — 한 줄 */}
-      <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.88rem] text-neutral-text2">
-        {(["recommended", "confirmed", "in-progress", "done"] as ActionStatus[]).map((st, i) => (
-          <span key={st} className="inline-flex items-center gap-1.5">
-            <span className="font-semibold text-neutral-text">{ACTION_STATUS_LABEL[st]}</span>
-            {i < 3 && <ArrowRight size={13} />}
-          </span>
+      {/* Loop 단계 — 추천에서 증빙까지 지금 몇 건이 어디에 있는가 */}
+      <ol
+        className="grid grid-cols-3 overflow-hidden rounded-xl border border-neutral-border bg-white text-center md:grid-cols-6"
+        aria-label="과제 처리 단계"
+        data-tour="action-loop"
+      >
+        {[
+          { label: "추천", n: counts.recommended, sub: "엔진·시나리오" },
+          { label: "검토", n: counts.confirmed, sub: "기준값 기록" },
+          { label: "승인 대기", n: waitingApproval, sub: "정책 기준", warn: waitingApproval > 0 },
+          { label: "실행", n: counts["in-progress"], sub: "고객 화면 반영" },
+          { label: "결과 측정", n: measured, sub: "전/후 비교" },
+          { label: "증빙", n: evidenceCount, sub: "과제 연결 기록" },
+        ].map((st, i) => (
+          <li
+            key={st.label}
+            className={cn(
+              "relative border-neutral-border px-2 py-2.5",
+              i % 3 !== 0 && "border-l",
+              i >= 3 && "border-t md:border-t-0",
+              i === 3 && "md:border-l",
+            )}
+          >
+            <p className="text-[0.75rem] font-semibold text-neutral-text2">
+              {i + 1}. {st.label}
+            </p>
+            <p className={cn("tabular text-[1.15rem] font-bold", st.warn && "text-[#b45309]")}>{num(st.n)}</p>
+            <p className="text-[0.7rem] text-neutral-text2">{st.sub}</p>
+          </li>
         ))}
-        <span className="mx-1 text-neutral-border">|</span>시스템은 추천만 하고, 실행은 사람이 승인합니다 (
-        <Term term="L3">L3</Term> · 자동발주 없음)
+      </ol>
+      <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.82rem] text-neutral-text2">
+        시스템은 후보와 근거만 만들고, 등록·승인·실행은 사람이 합니다 (<Term term="L3">L3</Term> · 자동발주 없음)
+        <ArrowRight size={12} aria-hidden />
+        정책: 발주 300만 원 이상·할인 20% 이상·캠페인 100명 이상은 대표 승인
       </p>
+
+      {role !== "ops" && !productParam && (
+        <CandidateQueue
+          onCreated={(id) => {
+            setStatus("all");
+            setExpanded((s) => new Set(s).add(id));
+            setTimeout(
+              () => document.getElementById(`action-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }),
+              250,
+            );
+          }}
+        />
+      )}
 
       {role === "ops" && <RoleNote>운영직원 화면 — 운영팀 담당 과제와 재입고 과제만 표시됩니다.</RoleNote>}
       {product && (
@@ -274,7 +338,9 @@ function ActionsInner() {
 
       {/* List */}
       <div className="space-y-4" data-tour="action-list">
-        <h2 className="tabular text-[0.85rem] font-normal text-neutral-text2">{num(list.length)}건 · 긴급한 것부터</h2>
+        <h2 className="tabular text-[0.85rem] font-normal text-neutral-text2">
+          {num(list.length)}건 · 우선순위순 (긴급도 + 대상 SKU 신호 강도 + 기한 경과)
+        </h2>
         {list.length === 0 ? (
           <EmptyState
             title={

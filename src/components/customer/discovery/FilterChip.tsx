@@ -29,7 +29,7 @@ export function FilterChip({
       className={cn(
         "inline-flex max-w-full select-none items-center gap-1.5 whitespace-nowrap rounded-full border font-semibold transition-all duration-fast active:scale-[0.97]",
         size === "sm"
-          ? "h-11 px-3.5 text-[0.88rem] md:h-9 md:px-3 md:text-[0.85rem]"
+          ? "h-11 min-w-11 justify-center px-3.5 text-[0.88rem] md:h-9 md:min-w-0 md:px-3 md:text-[0.85rem]"
           : "h-11 px-4 text-[0.92rem] md:h-10",
         active
           ? "border-brand-black bg-brand-black text-white"

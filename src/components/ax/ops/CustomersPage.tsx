@@ -63,6 +63,7 @@ import {
   SectionBlock,
   useMore,
 } from "./shared";
+import { LifecyclePanel } from "@/components/ax/intel/LifecyclePanel";
 
 type Row = Customer & { daysSince: number | null; live: boolean };
 const SEGMENTS: SegmentId[] = [
@@ -856,6 +857,8 @@ function CustomerDetail({
           </p>
         )}
       </div>
+
+      <LifecyclePanel customerId={c.id} />
 
       <div>
         <p className="mb-2 font-bold">관심 신호</p>

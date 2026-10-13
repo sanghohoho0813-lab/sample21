@@ -51,6 +51,8 @@ import {
   useMore,
 } from "./shared";
 import { cn } from "@/lib/cn";
+import { approvalOf } from "@/lib/intel/policy";
+import { LoopVerifier } from "@/components/ax/intel/LoopVerifier";
 
 const STATUS_LABEL: Record<EvidenceLog["status"], string> = {
   demo: "데모",
@@ -197,6 +199,7 @@ function EvidenceBody() {
 
   return (
     <div className="animate-fadeIn">
+      <LoopVerifier />
       <NoteCard tone="warning" icon={<Flag size={16} />}>
         <b>기준값: 미측정 · 실증 필요</b> — 이 화면의 숫자는 모두 데모·시뮬레이션입니다. 실제 개선율은 실증에서 기준값을
         잰 뒤에 말할 수 있습니다.
@@ -603,6 +606,7 @@ function LoopTimeline({ action, evidence, store }: { action: AXAction; evidence:
   const done = hist("done");
   const inProg = hist("in-progress");
   const conf = hist("confirmed");
+  const approval = approvalOf(action);
   const subs = action.variantId ? store.restockSubs.filter((r) => r.variantId === action.variantId) : [];
   const purchased = subs.filter((r) => r.status === "purchased" && !!r.notifiedAt).length;
   const notified = subs.filter((r) => r.status === "notified").length + purchased;
@@ -636,14 +640,23 @@ function LoopTimeline({ action, evidence, store }: { action: AXAction; evidence:
     },
     {
       key: "approval",
-      label: "승인 · 승인",
+      label: "검토 · 승인",
       icon: <ThumbsUp size={16} />,
       done: !!(conf || inProg || done),
-      at: (conf ?? inProg ?? done)?.at,
-      title: conf ? "담당자 확인" : inProg || done ? "확인 단계 생략 후 실행" : "승인 대기",
-      detail:
-        conf?.note ?? (conf ? `${conf.actor}이(가) 근거를 확인했습니다.` : "실행 센터에서 '확인'을 누르면 기록됩니다."),
-      actor: conf?.actor,
+      at: (approval.approvedAt ?? (conf ?? inProg ?? done)?.at) || undefined,
+      title: approval.approvedBy
+        ? `${approval.approvedBy} 승인`
+        : conf
+          ? "담당자 검토 확정"
+          : inProg || done
+            ? "검토 단계 생략 후 실행"
+            : "검토 대기",
+      detail: `${approval.reason}${
+        conf
+          ? ` · ${conf.actor} 검토 확정${conf.note ? ` — “${conf.note}”` : ""}`
+          : " · 실행 센터에서 '확인'을 누르면 기록됩니다."
+      }`,
+      actor: approval.approvedBy ?? conf?.actor,
     },
     {
       key: "action",
@@ -663,7 +676,7 @@ function LoopTimeline({ action, evidence, store }: { action: AXAction; evidence:
     },
     {
       key: "result",
-      label: "결과 · 결과",
+      label: "결과",
       icon: <Flag size={16} />,
       done: !!(done || resultEv),
       at: resultEv?.at ?? done?.at,
@@ -673,7 +686,7 @@ function LoopTimeline({ action, evidence, store }: { action: AXAction; evidence:
     },
     {
       key: "feedback",
-      label: "고객 반영 · 고객 반영",
+      label: "고객 반영",
       icon: <MessageSquare size={16} />,
       done:
         !!purchaseEv ||

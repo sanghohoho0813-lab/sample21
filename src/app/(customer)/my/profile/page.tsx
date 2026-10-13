@@ -12,6 +12,7 @@ import { SkeletonCard } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { FitProfileForm } from "@/components/customer/conversion/FitSignal";
 import { NotifyPrefsCard } from "@/components/customer/conversion/MyBits";
+import { FitLearningCard } from "@/components/customer/conversion/FitLearningCard";
 import { INTERESTS_KEY, useLocalPref } from "@/components/customer/conversion/shared";
 
 function InterestsCard() {
@@ -101,6 +102,7 @@ function ProfileContent() {
         <InterestsCard />
       </div>
       <div className="min-w-0 space-y-6">
+        <FitLearningCard />
         <NotifyPrefsCard />
         <div className="space-y-2 rounded-cardlg bg-brand-ivory p-5 text-[0.9rem] md:p-6">
           <p className="flex items-center gap-2 font-bold">

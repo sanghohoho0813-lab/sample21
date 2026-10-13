@@ -3,8 +3,12 @@
    the product's color DNA — never an empty box. Drop files into /public/images
    and register them in src/lib/assets.ts to switch to real photos. */
 import { cn } from "@/lib/cn";
-import { colorHex } from "@/lib/demo/seed";
+import { PRODUCTS, colorHex } from "@/lib/demo/seed";
 import { assetUrl } from "@/lib/assets";
+import type { CategoryId } from "@/lib/types";
+import { Garment, garmentKind } from "./Garment";
+
+const CATEGORY_BY_NAME = new Map(PRODUCTS.map((p) => [p.name, p.categoryId]));
 
 export function ProductImage({
   colors,
@@ -14,6 +18,9 @@ export function ProductImage({
   asset,
   variant = 0,
   caption = true,
+  name,
+  category,
+  zoom = 1,
   children,
 }: {
   colors: string[];
@@ -23,13 +30,21 @@ export function ProductImage({
   asset?: string;
   variant?: number;
   caption?: boolean;
+  /** 실루엣을 고를 상품명 — 없으면 label이 상품명이면 그것을 쓴다 */
+  name?: string;
+  category?: CategoryId;
+  /** 디테일 컷처럼 실루엣을 확대해 보여줄 때 */
+  zoom?: number;
   children?: React.ReactNode;
 }) {
   const url = asset ? assetUrl(asset) : null;
   const [a, b] = colorHex(colors[variant % colors.length] ?? colors[0]);
+  const productName = name ?? label ?? "";
+  const cat = category ?? CATEGORY_BY_NAME.get(productName);
+  const kind = cat ? garmentKind(productName, cat) : null;
   return (
     <div
-      className={cn("ph-img overflow-hidden rounded-2xl", ratio, className)}
+      className={cn("ph-img overflow-hidden rounded-2xl", kind && !url && "ph-studio", ratio, className)}
       style={{ ["--ph-a" as string]: a, ["--ph-b" as string]: b }}
       role="img"
       aria-label={label ?? "상품 이미지"}
@@ -37,13 +52,22 @@ export function ProductImage({
       {url ? (
         <img src={url} alt={label ?? ""} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
       ) : (
-        caption && (
-          <div className="absolute inset-0 flex min-w-0 items-end p-3">
-            <span className="ph-cap text-[0.78rem] font-semibold uppercase tracking-wider text-white/80 mix-blend-luminosity">
-              {label ? label.slice(0, 22) : "MORFIT"}
-            </span>
-          </div>
-        )
+        <>
+          {kind && (
+            <>
+              <Garment kind={kind} color={a} shade={b} zoom={zoom} id={`${kind}${a.slice(1)}${b.slice(1)}`} />
+              {/* 캡션 대신 — 이미지를 감싼 링크의 텍스트 이름이 비지 않게 */}
+              <span className="sr-only">{label ?? productName}</span>
+            </>
+          )}
+          {caption && !kind && (
+            <div className="absolute inset-0 flex min-w-0 items-end p-3">
+              <span className="ph-cap text-[0.78rem] font-semibold uppercase tracking-wider text-white/80 mix-blend-luminosity">
+                {label ? label.slice(0, 22) : "MORFIT"}
+              </span>
+            </div>
+          )}
+        </>
       )}
       {children}
     </div>

@@ -42,6 +42,7 @@ import {
   useLocalJson,
   useMore,
 } from "./shared";
+import { ReturnIntelPanel } from "@/components/ax/intel/ReturnIntelPanel";
 import { cn } from "@/lib/cn";
 
 const SIZING_LABEL: Record<SizingTendency, string> = { small: "작게 나옴", true: "정사이즈", large: "크게 나옴" };
@@ -465,6 +466,8 @@ function FitBody() {
           sub="접수됨 상태 · 승인 필요"
         />
       </div>
+
+      <ReturnIntelPanel />
 
       {/* Scenario B */}
       <SectionBlock

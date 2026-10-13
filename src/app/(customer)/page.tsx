@@ -8,7 +8,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 import { ArrowRight, Ruler, TrendingUp, Truck, RefreshCcw, ShieldCheck, Sparkles, ChevronRight } from "lucide-react";
-import { BRANDS, BRAND_BY_ID, PRODUCTS, DEMO_CUSTOMER_NAME } from "@/lib/demo/seed";
+import { BRANDS, BRAND_BY_ID, PRODUCTS, DEMO_CUSTOMER_NAME, colorHex } from "@/lib/demo/seed";
+import { assetUrl } from "@/lib/assets";
+import { cn } from "@/lib/cn";
 import { useApp } from "@/lib/store";
 import { allProductAgg } from "@/lib/kpi";
 import { recommendForCustomer } from "@/lib/engine";
@@ -19,6 +21,7 @@ import { Hydrated } from "@/components/system/Hydrated";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { GradientImage } from "@/components/ui/ProductImage";
+import { Garment, type GarmentKind } from "@/components/ui/Garment";
 import { SkeletonGrid, Skeleton } from "@/components/ui/States";
 import { Container, SectionHead } from "@/components/customer/Section";
 import { ProductCard, ProductGrid, HScroll } from "@/components/customer/ProductCard";
@@ -77,6 +80,16 @@ function Hero() {
             overlay
             label="FW 에디토리얼 메인"
           >
+            {!assetUrl("hero_main.jpg") && (
+              <>
+                <EditorialGarment
+                  kind="jacket"
+                  color="차콜"
+                  className="left-[4%] top-[14%] h-[58%] w-[52%] opacity-90"
+                />
+                <EditorialGarment kind="coat" color="베이지" className="right-[4%] top-[6%] h-[70%] w-[60%]" />
+              </>
+            )}
             <div className="absolute bottom-4 left-4 right-4 text-white">
               <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/75">FW EDITORIAL</p>
               <p className="mt-1 text-[1.05rem] font-bold leading-tight md:text-[1.25rem]">
@@ -102,6 +115,9 @@ function Hero() {
               label="MELLOW CODE 룩"
               className="transition-shadow group-hover:shadow-raised"
             >
+              {!assetUrl("fashion_editorial_01.jpg") && (
+                <EditorialGarment kind="dress" color="크림" className="inset-x-0 top-[6%] mx-auto h-[74%] w-[80%]" />
+              )}
               <span className="absolute bottom-3 left-3 text-[0.78rem] font-bold tracking-wide text-white">
                 MELLOW CODE
               </span>
@@ -116,6 +132,9 @@ function Hero() {
               label="CURRENT TYPE 룩"
               className="transition-shadow group-hover:shadow-raised"
             >
+              {!assetUrl("fashion_editorial_02.jpg") && (
+                <EditorialGarment kind="jacket" color="올리브" className="inset-x-0 top-[8%] mx-auto h-[70%] w-[84%]" />
+              )}
               <span className="absolute bottom-3 left-3 text-[0.78rem] font-bold tracking-wide text-white">
                 CURRENT TYPE
               </span>
@@ -479,6 +498,16 @@ export default function HomePage() {
         <SeasonEditSection />
         <TrustSection />
       </Container>
+    </div>
+  );
+}
+
+/** 사진 전까지 에디토리얼 칸에 놓는 의류 실루엣 구성 (D-53) */
+function EditorialGarment({ kind, color, className }: { kind: GarmentKind; color: string; className?: string }) {
+  const [a, b] = colorHex(color);
+  return (
+    <div className={cn("pointer-events-none absolute", className)} aria-hidden>
+      <Garment kind={kind} color={a} shade={b} id={`ed-${kind}-${a.slice(1)}`} />
     </div>
   );
 }

@@ -31,6 +31,7 @@ import {
   demoReviews,
   type DemoReview,
 } from "./shared";
+import { useFitContext } from "./useFitContext";
 import { LoopHint } from "@/components/customer/LoopHint";
 
 const SLOTS = [
@@ -48,6 +49,9 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
         colors={product.colors}
         variant={colorIdx}
         label={`${product.name} · ${product.colors[colorIdx]} · ${cur.label}`}
+        name={product.name}
+        category={product.categoryId}
+        zoom={slot === 1 ? 1.9 : 1}
         caption={false}
         ratio="aspect-square md:aspect-[3/4]"
         className="rounded-2xl md:rounded-cardlg"
@@ -92,6 +96,9 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
               colors={product.colors}
               variant={colorIdx}
               label={s.label}
+              name={product.name}
+              category={product.categoryId}
+              zoom={i === 1 ? 1.9 : 1}
               ratio="aspect-[3/4]"
               className="rounded-lg"
             >
@@ -126,7 +133,15 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
               colorIdx === i ? "border-brand-black" : "border-transparent hover:border-neutral-border",
             )}
           >
-            <ProductImage colors={product.colors} variant={i} label={c} ratio="aspect-[3/4]" className="rounded-lg" />
+            <ProductImage
+              colors={product.colors}
+              variant={i}
+              label={c}
+              name={product.name}
+              category={product.categoryId}
+              ratio="aspect-[3/4]"
+              className="rounded-lg"
+            />
             <span className="absolute inset-x-0 bottom-0 bg-white/85 py-0.5 text-center text-[0.78rem] font-bold text-brand-black">
               {c}
             </span>
@@ -366,9 +381,10 @@ export function ProductDetail({ product }: { product: Product }) {
   const subscribed = !!variant && store.restockSubs.some((s) => s.variantId === variant.id && s.status === "waiting");
   const wished = store.wishlist.some((w) => w.productId === product.id);
   const agg = productAgg(product, store);
+  const fitCtx = useFitContext(product.id);
   const fit = useMemo(
-    () => recommendFit(product, store.fitProfile, store.fitNoteOverride[product.id]),
-    [product, store.fitProfile, store.fitNoteOverride],
+    () => recommendFit(product, store.fitProfile, store.fitNoteOverride[product.id], fitCtx),
+    [product, store.fitProfile, store.fitNoteOverride, fitCtx],
   );
   const fitNote = effFitNote(product, store);
 

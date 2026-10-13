@@ -292,6 +292,10 @@ button,
     display: none;
   }
 }
+/* 실루엣이 있는 자리: 상품색 그라데이션 대신 스튜디오 배경 — 옷이 주인공 */
+.ph-img.ph-studio {
+  background: radial-gradient(90% 70% at 50% 35%, #fbfaf8, transparent 70%), linear-gradient(170deg, #f3f1ed, #e6e2dc);
+}
 .ph-img::after {
   content: "";
   position: absolute;

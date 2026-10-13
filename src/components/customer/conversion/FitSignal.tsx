@@ -14,6 +14,7 @@ import { AIReadyBadge } from "@/components/ax/AIReady";
 import { cn } from "@/lib/cn";
 import { PREFERRED_FIT_OPTIONS, SIZE_OPTIONS } from "./shared";
 import { parseFitNumber } from "@/lib/validation";
+import { useFitContext } from "./useFitContext";
 
 const CONF_LABEL = { high: "높음", mid: "보통", low: "낮음" } as const;
 const CONF_TONE = { high: "success", mid: "primary", low: "warning" } as const;
@@ -160,7 +161,9 @@ export function FitSignal({
   const store = useApp();
   const profile = store.fitProfile;
   const override = store.fitNoteOverride[product.id];
-  const result = useMemo(() => recommendFit(product, profile, override), [product, profile, override]);
+  const fitCtx = useFitContext(product.id);
+  const result = useMemo(() => recommendFit(product, profile, override, fitCtx), [product, profile, override, fitCtx]);
+  const learned = fitCtx.history?.length ?? 0;
   const fitNote = effFitNote(product, store);
   const [editing, setEditing] = useState(false);
   const track = store.track;
@@ -197,7 +200,14 @@ export function FitSignal({
           <p className="text-[1.05rem] font-bold leading-tight">내 사이즈 추천</p>
           <p className="text-[0.85rem] text-neutral-text2">
             {result.ready
-              ? "내 정보 · 상품 실측 · 실제 반품 데이터로 계산했어요"
+              ? [
+                  profileSummary ? "내 정보" : null,
+                  learned ? "내 구매 기록" : null,
+                  "상품 실측",
+                  fitCtx.returnSignal ? "구매 고객 반품 데이터" : "반품 데이터",
+                ]
+                  .filter(Boolean)
+                  .join(" · ") + "로 계산했어요"
               : "키·몸무게 또는 평소 사이즈만 입력하면 30초면 돼요"}
           </p>
         </div>
@@ -210,7 +220,7 @@ export function FitSignal({
         </div>
       ) : (
         <div className="space-y-4 px-5 pb-5">
-          <div className="grid items-stretch gap-4 sm:grid-cols-[auto_1fr]">
+          <div className="grid items-stretch gap-4 lg:grid-cols-[auto_1fr]">
             <div className="flex min-w-[150px] flex-col items-center justify-center rounded-2xl bg-brand-black px-6 py-5 text-white">
               <p className="text-[0.78rem] font-semibold text-white/70">추천 사이즈</p>
               <p className="tabular mt-1 text-[2.6rem] font-black leading-none">{result.size ?? "—"}</p>
@@ -319,7 +329,7 @@ export function FitSignal({
             <button
               type="button"
               onClick={() => setEditing((v) => !v)}
-              className="inline-flex items-center gap-1 text-[0.85rem] font-semibold text-neutral-text hover:text-brand-accent"
+              className="inline-flex min-h-11 items-center gap-1 text-[0.85rem] font-semibold text-neutral-text hover:text-brand-accent md:min-h-0"
             >
               {editing ? (
                 <>

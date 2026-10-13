@@ -73,11 +73,14 @@ import { Button } from "@/components/ui/Button";
 import { ProductImage } from "@/components/ui/ProductImage";
 import { Stat } from "@/components/ui/Kpi";
 import { EVIDENCE_TYPE_LABEL, SOURCE_LABEL } from "@/components/ax/ops/shared";
+import { MarkdownSimulator, OptionMatrixView, ReadingBar } from "@/components/ax/intel/ProductIntel";
 
-type Tab = "info" | "options" | "behavior" | "trend" | "returns" | "campaigns" | "insight" | "actions" | "evidence";
+type Tab =
+  "info" | "options" | "markdown" | "behavior" | "trend" | "returns" | "campaigns" | "insight" | "actions" | "evidence";
 const TABS: { value: Tab; label: string }[] = [
   { value: "info", label: "기본정보" },
-  { value: "options", label: "옵션별 판매·재고" },
+  { value: "options", label: "옵션 판단" },
+  { value: "markdown", label: "할인 판단" },
   { value: "behavior", label: "고객행동" },
   { value: "trend", label: "판매추세" },
   { value: "returns", label: "반품·핏" },
@@ -261,7 +264,11 @@ function DetailInner() {
         </div>
       </div>
 
+      <ReadingBar product={product} />
+
       <Segmented value={tab} onChange={setTab} options={TABS} className="w-full md:w-auto" />
+
+      {tab === "markdown" && <MarkdownSimulator product={product} />}
 
       {tab === "info" && (
         <div className="grid gap-5 lg:grid-cols-2">
@@ -338,6 +345,7 @@ function DetailInner() {
         </div>
       )}
 
+      {tab === "options" && <OptionMatrixView product={product} />}
       {tab === "options" && (
         <SectionCard
           title="옵션별 판매·재고"

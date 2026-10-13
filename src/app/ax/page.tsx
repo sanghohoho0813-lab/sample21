@@ -16,15 +16,11 @@ import {
   Wand2,
 } from "lucide-react";
 import { useApp, ROLE_NAME } from "@/lib/store";
-import { BRANDS, DAILY, PRODUCT_BY_ID, VARIANTS } from "@/lib/demo/seed";
+import { BRANDS, DAILY, PRODUCT_BY_ID } from "@/lib/demo/seed";
 import {
   actionKpi,
   allOrders,
   allReturns,
-  daysOfStock,
-  demandScore,
-  effVariant,
-  inventoryStatus,
   inventoryKpi,
   periodOrders,
   salesKpi,
@@ -66,6 +62,9 @@ import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/States";
 import { Button } from "@/components/ui/Button";
 import { EVIDENCE_TYPE_LABEL, SOURCE_LABEL } from "@/components/ax/ops/shared";
+import { useReadings } from "@/components/ax/intel/useIntel";
+import { PatternTag } from "@/components/ax/intel/Signals";
+import { ATTENTION_CODES } from "@/lib/intel/signals";
 
 const PERIODS: Period[] = ["today", "7d", "30d", "90d"];
 const DAYS: Record<Period, number> = { today: 1, "7d": 7, "30d": 30, "90d": 90 };
@@ -129,13 +128,15 @@ function Dashboard() {
   }, [k, returnsAll, days, orders, period]);
 
   /* ------------------------------ Demand radar preview ------------------------------ */
+  // 점수 순이 아니라 '판독' 순 — 무슨 문제인지와 왜 지금인지를 첫 화면에서 (D-48)
+  const readings = useReadings();
   const radar = useMemo(
     () =>
-      VARIANTS.map((v) => effVariant(v, app))
-        .map((v) => ({ v, score: demandScore(v), status: inventoryStatus(v, app) }))
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5),
-    [app],
+      readings
+        .filter((r) => ATTENTION_CODES.includes(r.pattern.code))
+        .slice(0, 5)
+        .map((r) => ({ v: r.signals.variant, pattern: r.pattern, status: r.signals.status })),
+    [readings],
   );
 
   /* ------------------------------ AI briefing (rule text) ------------------------------ */
@@ -616,14 +617,14 @@ function Dashboard() {
           className="lg:col-span-3"
           title={
             <span className="inline-flex items-center gap-2">
-              수요 레이더 <Term term="수요 신호">상위 5</Term>
+              SKU 신호 판독 <Term term="수요 신호">상위 5</Term>
             </span>
           }
-          desc="조회·찜·장바구니·재입고 신청을 옵션 단위 수요 점수로 계산"
-          right={<AxLink href="/ax/inventory">재고·재입고</AxLink>}
+          desc="조회·찜·장바구니·구매전환·반품·재고의 조합 → 무슨 문제인가 · 왜 지금인가"
+          right={<AxLink href="/ax/inventory#signals">전체 판독</AxLink>}
         >
           <ul className="divide-y divide-neutral-border">
-            {radar.map(({ v, score, status }) => {
+            {radar.map(({ v, pattern, status }) => {
               const p = PRODUCT_BY_ID[v.productId];
               return (
                 <li key={v.id}>
@@ -638,12 +639,10 @@ function Dashboard() {
                           · {v.color} · {v.size}
                         </span>
                       </p>
-                      <p className="tabular mt-0.5 text-[0.8rem] text-neutral-text2">
-                        7일 판매 {v.sales7d} (직전 {v.salesPrev7d}) · 찜 {v.wishlist7d} · 재입고 신청{" "}
-                        {v.restockRequests} · 재고 {v.stock}개{v.stock > 0 ? ` (${daysOfStock(v)}일)` : ""}
-                      </p>
+                      <PatternTag code={pattern.code} className="mt-0.5" />
+                      <p className="mt-0.5 text-[0.8rem] leading-snug text-neutral-text2">{pattern.why}</p>
                     </div>
-                    <MiniBar value={score} tone={demandTone(score)} className="w-28 shrink-0" />
+                    <MiniBar value={pattern.severity} tone={demandTone(pattern.severity)} className="w-28 shrink-0" />
                     <span className="hidden sm:inline-flex">
                       <InventoryStatusBadge status={status} />
                     </span>

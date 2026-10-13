@@ -35,6 +35,8 @@ import { toast } from "@/components/ui/Toast";
 import { AIReadyBadge } from "@/components/ax/AIReady";
 import { ActionStatusBadge, UrgencyLabel, ACTION_STATUS_LABEL } from "@/components/ax/StatusBadges";
 import { ACTION_TYPE_LABEL, ActionEntityChips, ENGINE_LABEL, ERROR_COST_LABEL, StatPill } from "./shared";
+import { ControlPanel, ControlStrip, MarkdownGuard, OutcomePanel } from "@/components/ax/intel/ActionControls";
+import { approvalOf, assigneeOf, needsApproval } from "@/lib/intel/policy";
 
 type Live = {
   label: string;
@@ -67,7 +69,11 @@ function useLiveStrip(action: AXAction): Live | null {
           value: v.stock <= 0 ? "품절" : `${dos}일`,
           tone: v.stock <= 0 ? "error" : dos <= rp.leadTime ? "warning" : "neutral",
         },
-        { label: "추천 수량", value: `${num(action.quantity ?? rp.suggestedQty)}개`, sub: `우선순위 ${rp.score}점` },
+        {
+          label: "추천 수량",
+          value: `${num(action.quantity ?? rp.suggestedQty)}개`,
+          sub: `엔진 제안 ${num(rp.suggestedQty)}개`,
+        },
         { label: "리드타임", value: `${rp.leadTime}일`, sub: `재입고 신청 ${num(v.restockRequests)}건` },
       ];
     }
@@ -189,7 +195,11 @@ export function ActionCard({
 
   const change = (status: ActionStatus, note?: string) => {
     const body = effectText(status);
-    updateActionStatus(action.id, status, actor, note);
+    if (!updateActionStatus(action.id, status, actor, note)) {
+      const ap = approvalOf(action);
+      toast("승인이 먼저 필요합니다", `${ap.reason} — 승인 후 실행할 수 있습니다.`, "info");
+      return;
+    }
     toast(
       `${ACTION_STATUS_LABEL[status]} 처리 · ${action.title}`,
       body,
@@ -231,7 +241,7 @@ export function ActionCard({
           <ChevronDown size={18} className="mt-1 shrink-0 -rotate-90 text-neutral-text2" />
         </div>
         <div className="mt-2 flex min-w-0 items-center justify-between gap-2 text-[0.78rem] text-neutral-text2">
-          <span className="min-w-0">{action.ownerName}</span>
+          <span className="min-w-0">{assigneeOf(action)}</span>
           <span className="tabular shrink-0">{relTime(action.recommendedAt)}</span>
         </div>
       </Link>
@@ -284,6 +294,9 @@ export function ActionCard({
           <div className="mt-2.5">
             <ActionEntityChips action={action} />
           </div>
+          <div className="mt-2">
+            <ControlStrip action={action} />
+          </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1 text-[0.8rem] text-neutral-text2">
           {onToggle && (expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />)}
@@ -291,7 +304,6 @@ export function ActionCard({
             <Clock size={12} />
             {relTime(action.recommendedAt)}
           </span>
-          <span className="whitespace-nowrap">{action.ownerName}</span>
         </div>
       </div>
 
@@ -353,10 +365,15 @@ export function ActionCard({
             </span>
             <span>{ERROR_COST_LABEL[action.errorCost]}</span>
             <span>
-              담당 <span className="font-semibold text-neutral-text">{action.ownerName}</span> · 추천일{" "}
+              담당 <span className="font-semibold text-neutral-text">{assigneeOf(action)}</span> · 추천일{" "}
               {fmtDate(action.recommendedAt, "datetime")}
             </span>
           </div>
+
+          {/* 할인 과제: 엔진 판단(근거 체크) · 운영 통제 · 성과 전/후 */}
+          <MarkdownGuard action={action} />
+          <ControlPanel action={action} role={role === "customer" ? "owner" : role} />
+          {action.status !== "recommended" && <OutcomePanel action={action} />}
 
           {/* Done: result + timeline + evidence */}
           {(action.status === "done" ||
@@ -418,9 +435,19 @@ export function ActionCard({
               </>
             )}
             {action.status === "confirmed" && (
-              <Button size="md" onClick={() => change("in-progress")} icon={<Play size={18} />}>
-                실행 시작
-              </Button>
+              <>
+                <Button
+                  size="md"
+                  onClick={() => change("in-progress")}
+                  icon={<Play size={18} />}
+                  disabled={needsApproval(action)}
+                >
+                  실행 시작
+                </Button>
+                {needsApproval(action) && (
+                  <span className="text-[0.82rem] font-semibold text-[#b45309]">승인 후 실행할 수 있습니다</span>
+                )}
+              </>
             )}
             {action.status === "in-progress" && (
               <Button
@@ -450,7 +477,7 @@ export function ActionCard({
                 완료됨 · 고객 화면 반영
               </span>
             )}
-            {isOpen && <span className="ml-auto text-[0.78rem] text-neutral-text2">승인자: {actor} (현재 역할)</span>}
+            {isOpen && <span className="ml-auto text-[0.78rem] text-neutral-text2">처리자: {actor} (현재 역할)</span>}
             {product && (
               <Link
                 href={`/products/${product.id}`}

@@ -4,7 +4,10 @@ import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AlertTriangle, Boxes, PackagePlus, Radar, TrendingDown, TrendingUp, Zap } from "lucide-react";
-import { useApp } from "@/lib/store";
+import { useApp, ROLE_NAME } from "@/lib/store";
+import { markdownRequestFor, restockRequestFor } from "@/lib/intel/candidates";
+import { markdownDecision } from "@/lib/intel/markdown";
+import { SignalBoard } from "@/components/ax/intel/SignalBoard";
 import { BRAND_BY_ID, PRODUCT_BY_ID, PRODUCTS, SCENARIO, VARIANTS } from "@/lib/demo/seed";
 import {
   daysOfStock,
@@ -145,12 +148,22 @@ function InventoryInner() {
   );
   const incoming = useMemo(() => rows.filter((r) => r.v.incoming > 0).sort((a, b) => a.dos - b.dos), [rows]);
 
-  const requestReview = (label: string) =>
+  // 검토 요청 = 엔진 판독을 근거로 붙여 실행 센터에 과제를 등록한다 (자동 실행 없음)
+  const actor = ROLE_NAME[role];
+  const registered = (_id: string, title: string) =>
     toast(
-      "검토 요청 (데모)",
-      `${label} · MD 승인 대기 과제는 시연 시나리오에서 제공됩니다. 실제 서비스에서는 수요 엔진이 자동으로 추천을 생성합니다.`,
-      "info",
+      "검토 과제 등록",
+      `${title} — 엔진 판독을 근거로 실행 센터에 올렸습니다. '과제 열기'에서 검토·승인합니다.`,
+      "success",
     );
+  const requestReview = (variantId: string) => {
+    const c = restockRequestFor(variantId, app, actor);
+    if (c) registered(app.createActionFromCandidate(c, actor), c.title);
+  };
+  const requestMarkdown = (productId: string) => {
+    const c = markdownRequestFor(productId, app, actor);
+    if (c) registered(app.createActionFromCandidate(c, actor), c.title);
+  };
 
   return (
     <div className="space-y-6">
@@ -194,6 +207,8 @@ function InventoryInner() {
           accent={ICON_ACCENTS.settings}
         />
       </div>
+
+      <SignalBoard />
 
       {/* Demand Radar */}
       <section
@@ -400,11 +415,29 @@ function InventoryInner() {
               { key: "cur", header: "현재 할인", align: "right", cell: (x) => pct(x.m.currentRate, 0) },
               {
                 key: "sug",
-                header: "제안 할인율",
-                align: "right",
-                cell: (x) => (
-                  <span className="tabular font-semibold text-theme-primary">{pct(x.m.suggestedRate, 0)}</span>
-                ),
+                header: "할인 판단 (근거 5개)",
+                cell: (x) => {
+                  const md = markdownDecision(x.p, app);
+                  return (
+                    <Link
+                      href={`/ax/products/${x.p.id}?tab=markdown`}
+                      className={cn(
+                        "tabular inline-flex min-h-11 flex-col justify-center font-semibold hover:underline md:min-h-0",
+                        md.verdict === "markdown"
+                          ? "text-theme-primary"
+                          : md.verdict === "hold"
+                            ? "text-[#b45309]"
+                            : "text-neutral-text2",
+                      )}
+                      title={md.guards[0] ?? md.checks.map((c) => `${c.ok ? "✓" : "✗"} ${c.label}`).join("\n")}
+                    >
+                      {md.verdictLabel}
+                      <span className="text-[0.72rem] font-normal text-neutral-text2">
+                        통과 {md.checks.filter((c) => c.ok).length}/{md.checks.length}
+                      </span>
+                    </Link>
+                  );
+                },
               },
               {
                 key: "act",
@@ -419,7 +452,7 @@ function InventoryInner() {
                       열기
                     </Link>
                   ) : (
-                    <Button size="sm" variant="outline" onClick={() => requestReview(x.p.name)}>
+                    <Button size="sm" variant="outline" onClick={() => requestMarkdown(x.p.id)}>
                       검토 요청
                     </Button>
                   ),
@@ -490,8 +523,7 @@ function InventoryInner() {
 }
 
 /* ------------------------------ Radar rows ------------------------------ */
-function ActionCell({ r, onRequest }: { r: RadarRow; onRequest: (label: string) => void }) {
-  const p = PRODUCT_BY_ID[r.v.productId];
+function ActionCell({ r, onRequest }: { r: RadarRow; onRequest: (variantId: string) => void }) {
   if (r.actionId)
     return (
       <Link
@@ -504,7 +536,7 @@ function ActionCell({ r, onRequest }: { r: RadarRow; onRequest: (label: string) 
     );
   return (
     <button
-      onClick={() => onRequest(`${p.name} ${r.v.color} ${r.v.size}`)}
+      onClick={() => onRequest(r.v.id)}
       className="h-10 whitespace-nowrap rounded-lg border border-neutral-border bg-white px-2.5 text-[0.8rem] font-semibold hover:bg-neutral-canvas md:h-8"
     >
       검토 요청
@@ -512,7 +544,15 @@ function ActionCell({ r, onRequest }: { r: RadarRow; onRequest: (label: string) 
   );
 }
 
-function RadarTr({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label: string) => void; tourable: boolean }) {
+function RadarTr({
+  r,
+  onRequest,
+  tourable,
+}: {
+  r: RadarRow;
+  onRequest: (variantId: string) => void;
+  tourable: boolean;
+}) {
   const p = PRODUCT_BY_ID[r.v.productId];
   const isA = r.v.id === SCENARIO.A_VARIANT;
   return (
@@ -587,7 +627,15 @@ function RadarTr({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label: s
   );
 }
 
-function RadarCard({ r, onRequest, tourable }: { r: RadarRow; onRequest: (label: string) => void; tourable: boolean }) {
+function RadarCard({
+  r,
+  onRequest,
+  tourable,
+}: {
+  r: RadarRow;
+  onRequest: (variantId: string) => void;
+  tourable: boolean;
+}) {
   const p = PRODUCT_BY_ID[r.v.productId];
   const isA = r.v.id === SCENARIO.A_VARIANT;
   return (
