@@ -138,6 +138,13 @@ describe("핏 학습 — 구매·반품 기록이 다음 추천 사이즈가 된
     expect(fit.reasons.join(" ")).toMatch(/내 구매 기록/);
   });
 
+  it("계산한 사이즈가 상품에 없으면 가장 가까운 사이즈를 추천한다 (XS → S, M이 아니라)", () => {
+    const oxford = PRODUCT_BY_ID[SCENARIO.A_PRODUCT]; // 크게 나온 상품 · S~XL
+    expect(oxford.sizes).not.toContain("XS");
+    const fit = recommendFit(oxford, { ...store().fitProfile, topSize: "S" });
+    expect(fit.size).toBe("S");
+  });
+
   it("상품 반품이 '작음'으로 몰린 상품은 반품 데이터를 추천 근거로 쓴다", () => {
     const sig = productReturnSignal(SCENARIO.B_PRODUCT, store());
     expect(sig?.direction).toBe("small");

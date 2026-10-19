@@ -143,7 +143,17 @@ export function recommendFit(
   if (idx < 0) idx = 2;
   idx = Math.max(0, Math.min(SIZE_ORDER.length - 1, idx + shift));
   base = SIZE_ORDER[idx];
-  if (!p.sizes.includes(base)) base = p.sizes.includes("M") ? "M" : p.sizes[Math.floor(p.sizes.length / 2)];
+  // 계산한 사이즈가 이 상품에 없으면 가장 가까운 사이즈로 (예: XS → S). 순서를 모르는 사이즈면 가운데
+  if (!p.sizes.includes(base)) {
+    const ladder = p.sizes.filter((z) => SIZE_ORDER.includes(z));
+    base = ladder.length
+      ? ladder.reduce((best, z) =>
+          Math.abs(SIZE_ORDER.indexOf(z) - idx) < Math.abs(SIZE_ORDER.indexOf(best) - idx) ? z : best,
+        )
+      : p.sizes.includes("M")
+        ? "M"
+        : p.sizes[Math.floor(p.sizes.length / 2)];
+  }
   let score = 0.55;
   if (usual) score += 0.2;
   if (fromHW) score += 0.15;
