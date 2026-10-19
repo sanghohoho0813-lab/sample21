@@ -2,12 +2,11 @@
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import type { Product } from "@/lib/types";
-import { BRAND_BY_ID } from "@/lib/demo/seed";
+import { BRAND_BY_ID, colorHex } from "@/lib/demo/seed";
 import { useApp } from "@/lib/store";
 import { effPrice, productAgg } from "@/lib/kpi";
 import { ProductImage } from "@/components/ui/ProductImage";
 import { Price } from "@/components/ui/Misc";
-import { Badge } from "@/components/ui/Badge";
 import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 
@@ -49,39 +48,64 @@ export function ProductCard({
         className="block"
         onClick={() => store.track("view_product", { productId: product.id })}
       >
-        <div className="relative overflow-hidden rounded-2xl">
+        <div className="relative overflow-hidden rounded-lg">
           <ProductImage
             colors={product.colors}
             label={product.name}
             caption={false}
-            className="transition-transform duration-normal group-hover:scale-[1.03]"
+            className="!rounded-none transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
           {rank !== undefined && (
-            <span className="tabular absolute left-0 top-0 flex h-9 min-w-[36px] items-center justify-center rounded-br-2xl bg-brand-black px-2 text-[0.95rem] font-black text-white">
+            <span
+              className={cn(
+                "tabular absolute left-0 top-0 flex h-8 min-w-[32px] items-center justify-center px-2 text-[0.88rem] font-black",
+                rank <= 3 ? "bg-brand-black text-white" : "bg-white/90 text-brand-black",
+              )}
+            >
               {rank}
             </span>
           )}
           {badge && (
-            <span className="absolute bottom-2 left-2">
-              <Badge tone={badge.tone} size="sm">
-                {badge.t}
-              </Badge>
+            <span
+              className={cn(
+                "absolute bottom-2 left-2 rounded px-1.5 py-0.5 text-[0.78rem] font-bold leading-tight backdrop-blur-sm",
+                BADGE_TONE[badge.tone],
+              )}
+            >
+              {badge.t}
             </span>
           )}
         </div>
-        <div className={cn("mt-2.5", compact ? "space-y-0" : "space-y-0.5")}>
-          <p className="text-[0.78rem] font-bold tracking-wide text-neutral-text2">{brand.name}</p>
-          <p className="line-clamp-2 min-h-[2.6em] text-[0.95rem] font-semibold leading-snug underline-offset-2 group-hover:underline">
+        <div className="mt-2.5 space-y-1 pr-1">
+          <p className="truncate text-[0.78rem] font-bold uppercase tracking-[0.04em] text-neutral-text">
+            {brand.name}
+          </p>
+          <p className="line-clamp-2 min-h-[2.5em] text-[0.9rem] leading-snug text-neutral-text2 underline-offset-2 group-hover:text-neutral-text">
             {product.name}
           </p>
-          <Price price={price} original={product.price} size="sm" />
+          <Price price={price} original={product.price} size="sm" strike={false} className="pt-0.5" />
           {reason ? (
             <p className="text-[0.78rem] font-semibold text-brand-accent">{reason}</p>
           ) : (
             !compact && (
-              <p className="tabular text-[0.78rem] text-neutral-text2">
-                ★ {product.rating} · 리뷰 {product.reviewCount}
-              </p>
+              <div className="flex items-center gap-2 text-[0.78rem] text-neutral-text2">
+                <span className="tabular">
+                  <span className="text-neutral-text">★ {product.rating}</span> (
+                  {product.reviewCount.toLocaleString("ko-KR")})
+                </span>
+                {product.colors.length > 1 && (
+                  <span className="flex items-center gap-1" aria-label={`색상 ${product.colors.length}가지`}>
+                    {product.colors.slice(0, 4).map((c) => (
+                      <span
+                        key={c}
+                        className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
+                        style={{ background: colorHex(c)[0] }}
+                        aria-hidden
+                      />
+                    ))}
+                  </span>
+                )}
+              </div>
             )
           )}
         </div>
@@ -100,15 +124,22 @@ export function ProductCard({
           );
         }}
         className={cn(
-          "absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full shadow-card transition-all duration-fast hover:scale-110 hover:shadow-raised active:scale-95",
-          wished ? "bg-brand-black text-white hover:bg-[#2a2a2a]" : "bg-white/90 text-neutral-text hover:bg-white",
+          "absolute right-1 top-1 flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-fast hover:scale-110 active:scale-90",
+          wished ? "text-[#e0344f]" : "text-neutral-text/70 hover:text-neutral-text",
         )}
       >
-        <Heart size={18} fill={wished ? "currentColor" : "none"} />
+        <Heart size={20} strokeWidth={1.8} fill={wished ? "currentColor" : "rgba(255,255,255,0.55)"} />
       </button>
     </div>
   );
 }
+
+const BADGE_TONE = {
+  accent: "bg-brand-accent/90 text-white",
+  warning: "bg-[#fff1e6]/95 text-[#b45309]",
+  neutral: "bg-white/90 text-neutral-text2",
+  dark: "bg-brand-black/85 text-white",
+} as const;
 
 export function ProductGrid({
   products,
@@ -124,7 +155,7 @@ export function ProductGrid({
   className?: string;
 }) {
   return (
-    <div className={cn("stagger stagger-sm grid gap-x-4 gap-y-7", cols, className)}>
+    <div className={cn("stagger stagger-sm grid gap-x-2.5 gap-y-7 md:gap-x-5 md:gap-y-10", cols, className)}>
       {products.map((p, i) => (
         <ProductCard key={p.id} product={p} rank={ranked ? i + 1 : undefined} reason={reasons?.[p.id]} />
       ))}

@@ -7,6 +7,25 @@
    Theme (9 × 6) changes mood; Neutral + Semantic stay fixed.
 ------------------------------------------------------------------- */
 :root {
+  /* 표면 토큰 — 고객 화면 기본값 */
+  --radius-card: 16px;
+  --radius-cardlg: 20px;
+  --shadow-card: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 3px rgba(17, 24, 39, 0.06);
+}
+/* 운영화면(AX) — 업무 도구는 둥근 카드보다 선·면으로 정리한다: 작은 반경, 그림자 대신 경계선 (D-55) */
+[data-surface="ax"] {
+  --radius-card: 10px;
+  --radius-cardlg: 12px;
+  --shadow-card: 0 1px 0 rgba(17, 24, 39, 0.03);
+}
+/* 같은 원칙을 AX 안의 고정 반경 클래스에도 — 바깥 면 12px, 안쪽 요소·버튼·입력 8px (클래스 이름은 그대로 두어 테스트·마크업 계약 유지) */
+[data-surface="ax"] .rounded-2xl {
+  border-radius: 12px;
+}
+[data-surface="ax"] .rounded-xl {
+  border-radius: 8px;
+}
+:root {
   /* Canonical Theme 01 — Deep Navy Blue (default) */
   --theme-shell: #0b1830;
   --theme-primary: #2457d6;

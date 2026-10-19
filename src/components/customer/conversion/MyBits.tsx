@@ -347,7 +347,8 @@ export function RestockList({ limit, tour, compact }: { limit?: number; tour?: s
 }
 
 /* ------------------------------ Profile / stats / recently viewed ------------------------------ */
-export function ProfileCard() {
+/** 마이 상단 — 회원 카드 한 장에 '누구인지 · 내 사이즈 · 지금 볼 것(주문·찜·재입고·알림)'을 모은다 */
+export function ProfileCard({ orders }: { orders?: Order[] }) {
   const fp = useApp((s) => s.fitProfile);
   const parts = [
     fp.height && `${fp.height}cm`,
@@ -359,37 +360,40 @@ export function ProfileCard() {
   ].filter(Boolean);
   const complete = !!(fp.height && fp.weight && fp.topSize && fp.bottomSize);
   return (
-    <div className="flex flex-col gap-4 rounded-cardlg border border-neutral-border bg-white p-5 sm:flex-row sm:items-center md:p-6">
-      <span className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-brand-black text-[1.4rem] font-black text-white">
-        {DEMO_CUSTOMER_NAME.slice(0, 1)}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-[1.25rem] font-bold leading-tight">{DEMO_CUSTOMER_NAME}님</p>
-        <p className="tabular mt-0.5 text-[0.85rem] text-neutral-text2">
-          {ME ? `${fmtDate(ME.joinedAt)} 가입 · ${ME.favoriteBrandId ? "AERNO 애호가" : "취향 탐색중"}` : "회원 정보"}
-        </p>
-        <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.9rem]">
-          <Ruler size={14} className="text-neutral-text2" />
-          {parts.length ? (
-            parts.join(" · ")
-          ) : (
-            <span className="text-neutral-text2">사이즈·취향 정보가 아직 없습니다</span>
+    <section className="overflow-hidden rounded-cardlg bg-brand-black text-white" aria-label="내 회원 정보">
+      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center md:p-6">
+        <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/10 text-[1.3rem] font-black ring-1 ring-white/20">
+          {DEMO_CUSTOMER_NAME.slice(0, 1)}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[1.3rem] font-bold leading-tight">{DEMO_CUSTOMER_NAME}님</p>
+          <p className="tabular mt-0.5 text-[0.85rem] text-white/60">
+            {ME ? `${fmtDate(ME.joinedAt)} 가입 · ${ME.favoriteBrandId ? "AERNO 애호가" : "취향 탐색중"}` : "회원 정보"}
+          </p>
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.9rem] text-white/85">
+            <Ruler size={14} className="text-white/60" />
+            {parts.length ? parts.join(" · ") : <span className="text-white/60">사이즈·취향 정보가 아직 없습니다</span>}
+          </p>
+        </div>
+        <Link
+          href="/my/profile"
+          className={cn(
+            "inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-[0.95rem] font-semibold transition-colors",
+            complete
+              ? "border border-white/25 text-white hover:bg-white/10"
+              : "bg-white text-brand-black hover:bg-white/90",
           )}
-        </p>
+        >
+          <User size={16} />
+          {complete ? "프로필 수정" : "사이즈·취향 입력"}
+        </Link>
       </div>
-      <Button
-        variant={complete ? "outline" : "brand"}
-        href="/my/profile"
-        icon={<User size={16} />}
-        className="shrink-0"
-      >
-        {complete ? "프로필 수정" : "사이즈·취향 입력"}
-      </Button>
-    </div>
+      {orders && <QuickStats orders={orders} dark />}
+    </section>
   );
 }
 
-export function QuickStats({ orders }: { orders: Order[] }) {
+export function QuickStats({ orders, dark }: { orders: Order[]; dark?: boolean }) {
   const store = useApp();
   const unread = store.notifications.filter((n) => !n.read).length;
   const items = [
@@ -403,6 +407,30 @@ export function QuickStats({ orders }: { orders: Order[] }) {
     },
     { label: "읽지 않은 알림", value: unread, href: "/my?tab=overview#notify", icon: BellRing },
   ];
+  if (dark)
+    return (
+      <div className="grid grid-cols-4 border-t border-white/10">
+        {items.map((it, i) => {
+          const Icon = it.icon;
+          return (
+            <Link
+              key={it.label}
+              href={it.href}
+              className={cn(
+                "flex min-h-[72px] flex-col items-center justify-center gap-0.5 px-1 py-3 text-center transition-colors hover:bg-white/5 active:bg-white/10",
+                i > 0 && "border-l border-white/10",
+              )}
+            >
+              <span className="tabular text-[1.3rem] font-black leading-tight">{it.value}</span>
+              <span className="inline-flex items-center gap-1 text-[0.78rem] text-white/60">
+                <Icon size={12} aria-hidden />
+                <span className="truncate">{it.label === "읽지 않은 알림" ? "새 알림" : it.label}</span>
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    );
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {items.map((it) => {

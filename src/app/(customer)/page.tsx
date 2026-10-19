@@ -6,7 +6,7 @@
              → 새 브랜드 → 시즌 스타일 편집 → 신뢰·배송·교환
 ------------------------------------------------------------------- */
 import Link from "next/link";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Ruler, TrendingUp, Truck, RefreshCcw, ShieldCheck, Sparkles, ChevronRight } from "lucide-react";
 import { BRANDS, BRAND_BY_ID, PRODUCTS, DEMO_CUSTOMER_NAME, colorHex } from "@/lib/demo/seed";
 import { assetUrl } from "@/lib/assets";
@@ -26,31 +26,142 @@ import { SkeletonGrid, Skeleton } from "@/components/ui/States";
 import { Container, SectionHead } from "@/components/customer/Section";
 import { ProductCard, ProductGrid, HScroll } from "@/components/customer/ProductCard";
 import { BRAND_ASSET, isNewBrand, brandProductCount } from "@/components/customer/discovery/BrandCard";
+import { CategoryLinks } from "@/components/customer/discovery/CategoryRail";
+import { BrandGarment } from "@/components/customer/discovery/BrandGarment";
 
 const VARIANT_COUNT = PRODUCTS.reduce((s, p) => s + p.colors.length * p.sizes.length, 0);
 /** 휴대폰에서는 목록을 4개(2줄)까지만 — 나머지는 '전체 보기'로. 홈이 끝없이 길어지지 않게 */
 const MOBILE_FOUR = "[&>*:nth-child(n+5)]:hidden md:[&>*:nth-child(n+5)]:block";
 
 /* ------------------------------ Hero ------------------------------ */
+type Slide = {
+  key: string;
+  href: string;
+  eyebrow: string;
+  title: [string, string];
+  cta: string;
+  gradient: [string, string];
+  asset: string;
+  garments: { kind: GarmentKind; color: string; className: string }[];
+};
+const SLIDES: Slide[] = [
+  {
+    key: "fw",
+    href: "/shop?category=outer",
+    eyebrow: "FW EDITORIAL · 아우터",
+    title: ["오늘의 취향을", "브랜드 너머로"],
+    cta: "아우터 보기",
+    gradient: ["#111111", "#3d3d3d"],
+    asset: "hero_main.jpg",
+    garments: [
+      { kind: "jacket", color: "차콜", className: "left-[2%] top-[12%] h-[56%] w-[54%] opacity-90" },
+      { kind: "coat", color: "베이지", className: "right-[2%] top-[4%] h-[68%] w-[62%]" },
+    ],
+  },
+  {
+    key: "mellow",
+    href: "/brands/mellow-code",
+    eyebrow: "BRAND · MELLOW CODE",
+    title: [BRAND_BY_ID["b-mellow"].tagline, "니트 원피스 컬렉션"],
+    cta: "브랜드 보기",
+    gradient: BRAND_BY_ID["b-mellow"].gradient,
+    asset: "fashion_editorial_01.jpg",
+    garments: [{ kind: "dress", color: "크림", className: "inset-x-0 top-[4%] mx-auto h-[68%] w-[70%]" }],
+  },
+  {
+    key: "current",
+    href: "/brands/current-type",
+    eyebrow: "BRAND · CURRENT TYPE",
+    title: [BRAND_BY_ID["b-current"].tagline, "쉘 자켓과 후디"],
+    cta: "브랜드 보기",
+    gradient: BRAND_BY_ID["b-current"].gradient,
+    asset: "fashion_editorial_02.jpg",
+    garments: [{ kind: "jacket", color: "올리브", className: "inset-x-0 top-[6%] mx-auto h-[64%] w-[76%]" }],
+  },
+];
+
+/** 휴대폰 첫 화면 — 글보다 옷이 먼저 보이게. 가로로 넘겨 보는 풀블리드 에디토리얼 */
+function HeroCarousel() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+  const onScroll = () => {
+    const el = ref.current;
+    if (el) setIndex(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)));
+  };
+  return (
+    <div className="relative md:hidden">
+      <div
+        ref={ref}
+        onScroll={onScroll}
+        className="hide-scrollbar flex snap-x snap-mandatory overflow-x-auto"
+        aria-roledescription="carousel"
+        aria-label="에디토리얼"
+      >
+        {SLIDES.map((sl, i) => {
+          const Heading = i === 0 ? "h1" : "h2";
+          return (
+            <Link
+              key={sl.key}
+              href={sl.href}
+              className="group block w-full shrink-0 snap-center"
+              aria-label={`${sl.title.join(" ")} — ${sl.cta}`}
+            >
+              <GradientImage
+                gradient={sl.gradient}
+                ratio="aspect-[4/5]"
+                asset={sl.asset}
+                overlay
+                label={sl.eyebrow}
+                className="!rounded-none"
+              >
+                {!assetUrl(sl.asset) &&
+                  sl.garments.map((g) => (
+                    <EditorialGarment key={g.kind + g.color} kind={g.kind} color={g.color} className={g.className} />
+                  ))}
+                <div className="absolute inset-x-5 bottom-7 text-white">
+                  <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/75">{sl.eyebrow}</p>
+                  <Heading className="mt-2 text-[2rem] font-black leading-[1.12] tracking-tight">
+                    {sl.title[0]}
+                    <br />
+                    {sl.title[1]}
+                  </Heading>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[0.9rem] font-semibold">
+                    {sl.cta}
+                    <ArrowRight size={15} />
+                  </span>
+                </div>
+              </GradientImage>
+            </Link>
+          );
+        })}
+      </div>
+      <span
+        className="tabular pointer-events-none absolute bottom-7 right-5 rounded-full bg-black/45 px-2.5 py-1 text-[0.78rem] font-semibold text-white backdrop-blur-sm"
+        aria-live="polite"
+      >
+        {index + 1} / {SLIDES.length}
+      </span>
+    </div>
+  );
+}
+
 function Hero() {
   return (
-    <section data-tour="c-hero" className="border-b border-neutral-border bg-brand-ivory">
-      <Container className="grid items-center gap-8 py-8 md:grid-cols-12 md:gap-10 md:py-14 lg:py-16">
-        <div className="md:col-span-6 lg:col-span-6">
-          <p className="text-[0.78rem] font-bold tracking-[0.2em] text-neutral-text2 md:text-[0.8rem]">
-            MULTI-BRAND FASHION PLATFORM
-          </p>
-          <h1 className="mt-3 text-[2.35rem] font-black leading-[1.05] tracking-tight md:text-[3.2rem] lg:text-[3.6rem]">
+    <section data-tour="c-hero" className="bg-brand-ivory md:border-b md:border-neutral-border">
+      <HeroCarousel />
+      <Container className="hidden items-center gap-10 py-14 md:grid md:grid-cols-12 lg:py-16">
+        <div className="md:col-span-6">
+          <p className="text-[0.8rem] font-bold tracking-[0.2em] text-neutral-text2">MULTI-BRAND FASHION PLATFORM</p>
+          <h1 className="mt-3 text-[3.2rem] font-black leading-[1.05] tracking-tight lg:text-[3.6rem]">
             오늘의 취향을
             <br />
             브랜드 너머로
           </h1>
-          <p className="mt-4 max-w-[34rem] text-[1rem] leading-relaxed text-neutral-text2 md:mt-5 md:text-[1.1rem]">
+          <p className="mt-5 max-w-[34rem] text-[1.1rem] leading-relaxed text-neutral-text2">
             {BRANDS.length}개 브랜드의 옷과 신발을 한곳에서 비교하고,
-            <br className="hidden sm:block" /> <strong className="text-neutral-text">내 사이즈에 맞는 상품</strong>까지
-            찾아드려요.
+            <br /> <strong className="text-neutral-text">내 사이즈에 맞는 상품</strong>까지 찾아드려요.
           </p>
-          <div className="mt-6 flex flex-wrap gap-2.5 md:mt-7">
+          <div className="mt-7 flex flex-wrap gap-2.5">
             <Button variant="brand" size="lg" href="/ranking" icon={<TrendingUp size={18} />}>
               랭킹 보기
             </Button>
@@ -58,89 +169,70 @@ function Hero() {
               스타일 찾기
             </Button>
           </div>
-          <ul className="mt-7 grid max-w-[32rem] grid-cols-3 gap-2 md:mt-8" aria-label="MORFIT 특징">
-            {[
-              { v: `${BRANDS.length}`, l: "입점 브랜드" },
-              { v: `${num(VARIANT_COUNT)}`, l: "색상·사이즈 옵션" },
-              { v: "핏 추천", l: "내 사이즈 기준" },
-            ].map((s) => (
-              <li key={s.l} className="rounded-2xl border border-neutral-border bg-white/70 px-3 py-2.5">
-                <p className="tabular text-[1.15rem] font-black leading-none md:text-[1.3rem]">{s.v}</p>
-                <p className="mt-1 break-keep text-[0.78rem] font-semibold text-neutral-text2">{s.l}</p>
-              </li>
-            ))}
-          </ul>
+          <p className="tabular mt-8 text-[0.85rem] text-neutral-text2">
+            입점 브랜드 <b className="text-neutral-text">{BRANDS.length}</b>
+            <span className="mx-2 text-neutral-border">|</span>
+            색상·사이즈 옵션 <b className="text-neutral-text">{num(VARIANT_COUNT)}</b>
+            <span className="mx-2 text-neutral-border">|</span>
+            상품마다 <b className="text-neutral-text">내 사이즈 추천</b>
+          </p>
         </div>
-        <div className="grid grid-cols-3 gap-2.5 md:col-span-6 md:gap-3">
-          <GradientImage
-            gradient={["#111111", "#3d3d3d"]}
-            ratio="aspect-[3/4]"
-            className="col-span-2 row-span-2 rounded-cardlg"
-            asset="hero_main.jpg"
-            overlay
-            label="FW 에디토리얼 메인"
-          >
-            {!assetUrl("hero_main.jpg") && (
-              <>
-                <EditorialGarment
-                  kind="jacket"
-                  color="차콜"
-                  className="left-[4%] top-[14%] h-[58%] w-[52%] opacity-90"
-                />
-                <EditorialGarment kind="coat" color="베이지" className="right-[4%] top-[6%] h-[70%] w-[60%]" />
-              </>
-            )}
-            <div className="absolute bottom-4 left-4 right-4 text-white">
-              <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/75">FW EDITORIAL</p>
-              <p className="mt-1 text-[1.05rem] font-bold leading-tight md:text-[1.25rem]">
-                구조적인 미니멀리즘,
-                <br />
-                오늘의 아우터
-              </p>
-              <Link
-                href="/shop?category=outer"
-                className="tap mt-2 inline-flex items-center gap-1 text-[0.82rem] font-semibold underline-offset-4 hover:underline"
+        <div className="grid grid-cols-3 gap-3 md:col-span-6">
+          {SLIDES.map((sl, i) => (
+            <Link
+              key={sl.key}
+              href={sl.href}
+              className={cn("group block", i === 0 && "col-span-2 row-span-2")}
+              aria-label={`${i === 0 ? "FW 에디토리얼" : sl.eyebrow} — ${sl.cta}`}
+            >
+              <GradientImage
+                gradient={sl.gradient}
+                ratio="aspect-[3/4]"
+                asset={sl.asset}
+                overlay
+                label={sl.eyebrow}
+                className={cn(
+                  "h-full transition-shadow group-hover:shadow-raised",
+                  i === 0 ? "rounded-cardlg" : "rounded-2xl",
+                )}
               >
-                아우터 보기
-                <ArrowRight size={14} />
-              </Link>
-            </div>
-          </GradientImage>
-          <Link href="/brands/mellow-code" className="group block">
-            <GradientImage
-              gradient={BRAND_BY_ID["b-mellow"].gradient}
-              ratio="aspect-[3/4]"
-              asset="fashion_editorial_01.jpg"
-              overlay
-              label="MELLOW CODE 룩"
-              className="transition-shadow group-hover:shadow-raised"
-            >
-              {!assetUrl("fashion_editorial_01.jpg") && (
-                <EditorialGarment kind="dress" color="크림" className="inset-x-0 top-[6%] mx-auto h-[74%] w-[80%]" />
-              )}
-              <span className="absolute bottom-3 left-3 text-[0.78rem] font-bold tracking-wide text-white">
-                MELLOW CODE
-              </span>
-            </GradientImage>
-          </Link>
-          <Link href="/brands/current-type" className="group block">
-            <GradientImage
-              gradient={BRAND_BY_ID["b-current"].gradient}
-              ratio="aspect-[3/4]"
-              asset="fashion_editorial_02.jpg"
-              overlay
-              label="CURRENT TYPE 룩"
-              className="transition-shadow group-hover:shadow-raised"
-            >
-              {!assetUrl("fashion_editorial_02.jpg") && (
-                <EditorialGarment kind="jacket" color="올리브" className="inset-x-0 top-[8%] mx-auto h-[70%] w-[84%]" />
-              )}
-              <span className="absolute bottom-3 left-3 text-[0.78rem] font-bold tracking-wide text-white">
-                CURRENT TYPE
-              </span>
-            </GradientImage>
-          </Link>
+                {!assetUrl(sl.asset) &&
+                  sl.garments.map((g) => (
+                    <EditorialGarment key={g.kind + g.color} kind={g.kind} color={g.color} className={g.className} />
+                  ))}
+                {i === 0 ? (
+                  <div className="absolute bottom-5 left-5 right-5 text-white">
+                    <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/75">FW EDITORIAL</p>
+                    <p className="mt-1 text-[1.25rem] font-bold leading-tight">
+                      구조적인 미니멀리즘,
+                      <br />
+                      오늘의 아우터
+                    </p>
+                    <span className="mt-2 inline-flex items-center gap-1 text-[0.85rem] font-semibold underline-offset-4 group-hover:underline">
+                      {sl.cta}
+                      <ArrowRight size={14} />
+                    </span>
+                  </div>
+                ) : (
+                  <span className="absolute bottom-3 left-3 text-[0.78rem] font-bold tracking-wide text-white">
+                    {sl.eyebrow.replace("BRAND · ", "")}
+                  </span>
+                )}
+              </GradientImage>
+            </Link>
+          ))}
         </div>
+      </Container>
+    </section>
+  );
+}
+
+/** 카테고리 바로가기 + 브랜드 줄 — 히어로 바로 아래, 첫 화면에서 바로 고를 수 있게 */
+function QuickEntry() {
+  return (
+    <section aria-label="빠른 탐색" className="border-b border-neutral-border bg-white">
+      <Container className="pb-3 pt-5 md:pb-4 md:pt-7">
+        <CategoryLinks />
       </Container>
       <div className="border-t border-neutral-border/70">
         <Container className="py-3">
@@ -243,6 +335,7 @@ function NewBrandsSection() {
                 label={`${b.name} 브랜드 이미지`}
                 className="rounded-none"
               >
+                <BrandGarment brandId={b.id} asset={BRAND_ASSET[b.slug]} />
                 <div className="absolute inset-0 flex flex-col justify-between p-3">
                   <div>
                     {newer ? (
@@ -314,6 +407,7 @@ const EDITS = [
     desc: "코트·자켓·플리스 — 브랜드별 실루엣 비교",
     gradient: ["#1f2937", "#6b7280"] as [string, string],
     asset: "category_outer.jpg",
+    garment: { kind: "coat" as GarmentKind, color: "베이지" },
   },
   {
     href: "/shop?gender=women",
@@ -322,6 +416,7 @@ const EDITS = [
     desc: "MELLOW CODE · HALF MOON의 단정한 실루엣",
     gradient: ["#3f3f46", "#c4b5fd"] as [string, string],
     asset: "fashion_editorial_03.jpg",
+    garment: { kind: "dress" as GarmentKind, color: "크림" },
   },
   {
     href: "/shop?sale=1",
@@ -330,6 +425,7 @@ const EDITS = [
     desc: "지금 할인 중인 상품만 모아보기",
     gradient: ["#0c4a6e", "#7dd3fc"] as [string, string],
     asset: "hero_secondary.jpg",
+    garment: { kind: "hoodie" as GarmentKind, color: "그레이" },
   },
 ];
 
@@ -348,6 +444,13 @@ function SeasonEditSection() {
               label={e.title}
               className="rounded-cardlg transition-shadow group-hover:shadow-raised"
             >
+              {!assetUrl(e.asset) && (
+                <EditorialGarment
+                  kind={e.garment.kind}
+                  color={e.garment.color}
+                  className="right-[4%] top-[8%] h-[84%] w-[42%] transition-transform duration-500 group-hover:scale-[1.04] sm:inset-x-0 sm:top-[6%] sm:mx-auto sm:h-[56%] sm:w-[72%]"
+                />
+              )}
               <div className="absolute inset-0 flex flex-col justify-end p-4 text-white md:p-5">
                 <p className="text-[0.78rem] font-bold tracking-[0.18em] text-white/75">{e.eyebrow}</p>
                 <p className="mt-1 text-[1.3rem] font-black leading-tight md:text-[1.5rem]">{e.title}</p>
@@ -413,15 +516,33 @@ function FitCtaSection() {
         <div className="p-6 md:col-span-5 md:p-8 md:pl-0">
           <GradientImage
             gradient={["#315cf5", "#1e2a4a"]}
-            ratio="aspect-[16/9] md:aspect-[4/3]"
+            ratio="aspect-[4/3]"
             asset="fit_profile.jpg"
             label="핏 프로필 안내"
             className="rounded-2xl"
           >
+            {!assetUrl("fit_profile.jpg") && (
+              <EditorialGarment kind="shirt" color="블랙" className="inset-x-0 top-[5%] mx-auto h-[42%] w-[38%]" />
+            )}
             <div className="absolute inset-0 flex flex-col justify-end p-4">
-              <div className="rounded-xl bg-white/95 p-3 text-neutral-text">
+              <div className="rounded-xl bg-white/95 p-3 text-neutral-text shadow-raised">
                 <p className="text-[0.78rem] font-bold text-neutral-text2">예시 · 오버핏 옥스포드 셔츠</p>
-                <p className="mt-0.5 text-[0.95rem] font-bold">
+                <div className="mt-2 flex gap-1.5" aria-hidden>
+                  {["S", "M", "L", "XL"].map((z) => (
+                    <span
+                      key={z}
+                      className={cn(
+                        "flex h-8 min-w-[2.5rem] items-center justify-center rounded-lg border text-[0.85rem] font-bold",
+                        z === "S"
+                          ? "border-brand-black bg-brand-black text-white"
+                          : "border-neutral-border text-neutral-text2",
+                      )}
+                    >
+                      {z}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-2 text-[0.9rem] font-bold">
                   추천 사이즈 <span className="text-brand-accent">S</span> · 크게 나온 상품이라 한 치수 작게
                 </p>
               </div>
@@ -483,7 +604,8 @@ export default function HomePage() {
   return (
     <div className="animate-fadeIn">
       <Hero />
-      <Container className="space-y-14 py-10 md:space-y-20 md:py-14">
+      <QuickEntry />
+      <Container className="space-y-12 py-9 md:space-y-20 md:py-14">
         <Hydrated fallback={<SectionSkeleton />}>
           <RankingSection />
         </Hydrated>

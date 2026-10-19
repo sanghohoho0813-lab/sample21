@@ -129,12 +129,14 @@ export function Segmented<T extends string>({
   options,
   className,
   size = "md",
+  ariaLabel,
 }: {
   value: T;
   onChange: (v: T) => void;
   options: { value: T; label: ReactNode }[];
   className?: string;
   size?: "sm" | "md";
+  ariaLabel?: string;
 }) {
   return (
     <div
@@ -143,6 +145,7 @@ export function Segmented<T extends string>({
         className,
       )}
       role="tablist"
+      aria-label={ariaLabel}
     >
       {options.map((o) => (
         <button
@@ -157,6 +160,51 @@ export function Segmented<T extends string>({
           )}
         >
           {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** 밑줄 탭 — 화면의 큰 갈래(카테고리)를 고를 때. 작은 조건(기간·기준)은 Segmented */
+export function UnderlineTabs<T extends string>({
+  value,
+  onChange,
+  options,
+  className,
+  ariaLabel,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  options: { value: T; label: ReactNode }[];
+  className?: string;
+  ariaLabel?: string;
+}) {
+  return (
+    <div
+      className={cn("hide-scrollbar flex overflow-x-auto border-b border-neutral-border", className)}
+      role="tablist"
+      aria-label={ariaLabel}
+    >
+      {options.map((o) => (
+        <button
+          key={o.value}
+          role="tab"
+          aria-selected={value === o.value}
+          onClick={() => onChange(o.value)}
+          className={cn(
+            "relative h-11 shrink-0 whitespace-nowrap px-4 text-[0.95rem] font-semibold transition-colors first:pl-0 md:px-5",
+            value === o.value ? "text-neutral-text" : "text-neutral-text2 hover:text-neutral-text",
+          )}
+        >
+          {o.label}
+          <span
+            aria-hidden
+            className={cn(
+              "absolute inset-x-4 bottom-[-1px] h-[2px] rounded-full bg-brand-black transition-opacity md:inset-x-5 [button:first-child>&]:left-0",
+              value === o.value ? "opacity-100" : "opacity-0",
+            )}
+          />
         </button>
       ))}
     </div>

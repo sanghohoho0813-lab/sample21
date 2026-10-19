@@ -220,14 +220,16 @@ export function FitSignal({
         </div>
       ) : (
         <div className="space-y-4 px-5 pb-5">
-          <div className="grid items-stretch gap-4 lg:grid-cols-[auto_1fr]">
-            <div className="flex min-w-[150px] flex-col items-center justify-center rounded-2xl bg-brand-black px-6 py-5 text-white">
-              <p className="text-[0.78rem] font-semibold text-white/70">추천 사이즈</p>
-              <p className="tabular mt-1 text-[2.6rem] font-black leading-none">{result.size ?? "—"}</p>
+          <div className="grid grid-cols-[92px_minmax(0,1fr)] items-stretch gap-3 sm:grid-cols-[120px_minmax(0,1fr)]">
+            <div className="flex min-w-0 flex-col items-center justify-center rounded-xl bg-brand-black px-2 py-4 text-white">
+              <p className="text-[0.78rem] font-semibold text-white/70">추천</p>
+              <p className="tabular mt-1 text-[2.3rem] font-black leading-none sm:text-[2.6rem]">
+                {result.size ?? "—"}
+              </p>
               {!result.size && <p className="mt-1 text-center text-[0.78rem] text-white/70">평소 mm 기준</p>}
             </div>
-            <div className="flex flex-col justify-center gap-2 rounded-2xl border border-neutral-border p-4">
-              <div className="flex items-center justify-between gap-2 text-[0.9rem]">
+            <div className="flex min-w-0 flex-col justify-center gap-2 rounded-xl border border-neutral-border p-3.5">
+              <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[0.9rem]">
                 <span className="font-bold">신뢰도</span>
                 <Badge
                   tone={CONF_TONE[result.confidence] === "primary" ? "accent" : CONF_TONE[result.confidence]}

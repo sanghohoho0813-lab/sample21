@@ -7,7 +7,7 @@ import { useApp } from "@/lib/store";
 import { allProductAgg, productSeries, type ProductAgg } from "@/lib/kpi";
 import { num } from "@/lib/format";
 import { Hydrated } from "@/components/system/Hydrated";
-import { Segmented } from "@/components/ui/Form";
+import { Segmented, UnderlineTabs } from "@/components/ui/Form";
 import { Button } from "@/components/ui/Button";
 import { SkeletonGrid, EmptyState } from "@/components/ui/States";
 import { Container, PageTitle } from "@/components/customer/Section";
@@ -89,7 +89,7 @@ function RankingBody({ tab, period, basis }: { tab: Tab; period: Period; basis: 
   if (!ranked.length) return <EmptyState title="해당 조건의 상품이 없습니다" desc="다른 탭이나 기간을 선택해보세요." />;
   return (
     <>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-7 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-2.5 gap-y-7 md:grid-cols-4 md:gap-x-5 md:gap-y-10">
         {list.map(({ agg, metric }, i) => (
           <div key={agg.product.id} className="min-w-0">
             <ProductCard product={agg.product} rank={i + 1} reason={`${b.label} ${num(metric)}${b.unit}`} />
@@ -121,30 +121,27 @@ export default function RankingPage() {
     <Container className="animate-fadeIn py-6 md:py-10">
       <PageTitle title="랭킹" desc="브랜드를 넘어, 지금 가장 반응이 좋은 상품" />
 
-      <div className="space-y-3 md:space-y-4">
-        <Segmented value={tab} onChange={setTab} options={TABS} className="w-full md:w-auto" />
-        <div className="flex flex-wrap items-center gap-2 md:gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-[0.82rem] font-bold text-neutral-text2">기간</span>
-            <Segmented value={period} onChange={setPeriod} options={PERIODS} size="sm" />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[0.82rem] font-bold text-neutral-text2">기준</span>
+      <div className="space-y-4">
+        <UnderlineTabs value={tab} onChange={setTab} options={TABS} ariaLabel="랭킹 분류" />
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Segmented value={period} onChange={setPeriod} options={PERIODS} size="sm" ariaLabel="기간" />
             <Segmented
               value={basis}
               onChange={setBasis}
               options={BASES.map((x) => ({ value: x.value, label: x.label }))}
               size="sm"
+              ariaLabel="순위 기준"
             />
           </div>
+          <p className="flex items-start gap-1.5 text-[0.8rem] leading-snug text-neutral-text2 md:max-w-[34rem] md:text-right">
+            <Info size={14} className="mt-0.5 shrink-0" />
+            <span>
+              <strong className="text-neutral-text">{b.label} 기준</strong> · {b.desc} 순위 변화(▲▼)는 직전 7일 대비
+              판매 변화로 계산합니다.
+            </span>
+          </p>
         </div>
-        <p className="flex items-start gap-1.5 text-[0.85rem] text-neutral-text2">
-          <Info size={15} className="mt-0.5 shrink-0" />
-          <span>
-            <strong className="text-neutral-text">{b.label} 기준</strong> · {b.desc} 순위 변화(▲▼)는 직전 7일 대비 판매
-            변화로 계산합니다.
-          </span>
-        </p>
       </div>
 
       <div data-tour="c-ranking" className="mt-6 md:mt-8">

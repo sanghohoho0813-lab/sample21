@@ -368,7 +368,7 @@ export function AxShell({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="flex min-h-screen bg-neutral-canvas">
+    <div className="flex min-h-screen bg-neutral-canvas" data-surface="ax">
       <SkipLink />
       <SurfaceMarker surface="ax" />
       <aside className="ax-sidebar fixed inset-y-0 left-0 z-30 hidden w-[280px] shrink-0 flex-col overflow-y-auto overscroll-contain px-3 py-5 xl:flex print:hidden">
@@ -610,14 +610,17 @@ export function PageHeader({
   tour?: string;
 }) {
   return (
-    <div className="animate-rise mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between" data-tour={tour}>
+    <div
+      className="animate-rise mb-6 flex flex-col gap-3 border-b border-neutral-border pb-5 md:flex-row md:items-end md:justify-between"
+      data-tour={tour}
+    >
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="break-keep text-[1.6rem] font-bold leading-tight tracking-tight md:text-[1.9rem]">{title}</h1>
+          <h1 className="break-keep text-[1.5rem] font-bold leading-tight tracking-tight md:text-[1.75rem]">{title}</h1>
           {badge}
         </div>
         {desc && (
-          <p className="mt-1.5 max-w-3xl break-keep text-[0.95rem] leading-relaxed text-neutral-text2">{desc}</p>
+          <p className="mt-1.5 max-w-3xl break-keep text-[0.92rem] leading-relaxed text-neutral-text2">{desc}</p>
         )}
       </div>
       {right && <div className="flex max-w-full shrink-0 flex-wrap items-center gap-2">{right}</div>}

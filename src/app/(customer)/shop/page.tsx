@@ -2,13 +2,12 @@
 /* /shop — 카테고리·검색 목록. URL 파라미터가 곧 필터 상태 (공유 가능한 링크). */
 import { Suspense, useCallback, useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CATEGORIES } from "@/lib/demo/seed";
 import { useApp } from "@/lib/store";
 import { Hydrated } from "@/components/system/Hydrated";
 import { SkeletonGrid } from "@/components/ui/States";
 import { Container, PageTitle } from "@/components/customer/Section";
 import { ProductListing } from "@/components/customer/discovery/ProductListing";
-import { FilterChip } from "@/components/customer/discovery/FilterChip";
+import { CategoryRail } from "@/components/customer/discovery/CategoryRail";
 import {
   parseFilters,
   toQueryString,
@@ -45,26 +44,12 @@ function ShopInner() {
   return (
     <Container className="animate-fadeIn py-6 md:py-10">
       <PageTitle title={title} desc={desc} />
-      {/* Quick category strip (mobile-first; sidebar has the full set on desktop) */}
-      <div
-        className="hide-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-4 md:hidden"
-        role="tablist"
-        aria-label="카테고리 빠른 선택"
-      >
-        <FilterChip size="sm" active={!filters.category} onClick={() => setFilters({ ...filters, category: null })}>
-          전체
-        </FilterChip>
-        {CATEGORIES.map((c) => (
-          <FilterChip
-            key={c.id}
-            size="sm"
-            active={filters.category === c.id}
-            onClick={() => setFilters({ ...filters, category: filters.category === c.id ? null : c.id })}
-          >
-            {c.name}
-          </FilterChip>
-        ))}
-      </div>
+      {/* 카테고리 바로가기 (휴대폰 — PC는 왼쪽 필터에 전체 목록) */}
+      <CategoryRail
+        className="pb-5 md:hidden"
+        value={filters.category}
+        onSelect={(category) => setFilters({ ...filters, category })}
+      />
       <Hydrated fallback={<SkeletonGrid n={8} />}>
         <ProductListing filters={filters} onChange={setFilters} />
       </Hydrated>

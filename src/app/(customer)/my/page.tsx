@@ -15,7 +15,6 @@ import {
   NotifyPrefsCard,
   OrderList,
   ProfileCard,
-  QuickStats,
   RecentlyViewed,
   RecommendSection,
   RestockList,
@@ -106,8 +105,7 @@ function MyContent() {
 
       {tab === "overview" && (
         <div className="space-y-8">
-          <ProfileCard />
-          <QuickStats orders={orders} />
+          <ProfileCard orders={orders} />
           <div className="grid gap-6 lg:grid-cols-2">
             <section className="min-w-0">
               <SectionHead title="최근 주문" more="/my/orders" moreLabel="전체 주문" />

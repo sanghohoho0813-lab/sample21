@@ -84,13 +84,14 @@ const config: Config = {
         ],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(17,24,39,0.04), 0 1px 3px rgba(17,24,39,0.06)",
+        // 화면 계열별로 다르게 — 고객 화면은 부드럽게, 운영화면(AX)은 선과 면으로 단정하게 (globals.css 변수)
+        card: "var(--shadow-card)",
         raised: "0 4px 14px rgba(17,24,39,0.08)",
         lift: "0 10px 24px rgba(17,24,39,0.12)",
       },
       borderRadius: {
-        card: "16px",
-        cardlg: "20px",
+        card: "var(--radius-card)",
+        cardlg: "var(--radius-cardlg)",
       },
       transitionDuration: {
         fast: "160ms",

@@ -54,11 +54,14 @@ export function Price({
   original,
   className,
   size = "md",
+  strike = true,
 }: {
   price: number;
   original?: number;
   className?: string;
   size?: "sm" | "md" | "lg";
+  /** 정상가 취소선 — 목록 카드는 할인율만으로 충분해 끈다 */
+  strike?: boolean;
 }) {
   const rate = original && original > price ? Math.round(((original - price) / original) * 100) : 0;
   return (
@@ -76,7 +79,7 @@ export function Price({
       >
         <AutoFit>{krw(price)}</AutoFit>
       </span>
-      {rate > 0 && original && (
+      {strike && rate > 0 && original && (
         <span className="tabular text-[0.82rem] text-neutral-text2 line-through">{krw(original)}</span>
       )}
     </span>

@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { GradientImage } from "@/components/ui/ProductImage";
 import { Badge } from "@/components/ui/Badge";
 import { toast } from "@/components/ui/Toast";
+import { BrandGarment } from "./BrandGarment";
 
 /** Registered photo slots per brand (assets applied later; placeholder until then). */
 export const BRAND_ASSET: Record<string, string> = {
@@ -120,6 +121,7 @@ export function BrandCard({
           label={`${brand.name} 브랜드 이미지`}
           className="rounded-none"
         >
+          <BrandGarment brandId={brand.id} asset={BRAND_ASSET[brand.slug]} />
           <div className="absolute inset-0 flex flex-col justify-between p-3 md:p-4">
             <div className="flex items-start justify-between gap-2">
               <span className="text-[0.78rem] font-bold tracking-[0.16em] text-white/80">

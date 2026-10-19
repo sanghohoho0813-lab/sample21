@@ -44,7 +44,7 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
   const [slot, setSlot] = useState(0);
   const cur = SLOTS[slot];
   return (
-    <div className="min-w-0 space-y-3 md:sticky md:top-[88px]">
+    <div className="-mx-4 min-w-0 space-y-3 md:sticky md:top-[88px] md:mx-0">
       <ProductImage
         colors={product.colors}
         variant={colorIdx}
@@ -53,8 +53,8 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
         category={product.categoryId}
         zoom={slot === 1 ? 1.9 : 1}
         caption={false}
-        ratio="aspect-square md:aspect-[3/4]"
-        className="rounded-2xl md:rounded-cardlg"
+        ratio="aspect-[4/5] md:aspect-[3/4]"
+        className="!rounded-none md:!rounded-cardlg"
       >
         {slot === 1 && (
           <div
@@ -79,7 +79,7 @@ function Gallery({ product, colorIdx, onColor }: { product: Product; colorIdx: n
           </span>
         </div>
       </ProductImage>
-      <div className="hide-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
+      <div className="hide-scrollbar flex gap-2 overflow-x-auto px-4 md:px-0">
         {SLOTS.map((s, i) => (
           <button
             key={s.key}
@@ -498,7 +498,7 @@ export function ProductDetail({ product }: { product: Product }) {
 
   return (
     <div>
-      <Container className="pt-4 md:pt-8">
+      <Container className="pt-0 md:pt-8">
         <nav className="mb-5 hidden items-center gap-1 text-[0.82rem] text-neutral-text2 md:flex" aria-label="경로">
           <Link href="/" className="hover:text-neutral-text">
             홈
@@ -543,7 +543,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   <Heart size={14} /> 찜 {agg.wishlist7d} (7일)
                 </span>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 border-t border-neutral-border pt-4">
                 <Price price={price} original={product.price} size="lg" />
                 {store.salePriceOverride[product.id] && (
                   <p className="mt-1 text-[0.82rem] font-semibold text-brand-accent">
@@ -551,17 +551,39 @@ export function ProductDetail({ product }: { product: Product }) {
                   </p>
                 )}
               </div>
-              <div className="mt-3 flex items-start gap-2 rounded-xl bg-brand-ivory px-4 py-3 text-[0.9rem]">
-                <Truck size={18} className="mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-bold">{etaLabel(free)}</p>
-                  <p className="text-[0.82rem] text-neutral-text2">
-                    {free
-                      ? "무료배송 · 오늘 자정 전 주문 시"
-                      : `배송비 3,000원 · ${FREE_SHIP_MIN.toLocaleString("ko-KR")}원 이상 구매 시 무료`}
-                  </p>
+              <dl className="mt-4 divide-y divide-neutral-border border-y border-neutral-border text-[0.88rem]">
+                <div className="flex gap-4 py-3">
+                  <dt className="w-14 shrink-0 font-semibold text-neutral-text2">배송</dt>
+                  <dd className="min-w-0">
+                    <p className="inline-flex items-center gap-1.5 font-bold">
+                      <Truck size={16} aria-hidden />
+                      {etaLabel(free)}
+                    </p>
+                    <p className="text-[0.82rem] text-neutral-text2">
+                      {free
+                        ? "무료배송 · 오늘 자정 전 주문 시"
+                        : `배송비 3,000원 · ${FREE_SHIP_MIN.toLocaleString("ko-KR")}원 이상 구매 시 무료`}
+                    </p>
+                  </dd>
                 </div>
-              </div>
+                <div className="flex gap-4 py-3">
+                  <dt className="w-14 shrink-0 font-semibold text-neutral-text2">교환</dt>
+                  <dd className="min-w-0">수령 후 7일 이내 · 사이즈 교환 1회 무료</dd>
+                </div>
+                <div className="flex gap-4 py-3">
+                  <dt className="w-14 shrink-0 font-semibold text-neutral-text2">사이즈</dt>
+                  <dd className="min-w-0">
+                    {fit.ready && fit.size ? (
+                      <>
+                        내 추천 <b className="text-brand-accent">{fit.size}</b>
+                        <span className="text-neutral-text2"> · {fit.reasons[0] ?? "핏 프로필 기준"}</span>
+                      </>
+                    ) : (
+                      <span className="text-neutral-text2">키·몸무게만 입력하면 추천 사이즈를 알려드려요</span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
             </div>
 
             <div id="options" className="scroll-mt-24 rounded-cardlg border border-neutral-border bg-white p-5">

@@ -26,6 +26,7 @@ import {
 } from "@/components/customer/discovery/BrandCard";
 import { useBrandFollow } from "@/components/customer/discovery/useBrandFollow";
 import { isNewProduct } from "@/components/customer/discovery/filters";
+import { BrandGarment } from "@/components/customer/discovery/BrandGarment";
 
 function BrandBody({ slug }: { slug: string }) {
   const brand = BRANDS.find((b) => b.slug === slug);
@@ -115,6 +116,11 @@ function BrandBody({ slug }: { slug: string }) {
         label={`${brand.name} 커버 이미지`}
         className="rounded-none"
       >
+        <BrandGarment
+          brandId={brand.id}
+          asset={BRAND_ASSET[brand.slug]}
+          className="!left-auto !right-[6%] !top-[10%] !mx-0 !h-[80%] !w-[34%] md:!right-[12%] md:!w-[22%]"
+        />
         <Container className="absolute inset-0 flex flex-col justify-end pb-5 md:pb-8">
           <div className="mb-2 flex items-center gap-2">
             {moods.map((m) => (
