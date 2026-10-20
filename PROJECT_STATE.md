@@ -3,12 +3,12 @@
 PROJECT FINAL OBJECTIVE: 고객의 패션 쇼핑 행동이 옵션별 수요 데이터가 되고, 그 데이터가 MD의 재고·할인·재구매 Action을 바꾸며, 처리결과가 다시 고객 경험으로 돌아오는 실제 작동형 패션 AX+플랫폼 (DEMO).
 
 ```text
-현재 상태            : Demo Ready — 11차 흐름 완성도 UI/UX (주문 단계·배송 진행 바·검색 순위 목록·찜 이미지 그리드·빈 화면·AX 표 밀도) · 10차 프리미엄 UI · 9차 Commerce Intelligence 유지
+현재 상태            : Demo Ready — 12차 결정 화면 UI/UX (상품 상세 섹션 탭·리뷰 요약·핏 근거 접기 · 장바구니 옵션 변경·무료배송 진행 · 주문서 저장 배송 정보 · 마이 주문 현황 · 검색 자동완성 · AX 주문 일괄 처리) · 11차 흐름 완성도 · 9차 Commerce Intelligence 유지
 FRONT_REFERENCE      : PENDING — Drive 「샘플 21. 의류」 2026-09-15 재확인, 여전히 비어 있음. 사진 추후 적용 (등록 경로 준비됨)
 DELIVERY STAGE       : DEMO
 현재 구현률          : 약 92% — MORFIT 최종 MVP 목표 대비 (남은 것: 사진 자산 · 실측 Baseline · 가정값 보정 · LLM 키)
-빌드                 : next build 성공(빌드 시 ESLint 포함) · Next 15.5.27 · typecheck 0 · ESLint 0 · Prettier 형식 통일 · 단위 테스트 76/76 (npm run check · GitHub Actions)
-수용 테스트          : Commerce Intelligence Loop 9/9 PASS (qa:loop · 순환 검증 8/8) · Whole-Hybrid Journey 25/25 · 사용 흐름·예외 33/33 (프로덕션 빌드) · 레이아웃 결함 0 (일반·햄버거·긴 데이터 × 8폭 × 34 Route) · 접근 이름 누락 0 · 40px 미만 터치 타겟 0
+빌드                 : next build 성공(빌드 시 ESLint 포함) · Next 15.5.27 · typecheck 0 · ESLint 0 · Prettier 형식 통일 · 단위 테스트 85/85 (npm run check · GitHub Actions)
+수용 테스트          : Commerce Intelligence Loop 9/9 PASS (qa:loop · 순환 검증 8/8) · Whole-Hybrid Journey 25/25 · 사용 흐름·예외 35/35 (프로덕션 빌드) · 레이아웃 결함 0 (일반·햄버거·긴 데이터 × 8폭 × 34 Route) · 접근 이름 누락 0 · 40px 미만 터치 타겟 0
 ```
 
 ## STRATEGIC GATES
@@ -97,6 +97,7 @@ Demand&Restock(RULE+STAT, L3) · Fit(RULE, L2) · Markdown(RULE+OPT, L3) · Repe
 4. Pilot 1~2주차 Baseline 측정 → Evidence Pack의 UNKNOWN/VALIDATE LATER 칸 채우기
 
 ## 최근 주요 변경
+- 12차: 결정 화면 — 상품 상세 섹션 바로가기·상품 정보 분리·리뷰 요약(별점 분포·사이즈 평가·체형 필터·도움돼요)·핏 근거 접기(D-59) · 장바구니 옵션 변경(`replaceCartItem`)·무료배송 진행 바·주문서 저장 배송 정보 카드·결제수단 라디오 카드(D-60) · 마이 주문·배송 현황 줄·최근 주문 짧은 줄·상태 필터 링크·검색 자동완성(헤더·시트·검색 화면, D-61) · 고객 화면 옅은 칠 토큰 복구·AX 주문 일괄 처리·행 버튼 위계·대시보드 고정 숫자 수정(D-62)
 - 11차: 흐름 완성도 — 주문 단계 표시·주문 상세/완료 배송 진행 바(D-57) · 검색 2열 순위·카테고리 레일·찜 2열 이미지 그리드·빈 화면 리디자인·재입고 머리 정리·AX 표/입력 밀도·주문 처리 열 한 줄(D-58)
 - 10차: 프리미엄 UI/UX — 고객 하이브리드(홈 풀블리드 에디토리얼 슬라이드·옷 모양 카테고리 레일·상품 카드 위계·상세 풀블리드·혜택 목록·핏 카드 압축·마이 회원 카드·랭킹 밑줄 탭·브랜드 실루엣, D-54) · AX 표면 토큰(D-55) · 핏 추천 가장 가까운 사이즈·카테고리 칩 잘림 회귀 수정(D-56)
 - 9차: Commerce Intelligence — 신호 조합 판독·대체 탐색 규칙·시나리오 E/F(D-48) · 옵션 매트릭스·사이즈 커브·수량 공식 통일(D-49) · 반품 패턴·Fit Closed Loop·핏 학습(D-50) · 근거 5개+가드+시즌 손익 할인 판단(D-51) · 후보 큐·승인 정책/게이트·변경 이력·성과 전/후·저장 v6(D-52) · AX 고밀도 패널 / 고객 의류 실루엣 이미지(D-53) · Evidence 순환 보기 중복 라벨('승인 · 승인' 등) 수정
