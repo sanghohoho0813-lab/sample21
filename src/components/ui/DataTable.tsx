@@ -14,6 +14,8 @@ export interface Column<T> {
   primary?: boolean;
   wrap?: boolean;
   mobileFull?: boolean;
+  /** 주 열이지만 짧은 값(주문번호 등) — PC 표에서 이름용 최소 폭을 쓰지 않는다 */
+  narrow?: boolean;
 }
 
 /* Desktop: 표 — 이름 열은 최소 폭을 보장하고(한글 세로 깨짐 방지) 나머지 값은 한 줄로 두어
@@ -47,7 +49,7 @@ export function DataTable<T>({
   return (
     <div className={cn("w-full min-w-0 max-w-full", className)}>
       <div className="hidden overflow-x-auto overscroll-x-contain rounded-cardlg border border-neutral-border bg-white md:block">
-        <table className="w-full text-[0.92rem]">
+        <table className="ui-table w-full text-[0.92rem]">
           <thead>
             <tr className="bg-neutral-canvas text-left text-neutral-text2">
               {columns.map((c) => (
@@ -84,7 +86,7 @@ export function DataTable<T>({
                       c.primary || c.wrap ? "break-keep" : "whitespace-nowrap",
                     )}
                   >
-                    {c.primary ? (
+                    {c.primary && !c.narrow ? (
                       <div className="min-w-[13rem] max-w-[24rem]">{c.cell(r)}</div>
                     ) : c.wrap ? (
                       <div className="min-w-[10rem] max-w-[22rem]">{c.cell(r)}</div>

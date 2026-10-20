@@ -62,85 +62,78 @@ function WishRow({
     store.subscribeRestock(variant.id);
     toast("재입고 알림을 신청했습니다", "입고되면 알림으로 알려드려요");
   };
+  const soldout = !!(variant && vState && !vState.purchasable);
   return (
-    <li className="rounded-cardlg border border-neutral-border bg-white p-4 transition-shadow hover:shadow-raised md:p-5">
-      <div className="flex gap-4">
-        <Link href={`/products/${p.id}`} className="w-24 shrink-0 transition-opacity hover:opacity-90 md:w-28">
-          <ProductImage colors={p.colors} variant={parsed?.colorIdx ?? 0} label={p.name} ratio="aspect-[3/4]" />
+    <li className="group relative min-w-0">
+      <Link href={`/products/${p.id}`} className="block overflow-hidden rounded-lg" aria-label={`${p.name} 상세`}>
+        <ProductImage
+          colors={p.colors}
+          variant={parsed?.colorIdx ?? 0}
+          label={p.name}
+          ratio="aspect-[3/4]"
+          caption={false}
+          className="!rounded-none transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+        />
+      </Link>
+      <button
+        type="button"
+        onClick={remove}
+        aria-label="찜 삭제"
+        className="absolute right-1 top-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-neutral-text/70 transition-colors hover:bg-white/80 hover:text-neutral-text"
+      >
+        <Trash2 size={18} />
+      </button>
+      {(note || !quiet) && (
+        <span className="pointer-events-none absolute left-2 top-2 flex flex-col items-start gap-1">
+          {note && (
+            <Badge tone="error" size="sm">
+              {note}
+            </Badge>
+          )}
+          {!quiet && (
+            <Badge tone={stock.tone} size="sm">
+              {stock.label}
+            </Badge>
+          )}
+        </span>
+      )}
+      <div className="mt-2.5 space-y-1 pr-1">
+        <p className="truncate text-[0.78rem] font-bold uppercase tracking-[0.04em]">{BRAND_BY_ID[p.brandId].name}</p>
+        <Link
+          href={`/products/${p.id}`}
+          className="line-clamp-2 min-h-11 text-[0.9rem] leading-snug text-neutral-text2 hover:text-neutral-text"
+        >
+          {p.name}
         </Link>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-[0.78rem] font-bold text-neutral-text2">{BRAND_BY_ID[p.brandId].name}</p>
-              <Link
-                href={`/products/${p.id}`}
-                className="font-semibold leading-snug underline-offset-2 hover:underline"
-              >
-                {p.name}
-              </Link>
-            </div>
-            <button
-              type="button"
-              onClick={remove}
-              aria-label="찜 삭제"
-              className="-mr-2 -mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-neutral-text2 hover:bg-brand-ivory hover:text-neutral-text"
-            >
-              <Trash2 size={18} />
-            </button>
-          </div>
-          <p className="mt-0.5 text-[0.82rem] text-neutral-text2">
-            {variant ? `선택 옵션 · ${variant.color} · ${variant.size}` : "옵션 미선택"} · {relTime(item.addedAt)} 찜
-          </p>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <Price price={price} original={p.price} size="sm" />
-            {note && (
-              <Badge tone="error" size="sm">
-                {note}
-              </Badge>
-            )}
-            {!quiet && (
-              <Badge tone={stock.tone} size="sm">
-                {stock.label}
-              </Badge>
-            )}
-          </div>
-          <div className="mt-3 hidden gap-2 sm:flex">
-            {variant && vState && !vState.purchasable ? (
-              <Button size="sm" variant="brand" onClick={restock} disabled={subscribed} icon={<Bell size={14} />}>
-                {subscribed ? "재입고 알림 신청 완료" : "재입고 알림"}
-              </Button>
-            ) : (
-              <Button size="sm" variant="brand" onClick={toCart} icon={<ShoppingBag size={14} />}>
-                {variant ? "장바구니 담기" : "옵션 선택 후 담기"}
-              </Button>
-            )}
-            <Button size="sm" variant="outline" href={`/products/${p.id}`}>
-              상세 보기
-            </Button>
-          </div>
-        </div>
+        <Price price={price} original={p.price} size="sm" strike={false} />
+        <p className="truncate text-[0.78rem] text-neutral-text2">
+          {variant ? `${variant.color} · ${variant.size}` : "옵션 미선택"} · {relTime(item.addedAt)} 찜
+        </p>
       </div>
-      <div className="mt-3 flex gap-2 sm:hidden">
-        {variant && vState && !vState.purchasable ? (
-          <Button
-            size="md"
-            variant="brand"
-            className="flex-1"
-            onClick={restock}
-            disabled={subscribed}
-            icon={<Bell size={14} />}
-          >
-            {subscribed ? "재입고 알림 신청 완료" : "재입고 알림"}
-          </Button>
-        ) : (
-          <Button size="md" variant="brand" className="flex-1" onClick={toCart} icon={<ShoppingBag size={14} />}>
-            {variant ? "장바구니 담기" : "옵션 선택 후 담기"}
-          </Button>
-        )}
-        <Button size="md" variant="outline" href={`/products/${p.id}`}>
-          상세
+      {soldout ? (
+        <Button
+          size="sm"
+          variant="brand"
+          full
+          className="mt-2.5 !h-11 md:!h-10"
+          onClick={restock}
+          disabled={subscribed}
+          icon={<Bell size={14} />}
+        >
+          {subscribed ? "알림 신청됨" : "재입고 알림"}
         </Button>
-      </div>
+      ) : (
+        <Button
+          size="sm"
+          variant="outline"
+          full
+          className="mt-2.5 !h-11 md:!h-10"
+          onClick={toCart}
+          icon={<ShoppingBag size={14} />}
+        >
+          {variant ? "장바구니 담기" : "옵션 선택"}
+        </Button>
+      )}
     </li>
   );
 }
@@ -185,7 +178,7 @@ function WishlistContent() {
           }
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="grid grid-cols-2 gap-x-2.5 gap-y-8 sm:grid-cols-3 md:grid-cols-4 md:gap-x-5 lg:grid-cols-5">
           {items.map((w) => (
             <WishRow
               key={w.productId}

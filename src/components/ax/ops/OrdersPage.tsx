@@ -141,10 +141,10 @@ function OrdersBody() {
       "info",
     );
 
-  const ActionButtons = ({ o }: { o: Order }) => {
+  const ActionButtons = ({ o, nowrap }: { o: Order; nowrap?: boolean }) => {
     const next = NEXT_STEP[o.status];
     return (
-      <div className="flex flex-wrap gap-1.5">
+      <div className={cn("flex gap-1.5", nowrap ? "flex-nowrap" : "flex-wrap")}>
         {next && (
           <Button
             size="sm"
@@ -203,10 +203,11 @@ function OrdersBody() {
       key: "id",
       header: "주문번호",
       primary: true,
+      narrow: true,
       cell: (o) => (
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="tabular font-semibold">{o.id}</span>
+            <span className="tabular whitespace-nowrap font-semibold">{o.id}</span>
             {isCustomerCreated(o.id) && (
               <Badge tone="primary" size="sm">
                 <Zap size={11} />
@@ -237,7 +238,7 @@ function OrdersBody() {
       ),
     },
     { key: "status", header: "상태", hideOnMobile: true, cell: (o) => <OrderStatusBadge status={o.status} /> },
-    { key: "act", header: "처리", hideOnMobile: true, cell: (o) => <ActionButtons o={o} /> },
+    { key: "act", header: "처리", hideOnMobile: true, cell: (o) => <ActionButtons o={o} nowrap /> },
   ];
 
   const open = openId ? (orders.find((o) => o.id === openId) ?? null) : null;

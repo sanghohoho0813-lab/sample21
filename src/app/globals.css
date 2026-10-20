@@ -25,6 +25,31 @@
 [data-surface="ax"] .rounded-xl {
   border-radius: 8px;
 }
+/* 업무 화면 밀도(PC) — 공용 표·입력 컴포넌트에 붙은 표식(ui-table·ui-field)만 대상. 휴대폰은 터치 크기(44px) 유지 */
+@media (min-width: 768px) {
+  [data-surface="ax"] .ui-field:not(.ui-textarea) {
+    height: 40px;
+    font-size: 0.9rem;
+  }
+  [data-surface="ax"] .ui-table {
+    font-size: 0.86rem;
+  }
+  [data-surface="ax"] .ui-table th {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+  }
+  [data-surface="ax"] .ui-table td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  [data-surface="ax"] .ui-table th,
+  [data-surface="ax"] .ui-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
 :root {
   /* Canonical Theme 01 — Deep Navy Blue (default) */
   --theme-shell: #0b1830;

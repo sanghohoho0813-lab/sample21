@@ -29,6 +29,7 @@ import {
   shippingFeeFor,
   stockState,
 } from "@/components/customer/conversion/shared";
+import { CheckoutSteps } from "@/components/customer/conversion/CheckoutSteps";
 
 function CartContent() {
   const store = useApp();
@@ -352,7 +353,11 @@ function WishQuick({ products, onPick }: { products: Product[]; onPick: (p: Prod
 export default function CartPage() {
   return (
     <Container className="py-6 md:py-10">
-      <PageTitle title="장바구니" desc="수량과 쿠폰을 확인하고 주문서로 이동하세요." />
+      <PageTitle
+        title="장바구니"
+        desc="수량과 쿠폰을 확인하고 주문서로 이동하세요."
+        right={<CheckoutSteps current={0} />}
+      />
       <Hydrated
         fallback={
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">

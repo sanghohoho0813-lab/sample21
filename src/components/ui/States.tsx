@@ -48,16 +48,25 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "rounded-cardlg border border-dashed border-neutral-border bg-white px-6 py-12 text-center",
+        "relative overflow-hidden rounded-cardlg border border-neutral-border bg-white px-6 py-12 text-center",
         className,
       )}
     >
-      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-canvas text-neutral-text2">
+      {/* 위쪽에서 은은하게 퍼지는 면 — 빈 칸이 아니라 '다음 행동을 기다리는 자리'로 보이게 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(60%_100%_at_50%_0%,var(--neutral-canvas),transparent)]"
+      />
+      <div className="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white text-neutral-text shadow-raised ring-[6px] ring-neutral-canvas">
         {icon ?? <Inbox size={22} />}
       </div>
-      <p className="text-[1.05rem] font-bold">{title}</p>
-      {desc && <p className="mt-1 text-[0.92rem] text-neutral-text2">{desc}</p>}
-      {action && <div className="mt-5 flex justify-center">{action}</div>}
+      <p className="relative text-[1.05rem] font-bold">{title}</p>
+      {desc && (
+        <p className="relative mx-auto mt-1.5 max-w-[30rem] text-[0.92rem] leading-relaxed text-neutral-text2">
+          {desc}
+        </p>
+      )}
+      {action && <div className="relative mt-6 flex flex-wrap justify-center gap-2">{action}</div>}
     </div>
   );
 }

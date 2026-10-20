@@ -22,7 +22,7 @@ export const Input = forwardRef<
           ref={ref}
           id={inputId}
           className={cn(
-            "h-12 w-full rounded-xl border border-neutral-border bg-white px-4 text-[1rem] text-neutral-text placeholder:text-neutral-text2/70 focus:border-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary/20",
+            "ui-field h-12 w-full rounded-xl border border-neutral-border bg-white px-4 text-[1rem] text-neutral-text placeholder:text-neutral-text2/70 focus:border-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary/20",
             suffix && "pr-12",
             className,
           )}
@@ -49,7 +49,7 @@ export const Textarea = forwardRef<
         ref={ref}
         id={tid}
         className={cn(
-          "min-h-[96px] w-full rounded-xl border border-neutral-border bg-white px-4 py-3 text-[1rem] focus:border-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary/20",
+          "ui-field ui-textarea min-h-[96px] w-full rounded-xl border border-neutral-border bg-white px-4 py-3 text-[1rem] focus:border-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary/20",
           className,
         )}
         {...rest}
@@ -72,7 +72,7 @@ export function Select({
       <select
         id={sid}
         className={cn(
-          "h-12 w-full rounded-xl border border-neutral-border bg-white px-3 text-[1rem] focus:border-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary/20",
+          "ui-field h-12 w-full rounded-xl border border-neutral-border bg-white px-3 text-[1rem] focus:border-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary/20",
           className,
         )}
         {...rest}

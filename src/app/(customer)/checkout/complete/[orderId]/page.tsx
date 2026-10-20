@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/Button";
 
 import { EmptyState, SkeletonCard } from "@/components/ui/States";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
-import { OrderInfoRows, OrderItemRow } from "@/components/customer/conversion/OrderBits";
+import { DeliveryProgress, OrderInfoRows, OrderItemRow } from "@/components/customer/conversion/OrderBits";
+import { CheckoutSteps } from "@/components/customer/conversion/CheckoutSteps";
 import { LoopHint } from "@/components/customer/LoopHint";
 
 function CompleteContent({ orderId }: { orderId: string }) {
@@ -38,6 +39,7 @@ function CompleteContent({ orderId }: { orderId: string }) {
   const itemCount = order.items.reduce((s, i) => s + i.qty, 0);
   return (
     <div className="mx-auto max-w-[720px] space-y-5">
+      <CheckoutSteps current={2} className="justify-center" />
       <div className="rounded-cardlg border border-neutral-border bg-white p-6 text-center shadow-card md:p-8">
         <span className="mx-auto inline-flex h-16 w-16 animate-scaleIn items-center justify-center rounded-full bg-semantic-success/10 text-semantic-success">
           <CheckCircle2 size={36} />
@@ -56,6 +58,9 @@ function CompleteContent({ orderId }: { orderId: string }) {
         <p className="tabular mt-2 text-[0.82rem] text-neutral-text2">
           {fmtDate(order.createdAt, "datetime")} · {order.channel === "mobile" ? "모바일" : "웹"} 주문
         </p>
+        <div className="mx-auto mt-6 max-w-[30rem] border-t border-neutral-border pt-5">
+          <DeliveryProgress order={order} compact />
+        </div>
       </div>
 
       <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">

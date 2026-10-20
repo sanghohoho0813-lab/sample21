@@ -12,6 +12,91 @@ import { cn } from "@/lib/cn";
 import { orderSummary } from "./shared";
 import { parseOrderMemo } from "@/lib/orderMemo";
 
+/** 지금 상태를 고객 말로 — 상태 이름보다 '무슨 일이 일어나고 있는지'를 먼저 */
+const STATUS_MESSAGE: Record<OrderStatus, { title: string; desc: string }> = {
+  pending: { title: "주문이 접수되었어요", desc: "확인되면 바로 상품 준비를 시작해요." },
+  preparing: { title: "상품을 준비하고 있어요", desc: "준비가 끝나면 출고하고 알림으로 알려드려요." },
+  shipped: { title: "상품이 출고되었어요", desc: "택배사로 전달되었어요. 곧 배송이 시작돼요." },
+  "in-transit": { title: "배송 중이에요", desc: "도착하면 알림으로 알려드려요." },
+  delivered: { title: "배송이 완료되었어요", desc: "사이즈가 맞지 않으면 수령 후 7일 이내 교환할 수 있어요." },
+  cancelled: { title: "주문이 취소되었어요", desc: "다시 주문하려면 상품 화면에서 담아주세요." },
+  "return-requested": { title: "반품 요청을 접수했어요", desc: "회수 일정이 정해지면 알려드려요." },
+  "exchange-requested": { title: "교환 요청을 접수했어요", desc: "교환 상품 준비가 시작되면 알려드려요." },
+};
+
+/** 진행 바 아래 짧은 이름 — 좁은 화면에서 다섯 단계가 붙지 않게 (전체 이름은 처리 이력에) */
+const STEP_SHORT: Partial<Record<OrderStatus, string>> = {
+  pending: "결제대기",
+  preparing: "상품준비",
+  shipped: "출고",
+  "in-transit": "배송중",
+  delivered: "배송완료",
+};
+
+/** 배송 진행 — 가로 진행 바 + 지금 상태 문구. 상세 이력(시각)은 OrderTimeline */
+export function DeliveryProgress({ order, compact }: { order: Order; compact?: boolean }) {
+  const reachedIdx = Math.max(
+    -1,
+    ...order.statusHistory.map((h) => ORDER_STATUS_FLOW.indexOf(h.status)),
+    ORDER_STATUS_FLOW.indexOf(order.status),
+  );
+  const terminal = !ORDER_STATUS_FLOW.includes(order.status);
+  const msg = STATUS_MESSAGE[order.status];
+  const pct = reachedIdx <= 0 ? 0 : (reachedIdx / (ORDER_STATUS_FLOW.length - 1)) * 100;
+  return (
+    <div data-delivery-progress>
+      {!compact && (
+        <div className="mb-4">
+          <p className={cn("text-[1.15rem] font-bold leading-snug", terminal && "text-semantic-error")}>{msg.title}</p>
+          <p className="mt-0.5 text-[0.88rem] text-neutral-text2">{msg.desc}</p>
+        </div>
+      )}
+      <div className="relative" role="img" aria-label={`배송 진행: ${ORDER_STATUS_LABEL[order.status]}`}>
+        {/* 선: 점 중심을 잇는다 (양 끝 10% 안쪽) */}
+        <div className="absolute left-[10%] right-[10%] top-[11px] h-[3px] rounded-full bg-neutral-border" aria-hidden>
+          <div
+            className={cn(
+              "h-full rounded-full transition-[width] duration-700 ease-out",
+              terminal ? "bg-neutral-text2" : "bg-brand-black",
+            )}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <ol className="relative grid grid-cols-5" aria-hidden>
+          {ORDER_STATUS_FLOW.map((st, i) => {
+            const done = i <= reachedIdx;
+            const current = !terminal && i === reachedIdx;
+            return (
+              <li key={st} className="flex flex-col items-center text-center">
+                <span
+                  className={cn(
+                    "flex h-[25px] w-[25px] items-center justify-center rounded-full border-2",
+                    current
+                      ? "border-brand-black bg-brand-black text-white ring-4 ring-brand-black/10"
+                      : done
+                        ? "border-brand-black bg-white text-brand-black"
+                        : "border-neutral-border bg-white text-neutral-border",
+                  )}
+                >
+                  {done ? <Check size={13} strokeWidth={3} /> : <Circle size={6} fill="currentColor" />}
+                </span>
+                <span
+                  className={cn(
+                    "mt-1.5 whitespace-nowrap text-[0.78rem] leading-tight",
+                    current ? "font-bold text-neutral-text" : done ? "text-neutral-text" : "text-neutral-text2",
+                  )}
+                >
+                  {STEP_SHORT[st]}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </div>
+  );
+}
+
 /** 주문 상태 타임라인 — ORDER_STATUS_FLOW + statusHistory. 현재 단계 강조. */
 export function OrderTimeline({ order, tour }: { order: Order; tour?: string }) {
   const history = order.statusHistory;

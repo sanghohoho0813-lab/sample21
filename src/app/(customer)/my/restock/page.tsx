@@ -13,17 +13,23 @@ function RestockContent() {
   const purchased = store.restockSubs.filter((s) => s.status === "purchased").length;
   return (
     <div className="space-y-5">
-      <div className="space-y-1.5">
-        <p className="text-[0.95rem] leading-relaxed text-neutral-text2">
-          품절된 색상·사이즈가 입고되면 알림으로 알려드리고, 바로 구매할 수 있게 열어드려요.
-        </p>
-        <LoopHint href="/ax/inventory">신청하면 AX 수요 레이더에 옵션별 수요로 바로 반영됩니다</LoopHint>
-      </div>
-      <p className="tabular text-[0.9rem] text-neutral-text2">
-        전체 <b className="text-neutral-text">{store.restockSubs.length}</b> · 대기{" "}
-        <b className="text-neutral-text">{waiting}</b> · 알림 도착 <b className="text-semantic-success">{notified}</b> ·
-        구매 완료 <b className="text-neutral-text">{purchased}</b>
-      </p>
+      {/* 상태 요약 — 한 줄 칩. 문구 형식('구매 완료 1')은 여정 테스트가 확인한다 */}
+      <ul className="tabular flex flex-wrap gap-2 text-[0.88rem]" aria-label="재입고 알림 현황">
+        {[
+          { label: "전체", n: store.restockSubs.length, tone: "" },
+          { label: "대기", n: waiting, tone: "" },
+          { label: "알림 도착", n: notified, tone: "text-semantic-success" },
+          { label: "구매 완료", n: purchased, tone: "" },
+        ].map((x) => (
+          <li
+            key={x.label}
+            className="rounded-full border border-neutral-border bg-white px-3.5 py-1.5 text-neutral-text2"
+          >
+            {x.label} <b className={x.tone || "text-neutral-text"}>{x.n}</b>
+          </li>
+        ))}
+      </ul>
+      <LoopHint href="/ax/inventory">신청하면 AX 수요 레이더에 옵션별 수요로 바로 반영됩니다</LoopHint>
       <div data-tour="c-restock-list">
         <RestockList />
       </div>
@@ -34,7 +40,7 @@ function RestockContent() {
 export default function RestockPage() {
   return (
     <Container className="max-w-[960px] py-6 md:py-10">
-      <PageTitle title="재입고 알림" desc="품절 옵션의 재입고 알림 신청 현황입니다." />
+      <PageTitle title="재입고 알림" desc="품절된 색상·사이즈가 입고되면 알려드리고, 바로 구매할 수 있게 열어드려요." />
       <Hydrated
         fallback={
           <div className="space-y-3">

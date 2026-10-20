@@ -18,7 +18,12 @@ import { EmptyState, SkeletonCard } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { OrderStatusBadge } from "@/components/ax/StatusBadges";
 import { cn } from "@/lib/cn";
-import { OrderInfoRows, OrderItemRow, OrderTimeline } from "@/components/customer/conversion/OrderBits";
+import {
+  OrderInfoRows,
+  OrderItemRow,
+  OrderTimeline,
+  DeliveryProgress,
+} from "@/components/customer/conversion/OrderBits";
 import { myOrders } from "@/components/customer/conversion/shared";
 import { LoopHint } from "@/components/customer/LoopHint";
 
@@ -155,9 +160,13 @@ function OrderDetail({ id }: { id: string }) {
         </span>
       </div>
 
+      <section className="rounded-cardlg border border-neutral-border bg-white p-5 shadow-card md:p-6">
+        <DeliveryProgress order={order} />
+      </section>
+
       <div className="grid items-start gap-5 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <section className="min-w-0 rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
-          <p className="mb-4 font-bold">배송 진행 상태</p>
+          <p className="mb-4 font-bold">처리 이력</p>
           <OrderTimeline order={order} tour="c-order-status" />
           <p className="mt-4 text-[0.85rem] leading-relaxed text-neutral-text2">
             상태가 바뀌면 이 화면과 알림으로 바로 알려드려요.

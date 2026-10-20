@@ -24,6 +24,7 @@ import {
 } from "@/components/customer/conversion/shared";
 import { CHECKOUT_FIELDS, CUSTOM_REQUEST, validateCheckout } from "@/lib/validation";
 import { buildOrderMemo } from "@/lib/orderMemo";
+import { CheckoutSteps } from "@/components/customer/conversion/CheckoutSteps";
 
 const PAYMENTS = [
   { key: "카드", label: "신용·체크카드", desc: "카드사 결제창 연결 예정", icon: CreditCard },
@@ -359,6 +360,7 @@ export default function CheckoutPage() {
       <PageTitle
         title="주문서"
         desc="배송지와 결제수단을 확인하세요. 실제 결제 없이 주문 흐름을 체험하는 데모입니다."
+        right={<CheckoutSteps current={1} />}
       />
       <Suspense fallback={<SkeletonCard lines={6} />}>
         <Hydrated

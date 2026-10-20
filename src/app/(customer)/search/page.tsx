@@ -15,6 +15,9 @@ import { ProductGrid } from "@/components/customer/ProductCard";
 import { ProductListing } from "@/components/customer/discovery/ProductListing";
 import { ChipLink } from "@/components/customer/discovery/FilterChip";
 import { BRAND_ASSET } from "@/components/customer/discovery/BrandCard";
+import { BrandGarment } from "@/components/customer/discovery/BrandGarment";
+import { CategoryLinks } from "@/components/customer/discovery/CategoryRail";
+import { cn } from "@/lib/cn";
 import {
   parseFilters,
   toQueryString,
@@ -96,9 +99,7 @@ function RecentAndSuggested({ onPick }: { onPick: (q: string) => void }) {
           )}
         </div>
         {recent.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-neutral-border px-4 py-5 text-center text-[0.9rem] text-neutral-text2">
-            아직 검색 기록이 없어요. 아래 추천 검색어로 시작해보세요.
-          </p>
+          <p className="text-[0.9rem] text-neutral-text2">아직 검색 기록이 없어요. 아래 추천 검색어로 시작해보세요.</p>
         ) : (
           <ul className="flex flex-wrap gap-2">
             {recent.map((r) => (
@@ -131,14 +132,31 @@ function RecentAndSuggested({ onPick }: { onPick: (q: string) => void }) {
           <TrendingUp size={18} className="text-neutral-text2" />
           추천 검색어
         </h2>
-        <div className="flex flex-wrap gap-2">
-          {SUGGESTED_SEARCHES.map((s, i) => (
-            <ChipLink key={s} href={searchHref(s)}>
-              <span className="tabular mr-0.5 text-brand-accent">{i + 1}</span>
-              {s}
-            </ChipLink>
+        {/* 순위형 목록 — 칩 묶음보다 훑어보기 쉽고, 1~3위가 먼저 눈에 들어온다 */}
+        <ol className="grid grid-flow-col grid-cols-2 grid-rows-4 gap-x-6 border-t border-neutral-border md:gap-x-10">
+          {SUGGESTED_SEARCHES.slice(0, 8).map((s, i) => (
+            <li key={s} className="border-b border-neutral-border">
+              <Link
+                href={searchHref(s)}
+                className="group flex h-12 items-center gap-3 text-[0.95rem] transition-colors hover:text-brand-accent"
+              >
+                <span
+                  className={cn(
+                    "tabular w-5 shrink-0 text-center font-black",
+                    i < 3 ? "text-brand-accent" : "text-neutral-text2",
+                  )}
+                >
+                  {i + 1}
+                </span>
+                <span className="min-w-0 truncate font-medium group-hover:underline">{s}</span>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ol>
+      </section>
+      <section>
+        <h2 className="mb-4 text-[1.1rem] font-bold">카테고리로 찾기</h2>
+        <CategoryLinks />
       </section>
       <section>
         <SectionHead title="인기 브랜드" desc="팔로워가 많은 순" more="/brands" moreLabel="브랜드 전체" />
@@ -157,6 +175,11 @@ function RecentAndSuggested({ onPick }: { onPick: (q: string) => void }) {
                 label={`${b.name} 이미지`}
                 className="rounded-none"
               >
+                <BrandGarment
+                  brandId={b.id}
+                  asset={BRAND_ASSET[b.slug]}
+                  className="!left-auto !right-[6%] !top-[8%] !mx-0 !h-[84%] !w-[40%]"
+                />
                 <span className="absolute bottom-2.5 left-3 text-[0.95rem] font-black tracking-tight text-white">
                   {b.name}
                 </span>
