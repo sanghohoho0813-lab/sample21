@@ -8,29 +8,20 @@ import { BRAND_BY_ID, CATEGORY_NAME, PRODUCTS } from "@/lib/demo/seed";
 import { useApp } from "@/lib/store";
 import { effPrice, effFitNote, productAgg } from "@/lib/kpi";
 import { recommendFit } from "@/lib/engine";
-import { fmtDate } from "@/lib/dates";
 import { Container, SectionHead } from "@/components/customer/Section";
 import { ProductGrid } from "@/components/customer/ProductCard";
 import { ProductImage } from "@/components/ui/ProductImage";
 import { BottomSheet } from "@/components/ui/Overlay";
 import { Button } from "@/components/ui/Button";
-import { Badge, DemoBadge } from "@/components/ui/Badge";
-import { Price, Progress } from "@/components/ui/Misc";
+import { Badge } from "@/components/ui/Badge";
+import { Price } from "@/components/ui/Misc";
 import { toast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { OptionPicker } from "./OptionPicker";
+import { ProductReviews } from "./ProductReviews";
+import { SectionNav, scrollToSection } from "./SectionNav";
 import { FitSignal } from "./FitSignal";
-import {
-  FIT_LABEL,
-  FIT_DESC,
-  SIZING_LABEL,
-  FREE_SHIP_MIN,
-  etaLabel,
-  findVariant,
-  stockState,
-  demoReviews,
-  type DemoReview,
-} from "./shared";
+import { FIT_LABEL, FIT_DESC, SIZING_LABEL, FREE_SHIP_MIN, etaLabel, findVariant, stockState } from "./shared";
 import { useFitContext } from "./useFitContext";
 import { LoopHint } from "@/components/customer/LoopHint";
 
@@ -244,97 +235,6 @@ function SizeGuide({
   );
 }
 
-function StarRow({ n, size = 14 }: { n: number; size?: number }) {
-  return (
-    <span role="img" className="inline-flex gap-0.5" aria-label={`별점 ${n}점`}>
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Star
-          key={i}
-          size={size}
-          className={i <= n ? "text-brand-black" : "text-neutral-border"}
-          fill={i <= n ? "currentColor" : "none"}
-        />
-      ))}
-    </span>
-  );
-}
-
-function Reviews({ product }: { product: Product }) {
-  const reviews = useMemo(() => demoReviews(product), [product]);
-  const dist = product.sizing === "small" ? [62, 33, 5] : product.sizing === "large" ? [6, 36, 58] : [12, 79, 9];
-  const [showAll, setShowAll] = useState(false);
-  const list = showAll ? reviews : reviews.slice(0, 4);
-  return (
-    <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="flex items-center gap-2 text-[1.05rem] font-bold">
-            리뷰 <DemoBadge label="데모 리뷰" />
-          </p>
-          <p className="mt-0.5 text-[0.85rem] text-neutral-text2">실제 고객 리뷰가 아닌 시연용 예시입니다.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="tabular text-[2rem] font-black leading-none">{product.rating}</span>
-          <div>
-            <StarRow n={Math.round(product.rating)} />
-            <p className="tabular text-[0.78rem] text-neutral-text2">리뷰 {product.reviewCount}개 (데모)</p>
-          </div>
-        </div>
-      </div>
-      {product.categoryId !== "bag" && product.categoryId !== "acc" && (
-        <div className="mb-5 grid grid-cols-3 gap-3">
-          {[
-            ["작아요", dist[0]],
-            ["딱 맞아요", dist[1]],
-            ["커요", dist[2]],
-          ].map(([l, v]) => (
-            <div key={l as string} className="rounded-xl bg-brand-ivory px-3 py-2.5">
-              <p className="text-[0.78rem] text-neutral-text2">{l}</p>
-              <p className="tabular font-bold">{v}%</p>
-              <Progress
-                value={(v as number) / 100}
-                className="mt-1.5 h-1.5 bg-white"
-                tone={l === "딱 맞아요" ? "success" : "warning"}
-                label={`구매자 후기 ‘${l}’ 비율`}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-      <ul className="divide-y divide-neutral-border">
-        {list.map((r: DemoReview) => (
-          <li key={r.id} className="py-4 first:pt-0 last:pb-0">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <StarRow n={r.rating} />
-                <span className="text-[0.9rem] font-semibold">{r.name}</span>
-              </div>
-              <span className="tabular text-[0.78rem] text-neutral-text2">{fmtDate(r.at)}</span>
-            </div>
-            <p className="mt-1 text-[0.82rem] text-neutral-text2">
-              {r.height}cm · {r.weight}kg · {r.bodyType} · 구매{" "}
-              <span className="font-semibold text-neutral-text">
-                {r.color} {r.size}
-              </span>
-            </p>
-            <p className="mt-1.5 text-[0.95rem] leading-relaxed">{r.text}</p>
-            <p className="mt-1.5 text-[0.78rem] text-neutral-text2">도움돼요 {r.helpful}</p>
-          </li>
-        ))}
-      </ul>
-      {reviews.length > 4 && (
-        <button
-          type="button"
-          onClick={() => setShowAll((v) => !v)}
-          className="mt-4 h-11 w-full rounded-xl border border-neutral-border font-semibold transition-colors hover:bg-brand-ivory active:bg-brand-ivory"
-        >
-          {showAll ? "접기" : `리뷰 ${reviews.length - 4}개 더 보기`}
-        </button>
-      )}
-    </div>
-  );
-}
-
 export function ProductDetail({ product }: { product: Product }) {
   const store = useApp();
   const router = useRouter();
@@ -534,11 +434,18 @@ export function ProductDetail({ product }: { product: Product }) {
               <h1 className="text-[1.5rem] font-bold leading-tight tracking-tight md:text-[1.8rem]">{product.name}</h1>
               <p className="mt-1 text-neutral-text2">{product.subtitle}</p>
               <div className="mt-3 flex items-center gap-3 text-[0.85rem] text-neutral-text2">
-                <span className="inline-flex items-center gap-1">
-                  <Star size={14} className="text-brand-black" fill="currentColor" />
+                <a
+                  href="#reviews"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection("reviews");
+                  }}
+                  className="inline-flex min-h-10 items-center gap-1 underline-offset-2 hover:underline"
+                >
+                  <Star size={14} className="text-brand-black" fill="currentColor" aria-hidden />
                   <span className="tabular font-semibold text-neutral-text">{product.rating}</span> · 리뷰{" "}
                   {product.reviewCount}
-                </span>
+                </a>
                 <span className="inline-flex items-center gap-1">
                   <Heart size={14} /> 찜 {agg.wishlist7d} (7일)
                 </span>
@@ -718,108 +625,131 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
       </Container>
 
-      <Container className="mt-10 space-y-8 md:mt-14 md:space-y-10">
-        <section id="size-guide" className="space-y-4">
-          <SectionHead title="사이즈·핏 정보" desc="실측표와 핏 특성을 함께 확인하세요." />
-          <SizeGuide product={product} selectedSize={size} recommended={fit.ready ? fit.size : null} />
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-cardlg border border-neutral-border bg-white p-5">
-              <p className="flex items-center gap-2 font-bold">
-                <Shirt size={16} />핏 정보
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Badge tone="dark">{FIT_LABEL[product.fit]}</Badge>
-                <Badge tone={product.sizing === "true" ? "success" : "warning"}>{SIZING_LABEL[product.sizing]}</Badge>
+      <Container className="mt-10 md:mt-14">
+        <SectionNav
+          items={[
+            { id: "info", label: "상품정보" },
+            { id: "size-guide", label: "사이즈·핏" },
+            { id: "reviews", label: "리뷰", count: product.reviewCount },
+            ...(related.length || alsoViewed.length ? [{ id: "recommend", label: "추천" }] : []),
+          ]}
+        />
+        <div className="mt-8 space-y-10 md:mt-10 md:space-y-14">
+          <section id="info" className="scroll-mt-[140px]">
+            <SectionHead title="상품 정보" />
+            <div className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+              <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
+                <p className="text-[1rem] leading-relaxed md:text-[1.05rem]">{product.description}</p>
+                <dl className="mt-5 grid gap-x-8 gap-y-3 border-t border-neutral-border pt-4 text-[0.9rem] sm:grid-cols-2">
+                  <div>
+                    <dt className="text-[0.8rem] text-neutral-text2">소재</dt>
+                    <dd className="font-semibold">{product.material}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[0.8rem] text-neutral-text2">세탁</dt>
+                    <dd>{product.care}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[0.8rem] text-neutral-text2">핏</dt>
+                    <dd className="font-semibold">
+                      {FIT_LABEL[product.fit]}{" "}
+                      <span className="font-normal text-neutral-text2">· {FIT_DESC[product.fit]}</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[0.8rem] text-neutral-text2">색상</dt>
+                    <dd>{product.colors.join(" · ")}</dd>
+                  </div>
+                </dl>
               </div>
-              <p className="mt-2 text-[0.85rem] text-neutral-text2">{FIT_DESC[product.fit]}</p>
-              <div className="mt-3 grid grid-cols-3 text-center text-[0.78rem] text-neutral-text2">
-                <span>작음</span>
-                <span>정사이즈</span>
-                <span>큼</span>
+              <div className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
+                <p className="flex items-center gap-2 font-bold">
+                  <User size={16} aria-hidden />
+                  모델 정보
+                </p>
+                <dl className="mt-3 space-y-1.5 text-[0.9rem]">
+                  <div className="flex justify-between">
+                    <dt className="text-neutral-text2">키</dt>
+                    <dd className="tabular font-semibold">{product.model.height}cm</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-neutral-text2">몸무게</dt>
+                    <dd className="tabular font-semibold">{product.model.weight}kg</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-neutral-text2">착용 사이즈</dt>
+                    <dd className="font-semibold">{product.model.size}</dd>
+                  </div>
+                </dl>
+                <p className="mt-3 text-[0.82rem] text-neutral-text2">모델 착용 사진은 준비 중입니다.</p>
               </div>
-              <div className="relative mt-1 h-2 rounded-full bg-brand-ivory">
-                <span
-                  className={cn(
-                    "absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white bg-brand-black shadow-card",
-                    product.sizing === "small"
-                      ? "left-[12%]"
-                      : product.sizing === "large"
-                        ? "left-[82%]"
-                        : "left-[47%]",
-                  )}
-                />
-              </div>
-              <p className="mt-3 text-[0.88rem] leading-relaxed">{fitNote}</p>
             </div>
-            <div className="rounded-cardlg border border-neutral-border bg-white p-5">
-              <p className="flex items-center gap-2 font-bold">
-                <User size={16} />
-                모델 정보
-              </p>
-              <dl className="mt-3 space-y-1.5 text-[0.9rem]">
-                <div className="flex justify-between">
-                  <dt className="text-neutral-text2">키</dt>
-                  <dd className="tabular font-semibold">{product.model.height}cm</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-neutral-text2">몸무게</dt>
-                  <dd className="tabular font-semibold">{product.model.weight}kg</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-neutral-text2">착용 사이즈</dt>
-                  <dd className="font-semibold">{product.model.size}</dd>
-                </div>
-              </dl>
-              <p className="mt-3 text-[0.82rem] text-neutral-text2">모델 착용 사진은 준비 중입니다.</p>
-            </div>
-            <div className="rounded-cardlg border border-neutral-border bg-white p-5">
-              <p className="flex items-center gap-2 font-bold">
-                <Ruler size={16} />
-                소재·세탁 정보
-              </p>
-              <dl className="mt-3 space-y-2 text-[0.9rem]">
-                <div>
-                  <dt className="text-[0.8rem] text-neutral-text2">소재</dt>
-                  <dd className="font-semibold">{product.material}</dd>
-                </div>
-                <div>
-                  <dt className="text-[0.8rem] text-neutral-text2">세탁</dt>
-                  <dd>{product.care}</dd>
-                </div>
-                <div>
-                  <dt className="text-[0.8rem] text-neutral-text2">상품 설명</dt>
-                  <dd className="leading-relaxed">{product.description}</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-        </section>
-
-        <section id="reviews">
-          <Reviews product={product} />
-        </section>
-
-        {related.length > 0 && (
-          <section>
-            <SectionHead
-              title={`${brand.name}의 다른 상품`}
-              desc={brand.tagline}
-              more={`/brands/${brand.slug}`}
-              moreLabel="브랜드 보기"
-            />
-            <ProductGrid products={related} />
           </section>
-        )}
-        {alsoViewed.length > 0 && (
-          <section>
-            <SectionHead
-              title="함께 본 상품"
-              desc={`${CATEGORY_NAME[product.categoryId]} 카테고리에서 반응이 좋은 상품`}
-              more={`/shop?category=${product.categoryId}`}
-            />
-            <ProductGrid products={alsoViewed} />
+
+          <section id="size-guide" className="scroll-mt-[140px]">
+            <SectionHead title="사이즈·핏 정보" desc="실측표와 핏 특성을 함께 확인하세요." />
+            <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+              <SizeGuide product={product} selectedSize={size} recommended={fit.ready ? fit.size : null} />
+              <div className="rounded-cardlg border border-neutral-border bg-white p-5">
+                <p className="flex items-center gap-2 font-bold">
+                  <Shirt size={16} aria-hidden />핏 정보
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Badge tone="dark">{FIT_LABEL[product.fit]}</Badge>
+                  <Badge tone={product.sizing === "true" ? "success" : "warning"}>{SIZING_LABEL[product.sizing]}</Badge>
+                </div>
+                <div className="mt-4 grid grid-cols-3 text-center text-[0.78rem] text-neutral-text2">
+                  <span>작음</span>
+                  <span>정사이즈</span>
+                  <span>큼</span>
+                </div>
+                <div className="relative mt-1 h-2 rounded-full bg-brand-ivory">
+                  <span
+                    className={cn(
+                      "absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white bg-brand-black shadow-card",
+                      product.sizing === "small"
+                        ? "left-[12%]"
+                        : product.sizing === "large"
+                          ? "left-[82%]"
+                          : "left-[47%]",
+                    )}
+                  />
+                </div>
+                <p className="mt-3 text-[0.88rem] leading-relaxed">{fitNote}</p>
+              </div>
+            </div>
           </section>
-        )}
+
+          <section id="reviews" className="scroll-mt-[140px]">
+            <ProductReviews product={product} recommended={fit.ready ? fit.size : null} />
+          </section>
+
+          {(related.length > 0 || alsoViewed.length > 0) && (
+            <div id="recommend" className="scroll-mt-[140px] space-y-10 md:space-y-14">
+              {related.length > 0 && (
+                <section>
+                  <SectionHead
+                    title={`${brand.name}의 다른 상품`}
+                    desc={brand.tagline}
+                    more={`/brands/${brand.slug}`}
+                    moreLabel="브랜드 보기"
+                  />
+                  <ProductGrid products={related} />
+                </section>
+              )}
+              {alsoViewed.length > 0 && (
+                <section>
+                  <SectionHead
+                    title="함께 본 상품"
+                    desc={`${CATEGORY_NAME[product.categoryId]} 카테고리에서 반응이 좋은 상품`}
+                    more={`/shop?category=${product.categoryId}`}
+                  />
+                  <ProductGrid products={alsoViewed} />
+                </section>
+              )}
+            </div>
+          )}
+        </div>
       </Container>
 
       {/* 모바일 하단 구매 바 — 상품 상세에서는 하단 탭 대신 이 바가 화면 맨 아래를 쓴다 (쇼핑앱 표준) */}

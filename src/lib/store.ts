@@ -100,6 +100,8 @@ export interface AppState {
   addToCart: (variantId: string, qty?: number) => void;
   updateCartQty: (variantId: string, qty: number) => void;
   removeFromCart: (variantId: string) => void;
+  /** 장바구니 옵션 변경 — 자리·수량을 유지하고, 같은 옵션이 이미 있으면 합친다 */
+  replaceCartItem: (fromVariantId: string, toVariantId: string) => void;
   clearCart: () => void;
   recentlyViewed: string[];
   pushRecentlyViewed: (productId: string) => void;
@@ -333,6 +335,22 @@ export const useApp = create<AppState>()(
           cart: s.cart.map((c) => (c.variantId === variantId ? { ...c, qty: Math.max(1, Math.min(9, qty)) } : c)),
         })),
       removeFromCart: (variantId) => set((s) => ({ cart: s.cart.filter((c) => c.variantId !== variantId) })),
+      replaceCartItem: (from, to) => {
+        const v = VARIANT_BY_ID[to];
+        const old = get().cart.find((c) => c.variantId === from);
+        if (from === to || !v || !old) return;
+        set((s) => {
+          const merged = s.cart.some((c) => c.variantId === to);
+          const cart = merged
+            ? s.cart
+                .filter((c) => c.variantId !== from)
+                .map((c) => (c.variantId === to ? { ...c, qty: Math.min(9, c.qty + old.qty) } : c))
+            : s.cart.map((c) => (c.variantId === from ? { variantId: to, productId: v.productId, qty: old.qty } : c));
+          // 바꾼 옵션은 새로 담은 것과 같은 수요 신호다(옵션별 장바구니 수)
+          return { cart, cartDelta: { ...s.cartDelta, [to]: (s.cartDelta[to] ?? 0) + old.qty } };
+        });
+        get().track("change_cart_option", { productId: v.productId, variantId: to, from });
+      },
       clearCart: () => set({ cart: [] }),
 
       pushRecentlyViewed: (productId) =>

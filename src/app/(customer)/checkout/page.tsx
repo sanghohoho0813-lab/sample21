@@ -1,7 +1,7 @@
 "use client";
 import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ShoppingBag, CreditCard, Landmark, Smartphone, ShieldCheck, MapPin, User } from "lucide-react";
+import { ShoppingBag, CreditCard, Landmark, Smartphone, ShieldCheck, MapPin } from "lucide-react";
 import { DEMO_CUSTOMER_NAME } from "@/lib/demo/seed";
 import { useApp } from "@/lib/store";
 import { effPrice } from "@/lib/kpi";
@@ -54,6 +54,8 @@ function CheckoutForm() {
   const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  /** 저장된 배송 정보는 카드 한 장으로 보여주고, '변경'을 누를 때만 입력칸을 연다 */
+  const [editInfo, setEditInfo] = useState(false);
   /** 고친 칸의 오류는 바로 지운다 — 다시 제출할 때까지 빨간 글씨가 남아 있지 않게 */
   const clearErr = (k: string) =>
     setErrors((e) => {
@@ -101,13 +103,20 @@ function CheckoutForm() {
     setErrors(err);
     if (Object.keys(err).length) {
       toast("입력 내용을 확인해주세요", `${Object.keys(err).length}곳을 고쳐주세요`, "warning");
-      // 첫 번째로 잘못된 칸으로 이동해 바로 고칠 수 있게
+      // 첫 번째로 잘못된 칸으로 이동해 바로 고칠 수 있게 — 배송 정보가 접혀 있으면 먼저 연다
       const first = CHECKOUT_FIELDS.find((k) => err[k]);
-      const el = first
-        ? document.querySelector<HTMLElement>(`[name="${first === "request" ? "customRequest" : first}"]`)
-        : null;
-      el?.scrollIntoView({ behavior: "smooth", block: "center" });
-      el?.focus({ preventScroll: true });
+      const focusFirst = () => {
+        const el = first
+          ? document.querySelector<HTMLElement>(`[name="${first === "request" ? "customRequest" : first}"]`)
+          : null;
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        el?.focus({ preventScroll: true });
+      };
+      const infoErr = !!(err.name || err.phone || err.address);
+      if (infoErr && !editInfo) {
+        setEditInfo(true);
+        setTimeout(focusFirst, 60);
+      } else focusFirst();
       return;
     }
     setSubmitting(true);
@@ -130,77 +139,100 @@ function CheckoutForm() {
     >
       <div className="min-w-0 space-y-5">
         <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-[1.05rem] font-bold">
-            <User size={18} />
-            주문자 정보
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Input
-                label="이름"
-                name="name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  clearErr("name");
-                }}
-                placeholder="주문자 이름"
-                required
-                aria-invalid={!!errors.name}
-                className={cn(errors.name && "border-semantic-error")}
-              />
-              {errors.name && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.name}</p>}
-            </div>
-            <div>
-              <Input
-                label="휴대폰"
-                name="phone"
-                value={phone}
-                onChange={(e) => {
-                  setPhone(e.target.value);
-                  clearErr("phone");
-                }}
-                placeholder="010-0000-0000"
-                inputMode="tel"
-                required
-                aria-invalid={!!errors.phone}
-                className={cn(errors.phone && "border-semantic-error")}
-                hint="문자는 실제로 발송되지 않아요"
-              />
-              {errors.phone && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.phone}</p>}
-            </div>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-[1.05rem] font-bold">
+              <MapPin size={18} aria-hidden />
+              배송 정보
+            </h2>
+            {!editInfo && (
+              <button
+                type="button"
+                onClick={() => setEditInfo(true)}
+                aria-label="배송 정보 변경"
+                className="inline-flex h-10 items-center rounded-lg border border-neutral-border px-3.5 text-[0.85rem] font-semibold transition-colors hover:bg-brand-ivory"
+              >
+                변경
+              </button>
+            )}
           </div>
-        </section>
-
-        <section className="rounded-cardlg border border-neutral-border bg-white p-5 md:p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-[1.05rem] font-bold">
-            <MapPin size={18} />
-            배송지
-          </h2>
           <div className="space-y-4">
-            <div>
-              <Input
-                label="주소"
-                name="address"
-                value={address}
-                onChange={(e) => {
-                  setAddress(e.target.value);
-                  clearErr("address");
-                }}
-                placeholder="도로명 주소"
-                required
-                aria-invalid={!!errors.address}
-                className={cn(errors.address && "border-semantic-error")}
-              />
-              {errors.address && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.address}</p>}
-            </div>
-            <Input
-              label="상세 주소 (선택)"
-              name="addressDetail"
-              value={detail}
-              onChange={(e) => setDetail(e.target.value)}
-              placeholder="동·호수 등"
-            />
+            {!editInfo ? (
+              <div className="rounded-xl border border-neutral-border bg-brand-ivory/50 px-4 py-3.5" data-saved-address>
+                <p className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold">{name}</span>
+                  <span className="rounded-md bg-white px-1.5 py-0.5 text-[0.78rem] font-semibold text-neutral-text2 ring-1 ring-neutral-border">
+                    기본 배송지
+                  </span>
+                </p>
+                <p className="tabular mt-0.5 text-[0.88rem] text-neutral-text2">{phone}</p>
+                <p className="mt-1.5 text-[0.95rem] leading-snug">
+                  {address}
+                  {detail.trim() && ` ${detail.trim()}`}
+                </p>
+              </div>
+            ) : (
+              <div className="animate-fadeIn space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Input
+                      label="이름"
+                      name="name"
+                      value={name}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        clearErr("name");
+                      }}
+                      placeholder="주문자 이름"
+                      required
+                      aria-invalid={!!errors.name}
+                      className={cn(errors.name && "border-semantic-error")}
+                    />
+                    {errors.name && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.name}</p>}
+                  </div>
+                  <div>
+                    <Input
+                      label="휴대폰"
+                      name="phone"
+                      value={phone}
+                      onChange={(e) => {
+                        setPhone(e.target.value);
+                        clearErr("phone");
+                      }}
+                      placeholder="010-0000-0000"
+                      inputMode="tel"
+                      required
+                      aria-invalid={!!errors.phone}
+                      className={cn(errors.phone && "border-semantic-error")}
+                      hint="문자는 실제로 발송되지 않아요"
+                    />
+                    {errors.phone && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.phone}</p>}
+                  </div>
+                </div>
+                <div>
+                  <Input
+                    label="주소"
+                    name="address"
+                    value={address}
+                    onChange={(e) => {
+                      setAddress(e.target.value);
+                      clearErr("address");
+                    }}
+                    placeholder="도로명 주소"
+                    required
+                    aria-invalid={!!errors.address}
+                    className={cn(errors.address && "border-semantic-error")}
+                  />
+                  {errors.address && <p className="mt-1 text-[0.82rem] text-semantic-error">{errors.address}</p>}
+                </div>
+                <Input
+                  label="상세 주소 (선택)"
+                  name="addressDetail"
+                  value={detail}
+                  onChange={(e) => setDetail(e.target.value)}
+                  placeholder="동·호수 등"
+                />
+              </div>
+            )}
             <Select label="배송 요청사항" name="request" value={request} onChange={(e) => setRequest(e.target.value)}>
               {REQUESTS.map((r) => (
                 <option key={r} value={r}>
@@ -238,7 +270,7 @@ function CheckoutForm() {
           <p className="mb-4 text-[0.85rem] text-neutral-text2">
             결제는 연결되지 않아요. 선택한 수단만 주문에 기록됩니다.
           </p>
-          <div className="grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="결제수단">
+          <div className="grid gap-2.5 sm:grid-cols-3 sm:gap-3" role="radiogroup" aria-label="결제수단">
             {PAYMENTS.map((p) => {
               const Icon = p.icon;
               const on = payment === p.key;
@@ -246,8 +278,8 @@ function CheckoutForm() {
                 <label
                   key={p.key}
                   className={cn(
-                    "flex cursor-pointer flex-col gap-1 rounded-2xl border p-4 transition-all duration-fast hover:border-neutral-text2 active:scale-[0.99]",
-                    on ? "border-brand-black bg-brand-black text-white" : "border-neutral-border bg-white",
+                    "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-fast hover:border-neutral-text2 active:scale-[0.99]",
+                    on ? "border-brand-black bg-white ring-1 ring-brand-black" : "border-neutral-border bg-white",
                   )}
                 >
                   <input
@@ -258,11 +290,22 @@ function CheckoutForm() {
                     onChange={() => setPayment(p.key)}
                     className="sr-only"
                   />
-                  <span className="flex items-center gap-2 font-bold">
-                    <Icon size={18} />
-                    {p.label}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                      on ? "border-brand-black" : "border-neutral-border",
+                    )}
+                  >
+                    {on && <span className="h-2.5 w-2.5 rounded-full bg-brand-black" />}
                   </span>
-                  <span className={cn("text-[0.8rem]", on ? "text-white/70" : "text-neutral-text2")}>{p.desc}</span>
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-1.5 font-bold">
+                      <Icon size={16} aria-hidden />
+                      {p.label}
+                    </span>
+                    <span className="mt-0.5 block text-[0.8rem] text-neutral-text2">{p.desc}</span>
+                  </span>
                 </label>
               );
             })}

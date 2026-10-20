@@ -18,6 +18,15 @@ export interface Column<T> {
   narrow?: boolean;
 }
 
+/** 여러 행을 골라 한 번에 처리(PC 표만). 휴대폰 카드는 행마다 처리 버튼을 쓴다 */
+export interface Selection<T> {
+  selected: Set<string>;
+  onChange: (next: Set<string>) => void;
+  canSelect?: (r: T) => boolean;
+  /** 체크박스 접근 이름 — 예: "주문 MF1020-1227 선택" */
+  label: (r: T) => string;
+}
+
 /* Desktop: 표 — 이름 열은 최소 폭을 보장하고(한글 세로 깨짐 방지) 나머지 값은 한 줄로 두어
    좁으면 표 안에서만 가로 스크롤된다. Mobile: 카드 — 라벨 위·값 아래로 쌓아 값이 잘리지 않는다. */
 export function DataTable<T>({
@@ -29,6 +38,7 @@ export function DataTable<T>({
   className,
   dense,
   mobileFooter,
+  selection,
 }: {
   rows: T[];
   columns: Column<T>[];
@@ -39,6 +49,7 @@ export function DataTable<T>({
   dense?: boolean;
   /** 모바일 카드 맨 아래(내용을 다 읽은 뒤)에 두는 처리 버튼 */
   mobileFooter?: (r: T) => ReactNode;
+  selection?: Selection<T>;
 }) {
   if (!rows.length)
     return (
@@ -46,12 +57,44 @@ export function DataTable<T>({
         {empty ?? <p className="py-10 text-center text-neutral-text2">데이터가 없습니다.</p>}
       </div>
     );
+  const selectable = selection ? rows.filter((r) => selection.canSelect?.(r) ?? true).map(rowKey) : [];
+  const allOn = selectable.length > 0 && selectable.every((k) => selection!.selected.has(k));
+  const someOn = selectable.some((k) => selection?.selected.has(k));
+  const toggle = (k: string) => {
+    if (!selection) return;
+    const next = new Set(selection.selected);
+    if (next.has(k)) next.delete(k);
+    else next.add(k);
+    selection.onChange(next);
+  };
+  const BOX = "h-4 w-4 cursor-pointer rounded border-neutral-border accent-[var(--theme-primary)]";
   return (
     <div className={cn("w-full min-w-0 max-w-full", className)}>
       <div className="hidden overflow-x-auto overscroll-x-contain rounded-cardlg border border-neutral-border bg-white md:block">
         <table className="ui-table w-full text-[0.92rem]">
           <thead>
             <tr className="bg-neutral-canvas text-left text-neutral-text2">
+              {selection && (
+                <th className={cn("w-10 !pr-0", dense ? "py-2.5" : "py-3")}>
+                  <input
+                    type="checkbox"
+                    className={BOX}
+                    checked={allOn}
+                    ref={(el) => {
+                      if (el) el.indeterminate = !allOn && someOn;
+                    }}
+                    disabled={!selectable.length}
+                    onChange={() =>
+                      selection.onChange(
+                        allOn
+                          ? new Set([...selection.selected].filter((k) => !selectable.includes(k)))
+                          : new Set([...selection.selected, ...selectable]),
+                      )
+                    }
+                    aria-label="보이는 행 모두 선택"
+                  />
+                </th>
+              )}
               {columns.map((c) => (
                 <th
                   key={c.key}
@@ -73,8 +116,29 @@ export function DataTable<T>({
               <tr
                 key={rowKey(r)}
                 onClick={onRowClick ? () => onRowClick(r) : undefined}
-                className={cn("hover-row group border-t border-neutral-border", onRowClick && "cursor-pointer")}
+                aria-selected={selection ? selection.selected.has(rowKey(r)) : undefined}
+                className={cn(
+                  "hover-row group border-t border-neutral-border",
+                  onRowClick && "cursor-pointer",
+                  selection?.selected.has(rowKey(r)) && "bg-theme-soft/40",
+                )}
               >
+                {selection && (
+                  <td
+                    className={cn("w-10 !pr-0 align-middle", dense ? "py-2.5" : "py-3.5")}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {(selection.canSelect?.(r) ?? true) && (
+                      <input
+                        type="checkbox"
+                        className={BOX}
+                        checked={selection.selected.has(rowKey(r))}
+                        onChange={() => toggle(rowKey(r))}
+                        aria-label={selection.label(r)}
+                      />
+                    )}
+                  </td>
+                )}
                 {columns.map((c) => (
                   <td
                     key={c.key}

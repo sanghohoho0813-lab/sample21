@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Check, Circle, XCircle, RotateCcw, Repeat } from "lucide-react";
+import { Check, ChevronRight, Circle, XCircle, RotateCcw, Repeat } from "lucide-react";
 import type { Order, OrderStatus } from "@/lib/types";
 import { PRODUCT_BY_ID, VARIANT_BY_ID } from "@/lib/demo/seed";
 import { ORDER_STATUS_FLOW, ORDER_STATUS_LABEL } from "@/lib/kpi";
@@ -319,5 +319,122 @@ export function PriceSummary({
         <dd className="tabular text-[1.25rem] font-black">{krw(total)}</dd>
       </div>
     </dl>
+  );
+}
+
+const FLOW: OrderStatus[] = ["pending", "preparing", "shipped", "in-transit", "delivered"];
+const AFTER: OrderStatus[] = ["cancelled", "return-requested", "exchange-requested"];
+
+/** 마이 — 주문·배송 현황 한 줄. 상태별 건수를 누르면 그 상태의 주문 목록으로 간다 */
+export function OrderStatusStrip({ orders }: { orders: Order[] }) {
+  const count = (st: OrderStatus) => orders.filter((o) => o.status === st).length;
+  const after = orders.filter((o) => AFTER.includes(o.status)).length;
+  return (
+    <section
+      className="rounded-cardlg border border-neutral-border bg-white"
+      aria-labelledby="order-strip-title"
+      data-order-strip
+    >
+      <div className="flex items-center justify-between gap-3 px-5 pt-4 md:px-6">
+        <h2 id="order-strip-title" className="text-[1.05rem] font-bold">
+          주문·배송 현황
+        </h2>
+        <Link
+          href="/my?tab=orders"
+          className="tap inline-flex items-center gap-0.5 text-[0.85rem] font-semibold text-neutral-text2 hover:text-neutral-text"
+        >
+          전체 주문
+          <ChevronRight size={15} aria-hidden />
+        </Link>
+      </div>
+      <ol className="grid grid-cols-5 px-1.5 py-3 md:px-4">
+        {FLOW.map((st, i) => {
+          const n = count(st);
+          return (
+            <li key={st} className="relative min-w-0">
+              <Link
+                href={`/my?tab=orders&status=${st === "delivered" ? "delivered" : "active"}`}
+                aria-label={`${STEP_SHORT[st]} ${n}건`}
+                className="flex flex-col items-center gap-1 rounded-xl px-1 py-2 transition-colors hover:bg-neutral-canvas active:bg-neutral-canvas"
+              >
+                <span
+                  className={cn(
+                    "tabular text-[1.4rem] font-black leading-none",
+                    n ? "text-neutral-text" : "text-neutral-border",
+                  )}
+                >
+                  {n}
+                </span>
+                <span className="whitespace-nowrap text-[0.78rem] font-medium text-neutral-text2">
+                  {STEP_SHORT[st]}
+                </span>
+              </Link>
+              {i < FLOW.length - 1 && (
+                <ChevronRight
+                  size={13}
+                  aria-hidden
+                  className="pointer-events-none absolute -right-[6.5px] top-[17px] text-neutral-border"
+                />
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      <Link
+        href="/my?tab=orders&status=after"
+        className="flex min-h-12 items-center justify-between gap-3 rounded-b-cardlg border-t border-neutral-border px-5 text-[0.88rem] transition-colors hover:bg-neutral-canvas/60 md:px-6"
+      >
+        <span className="text-neutral-text2">취소·반품·교환</span>
+        <span className="tabular inline-flex items-center gap-0.5 font-bold">
+          {after}건
+          <ChevronRight size={15} className="text-neutral-text2" aria-hidden />
+        </span>
+      </Link>
+    </section>
+  );
+}
+
+/** 마이 — 최근 주문을 한 카드 안의 짧은 줄로. 상태는 이름 대신 '지금 무슨 일인지' 문장으로 */
+export function OrderMiniList({ orders }: { orders: Order[] }) {
+  return (
+    <ul className="divide-y divide-neutral-border overflow-hidden rounded-cardlg border border-neutral-border bg-white">
+      {orders.map((o) => {
+        const first = PRODUCT_BY_ID[o.items[0]?.productId];
+        const v = VARIANT_BY_ID[o.items[0]?.variantId];
+        const tone = AFTER.includes(o.status)
+          ? "text-semantic-warning"
+          : o.status === "delivered"
+            ? "text-neutral-text2"
+            : "text-brand-accent";
+        return (
+          <li key={o.id}>
+            <Link
+              href={`/my/orders/${o.id}`}
+              className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-neutral-canvas/60 active:bg-neutral-canvas md:px-5"
+            >
+              {first && (
+                <ProductImage
+                  colors={first.colors}
+                  variant={v ? Math.max(0, first.colors.indexOf(v.color)) : 0}
+                  label={first.name}
+                  name={first.name}
+                  category={first.categoryId}
+                  className="w-14 shrink-0 rounded-lg"
+                  ratio="aspect-[3/4]"
+                />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className={cn("text-[0.82rem] font-bold", tone)}>{STATUS_MESSAGE[o.status].title}</p>
+                <p className="truncate font-semibold leading-snug">{orderSummary(o)}</p>
+                <p className="tabular text-[0.8rem] text-neutral-text2">
+                  {fmtDate(o.createdAt)} · {krw(o.total)}
+                </p>
+              </div>
+              <ChevronRight size={18} className="shrink-0 text-neutral-text2" aria-hidden />
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

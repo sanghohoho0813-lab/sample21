@@ -177,12 +177,15 @@ export function OrderList({
   orders,
   filterable = true,
   limit,
+  initialFilter = "all",
 }: {
   orders: Order[];
   filterable?: boolean;
   limit?: number;
+  initialFilter?: (typeof ORDER_FILTERS)[number]["key"];
 }) {
-  const [filter, setFilter] = useState<(typeof ORDER_FILTERS)[number]["key"]>("all");
+  const [filter, setFilter] = useState<(typeof ORDER_FILTERS)[number]["key"]>(initialFilter);
+  useEffect(() => setFilter(initialFilter), [initialFilter]);
   const list = filterOrders(orders, filter).slice(0, limit ?? Infinity);
   return (
     <div className="space-y-3">

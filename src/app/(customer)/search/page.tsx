@@ -1,9 +1,9 @@
 "use client";
 /* /search — 검색. ?q= 없으면 최근 검색어·추천 검색어·인기 브랜드, 있으면 /shop과 같은 필터·정렬 UI로 결과 표시. */
 import Link from "next/link";
-import { Suspense, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, X, Clock, TrendingUp, ChevronRight } from "lucide-react";
+import { X, Clock, TrendingUp, ChevronRight } from "lucide-react";
 import { BRANDS, PRODUCTS } from "@/lib/demo/seed";
 import { useApp } from "@/lib/store";
 import { num } from "@/lib/format";
@@ -17,6 +17,7 @@ import { ChipLink } from "@/components/customer/discovery/FilterChip";
 import { BRAND_ASSET } from "@/components/customer/discovery/BrandCard";
 import { BrandGarment } from "@/components/customer/discovery/BrandGarment";
 import { CategoryLinks } from "@/components/customer/discovery/CategoryRail";
+import { SearchSuggest } from "@/components/customer/discovery/SearchSuggest";
 import { cn } from "@/lib/cn";
 import {
   parseFilters,
@@ -39,38 +40,35 @@ function SearchForm({ initial, onSubmit }: { initial: string; onSubmit: (q: stri
   useEffect(() => {
     setV(initial);
   }, [initial]);
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    onSubmit(v.trim());
-  };
   return (
-    <form onSubmit={submit} role="search" className="relative">
-      <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-text2" />
-      <input
-        value={v}
-        onChange={(e) => setV(e.target.value)}
-        placeholder="상품 · 브랜드 · 스타일 검색"
-        aria-label="검색어"
-        autoComplete="off"
-        className="h-[52px] w-full rounded-2xl border border-neutral-border bg-neutral-canvas pl-12 pr-24 text-[1rem] focus:border-neutral-text2 focus:outline-none focus:ring-2 focus:ring-brand-black/20 md:bg-white"
-      />
-      {v && (
-        <button
-          type="button"
-          onClick={() => setV("")}
-          aria-label="입력 지우기"
-          className="absolute right-[76px] top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-neutral-text2 hover:bg-neutral-canvas"
-        >
-          <X size={16} />
-        </button>
-      )}
-      <button
-        type="submit"
-        className="absolute right-2 top-1/2 h-10 -translate-y-1/2 rounded-xl bg-brand-black px-4 text-[0.9rem] font-semibold text-white transition-all hover:bg-[#2a2a2a] active:scale-[0.98]"
-      >
-        검색
-      </button>
-    </form>
+    <SearchSuggest
+      value={v}
+      onValueChange={setV}
+      onSubmit={onSubmit}
+      label="검색어"
+      iconSize={20}
+      inputClassName="h-[52px] w-full rounded-2xl border border-neutral-border bg-neutral-canvas pl-12 pr-24 text-[1rem] focus:border-neutral-text2 focus:outline-none focus:ring-2 focus:ring-brand-black/20 md:bg-white"
+      trailing={
+        <>
+          {v && (
+            <button
+              type="button"
+              onClick={() => setV("")}
+              aria-label="입력 지우기"
+              className="absolute right-[76px] top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-neutral-text2 hover:bg-neutral-canvas"
+            >
+              <X size={16} />
+            </button>
+          )}
+          <button
+            type="submit"
+            className="absolute right-2 top-1/2 h-10 -translate-y-1/2 rounded-xl bg-brand-black px-4 text-[0.9rem] font-semibold text-white transition-all hover:bg-[#2a2a2a] active:scale-[0.98]"
+          >
+            검색
+          </button>
+        </>
+      }
+    />
   );
 }
 

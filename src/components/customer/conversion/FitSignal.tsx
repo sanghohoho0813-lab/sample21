@@ -166,6 +166,7 @@ export function FitSignal({
   const learned = fitCtx.history?.length ?? 0;
   const fitNote = effFitNote(product, store);
   const [editing, setEditing] = useState(false);
+  const [more, setMore] = useState(false);
   const track = store.track;
   const role = store.role;
   useEffect(() => {
@@ -185,6 +186,15 @@ export function FitSignal({
     .filter(Boolean)
     .join(" · ");
   const sizeSelectable = !!result.size && product.sizes.includes(result.size);
+  /** 접었을 때 보이는 이유 — 기준(첫 줄)과 최종 보정(마지막 줄). 사이즈가 왜 바뀌었는지는 마지막 보정이 말한다 */
+  const keyReasons =
+    result.reasons.length <= 2 ? result.reasons : [result.reasons[0], result.reasons[result.reasons.length - 1]];
+  /** 접혀 있는 근거 수 — 이유 3번째부터 · 주의 2번째부터 · 비슷한 체형 · (개선 전) 상품 핏 특성 */
+  const hidden =
+    Math.max(0, result.reasons.length - 2) +
+    Math.max(0, result.cautions.length - 1) +
+    (result.peerNote ? 1 : 0) +
+    (override ? 0 : 1);
 
   return (
     <section
@@ -263,64 +273,72 @@ export function FitSignal({
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <p className="mb-1.5 text-[0.9rem] font-bold">추천 이유</p>
-              {result.reasons.length ? (
-                <ul className="space-y-1.5 text-[0.9rem]">
-                  {result.reasons.map((r) => (
-                    <li key={r} className="flex gap-2">
-                      <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-semantic-success" />
-                      <span>{r}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-[0.88rem] text-neutral-text2">단일 사이즈 상품입니다.</p>
-              )}
-            </div>
-            <div>
-              <p className="mb-1.5 text-[0.9rem] font-bold">주의할 점</p>
-              {result.cautions.length ? (
-                <ul className="space-y-1.5 text-[0.9rem]">
-                  {result.cautions.map((c) => (
-                    <li key={c} className="flex gap-2">
-                      <AlertTriangle size={16} className="mt-0.5 shrink-0 text-semantic-warning" />
-                      <span>{c}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-[0.88rem] text-neutral-text2">특별한 주의사항이 없습니다.</p>
-              )}
-            </div>
+          {/* 근거는 핵심 2개 + 주의 1개만 먼저 — 나머지는 펼쳐서 본다 */}
+          <div>
+            <p className="mb-1.5 text-[0.9rem] font-bold">{result.size ? `왜 ${result.size}인가요?` : "추천 이유"}</p>
+            <ul className="space-y-1.5 text-[0.9rem]">
+              {result.reasons.length === 0 && <li className="text-neutral-text2">단일 사이즈 상품입니다.</li>}
+              {(more ? result.reasons : keyReasons).map((r) => (
+                <li key={r} className="flex gap-2">
+                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-semantic-success" aria-hidden />
+                  <span>{r}</span>
+                </li>
+              ))}
+              {(more ? result.cautions : result.cautions.slice(0, 1)).map((c) => (
+                <li key={c} className="flex gap-2">
+                  <AlertTriangle size={16} className="mt-0.5 shrink-0 text-semantic-warning" aria-label="주의" />
+                  <span>{c}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {result.peerNote && (
-            <div className="flex gap-2 rounded-xl bg-brand-ivory px-4 py-3 text-[0.9rem]">
-              <Users size={16} className="mt-0.5 shrink-0 text-neutral-text2" />
+          {more && result.peerNote && (
+            <div className="flex animate-fadeIn gap-2 rounded-xl bg-brand-ivory px-4 py-3 text-[0.9rem]">
+              <Users size={16} className="mt-0.5 shrink-0 text-neutral-text2" aria-hidden />
               <div>
                 <p className="font-bold">비슷한 체형의 선택</p>
                 <p className="text-neutral-text2">{result.peerNote}</p>
               </div>
             </div>
           )}
-          <div
-            className={cn(
-              "rounded-xl border px-4 py-3 text-[0.9rem]",
-              override ? "border-brand-accent/40 bg-brand-accent/5" : "border-neutral-border",
-            )}
-          >
-            <p className="flex items-center gap-2 font-bold">
-              상품별 핏 특성{" "}
-              {override && (
-                <Badge tone="accent" size="sm">
-                  핏 안내 개선 반영
-                </Badge>
+          {/* 핏 안내가 개선된 상품은 접지 않는다 — 고객이 바뀐 안내를 바로 본다 */}
+          {(more || override) && (
+            <div
+              className={cn(
+                "rounded-xl border px-4 py-3 text-[0.9rem]",
+                override ? "border-brand-accent/40 bg-brand-accent/5" : "animate-fadeIn border-neutral-border",
               )}
-            </p>
-            <p className="mt-0.5 leading-relaxed text-neutral-text2">{fitNote}</p>
-          </div>
+            >
+              <p className="flex items-center gap-2 font-bold">
+                상품별 핏 특성{" "}
+                {override && (
+                  <Badge tone="accent" size="sm">
+                    핏 안내 개선 반영
+                  </Badge>
+                )}
+              </p>
+              <p className="mt-0.5 leading-relaxed text-neutral-text2">{fitNote}</p>
+            </div>
+          )}
+          {hidden > 0 && (
+            <button
+              type="button"
+              onClick={() => setMore((v) => !v)}
+              aria-expanded={more}
+              className="inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-xl border border-neutral-border text-[0.88rem] font-semibold transition-colors hover:bg-brand-ivory"
+            >
+              {more ? (
+                <>
+                  근거 접기 <ChevronUp size={15} aria-hidden />
+                </>
+              ) : (
+                <>
+                  추천 근거 {hidden}개 더 보기 <ChevronDown size={15} aria-hidden />
+                </>
+              )}
+            </button>
+          )}
 
           <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
             <p className="text-[0.82rem] text-neutral-text2">

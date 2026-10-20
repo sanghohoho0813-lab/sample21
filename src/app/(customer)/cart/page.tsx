@@ -34,7 +34,12 @@ import { CheckoutSteps } from "@/components/customer/conversion/CheckoutSteps";
 function CartContent() {
   const store = useApp();
   const [coupon, setCoupon] = useState("");
-  const [sheet, setSheet] = useState<{ product: Product; colorIdx: number } | null>(null);
+  const [sheet, setSheet] = useState<{
+    product: Product;
+    colorIdx: number;
+    size?: string;
+    replaceFrom?: string;
+  } | null>(null);
   const rows = store.cart
     .map((c) => {
       const parsed = parseVariant(c.variantId);
@@ -95,6 +100,7 @@ function CartContent() {
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
       <div className="min-w-0 space-y-4">
+        <FreeShipBar subtotal={subtotal} />
         <ul className="divide-y divide-neutral-border rounded-cardlg border border-neutral-border bg-white">
           {rows.map(({ c, product, variant, colorIdx, price, st }) => (
             <li key={c.variantId} className="p-4 md:p-5">
@@ -112,8 +118,18 @@ function CartContent() {
                       >
                         {product.name}
                       </Link>
-                      <p className="mt-0.5 text-[0.85rem] text-neutral-text2">
-                        {variant.color} · {variant.size}
+                      <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-[0.85rem] text-neutral-text2">
+                        <span>
+                          {variant.color} · {variant.size}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSheet({ product, colorIdx, size: variant.size, replaceFrom: c.variantId })}
+                          className="-my-2.5 inline-flex h-10 items-center px-1 font-semibold text-neutral-text underline decoration-neutral-text2/60 underline-offset-4 hover:decoration-neutral-text"
+                          aria-label={`옵션 변경 (${product.name} ${variant.color} ${variant.size})`}
+                        >
+                          옵션 변경
+                        </button>
                       </p>
                     </div>
                     <button
@@ -174,20 +190,18 @@ function CartContent() {
                       )}
                     </p>
                   </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-2 text-[0.82rem]">
-                    <span className="inline-flex items-center gap-1 text-neutral-text2">
-                      <Truck size={14} />
-                      {etaLabel(subtotal >= FREE_SHIP_MIN)}
-                    </span>
-                    {st.key !== "normal" && st.key !== "rising" && (
-                      <Badge tone={st.tone} size="sm">
-                        {st.label}
-                      </Badge>
-                    )}
-                    {st.purchasable && st.stock < c.qty && (
-                      <span className="font-semibold text-semantic-error">재고 {st.stock}개 · 수량을 줄여주세요</span>
-                    )}
-                  </div>
+                  {((st.key !== "normal" && st.key !== "rising") || (st.purchasable && st.stock < c.qty)) && (
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-[0.82rem]">
+                      {st.key !== "normal" && st.key !== "rising" && (
+                        <Badge tone={st.tone} size="sm">
+                          {st.label}
+                        </Badge>
+                      )}
+                      {st.purchasable && st.stock < c.qty && (
+                        <span className="font-semibold text-semantic-error">재고 {st.stock}개 · 수량을 줄여주세요</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </li>
@@ -277,6 +291,8 @@ function CartContent() {
         open={!!sheet}
         onClose={() => setSheet(null)}
         initialColorIdx={sheet?.colorIdx ?? 0}
+        initialSize={sheet?.size ?? null}
+        replaceFrom={sheet?.replaceFrom}
       />
 
       {/* 휴대폰: 총액과 '주문하기'를 하단 탭 바로 위에 고정 — 아래 요약까지 스크롤하지 않아도 된다 */}
@@ -311,6 +327,45 @@ function CartContent() {
             <ArrowRight size={17} />
           </Link>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** 무료배송까지 남은 금액 — 한 번 더 담을 이유를 숫자로 보여준다 */
+function FreeShipBar({ subtotal }: { subtotal: number }) {
+  const free = subtotal >= FREE_SHIP_MIN;
+  const pct = Math.min(100, Math.round((subtotal / FREE_SHIP_MIN) * 100));
+  return (
+    <div className="rounded-cardlg border border-neutral-border bg-white px-4 py-3.5 md:px-5" data-free-ship>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <p className="flex min-w-0 items-center gap-2 text-[0.92rem]">
+          <Truck size={17} aria-hidden className={free ? "text-semantic-success" : "text-neutral-text"} />
+          {free ? (
+            <b>무료배송이 적용됐어요</b>
+          ) : (
+            <span>
+              <b className="tabular">{krw(FREE_SHIP_MIN - subtotal)}</b> 더 담으면 <b>무료배송</b>
+            </span>
+          )}
+        </p>
+        <p className="ml-auto text-[0.8rem] text-neutral-text2">{etaLabel(free)}</p>
+      </div>
+      <div
+        className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-neutral-canvas"
+        role="progressbar"
+        aria-label="무료배송까지"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+      >
+        <span
+          className={cn(
+            "block h-full rounded-full transition-[width] duration-500",
+            free ? "bg-semantic-success" : "bg-brand-black",
+          )}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );

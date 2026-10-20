@@ -84,6 +84,8 @@ function OrdersBody() {
   const [q, setQ] = useState(params.get("q") ?? "");
   const [range, setRange] = useState<"all" | "today" | "7d" | "30d">("all");
   const [openId, setOpenId] = useState<string | null>(null);
+  /** 여러 주문 한 번에 처리 — 다음 단계가 있는 주문만 고를 수 있다 */
+  const [picked, setPicked] = useState<Set<string>>(new Set());
   useEffect(() => {
     const v = params.get("q");
     if (v) setQ(v);
@@ -124,6 +126,23 @@ function OrdersBody() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orders, tab, q, range, store.orders]);
   const { limit, hasMore, more } = useMore(filtered.length, 40);
+  // 탭·검색·기간이 바뀌면 고른 것을 비운다 — 안 보이는 주문이 함께 처리되지 않게
+  useEffect(() => setPicked(new Set()), [tab, q, range]);
+  const pickedOrders = filtered.filter((o) => picked.has(o.id) && NEXT_STEP[o.status]);
+  const bulkGroups = (Object.keys(NEXT_STEP) as OrderStatus[])
+    .map((from) => ({ from, step: NEXT_STEP[from]!, list: pickedOrders.filter((o) => o.status === from) }))
+    .filter((g) => g.list.length > 0);
+  const bulk = (from: OrderStatus) => {
+    const g = bulkGroups.find((x) => x.from === from);
+    if (!g) return;
+    g.list.forEach((o) => store.updateOrderStatus(o.id, g.step.status, ROLE_NAME[role]));
+    setPicked((p) => new Set([...p].filter((id) => !g.list.some((o) => o.id === id))));
+    toast(
+      `${g.list.length}건 ${g.step.label} 처리`,
+      `고객 마이페이지 주문상태에 반영되었습니다 · 처리자 ${ROLE_NAME[role]}`,
+      "success",
+    );
+  };
   const newOrders = orders.filter((o) => isCustomerCreated(o.id));
 
   const change = (o: Order, status: OrderStatus) => {
@@ -141,13 +160,16 @@ function OrdersBody() {
       "info",
     );
 
-  const ActionButtons = ({ o, nowrap }: { o: Order; nowrap?: boolean }) => {
+  /** quiet: 표 안의 행 버튼 — 화면 전체가 파란 버튼으로 덮이지 않게 한 단계 낮춘다(상세·일괄 처리는 기본) */
+  const ActionButtons = ({ o, nowrap, quiet }: { o: Order; nowrap?: boolean; quiet?: boolean }) => {
     const next = NEXT_STEP[o.status];
     return (
       <div className={cn("flex gap-1.5", nowrap ? "flex-nowrap" : "flex-wrap")}>
         {next && (
           <Button
             size="sm"
+            variant={quiet ? "secondary" : "primary"}
+            className={quiet ? "!text-theme-primary" : undefined}
             onClick={(e) => {
               e.stopPropagation();
               change(o, next.status);
@@ -238,7 +260,7 @@ function OrdersBody() {
       ),
     },
     { key: "status", header: "상태", hideOnMobile: true, cell: (o) => <OrderStatusBadge status={o.status} /> },
-    { key: "act", header: "처리", hideOnMobile: true, cell: (o) => <ActionButtons o={o} nowrap /> },
+    { key: "act", header: "처리", hideOnMobile: true, cell: (o) => <ActionButtons o={o} nowrap quiet /> },
   ];
 
   const open = openId ? (orders.find((o) => o.id === openId) ?? null) : null;
@@ -368,6 +390,12 @@ function OrdersBody() {
           onRowClick={(o) => setOpenId(o.id)}
           dense
           mobileFooter={(o) => <ActionButtons o={o} />}
+          selection={{
+            selected: picked,
+            onChange: setPicked,
+            canSelect: (o) => !!NEXT_STEP[o.status],
+            label: (o) => `주문 ${o.id} 선택`,
+          }}
           empty={
             <EmptyState
               title="조건에 맞는 주문이 없습니다"
@@ -389,6 +417,29 @@ function OrdersBody() {
           }
         />
         <MoreButton hasMore={hasMore} onClick={more} remaining={filtered.length - limit} />
+        {pickedOrders.length > 0 && (
+          <div
+            className="sticky bottom-4 z-20 mx-auto mt-4 hidden w-fit max-w-full animate-fadeIn items-center gap-2 rounded-2xl bg-[#111827] py-2 pl-4 pr-2 text-white shadow-raised md:flex"
+            role="region"
+            aria-label="선택한 주문 일괄 처리"
+            data-bulk-bar
+          >
+            <span className="tabular whitespace-nowrap pr-1 text-[0.9rem] font-bold">{pickedOrders.length}건 선택</span>
+            <span aria-hidden className="h-5 w-px bg-white/20" />
+            {bulkGroups.map((g) => (
+              <Button key={g.from} size="sm" onClick={() => bulk(g.from)}>
+                {g.list.length}건 {g.step.label}
+              </Button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setPicked(new Set())}
+              className="inline-flex h-9 items-center rounded-lg px-3 text-[0.85rem] font-semibold text-white/75 hover:bg-white/10 hover:text-white"
+            >
+              선택 해제
+            </button>
+          </div>
+        )}
       </div>
       <NoteCard className="mt-4">
         상태 흐름: 결제대기 → 상품준비 → 출고완료 → 배송중 → 배송완료. 취소는 상품준비 전까지 가능합니다. 실제 결제·택배

@@ -380,9 +380,13 @@ button,
   padding-top: max(env(safe-area-inset-top, 0px), 1rem);
 }
 
-/* Customer surface */
+/* Customer surface — 페이지 바탕은 흰색. '옅은 칠'(입력칸·칩·진행 바 바탕·호버)은 따뜻한 옅은 회색으로 남겨
+   흰 바탕 위에서도 누를 곳·채울 곳이 보이게 한다 (12차: 흰색으로 덮어 입력칸·호버가 사라지던 문제) */
 [data-surface="customer"] {
-  --neutral-canvas: #ffffff;
+  --neutral-canvas: #f4f4f1;
+}
+[data-surface="customer"] body {
+  background: #ffffff;
 }
 
 /* AX sidebar */

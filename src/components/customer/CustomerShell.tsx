@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Search,
   Heart,
@@ -26,6 +26,7 @@ import {
 import { useApp } from "@/lib/store";
 import { BRANDS, CATEGORIES } from "@/lib/demo/seed";
 import { cn } from "@/lib/cn";
+import { SearchSuggest } from "@/components/customer/discovery/SearchSuggest";
 import { Badge } from "@/components/ui/Badge";
 import { Drawer, BottomSheet } from "@/components/ui/Overlay";
 import { DevicePreviewButton } from "@/components/system/DevicePreview";
@@ -380,29 +381,35 @@ function NotificationsButton() {
   );
 }
 
-function SearchBox({ className, autoFocus, onDone }: { className?: string; autoFocus?: boolean; onDone?: () => void }) {
+function SearchBox({
+  className,
+  autoFocus,
+  onDone,
+  inline,
+}: {
+  className?: string;
+  autoFocus?: boolean;
+  onDone?: () => void;
+  inline?: boolean;
+}) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const track = useApp((s) => s.track);
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    const t = q.trim();
-    track("search_product", { q: t });
-    router.push(t ? `/search?q=${encodeURIComponent(t)}` : "/search");
-    onDone?.();
-  };
   return (
-    <form onSubmit={submit} role="search" className={cn("relative", className)}>
-      <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-text2" />
-      <input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        autoFocus={autoFocus}
-        placeholder="상품 · 브랜드 · 스타일 검색"
-        aria-label="검색"
-        className="h-11 w-full rounded-full border border-transparent bg-neutral-canvas pl-11 pr-4 text-[0.95rem] focus:border-neutral-border focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-black/20"
-      />
-    </form>
+    <SearchSuggest
+      value={q}
+      onValueChange={setQ}
+      onSubmit={(t) => {
+        track("search_product", { q: t });
+        router.push(t ? `/search?q=${encodeURIComponent(t)}` : "/search");
+        onDone?.();
+      }}
+      onNavigate={onDone}
+      inline={inline}
+      autoFocus={autoFocus}
+      className={className}
+      inputClassName="h-11 w-full rounded-full border border-transparent bg-neutral-canvas pl-11 pr-4 text-[0.95rem] focus:border-neutral-border focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-black/20"
+    />
   );
 }
 
@@ -822,7 +829,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
       </BottomSheet>
 
       <BottomSheet open={search} onClose={() => setSearch(false)} title="검색">
-        <SearchBox autoFocus onDone={() => setSearch(false)} />
+        <SearchBox autoFocus inline onDone={() => setSearch(false)} />
         <p className="mb-2 mt-4 text-[0.8rem] font-bold text-neutral-text2">추천 검색어</p>
         <div className="flex flex-wrap gap-2">
           {["오버핏 셔츠", "와이드 데님", "울 코트", "첼시 부츠", "크롭 가디건"].map((k) => (

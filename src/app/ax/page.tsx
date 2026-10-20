@@ -216,10 +216,11 @@ function Dashboard() {
   };
 
   /* ------------------------------ Actions / evidence ------------------------------ */
-  const todayActions = useMemo(
-    () => sortByUrgency(visibleActions(role, app.actions).filter((a) => OPEN_STATUSES.has(a.status))).slice(0, 4),
+  const openVisible = useMemo(
+    () => visibleActions(role, app.actions).filter((a) => OPEN_STATUSES.has(a.status)),
     [app.actions, role],
   );
+  const todayActions = useMemo(() => sortByUrgency(openVisible).slice(0, 4), [openVisible]);
   const evidence = useMemo(() => [...app.evidence].sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, 3), [app.evidence]);
 
   /* ------------------------------ Chart (DAILY + store orders) ------------------------------ */
@@ -465,8 +466,8 @@ function Dashboard() {
         </>
       )}
 
-      {/* AI 브리핑 + 오늘의 Action */}
-      <div className="grid gap-5 lg:grid-cols-5">
+      {/* AI 브리핑 + 오늘의 Action — 높이를 맞추려 늘이지 않는다(짧은 쪽 카드에 빈 흰 공간이 생기지 않게) */}
+      <div className="grid items-start gap-5 lg:grid-cols-5">
         <SectionCard
           tour="ai-briefing"
           className="lg:col-span-3"
@@ -530,7 +531,7 @@ function Dashboard() {
         <SectionCard
           className="lg:col-span-2"
           title="오늘의 과제"
-          desc="긴급도 순 · 미처리 4건"
+          desc={`긴급도 순 · 미처리 ${num(openVisible.length)}건 중 ${num(todayActions.length)}건`}
           right={<AxLink href="/ax/actions">전체</AxLink>}
         >
           {todayActions.length === 0 ? (

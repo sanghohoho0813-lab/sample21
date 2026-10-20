@@ -117,6 +117,30 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
     await m.waitForTimeout(300);
     must(/장바구니가 비어 있습니다/.test(await text(m)), "빈 장바구니 안내 없음");
   });
+  await step("장바구니 — 무료배송 진행 바 · 옵션 변경(수량 유지)", async () => {
+    await go(m, "/products/p-nove-oxford");
+    await m.locator("[data-buy-bar]").getByRole("button", { name: "장바구니" }).click();
+    await m.waitForTimeout(300);
+    const dlg = m.getByRole("dialog");
+    await dlg.getByRole("button", { name: /^사이즈 L/ }).click();
+    await dlg.getByRole("button", { name: /장바구니 담기/ }).click();
+    await m.waitForTimeout(300);
+    await go(m, "/cart");
+    must(await m.locator("[data-free-ship]").isVisible(), "무료배송 진행 바 없음");
+    await m.getByRole("button", { name: "수량 늘리기" }).first().click();
+    await m
+      .getByRole("button", { name: /^옵션 변경/ })
+      .first()
+      .click();
+    const d2 = m.getByRole("dialog");
+    await d2.getByRole("button", { name: /^사이즈 XL/ }).click();
+    await d2.getByRole("button", { name: "이 옵션으로 변경" }).click();
+    await m.waitForTimeout(300);
+    const c = (await store(m)).cart;
+    must(c.length === 1 && /-XL$/.test(c[0].variantId) && c[0].qty === 2, `옵션 변경 결과 ${JSON.stringify(c)}`);
+    await m.getByRole("button", { name: "삭제" }).first().click();
+    await m.waitForTimeout(300);
+  });
   await step("장바구니 → 주문서 — 하단 고정 결제 바(탭 위) · 주문서에서는 탭 숨김", async () => {
     await go(m, "/products/p-nove-oxford");
     await m.locator("[data-buy-bar]").getByRole("button", { name: "구매하기" }).click();
@@ -138,7 +162,9 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
     const cb = await m.locator("[data-checkout-bar]").boundingBox();
     must(cb && cb.y + cb.height >= 844 - 2, "주문서 결제 버튼이 화면 맨 아래가 아님");
   });
-  await step("주문서 — 오류 표시 후 고치면 즉시 해제 · 정상 주문", async () => {
+  await step("주문서 — 저장된 배송 정보 카드 → 변경 · 오류 표시 후 고치면 즉시 해제 · 정상 주문", async () => {
+    must(await m.locator("[data-saved-address]").isVisible(), "저장된 배송 정보 카드가 없음");
+    await m.getByRole("button", { name: "배송 정보 변경" }).click();
     await m.locator('input[name="name"]').fill("");
     await m.locator('input[name="phone"]').fill("123");
     await m.getByRole("button", { name: /데모 주문 완료/ }).click();
@@ -394,6 +420,23 @@ const store = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("morfit-de
     await d.getByPlaceholder(/주문번호 또는 고객명/).fill("없는주문zz");
     await d.waitForTimeout(400);
     must(/없습니다|0건/.test(await text(d)), "빈 결과 안내 없음");
+  });
+  await step("주문 — 여러 건 선택 → 일괄 처리 · 고른 것만 다음 단계로", async () => {
+    await go(d, "/ax/orders");
+    const tabCount = async () =>
+      Number((await d.getByRole("tab", { name: /^신규주문/ }).innerText()).replace(/[^0-9]/g, ""));
+    await d.getByRole("tab", { name: /^신규주문/ }).click();
+    await d.waitForTimeout(300);
+    const before = await tabCount();
+    await d.getByRole("checkbox", { name: "보이는 행 모두 선택" }).check();
+    const bar = d.locator("[data-bulk-bar]");
+    must(await bar.isVisible(), "일괄 처리 바 없음");
+    must(new RegExp(`${before}건 선택`).test(await bar.innerText()), "선택 건수 표시가 다름");
+    await bar.getByRole("button", { name: /건 상품준비$/ }).click();
+    await d.waitForTimeout(400);
+    const after = await tabCount();
+    must(before > 0 && after === 0, `신규주문 ${before} → ${after}`);
+    must((await bar.count()) === 0, "처리 후에도 일괄 처리 바가 남음");
   });
   await step("재고 — 상태 필터 · 0건 상태는 숨김", async () => {
     await go(d, "/ax/inventory");

@@ -212,6 +212,8 @@ export interface DemoReview {
   color: string;
   rating: number;
   text: string;
+  /** 리뷰어가 남긴 사이즈 평가 — 가방·잡화는 없음 */
+  fit: SizingTendency | null;
   at: string;
   helpful: number;
 }
@@ -230,26 +232,40 @@ const REVIEWER = [
   "오*원",
 ];
 const BODY = ["보통 체형", "마른 체형", "어깨 넓은 체형", "골반 있는 체형", "상체 발달", "하체 발달"];
-const TEXT_BY_SIZING: Record<SizingTendency, string[]> = {
+/** 후기 문장과 그 후기의 사이즈 평가를 함께 둔다 — 문장과 '작아요/딱 맞아요/커요'가 어긋나지 않게 */
+type ReviewText = [text: string, fit: SizingTendency];
+const TEXT_BY_SIZING: Record<SizingTendency, ReviewText[]> = {
   small: [
-    "평소 사이즈로 샀더니 조금 타이트해요. 한 치수 크게 가는 게 맞는 것 같아요.",
-    "안내대로 한 치수 크게 골랐더니 딱 맞아요. 원단 질감이 좋습니다.",
-    "작게 나온다는 후기 보고 업사이즈 했는데 정답이었어요.",
-    "허리가 살짝 조이는 느낌이라 다음엔 한 치수 크게 살 예정입니다.",
+    ["평소 사이즈로 샀더니 조금 타이트해요. 한 치수 크게 가는 게 맞는 것 같아요.", "small"],
+    ["안내대로 한 치수 크게 골랐더니 딱 맞아요. 원단 질감이 좋습니다.", "true"],
+    ["작게 나온다는 후기 보고 업사이즈 했는데 정답이었어요.", "true"],
+    ["허리가 살짝 조이는 느낌이라 다음엔 한 치수 크게 살 예정입니다.", "small"],
   ],
   true: [
-    "정사이즈라 평소대로 샀는데 잘 맞아요. 사진이랑 색감도 비슷합니다.",
-    "핏 추천 그대로 골랐더니 편하게 맞습니다. 재구매 의사 있어요.",
-    "실측 보고 골랐는데 총장·어깨 다 표기랑 같았어요.",
-    "고민 없이 평소 사이즈 추천드려요. 마감이 깔끔합니다.",
+    ["정사이즈라 평소대로 샀는데 잘 맞아요. 사진이랑 색감도 비슷합니다.", "true"],
+    ["핏 추천 그대로 골랐더니 편하게 맞습니다. 재구매 의사 있어요.", "true"],
+    ["실측 보고 골랐는데 총장·어깨 다 표기랑 같았어요.", "true"],
+    ["고민 없이 평소 사이즈 추천드려요. 마감이 깔끔합니다.", "true"],
   ],
   large: [
-    "크게 나와서 한 치수 작게 샀는데 세미 오버핏으로 예쁘게 떨어져요.",
-    "평소 사이즈로 사면 확실히 넉넉합니다. 오버핏 좋아하면 그대로 가세요.",
-    "안내대로 다운사이즈 했더니 딱 원하던 실루엣이에요.",
-    "품이 넉넉해서 레이어드하기 좋아요. 기장은 표기와 같았습니다.",
+    ["크게 나와서 한 치수 작게 샀는데 세미 오버핏으로 예쁘게 떨어져요.", "true"],
+    ["평소 사이즈로 사면 확실히 넉넉합니다. 오버핏 좋아하면 그대로 가세요.", "large"],
+    ["안내대로 다운사이즈 했더니 딱 원하던 실루엣이에요.", "true"],
+    ["품이 넉넉해서 레이어드하기 좋아요. 기장은 표기와 같았습니다.", "large"],
   ],
 };
+const SHOE_TEXT: ReviewText[] = [
+  ["발볼이 넓은 편인데 5mm 크게 신으니 편해요.", "small"],
+  ["평소 신는 사이즈 그대로 잘 맞습니다.", "true"],
+  ["가볍고 쿠션감이 좋아요. 정사이즈 추천.", "true"],
+  ["처음엔 조금 타이트했는데 며칠 신으니 길들여졌어요.", "small"],
+];
+const GOODS_TEXT = [
+  "사진보다 실물이 더 고급스러워요.",
+  "크기가 딱 실용적이에요. 매일 쓰고 있습니다.",
+  "마감이 깔끔하고 색상도 사진과 같아요.",
+  "선물용으로 샀는데 반응이 좋았어요.",
+];
 export function demoReviews(p: Product): DemoReview[] {
   const r = mulberry32(hashStr(p.id + ":reviews"));
   const n = randInt(r, 4, 6);
@@ -259,21 +275,10 @@ export function demoReviews(p: Product): DemoReview[] {
     const height = women ? randInt(r, 155, 172) : p.gender === "men" ? randInt(r, 168, 185) : randInt(r, 158, 183);
     const weight = Math.round(height - randInt(r, 100, 118));
     const rating = r() < 0.72 ? 5 : r() < 0.8 ? 4 : 3;
-    const text = isShoe
-      ? pick(r, [
-          "발볼이 넓은 편인데 5mm 크게 신으니 편해요.",
-          "평소 신는 사이즈 그대로 잘 맞습니다.",
-          "가볍고 쿠션감이 좋아요. 정사이즈 추천.",
-          "처음엔 조금 타이트했는데 며칠 신으니 길들여졌어요.",
-        ])
-      : p.categoryId === "bag" || p.categoryId === "acc"
-        ? pick(r, [
-            "사진보다 실물이 더 고급스러워요.",
-            "크기가 딱 실용적이에요. 매일 쓰고 있습니다.",
-            "마감이 깔끔하고 색상도 사진과 같아요.",
-            "선물용으로 샀는데 반응이 좋았어요.",
-          ])
-        : pick(r, TEXT_BY_SIZING[p.sizing]);
+    const goods = p.categoryId === "bag" || p.categoryId === "acc";
+    const [text, fit]: [string, SizingTendency | null] = goods
+      ? [pick(r, GOODS_TEXT), null]
+      : pick(r, isShoe ? SHOE_TEXT : TEXT_BY_SIZING[p.sizing]);
     return {
       id: `${p.id}-rv-${i}`,
       name: pick(r, REVIEWER),
@@ -284,6 +289,7 @@ export function demoReviews(p: Product): DemoReview[] {
       color: pick(r, p.colors),
       rating,
       text,
+      fit,
       at: isoDaysAgo(randInt(r, 2, 60), randInt(r, 9, 22)),
       helpful: randInt(r, 0, 38),
     };

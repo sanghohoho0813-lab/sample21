@@ -339,6 +339,7 @@ export type EventName =
   | "remove_wishlist"
   | "subscribe_restock"
   | "add_to_cart"
+  | "change_cart_option"
   | "begin_checkout"
   | "complete_demo_order"
   | "view_order"

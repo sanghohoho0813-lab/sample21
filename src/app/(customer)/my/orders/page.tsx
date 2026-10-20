@@ -1,15 +1,18 @@
 "use client";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useApp } from "@/lib/store";
 import { Hydrated } from "@/components/system/Hydrated";
 import { Container, PageTitle } from "@/components/customer/Section";
 import { SkeletonCard } from "@/components/ui/States";
 import { OrderList } from "@/components/customer/conversion/MyBits";
-import { myOrders } from "@/components/customer/conversion/shared";
+import { ORDER_FILTERS, myOrders } from "@/components/customer/conversion/shared";
 
 function OrdersContent() {
   const store = useApp();
+  const raw = useSearchParams().get("status");
   const orders = myOrders(store);
-  return <OrderList orders={orders} />;
+  return <OrderList orders={orders} initialFilter={ORDER_FILTERS.find((f) => f.key === raw)?.key ?? "all"} />;
 }
 
 export default function MyOrdersPage() {
@@ -25,7 +28,9 @@ export default function MyOrdersPage() {
           </div>
         }
       >
-        <OrdersContent />
+        <Suspense fallback={<SkeletonCard lines={3} />}>
+          <OrdersContent />
+        </Suspense>
       </Hydrated>
     </Container>
   );

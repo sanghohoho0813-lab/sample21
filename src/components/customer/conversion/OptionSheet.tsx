@@ -14,7 +14,8 @@ import { toast } from "@/components/ui/Toast";
 import { OptionPicker } from "./OptionPicker";
 import { findVariant, stockState } from "./shared";
 
-/** 찜·장바구니에서 옵션(색상·사이즈)을 고른 뒤 장바구니에 담는 시트 */
+/** 찜·장바구니에서 옵션(색상·사이즈)을 고른 뒤 장바구니에 담는 시트.
+    replaceFrom을 주면 '옵션 변경' — 장바구니의 그 옵션을 새 옵션으로 바꾼다(수량 유지). */
 export function OptionSheet({
   product,
   open,
@@ -22,6 +23,7 @@ export function OptionSheet({
   initialColorIdx = 0,
   initialSize = null,
   onAdded,
+  replaceFrom,
 }: {
   product: Product | null;
   open: boolean;
@@ -29,6 +31,7 @@ export function OptionSheet({
   initialColorIdx?: number;
   initialSize?: string | null;
   onAdded?: (variantId: string) => void;
+  replaceFrom?: string;
 }) {
   const store = useApp();
   const router = useRouter();
@@ -56,6 +59,14 @@ export function OptionSheet({
     onAdded?.(variant.id);
     onClose();
   };
+  const replace = () => {
+    if (!variant || !replaceFrom) return;
+    if (variant.id !== replaceFrom) {
+      store.replaceCartItem(replaceFrom, variant.id);
+      toast("옵션을 변경했습니다", `${variant.color} · ${variant.size}`);
+    }
+    onClose();
+  };
   const restock = () => {
     if (!variant) return;
     store.subscribeRestock(variant.id);
@@ -66,7 +77,7 @@ export function OptionSheet({
     <Responsive
       open={open}
       onClose={onClose}
-      title="옵션 선택"
+      title={replaceFrom ? "옵션 변경" : "옵션 선택"}
       size="md"
       footer={
         <div className="flex gap-2">
@@ -89,6 +100,14 @@ export function OptionSheet({
               icon={<Bell size={16} />}
             >
               {subscribed ? "재입고 알림 신청 완료" : "재입고 알림 신청"}
+            </Button>
+          ) : replaceFrom ? (
+            <Button variant="brand" className="flex-[2]" onClick={replace} disabled={!variant}>
+              {!variant
+                ? "색상과 사이즈를 선택해주세요"
+                : variant.id === replaceFrom
+                  ? "지금 옵션 그대로"
+                  : "이 옵션으로 변경"}
             </Button>
           ) : (
             <Button variant="brand" className="flex-[2]" onClick={add} icon={<ShoppingBag size={16} />}>

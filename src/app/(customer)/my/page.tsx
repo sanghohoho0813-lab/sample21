@@ -20,8 +20,8 @@ import {
   RestockList,
   TabLink,
 } from "@/components/customer/conversion/MyBits";
-import { OrderCard } from "@/components/customer/conversion/OrderBits";
-import { myOrders } from "@/components/customer/conversion/shared";
+import { OrderMiniList, OrderStatusStrip } from "@/components/customer/conversion/OrderBits";
+import { ORDER_FILTERS, myOrders } from "@/components/customer/conversion/shared";
 
 type Tab = "overview" | "orders" | "recommend";
 const TABS: { key: Tab; label: string }[] = [
@@ -87,6 +87,8 @@ function MyContent() {
   const params = useSearchParams();
   const raw = params.get("tab");
   const tab: Tab = raw === "orders" || raw === "recommend" ? raw : "overview";
+  const rawStatus = params.get("status");
+  const status = ORDER_FILTERS.find((f) => f.key === rawStatus)?.key ?? "all";
   const store = useApp();
   const orders = myOrders(store);
   return (
@@ -105,10 +107,13 @@ function MyContent() {
 
       {tab === "overview" && (
         <div className="space-y-8">
-          <ProfileCard orders={orders} />
+          <div className="space-y-4">
+            <ProfileCard orders={orders} />
+            <OrderStatusStrip orders={orders} />
+          </div>
           <div className="grid gap-6 lg:grid-cols-2">
             <section className="min-w-0">
-              <SectionHead title="최근 주문" more="/my/orders" moreLabel="전체 주문" />
+              <SectionHead title="최근 주문" more="/my?tab=orders" moreLabel="전체 주문" />
               {orders.length === 0 ? (
                 <div className="rounded-cardlg border border-dashed border-neutral-border bg-white p-6 text-center text-[0.9rem] text-neutral-text2">
                   아직 주문이 없습니다.{" "}
@@ -117,13 +122,7 @@ function MyContent() {
                   </Link>
                 </div>
               ) : (
-                <ul className="space-y-3">
-                  {orders.slice(0, 3).map((o) => (
-                    <li key={o.id}>
-                      <OrderCard order={o} />
-                    </li>
-                  ))}
-                </ul>
+                <OrderMiniList orders={orders.slice(0, 3)} />
               )}
             </section>
             <section className="min-w-0">
@@ -143,7 +142,7 @@ function MyContent() {
               </div>
             </section>
           </div>
-          <section>
+          <section id="recent" className="scroll-mt-24">
             <SectionHead title="최근 본 상품" />
             <RecentlyViewed />
           </section>
@@ -178,7 +177,7 @@ function MyContent() {
             more="/my/orders"
             moreLabel="주문 페이지"
           />
-          <OrderList orders={orders} />
+          <OrderList orders={orders} initialFilter={status} />
         </div>
       )}
 
